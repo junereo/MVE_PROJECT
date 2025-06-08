@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "outDir": "dist",
+    "rootDir": "../../", // 🔥 루트 기준
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "src",                          // API 소스
+    "prisma",                       // Prisma 스키마
+    "../../packages/utils",        // 공통 유틸
+    "../../packages/types"         // 공통 타입
+  ]
+}
