@@ -5,7 +5,7 @@
   "main": "index.js",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "apps/tuner-api",
     "packages/*"
   ],
   "scripts": {
