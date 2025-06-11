@@ -1,3 +1,30 @@
-node_modules
-# Keep environment variables out of version control
+# Node
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+.npmrc
+.pnpm-store/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Build
+dist/
+.next/
+coverage/
+# Env
 .env
+.env.*
+
+# VSCode & OS
+.vscode/
+.DS_Store
+.idea/
+*.swp
+*.swo
+*.sublime*
+
+# TS
+*.tsbuildinfo
