@@ -1,27 +1,115 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  min-height: 48px;
+  max-width: 720px;
+  width: 100%;
+  z-index: 3;
+  background: white;
+  color: black;
+  border: 1px solid red;
+}
+.header a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: black;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+}
+.logo {
+  font-size: 32px;
+  font-weight: 700;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+.footer {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  min-height: 64px;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  background: white;
+  color: black;
+  border: 1px solid red;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.sidebar {
+  display: flex;
+  position: fixed;
+  justify-content: space-around;
+  align-items: center;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 64px;
+  max-width: 720px;
+  width: 100%;
+  z-index: 1;
+  background: white;
+  color: black;
+  border: 1px solid red;
+}
+.sidebar a {
+  font-size: 24px;
+  text-decoration: none;
+  color: black;
+}
+
+.content {
+  background: #303030;
+  color: white;
+  min-height: 1000px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 720px;
+  margin: 0 auto;
+  padding-top: 100px;
+}
+
+.login-container {
+  width: 60%;
+  margin: 0 auto;
+  padding-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.login-container button {
+  width: 400px;
+  height: 40px;
+}
+.login-form {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.login-form input {
+  width: 400px;
+  height: 40px;
+}
+.kakao {
+  width: 400px;
+  height: 40px;
+  background-color: yellow;
+}
+.login-container a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: white;
 }
