@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="footer">
+    <footer className="w-full max-w-[485px] mx-auto py-6 text-black border border-red-500 text-sm md:text-base flex justify-between">
       <div>
         <div>
           <p>02-1234-5678</p>

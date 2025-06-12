@@ -7,7 +7,7 @@ export default function Signup() {
       <div className="login-container">
         <div>
           <div className="login-form">
-            <input type="text" placeholder="이메일을 입력해주세요" />
+            <input type="email" placeholder="이메일을 입력해주세요" />
             <input type="password" placeholder="비밀번호를 입력해주세요" />
             <input type="text" placeholder="닉네임을 입력해주세요" />
             <input

@@ -2,6 +2,7 @@ import "./globals.css";
 import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
 import Sidebar from "./components/layouts/sidebar";
+import Wrapper from "./components/layouts/Wrapper";
 
 export default function RootLayout({
   children,
@@ -12,7 +13,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Header />
-        {children}
+        <Wrapper>{children}</Wrapper>
         <Sidebar />
         <Footer />
       </body>
