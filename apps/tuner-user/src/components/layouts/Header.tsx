@@ -10,7 +10,7 @@ export default function Header() {
       </div>
       <nav className="flex gap-4 items-center">
         <Link href="/search">Search</Link>
-        <Link href="/login">Login</Link>
+        <Link href="/auth">Login</Link>
         <div className="block">☰</div>
       </nav>
     </header>
