@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -29,19 +23,19 @@ model User {
   phone_number    String
   password        String
   nickname        String
-  wallet_address  String
-  simple_password String
+  wallet_address  String?
+  simple_password String?
   level           UserLevel
   badge_issued_at DateTime?
   balance         Int       @default(0)
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
 
-  oauths User_Oauth[] // Relation (1:N)
+  oauths User_OAuth[] // Relation (1:N)
   // surveys Surveys[] // 내가 만든설문 연결
 }
 
-model User_Oauth {
+model User_OAuth {
   id            Int      @id @default(autoincrement())
   provider      String
   provider_id   String   @unique
