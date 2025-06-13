@@ -8,7 +8,8 @@ import {
   validateAllFields,
   validateField,
 } from "@/features/auth/utils/validate";
-import { mockSignup } from "@/features/auth/services/api";
+import { signup } from "@/features/auth/services/api";
+// import { mockSignup } from "@/features/auth/services/api"; 테스트용
 
 const initialFormData: SignupFormData = {
   email: "",
@@ -40,6 +41,17 @@ export default function SignupForm() {
       return;
     }
 
+    // !-수정 필요함-!
+    try {
+      const res = await signup(formData);
+      alert("회원가입 성공");
+    } catch (err) {
+      alert("회원가입 실패");
+    }
+
+    /*
+      테스트용
+
     try {
       const res = await mockSignup(formData);
       if (res.status === 201) {
@@ -49,6 +61,7 @@ export default function SignupForm() {
     } catch (err) {
       alert("회원가입 실패");
     }
+    */
   };
 
   return (
