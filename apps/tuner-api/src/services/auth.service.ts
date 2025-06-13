@@ -1,7 +1,8 @@
-import { PrismaClient, UserLevel } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { RegisterList, LoginResponse } from "../types/auth.types";
 import jwt from 'jsonwebtoken';
-import { password, verifyPassword } from '../utils/auth.utils';
+import { hashPassword, verifyPassword } from '../utils/auth.utils';
+
 
 const prisma = new PrismaClient();
 
@@ -9,7 +10,7 @@ export const register = async (data: RegisterList) => {
     const isUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (isUser) throw new Error("이미 가입된 이메일입니다.");
 
-    const hashedPassword = await password(data.password);
+    const hashedPassword = await hashPassword(data.password);
 
     const newUser = await prisma.user.create({
         data: {
@@ -17,13 +18,14 @@ export const register = async (data: RegisterList) => {
             password: hashedPassword,
             nickname: data.nickname,
             phone_number: data.phone_number,
-            level: UserLevel.Regular,
+
         }
     });
     return {
         id: newUser.id,
         email: newUser.email,
         nickname: newUser.nickname,
+        level: newUser.level
     };
 };
 
@@ -48,7 +50,7 @@ export const login = async (email: string, password: string): Promise<LoginRespo
             userId: user.id,
             nickname: user.nickname
         },
-        jwtSecret,
+        jwtSecret!,
         { expiresIn: '1d' }
     );
 
@@ -56,7 +58,7 @@ export const login = async (email: string, password: string): Promise<LoginRespo
         token,
         user: {
             id: user.id,
-            nickname: user.nickname
+            nickname: user.nickname,
         }
     };
 }; 
