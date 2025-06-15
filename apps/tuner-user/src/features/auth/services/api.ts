@@ -14,6 +14,16 @@ export const login = async (data: LoginFormData) => {
   return response.data;
 };
 
+// 사용자 정보 가져옴
+export const getMe = async (token: string) => {
+  const response = await axios.get("/auth/me", {
+    headers: {
+      Authorization: `Bearer ${token}`, // JWT 방식
+    },
+  });
+  return response.data.user; // 사용자 정보 / nickname, email 등
+};
+
 /*
   테스트용
 
