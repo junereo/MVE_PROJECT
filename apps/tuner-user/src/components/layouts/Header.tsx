@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useAuthStore } from "@/features/auth/store/authStore";
+import LogoutButton from "@/app/auth/components/LogoutButton";
 
 export default function Header() {
   const { user } = useAuthStore();
@@ -13,7 +14,7 @@ export default function Header() {
       </div>
       <nav className="flex gap-4 items-center">
         <Link href="/search">Search</Link>
-        {user ? <p>{user.nickname}님</p> : <Link href="/auth">Login</Link>}
+        {user ? <LogoutButton /> : <Link href="/auth">Login</Link>}
         <div className="block">☰</div>
       </nav>
     </header>
