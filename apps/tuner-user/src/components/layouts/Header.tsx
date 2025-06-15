@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import LogoutButton from "@/app/auth/components/LogoutButton";

@@ -1,5 +1,5 @@
 import LoginForm from "./components/LoginForm";
-import Button from "@/components/ui/Button";
+import KakaoLoginButton from "./components/KakaoLoginButton";
 
 export default function auth() {
   return (
@@ -10,7 +10,7 @@ export default function auth() {
       </div>
       <div className="max-w-[350px] w-full mx-auto mt-10 mb-10">
         <LoginForm />
-        <Button color="yellow">카카오 로그인</Button>
+        <KakaoLoginButton />
       </div>
     </div>
   );

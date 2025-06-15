@@ -14,6 +14,12 @@ export const login = async (data: LoginFormData) => {
   return response.data;
 };
 
+// 카카오 로그인
+export const socialLogin = async (provider: "kakao", code: string) => {
+  const response = await axios.post(`/auth/${provider}/login`, { code });
+  return response.data; // { token, user }
+};
+
 // 사용자 정보 가져옴
 export const getMe = async (token: string) => {
   const response = await axios.get("/auth/me", {
