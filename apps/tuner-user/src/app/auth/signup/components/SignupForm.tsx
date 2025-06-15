@@ -5,11 +5,11 @@ import Input from "@/components/ui/input";
 import { useState } from "react";
 import { SignupFormData, SignupFormErrors } from "@/features/auth/types";
 import {
-  validateAllFields,
-  validateField,
-} from "@/features/auth/utils/validate";
+  allSignupFields,
+  validateSignupField,
+} from "@/features/auth/utils/validateSignup";
 import { signup } from "@/features/auth/services/api";
-// import { mockSignup } from "@/features/auth/services/api"; 테스트용
+// import { mockSignup } from "@/features/auth/services/api"; // 테스트용
 
 const initialFormData: SignupFormData = {
   email: "",
@@ -27,13 +27,17 @@ export default function SignupForm() {
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
     setFormData(updated);
-    const error = validateField(name as keyof SignupFormData, value, updated);
+    const error = validateSignupField(
+      name as keyof SignupFormData,
+      value,
+      updated
+    );
     setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newErrors = validateAllFields(formData);
+    const newErrors = allSignupFields(formData);
 
     // 에러가 있는 경우 에러 상태 업데이트
     if (Object.keys(newErrors).length > 0) {
@@ -61,6 +65,8 @@ export default function SignupForm() {
     } catch (err) {
       alert("회원가입 실패");
     }
+
+    {email: 'choa323@naver.com', password: 'skdi3487', confirmPassword: 'skdi3487', nickname: '조상', phoneNumber: '01012344567'}
     */
   };
 

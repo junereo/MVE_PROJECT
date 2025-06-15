@@ -1,7 +1,7 @@
 import { SignupFormData, SignupFormErrors } from "../types";
 
-// 입력값 유효성 검사
-export const validateField = (
+// 회원가입 입력값 유효성 검사
+export const validateSignupField = (
   field: keyof SignupFormData,
   value: string,
   formData: SignupFormData
@@ -33,14 +33,12 @@ export const validateField = (
 };
 
 // SignupFormData 각 필드별 유효성 검사를 수행하고 에러 메시지가 있는 필드만 errors 객체에 담아 반환함
-export const validateAllFields = (
-  formData: SignupFormData
-): SignupFormErrors => {
+export const allSignupFields = (formData: SignupFormData): SignupFormErrors => {
   const errors: SignupFormErrors = {}; // 에러 메세지 담을 빈 객체 생성
 
   // 'email' | 'password'... 순서대로 각 필드에 대해 유효성 검사 수행
   (Object.keys(formData) as (keyof SignupFormData)[]).forEach((field) => {
-    const error = validateField(field, formData[field], formData); // 각 필드에 대해 유효성 검사 수행
+    const error = validateSignupField(field, formData[field], formData); // 각 필드에 대해 유효성 검사 수행
     if (error) errors[field] = error; // 에러 있는 경우 errors 객체에 추가
   });
   return errors;
