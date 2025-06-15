@@ -47,10 +47,16 @@ export default function SignupForm() {
 
     // !-수정 필요함-!
     try {
-      const res = await signup(formData);
-      alert("회원가입 성공");
-    } catch (err) {
-      alert("회원가입 실패");
+      const res = await signup(formData); // 백엔드에 요청
+      if (res.token) {
+        alert("회원가입 성공");
+      }
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        alert(err.response.data.message);
+      } else {
+        alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+      }
     }
 
     /*

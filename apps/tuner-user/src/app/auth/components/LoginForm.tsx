@@ -9,7 +9,8 @@ import {
   validateLoginField,
 } from "@/features/auth/utils/validateLogin";
 import Link from "next/link";
-import { mockLogin } from "@/features/auth/services/api"; // 테스트용
+import { login } from "@/features/auth/services/api";
+// import { mockLogin } from "@/features/auth/services/api"; // 테스트용
 
 const initialFormData: LoginFormData = {
   email: "",
@@ -44,11 +45,27 @@ export default function LoginForm() {
 
     // !-수정 필요함-!
     try {
-      const res = await mockLogin(formData);
-      alert("로그인 성공");
-    } catch (err) {
-      alert("로그인 실패");
+      const res = await login(formData); // 백엔드에 요청
+      if (res.token) {
+        localStorage.setItem("token", res.token); // 토큰 저장
+        alert("로그인 성공");
+      }
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        alert(err.response.data.message);
+      } else {
+        alert("로그인에 실패했습니다. 다시 시도해주세요.");
+      }
     }
+    /*
+        테스트
+        try {
+          const res = await mockLogin(formData);
+          alert("로그인 성공");
+        } catch (err) {
+          alert("로그인 실패");
+        }
+    */
   };
 
   return (
