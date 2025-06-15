@@ -9,6 +9,8 @@ import {
   validateLoginField,
 } from "@/features/auth/utils/validateLogin";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/features/auth/store/authStore";
 import { login } from "@/features/auth/services/api";
 // import { mockLogin } from "@/features/auth/services/api"; // 테스트용
 
@@ -20,6 +22,8 @@ const initialFormData: LoginFormData = {
 export default function LoginForm() {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<LoginFormErrors>({});
+  const { setToken, setUser } = useAuthStore();
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,9 +50,11 @@ export default function LoginForm() {
     // !-수정 필요함-!
     try {
       const res = await login(formData); // 백엔드에 요청
-      if (res.token) {
+      if (res.token && res.user) {
+        setToken(res.token); // 토큰 상태 저장
+        setUser(res.user); // 사용자 정보 저장 (email, nickname)
         localStorage.setItem("token", res.token); // 토큰 저장
-        alert("로그인 성공");
+        router.push("/"); // 메인으로 이동
       }
     } catch (err: any) {
       if (err.response?.data?.message) {
@@ -57,6 +63,7 @@ export default function LoginForm() {
         alert("로그인에 실패했습니다. 다시 시도해주세요.");
       }
     }
+
     /*
         테스트
         try {

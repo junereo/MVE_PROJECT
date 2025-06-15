@@ -13,6 +13,7 @@ export const login = async (data: LoginFormData) => {
   const response = await axios.post("/auth/login", data);
   return response.data;
 };
+
 /*
   테스트용
 
