@@ -1,3 +1,4 @@
+import Navigate from './components/layouts/navigate'
 import SessionChecker from './components/SessionChecRer'
 import './globals.css'
 import Providers from './provider'
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body>
         <Providers>
+          <Navigate />
           <SessionChecker />
           {children}
         </Providers>

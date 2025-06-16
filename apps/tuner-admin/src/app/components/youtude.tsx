@@ -34,7 +34,11 @@ export default function YoutubeSearch() {
 
       {videos.map((video) => (
         <div key={video.videoId} className="mb-6">
-          <img src={video.thumbnail} alt={video.title} className="rounded w-full" />
+          <img
+            src={video.thumbnail}
+            alt={video.title}
+            className="rounded w-full"
+          />
           <a
             href={`https://www.youtube.com/watch?v=${video.videoId}`}
             target="_blank"
