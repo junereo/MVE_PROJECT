@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,7 +7,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserLevel {
+  Regular
+  Expert
+}
+
+enum AdminRole {
+  admin
+  superadmin
+}
+
 model User {
-  id    String @id @default(cuid())
-  email String @unique
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  phone_number    String
+  password        String
+  nickname        String
+  wallet_address  String?
+  simple_password String?
+  level           UserLevel @default(Regular)
+  badge_issued_at DateTime?
+  balance         Int       @default(0)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  oauths User_OAuth[] // Relation (1:N)
+  // surveys Surveys[] // 내가 만든설문 연결
+}
+
+model User_OAuth {
+  id            Int      @id @default(autoincrement())
+  provider      String
+  provider_id   String   @unique
+  email         String
+  profile_image String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  // Relation to User
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Admin {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  password   String
+  name       String
+  role       AdminRole
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  // Relation to survey
+  // Relation to rewards 
+  // Relation to sbt_issuances
+  // Relation to withdrawal_requests
 }
