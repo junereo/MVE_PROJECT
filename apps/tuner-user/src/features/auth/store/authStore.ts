@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 interface User {
-  email: string;
+  id: string;
   nickname: string;
 }
 
