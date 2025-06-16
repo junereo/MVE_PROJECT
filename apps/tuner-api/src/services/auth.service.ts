@@ -3,7 +3,7 @@ import type { Request, CookieOptions } from 'express';
 import { RegisterList, LoginResponse } from "../types/auth.types";
 import jwt from 'jsonwebtoken';
 import { hashPassword, verifyPassword } from '../utils/auth.utils';
-import { signToken, verifyToken } from '../utils/jwt';
+import { signToken } from '../utils/jwt';
 import axios from 'axios';
 
 const prisma = new PrismaClient();

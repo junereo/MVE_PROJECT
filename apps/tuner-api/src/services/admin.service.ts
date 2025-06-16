@@ -1,19 +1,42 @@
 import { PrismaClient } from '@prisma/client';
-import { AdminRole } from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import { verifyPassword } from '../utils/auth.utils';
+
+
 
 const prisma = new PrismaClient();
+const jwtSecret = process.env.JWT_SECRET!;
 
-export const createAdmin = async () => {
-    const newaAdmin = await prisma.admin.create({
-        data: {
-            email: "test@naver.com",
-            password: "test1234",
-            name: "테스트관리자",
-            role: AdminRole.superadmin
+export const login = async (email: string, password: string) => {
+    const admin = await prisma.admin.findUnique({ where: { email } });
+
+    if (!admin) {
+        throw new Error("존재하지 않는 관리자입니다.");
+    }
+
+    const isValid = await verifyPassword(password, admin.password);
+    if (!isValid) {
+        throw new Error("비밀번호가 일치하지 않습니다.");
+    }
+
+    const token = jwt.sign(
+        {
+            adminId: admin.id,
+            name: admin.name,
+            role: admin.role,
         },
-    });
+        jwtSecret,
+        { expiresIn: '1d' }
+    );
 
-    console.log("새 슈퍼관리자 생성됨:", newaAdmin);
+    return {
+        token,
+        admin: {
+            id: admin.id,
+            name: admin.name,
+            role: admin.role,
+        },
+    };
 };
 
 
