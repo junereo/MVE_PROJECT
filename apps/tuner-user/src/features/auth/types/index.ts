@@ -13,7 +13,7 @@ export interface SignupFormData {
   password: string;
   confirmPassword: string;
   nickname: string;
-  phoneNumber: string;
+  phone_number: string;
 }
 
 // 회원가입 데이터 에러
