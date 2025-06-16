@@ -27,8 +27,8 @@ export const logoutRequest = async () => {
 
 // 사용자 정보 가져옴
 export const getMe = async () => {
-  const response = await axios.get("/auth/me");
-  return response.data.user; // 사용자 정보 / nickname, email 등
+  const response = await axios.get("/auth/me"); // 쿠키 기반
+  return response.data.user; // {id, nickname}
 };
 
 /*
