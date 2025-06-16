@@ -9,7 +9,7 @@ export const signup = async (data: SignupFormData) => {
 };
 
 // 로그인
-export const login = async (data: LoginFormData) => {
+export const loginRequest = async (data: LoginFormData) => {
   const response = await axios.post("/auth/login", data);
   return response.data;
 };
@@ -20,13 +20,14 @@ export const socialLogin = async (provider: "kakao", code: string) => {
   return response.data; // { token, user }
 };
 
+// 로그아웃
+export const logoutRequest = async () => {
+  await axios.post("/auth/logout"); // 쿠키 제거 요청
+};
+
 // 사용자 정보 가져옴
-export const getMe = async (token: string) => {
-  const response = await axios.get("/auth/me", {
-    headers: {
-      Authorization: `Bearer ${token}`, // JWT 방식
-    },
-  });
+export const getMe = async () => {
+  const response = await axios.get("/auth/me");
   return response.data.user; // 사용자 정보 / nickname, email 등
 };
 
