@@ -1,24 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
-import { useAuthStore } from "../store/authStore";
-import { getMe } from "../services/api";
+import { useUser } from "../hooks/useUser";
 
+// 최초 실행 시 Zustand에 로그인 사용자 저장
 export default function AuthInitializer() {
-  const { setToken, setUser } = useAuthStore();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      setToken(token); // 토큰 저장
-      getMe(token)
-        .then((user) => setUser(user)) // 사용자 상태 유지
-        .catch(() => {
-          localStorage.removeItem("token"); // 만료된 토큰이면 로그아웃 처리
-        });
-    }
-  }, []);
+  useUser(); // 로그인 상태 확인 자동으로 실행, 페이지 진입 => `/auth/me` => zustand user 저장
 
   return null;
 }
