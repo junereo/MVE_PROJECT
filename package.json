@@ -10,11 +10,11 @@
   ],
   "scripts": {
     "dev:web": "pnpm --filter web dev",
-    "dev:api": "pnpm --filter api dev",
+    "dev:api": "pnpm --filter tuner-api dev",
     "build": "pnpm -r run build",
-    "start": "pnpm --filter api start",
-    "lint": "pnpm lint:web && pnpm lint:api",
-    "format": "pnpm format:web && pnpm format:api"
+    "start": "pnpm --filter tuner-api start",
+    "lint": "pnpm lint:web && pnpm lint:tuner-api",
+    "format": "pnpm format:web && pnpm format:tuner-api"
   },
   "devDependencies": {
     "eslint": "^9.28.0",

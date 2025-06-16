@@ -10,10 +10,12 @@
     "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,md}'"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.80.7",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
     "next": "14.2.29",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-query": "^3.39.3",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
