@@ -8,6 +8,7 @@ import {
   allSignupFields,
   validateSignupField,
 } from "@/features/auth/utils/validateSignup";
+import { useRouter } from "next/navigation";
 import { signup } from "@/features/auth/services/api";
 // import { mockSignup } from "@/features/auth/services/api"; // 테스트용
 
@@ -22,6 +23,7 @@ const initialFormData: SignupFormData = {
 export default function SignupForm() {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<SignupFormErrors>({}); // 에러 상태 관리
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,11 +47,11 @@ export default function SignupForm() {
       return;
     }
 
-    // !-수정 필요함-!
+    // !-수정 필요함, 모달창으로 회원가입 성공 안내-!
     try {
       const res = await signup(formData); // 백엔드에 요청
-      if (res.token) {
-        alert("회원가입 성공");
+      if (res.status === 201) {
+        router.push("/login"); // 로그인으로 이동
       }
     } catch (err: any) {
       if (err.response?.data?.message) {
