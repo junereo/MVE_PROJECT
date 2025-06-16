@@ -17,7 +17,7 @@ const initialFormData: SignupFormData = {
   password: "",
   confirmPassword: "",
   nickname: "",
-  phoneNumber: "",
+  phone_number: "",
 };
 
 export default function SignupForm() {
@@ -130,12 +130,12 @@ export default function SignupForm() {
           required
         />
         <Input
-          label="휴대폰 번호"
-          name="phoneNumber"
+          label="휴대전화번호"
+          name="phone_number"
           type="tel"
-          value={formData.phoneNumber}
+          value={formData.phone_number}
           onChange={handleChange}
-          error={errors.phoneNumber}
+          error={errors.phone_number}
           maxLength={11}
           placeholder="휴대폰 번호"
           required
