@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 
 export const emailRegister = async (data: RegisterList) => {
     const isUser = await prisma.user.findUnique({ where: { email: data.email } });
-    if (isUser) throw new Error("이미 가입된 이메일입니다.");
+    if (isUser) throw new Error("이미 가입된 이메일입니다ddddddd.");
 
     const hashedPassword = await hashPassword(data.password);
 
