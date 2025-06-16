@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@/components/ui/input";
+import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { LoginFormData, LoginFormErrors } from "@/features/auth/types";
@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store/authStore";
-import { login } from "@/features/auth/services/api";
+import { loginRequest } from "@/features/auth/services/api";
 // import { mockLogin } from "@/features/auth/services/api"; // 테스트용
 
 const initialFormData: LoginFormData = {
@@ -49,11 +49,10 @@ export default function LoginForm() {
 
     // !-수정 필요함-!
     try {
-      const res = await login(formData); // 백엔드에 요청
+      const res = await loginRequest(formData); // 백엔드에 요청
       if (res.token && res.user) {
         setToken(res.token); // 토큰 상태 저장
         setUser(res.user); // 사용자 정보 저장 (email, nickname)
-        localStorage.setItem("token", res.token); // 토큰 저장
         router.push("/"); // 메인으로 이동
       }
     } catch (err: any) {

@@ -19,7 +19,6 @@ export default function KakaoRedirectPage() {
         .then((res) => {
           setToken(res.token); // 토큰 상태 저장
           setUser(res.user); // 로그인 상태 저장
-          localStorage.setItem("token", res.token); // 로컬스토리지에 토큰 저장
           router.push("/"); // 로그인 성공 시 메인으로 이동
         })
         .catch((err) => {
