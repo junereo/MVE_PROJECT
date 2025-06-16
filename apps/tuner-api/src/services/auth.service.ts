@@ -114,7 +114,7 @@ export const oauthCallbackService = async (
 
     let user: User;
 
-    // 🔸 STEP 1: 사용자 및 계정 등록 (DB 트랜잭션)
+    // STEP 1: 사용자 및 계정 등록 (DB 트랜잭션)
     try {
         user = await prisma.$transaction(async (tx) => {
             const existingAccount = await tx.user_OAuth.findUnique({
@@ -164,7 +164,7 @@ export const oauthCallbackService = async (
         };
     }
 
-    // 🔸 STEP 2: JWT 발급
+    // STEP 2: JWT 발급
     const token = signToken({ userId: user.id });
 
     return {
