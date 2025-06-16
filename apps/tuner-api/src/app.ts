@@ -1,5 +1,6 @@
 import express from "express";
 import { adminRoutes, authRoutes, userRoutes, surveyRoutes } from "../src/routes";
+import cors from "cors";
 
 
 const app = express();
@@ -18,6 +19,13 @@ app.use("/admin", adminRoutes);
 app.get("/", (req, res) => {
     res.json({ status: "ok", uptime: process.uptime() });
 });
+
+app.use(
+    cors({
+        origin: process.env.CLIENT_IP || 'http://192.168.0.59:5173',
+        credentials: true,
+    }),
+);
 
 // 에러 핸들링 미들웨어
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

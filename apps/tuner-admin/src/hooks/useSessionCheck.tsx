@@ -29,6 +29,7 @@ export const useSessionCheck = () => {
             } catch (err) {
                 console.log(err);
                 // router.push("/login")
+
             }
 
         };
