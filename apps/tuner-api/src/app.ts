@@ -1,6 +1,6 @@
 import express from "express";
 import { adminRoutes, authRoutes, userRoutes, surveyRoutes } from "../src/routes";
-
+import routerWallet from "../src/wallet/routers/wallet.routes"
 
 const app = express();
 
@@ -13,6 +13,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/surveys", surveyRoutes);
 app.use("/admin", adminRoutes);
+app.use("/contract", routerWallet);
 
 // 기본 라우트
 app.get("/", (req, res) => {
