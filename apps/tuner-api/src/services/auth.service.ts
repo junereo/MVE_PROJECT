@@ -3,14 +3,14 @@ import type { Request, CookieOptions } from 'express';
 import { RegisterList, LoginResponse } from "../types/auth.types";
 import jwt from 'jsonwebtoken';
 import { hashPassword, verifyPassword } from '../utils/auth.utils';
-import { signToken, verifyToken } from '../utils/jwt';
+import { signToken } from '../utils/jwt';
 import axios from 'axios';
 
 const prisma = new PrismaClient();
 
 export const emailRegister = async (data: RegisterList) => {
     const isUser = await prisma.user.findUnique({ where: { email: data.email } });
-    if (isUser) throw new Error("이미 가입된 이메일입니다ddddddd.");
+    if (isUser) throw new Error("이미 가입된 이메일입니다.");
 
     const hashedPassword = await hashPassword(data.password);
 
@@ -114,7 +114,7 @@ export const oauthCallbackService = async (
 
     let user: User;
 
-    // 🔸 STEP 1: 사용자 및 계정 등록 (DB 트랜잭션)
+    // STEP 1: 사용자 및 계정 등록 (DB 트랜잭션)
     try {
         user = await prisma.$transaction(async (tx) => {
             const existingAccount = await tx.user_OAuth.findUnique({
@@ -164,7 +164,7 @@ export const oauthCallbackService = async (
         };
     }
 
-    // 🔸 STEP 2: JWT 발급
+    // STEP 2: JWT 발급
     const token = signToken({ userId: user.id });
 
     return {
