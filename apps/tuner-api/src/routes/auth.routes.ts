@@ -7,6 +7,7 @@ import { validateRegister, validateLogin } from "../middlewares/auth.middleware"
 const router = express.Router();
 
 router.post("/signup", validateRegister, emailRegister);
+// router.post("/me")
 router.post("/login", validateLogin, emaillogin);
 router.get("/oauth/:provider", oauthCallbackController);
 

@@ -20,12 +20,14 @@ app.get("/", (req, res) => {
     res.json({ status: "ok", uptime: process.uptime() });
 });
 
-app.use(
-    cors({
-        origin: process.env.CLIENT_IP || 'http://192.168.0.59:5173',
-        credentials: true,
-    }),
-);
+
+app.use(cors({
+    origin: process.env.CLIENT_IP || 'http://192.168.0.59:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+}));
+console.log(process.env.CLIENT_IP);
+
 
 // 에러 핸들링 미들웨어
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -33,4 +35,5 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
     res.status(500).json({ error: "Internal Server Error" });
 });
 
-export default app; 
+export default app;
+
