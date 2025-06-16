@@ -25,7 +25,7 @@ model User {
   nickname        String
   wallet_address  String?
   simple_password String?
-  level           UserLevel
+  level           UserLevel @default(Regular)
   badge_issued_at DateTime?
   balance         Int       @default(0)
   created_at      DateTime  @default(now())

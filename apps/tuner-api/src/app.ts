@@ -1,8 +1,6 @@
 import express from "express";
-import authRoutes from "../routes/auth.routes";
-import userRoutes from "../routes/user.routes";
-import surveyRoutes from "../routes/survey.routes";
-import adminRoutes from "../routes/admin.routes";
+import { adminRoutes, authRoutes, userRoutes, surveyRoutes } from "../src/routes";
+
 
 const app = express();
 

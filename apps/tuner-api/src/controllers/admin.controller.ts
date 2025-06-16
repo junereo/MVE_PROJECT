@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 // TODO: Implement admin controller methods
-export const getAdminDashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const dashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     // Implementation will be added later
 };
 

@@ -4,7 +4,7 @@ import { validateUserProfile, validateUserUpdate } from "../middlewares/user.mid
 
 const router = express.Router();
 
-router.get("/profile", validateUserProfile, getUserProfile);
-router.put("/profile", validateUserUpdate, updateUserProfile);
+router.get("/me", validateUserProfile, getUserProfile);
+router.put("/me", validateUserUpdate, updateUserProfile);
 
 export default router; 
