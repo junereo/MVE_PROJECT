@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "@/components/ui/input";
+import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { LoginFormData, LoginFormErrors } from "@/features/auth/types";

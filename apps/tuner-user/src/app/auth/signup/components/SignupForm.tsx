@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/input";
+import Input from "@/components/ui/Input";
 import { useState } from "react";
 import { SignupFormData, SignupFormErrors } from "@/features/auth/types";
 import {
@@ -93,7 +93,7 @@ export default function SignupForm() {
               value={formData.email}
               onChange={handleChange}
               error={errors.email}
-              placeholder="이메일을 입력해주세요"
+              placeholder="이메일"
               required
             />
           </div>
@@ -104,7 +104,7 @@ export default function SignupForm() {
             value={formData.password}
             onChange={handleChange}
             error={errors.password}
-            placeholder="비밀번호를 입력해주세요"
+            placeholder="비밀번호"
             required
           />
           <Input
@@ -114,7 +114,7 @@ export default function SignupForm() {
             value={formData.confirmPassword}
             onChange={handleChange}
             error={errors.confirmPassword}
-            placeholder="비밀번호를 다시 입력해주세요"
+            placeholder="비밀번호 확인"
             required
           />
         </div>
@@ -126,23 +126,23 @@ export default function SignupForm() {
           onChange={handleChange}
           error={errors.nickname}
           maxLength={8}
-          placeholder="닉네임을 입력해주세요"
+          placeholder="닉네임"
           required
         />
         <Input
-          label="휴대전화번호"
+          label="휴대폰 번호"
           name="phoneNumber"
           type="tel"
           value={formData.phoneNumber}
           onChange={handleChange}
           error={errors.phoneNumber}
           maxLength={11}
-          placeholder="휴대전화번호를 입력해주세요"
+          placeholder="휴대폰 번호"
           required
         />
       </div>
       <Button type="submit" color="blue">
-        회원가입
+        가입하기
       </Button>
     </form>
   );
