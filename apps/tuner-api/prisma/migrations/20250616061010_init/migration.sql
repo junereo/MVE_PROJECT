@@ -27,6 +27,7 @@ CREATE TABLE "User_OAuth" (
     "id" SERIAL NOT NULL,
     "provider" TEXT NOT NULL,
     "provider_id" TEXT NOT NULL,
+    "nickname" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "profile_image" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

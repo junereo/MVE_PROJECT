@@ -39,6 +39,7 @@ model User_OAuth {
   id            Int      @id @default(autoincrement())
   provider      String
   provider_id   String   @unique
+  nickname      String
   email         String
   profile_image String?
   created_at    DateTime @default(now())
