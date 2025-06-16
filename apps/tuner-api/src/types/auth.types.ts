@@ -11,4 +11,5 @@ export interface LoginResponse {
         id: number;
         nickname: string;
     };
-} 
+}
+

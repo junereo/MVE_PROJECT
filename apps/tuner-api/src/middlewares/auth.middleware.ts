@@ -3,6 +3,8 @@ import { RegisterList } from "../types/auth.types";
 
 export const validateRegister = (req: Request, res: Response, next: NextFunction): void => {
     const { email, password, nickname, phone_number }: RegisterList = req.body;
+    console.log(req.body);
+
 
     if (!email || !password || !nickname || !phone_number) {
         res.status(400).json({ error: "모든 필드를 입력해주세요." });
@@ -24,6 +26,6 @@ export const validateLogin = (req: Request, res: Response, next: NextFunction): 
         res.status(400).json({ error: "이메일과 비밀번호를 입력해주세요." });
         return;
     }
-
     next();
-}; 
+};
+
