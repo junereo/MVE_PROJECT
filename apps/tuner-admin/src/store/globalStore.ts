@@ -1,5 +1,5 @@
-// src/features/user/home/store/useHomeStore.ts
-import { create } from "zustand"; // ✅ 여기서 1번만 불러옴
+// 전역으로 관리되는 로그인 사용자 상태
+import { create } from "zustand"; // 
 
 type HomeState = {
   activeTab: string;
