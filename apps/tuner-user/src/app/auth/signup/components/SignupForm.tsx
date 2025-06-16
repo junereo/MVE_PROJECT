@@ -1,13 +1,14 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/input";
+import Input from "@/components/ui/Input";
 import { useState } from "react";
 import { SignupFormData, SignupFormErrors } from "@/features/auth/types";
 import {
   allSignupFields,
   validateSignupField,
 } from "@/features/auth/utils/validateSignup";
+import { useRouter } from "next/navigation";
 import { signup } from "@/features/auth/services/api";
 // import { mockSignup } from "@/features/auth/services/api"; // 테스트용
 
@@ -22,6 +23,7 @@ const initialFormData: SignupFormData = {
 export default function SignupForm() {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<SignupFormErrors>({}); // 에러 상태 관리
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,11 +47,11 @@ export default function SignupForm() {
       return;
     }
 
-    // !-수정 필요함-!
+    // !-수정 필요함, 모달창으로 회원가입 성공 안내-!
     try {
       const res = await signup(formData); // 백엔드에 요청
-      if (res.token) {
-        alert("회원가입 성공");
+      if (res.status === 201) {
+        router.push("/login"); // 로그인으로 이동
       }
     } catch (err: any) {
       if (err.response?.data?.message) {
@@ -91,7 +93,7 @@ export default function SignupForm() {
               value={formData.email}
               onChange={handleChange}
               error={errors.email}
-              placeholder="이메일을 입력해주세요"
+              placeholder="이메일"
               required
             />
           </div>
@@ -102,7 +104,7 @@ export default function SignupForm() {
             value={formData.password}
             onChange={handleChange}
             error={errors.password}
-            placeholder="비밀번호를 입력해주세요"
+            placeholder="비밀번호"
             required
           />
           <Input
@@ -112,7 +114,7 @@ export default function SignupForm() {
             value={formData.confirmPassword}
             onChange={handleChange}
             error={errors.confirmPassword}
-            placeholder="비밀번호를 다시 입력해주세요"
+            placeholder="비밀번호 확인"
             required
           />
         </div>
@@ -124,23 +126,23 @@ export default function SignupForm() {
           onChange={handleChange}
           error={errors.nickname}
           maxLength={8}
-          placeholder="닉네임을 입력해주세요"
+          placeholder="닉네임"
           required
         />
         <Input
-          label="휴대전화번호"
+          label="휴대폰 번호"
           name="phoneNumber"
           type="tel"
           value={formData.phoneNumber}
           onChange={handleChange}
           error={errors.phoneNumber}
           maxLength={11}
-          placeholder="휴대전화번호를 입력해주세요"
+          placeholder="휴대폰 번호"
           required
         />
       </div>
       <Button type="submit" color="blue">
-        회원가입
+        가입하기
       </Button>
     </form>
   );

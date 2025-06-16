@@ -4,6 +4,7 @@ import Footer from "../components/layouts/Footer";
 import Sidebar from "../components/layouts/sidebar";
 import Wrapper from "../components/layouts/Wrapper";
 import AuthInitializer from "@/features/auth/components/AuthInitializer";
+import QueryClientProvider from "@/lib/react-query/QueryClientProvider";
 
 export default function RootLayout({
   children,
@@ -11,15 +12,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body>
-        <Header />
-        <Wrapper>
-          <AuthInitializer />
-          {children}
-        </Wrapper>
-        <Sidebar />
-        <Footer />
+        <QueryClientProvider>
+          <Header />
+          <Wrapper>
+            <AuthInitializer />
+            {children}
+          </Wrapper>
+          <Sidebar />
+          <Footer />
+        </QueryClientProvider>
       </body>
     </html>
   );
