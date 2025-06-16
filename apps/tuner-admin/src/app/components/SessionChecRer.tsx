@@ -1,6 +1,6 @@
 "use client";
 
-import { useSessionCheck } from "@/hoooks/useSessionCheck";
+import { useSessionCheck } from "@/hooks/useSessionCheck";
 
 export default function SessionChecker() {
     useSessionCheck(); // 클라이언트 훅 호출

@@ -2,6 +2,10 @@
 import { useRouter } from "next/navigation";
 import { useOauth } from "@/store/globalStore";
 import axiosInstance from "@/lib/network/axios";
+import axiosClient from "@/lib/network/axios";
+import { useSessionStore } from "@/store/authmeStore";
+
+import { useState } from "react";
 
 const pushLogin = async (formData: any) => {
     const res = await axiosInstance.post("/adminLogin", formData);
@@ -11,11 +15,17 @@ const pushLogin = async (formData: any) => {
 const LoginFrom = () => {
     const router = useRouter();
 
-    const { email, password, name, phone_number, role, setValue } = useOauth();
+    const { setValue } = useOauth();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    // 이거 전역 상태로 관리하지 마 내부 컴포넌트 상태로 관리
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("로그인 전송할 값:", { email, password });
+        // 매번 사이트마다 요청 떄리는 게 절때 아니야, 
+
 
         const formData = { email, password };
 
@@ -29,10 +39,13 @@ const LoginFrom = () => {
             setValue("phone_number", result.phone_number);
             setValue("role", result.role);
 
+
             router.push("/dashboard")
 
         } catch (error) {
+            alert("로그인 실패하였습니다.")
             console.error("요청 실패:", error);
+
         }
     };
 
@@ -51,13 +64,13 @@ const LoginFrom = () => {
                     <input
                         type="email"
                         placeholder="Email"
-                        onChange={(e) => setValue("email", e.target.value)}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-500"
                     />
                     <input
                         type="password"
                         placeholder="Password"
-                        onChange={(e) => setValue("password", e.target.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-500"
                     />
                     <button
@@ -66,7 +79,7 @@ const LoginFrom = () => {
                     >
                         Login
                     </button>
-                    <div className="text-5xl text-red-600">{name}</div>
+                    {/* <div className="text-5xl text-red-600">{name}</div> */}
                 </form>
                 <div className="mt-4 text-center text-sm text-white/80">
                     Not registered?{" "}
