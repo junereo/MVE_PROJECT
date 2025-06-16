@@ -13,7 +13,7 @@ CREATE TABLE "User" (
     "nickname" TEXT NOT NULL,
     "wallet_address" TEXT,
     "simple_password" TEXT,
-    "level" "UserLevel" NOT NULL,
+    "level" "UserLevel" NOT NULL DEFAULT 'Regular',
     "badge_issued_at" TIMESTAMP(3),
     "balance" INTEGER NOT NULL DEFAULT 0,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
