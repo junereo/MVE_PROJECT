@@ -13,7 +13,7 @@ enum UserLevel {
 }
 
 enum AdminRole {
-  admin
+  admin 
   superadmin
 }
 

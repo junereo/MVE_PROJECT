@@ -19,11 +19,12 @@ export const manageUsers = async (req: Request, res: Response, next: NextFunctio
 export const adminLoginHandler = async (req: Request, res: Response) => {
 
     try {
+
         const result = await AdminService.login(req.body.email, req.body.password);
 
         // 토큰을 HTTP Only 쿠키 저장
         res.cookie('token', result.token, defaultCookieOptions);
-        res.status(200).json({ admin: result.admin, success: true});
+        res.status(200).json({ admin: result.admin, success: true });
 
     } catch (err: any) {
         res.status(401).json({ error: err.message });

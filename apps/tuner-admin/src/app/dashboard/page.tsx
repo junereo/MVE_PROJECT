@@ -3,6 +3,7 @@
 // import { useRouter } from 'next/navigation';
 import { useSessionCheck } from '@/hooks/useSessionCheck';
 import { DonutChart } from './components/DonutChart';
+import RewardLineChart from './components/Recjarts';
 const Dashboard = () => {
     // 로그인 세션유지
     useSessionCheck(); // 클라이언트 훅 호출
@@ -30,9 +31,9 @@ const Dashboard = () => {
 
                         {/* 오른쪽: 선 그래프 */}
                         <div className="bg-white rounded-lg shadow p-4">
-                            <h2 className="text-lg font-semibold mb-2">Reward Status</h2>
+                            <h2 className="text-lg font-semibold mb-2">설문 참여율</h2>
                             {/* 선 그래프 컴포넌트 자리 */}
-                            {/* <LineChart /> */}
+                            <RewardLineChart />
                         </div>
                     </div>
 
