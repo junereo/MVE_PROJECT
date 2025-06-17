@@ -13,7 +13,7 @@ const LoginFrom = () => {
     const [password, setPassword] = useState('');
 
     // 이거 전역 상태로 관리하지 마 내부 컴포넌트 상태로 관리
-
+    const a = 1;
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log('로그인 전송할 값:', { email, password });
