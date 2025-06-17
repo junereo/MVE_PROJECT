@@ -8,7 +8,11 @@ import {
 import { RegisterList } from "../types/auth.types";
 
 
-
+const defaultCookieOptions = {
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  maxAge: 24 * 60 * 60 * 1000,
+};
 
 
 export const emailRegister = async (req: Request, res: Response): Promise<void> => {
@@ -25,9 +29,9 @@ export const emaillogin = async (req: Request, res: Response): Promise<void> => 
   try {
     const { email, password } = req.body;
     const result = await loginServices(email, password);
-    console.log(result);
+    res.cookie('token', result.token, defaultCookieOptions);
 
-    res.json(result);
+    res.status(200).json({ user: result.user, redirect: 'http://localhost:3000/' });
   } catch (error: any) {
     res.status(401).json({ error: error.message });
   }
@@ -62,3 +66,20 @@ export const getCurrentUserController = async (
     res.status(500).json({ error: error.message || '서버 오류' });
   }
 };
+
+export const logout = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+    });
+    res.status(200).json({ message: 'Logged out and cookies cleared', redirect: '/' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || '서버 오류' });
+  }
+};
+
