@@ -38,6 +38,7 @@ export interface AuthRequest extends Request {
     };
 }
 
+
 export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
     let token = req.cookies.token;
 

@@ -64,7 +64,7 @@ export const emaillogin = async (email: string, password: string): Promise<OAuth
     if (!isValid) {
         throw new Error("비밀번호가 일치하지 않습니다.-서버");
     }
-    
+
     // STEP 2: JWT 발급
     const token = signToken({ userId: user.id });
 
