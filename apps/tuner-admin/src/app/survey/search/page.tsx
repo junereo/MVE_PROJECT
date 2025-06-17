@@ -1,6 +1,6 @@
-import YoutubeSearch from '@/app/components/youtude';
+import YoutubeSearch from './components/youtude';
 const Youtube = () => {
-    <YoutubeSearch />;
+    return <YoutubeSearch />;
 };
 
 export default Youtube;

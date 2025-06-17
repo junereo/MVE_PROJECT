@@ -15,7 +15,7 @@ const Button = ({ color, children, type = 'button', onClick }: ButtonProps) => {
         <button
             type={type}
             onClick={onClick}
-            className={`w-full py-2 rounded-md font-semibold ${styles[color]}`}
+            className={`w-[100px] py-2 rounded-md font-semibold ${styles[color]}`}
         >
             {children}
         </button>

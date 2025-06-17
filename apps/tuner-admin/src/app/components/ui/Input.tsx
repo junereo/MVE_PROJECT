@@ -7,7 +7,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     id?: string;
 }
 
-export default function Input({ label, type, id }: InputProps) {
+export default function Input({ label, type, id, ...rest }: InputProps) {
+    const radioColorVariants = {
+        white: 'bg-white border-gray-300',
+        black: 'bg-black border-gray-800',
+    };
     return (
         <div className="flex flex-col">
             {label && (
@@ -15,7 +19,12 @@ export default function Input({ label, type, id }: InputProps) {
                     {label}
                 </label>
             )}
-            <input type={type} id={id} />
+            <input
+                type={type}
+                id={id}
+                className={`w-4 h-4 ${radioColorVariants[color]} rounded-full focus`}
+                {...rest}
+            />
         </div>
     );
 }

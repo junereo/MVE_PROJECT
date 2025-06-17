@@ -1,9 +1,8 @@
-"use client"
-import { useSessionStore } from "@/store/authmeStore";
-import { useRouter } from "next/navigation";
-import { useSessionCheck } from "@/hooks/useSessionCheck";
+'use client';
+// import { useSessionStore } from '@/store/authmeStore';
+// import { useRouter } from 'next/navigation';
+import { useSessionCheck } from '@/hooks/useSessionCheck';
 const Dashboard = () => {
-
     // 로그인 세션유지
     useSessionCheck(); // 클라이언트 훅 호출
 

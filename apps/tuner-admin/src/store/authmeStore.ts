@@ -13,6 +13,7 @@ type SessionState = {
     isLoading: boolean;
     isLoggedIn: boolean;
     setAdmin: (admin: AdminType) => void;
+    logout: () => void;
 };
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -26,5 +27,10 @@ export const useSessionStore = create<SessionState>((set) => ({
             isLoading: false,
             isLoggedIn: true,
         }),
-
+    logout: () =>
+        set({
+            admin: null,
+            isLoading: false,
+            isLoggedIn: false,
+        }),
 }));

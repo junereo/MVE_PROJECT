@@ -1,20 +1,21 @@
-'use client'
+'use client';
 
-import { useSessionCheck } from "@/hooks/useSessionCheck";
-import Link from "next/link";
-
+import { useSessionCheck } from '@/hooks/useSessionCheck';
+import YoutubeBtn from '../components/ui/Youtube';
+import YoutuveVideo from './components/youtubeVideo';
 const Survey = () => {
     useSessionCheck(); // 클라이언트 훅 호출
 
     return (
-        <div className="w-full h-[800px] bg-red-300 flex flex-col ali">
-            <div>
+        <div className="w-[1200px] bg-white flex flex-col items-end justify-center">
+            <div className="min-w-[800px]">
                 <div>
-                    <label>
-                        <button>
-                            +
-                        </button>
+                    <label className="flex items-end justify-end">
+                        <YoutubeBtn type="button">
+                            유튜브 영상 찾으러 가기
+                        </YoutubeBtn>
                     </label>
+                    <YoutuveVideo />
                 </div>
                 <div>
                     <button>+ 질문 추가하기</button>
@@ -34,10 +35,26 @@ const Survey = () => {
                         <div>
                             <div>객관형</div>
                             <div>
-                                <input type="radio" name="multipleChoice" placeholder="객관형 질문을 입력해주세요"></input>
-                                <input type="radio" name="multipleChoice" placeholder="객관형 질문을 입력해주세요"></input>
-                                <input type="radio" name="multipleChoice" placeholder="객관형 질문을 입력해주세요"></input>
-                                <input type="radio" name="multipleChoice" placeholder="객관형 질문을 입력해주세요"></input>
+                                <input
+                                    type="radio"
+                                    name="multipleChoice"
+                                    placeholder="객관형 질문을 입력해주세요"
+                                ></input>
+                                <input
+                                    type="radio"
+                                    name="multipleChoice"
+                                    placeholder="객관형 질문을 입력해주세요"
+                                ></input>
+                                <input
+                                    type="radio"
+                                    name="multipleChoice"
+                                    placeholder="객관형 질문을 입력해주세요"
+                                ></input>
+                                <input
+                                    type="radio"
+                                    name="multipleChoice"
+                                    placeholder="객관형 질문을 입력해주세요"
+                                ></input>
                             </div>
                         </div>
                     </div>
@@ -57,8 +74,7 @@ const Survey = () => {
                 <div></div>
             </div>
         </div>
-    )
+    );
+};
 
-}
-
-export default Survey
+export default Survey;
