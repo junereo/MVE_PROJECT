@@ -10,8 +10,8 @@ import {
   validateSignupField,
 } from "@/features/auth/utils/validateSignup";
 import { useRouter } from "next/navigation";
-import { signup } from "@/features/auth/services/api";
-// import { mockSignup } from "@/features/auth/services/api"; // 테스트용
+import { signup } from "@/features/auth/services/singup";
+// import { mockSignup } from "@/features/auth/services/singup"; // 테스트용
 
 const initialFormData: SignupFormData = {
   email: "",
