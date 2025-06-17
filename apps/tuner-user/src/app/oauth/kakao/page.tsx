@@ -17,12 +17,11 @@ export default function KakaoRedirectPage() {
     if (code) {
       socialLogin("kakao", code)
         .then((res) => {
-          setToken(res.token); // 토큰 상태 저장
-          setUser(res.user); // 로그인 상태 저장
+          setToken(res.data.token); // 토큰 상태 저장
+          setUser(res.data.user); // 로그인 상태 저장
           router.push("/"); // 로그인 성공 시 메인으로 이동
         })
-        .catch((err) => {
-          alert("카카오 로그인 실패");
+        .catch((error) => {
           router.push("/auth");
         });
     }

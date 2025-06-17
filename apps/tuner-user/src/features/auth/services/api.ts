@@ -11,18 +11,19 @@ export const signup = async (data: SignupFormData) => {
 // 로그인
 export const loginRequest = async (data: LoginFormData) => {
   const response = await axios.post("/auth/login", data);
-  return response.data;
+  return response;
 };
 
 // 카카오 로그인
 export const socialLogin = async (provider: "kakao", code: string) => {
   const response = await axios.post(`/auth/${provider}/login`, { code });
-  return response.data; // { token, user }
+  return response; // { token, user }
 };
 
 // 로그아웃
 export const logoutRequest = async () => {
-  await axios.post("/auth/logout"); // 쿠키 제거 요청
+  const responsse = await axios.post("/auth/logout"); // 쿠키 제거 요청
+  return responsse;
 };
 
 // 사용자 정보 가져옴
