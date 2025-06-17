@@ -7,14 +7,6 @@ import {
 } from "../services/auth.service";
 import { RegisterList } from "../types/auth.types";
 
-
-const defaultCookieOptions = {
-  httpOnly: true,
-  sameSite: 'lax' as const,
-  maxAge: 24 * 60 * 60 * 1000,
-};
-
-
 export const emailRegister = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData: RegisterList = req.body;
@@ -29,9 +21,13 @@ export const emaillogin = async (req: Request, res: Response): Promise<void> => 
   try {
     const { email, password } = req.body;
     const result = await loginServices(email, password);
-    res.cookie('token', result.token, defaultCookieOptions);
 
-    res.status(200).json({ user: result.user, redirect: 'http://localhost:3000/' });
+    if ('error' in result) {
+      res.status(400).json(result);
+      return;
+    }
+    res.cookie('token', result.token, result.cookieOptions);
+    res.json({ success: true }); 
   } catch (error: any) {
     res.status(401).json({ error: error.message });
   }
@@ -77,9 +73,8 @@ export const logout = async (
       secure: true,
       sameSite: 'lax',
     });
-    res.status(200).json({ message: 'Logged out and cookies cleared', redirect: '/' });
+    res.status(200).json({ message: 'Logged out and cookies cleared', redirect: process.env.CLIENT_IP });
   } catch (error: any) {
     res.status(500).json({ error: error.message || '서버 오류' });
   }
 };
-

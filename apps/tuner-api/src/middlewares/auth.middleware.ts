@@ -23,9 +23,6 @@ export const validateRegister = (req: Request, res: Response, next: NextFunction
 
 export const validateLogin = (req: Request, res: Response, next: NextFunction): void => {
     const { email, password } = req.body;
-    console.log(email, password);
-
-
     if (!email || !password) {
         res.status(400).json({ error: "이메일과 비밀번호를 입력해주세요." });
         return;
