@@ -9,4 +9,5 @@ export const getUserProfileService = async (userId: number) => {
 
 export const updateUserProfileService = async (userId: number, data: any) => {
     // Implementation will be added later
-}; 
+};
+
