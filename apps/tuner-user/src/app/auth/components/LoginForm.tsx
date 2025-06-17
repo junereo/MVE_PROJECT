@@ -50,6 +50,7 @@ export default function LoginForm() {
     // !-수정 필요함-!
     try {
       const res = await loginRequest(formData); // 백엔드에 요청
+      console.log(res);
       if (res.token && res.user) {
         setToken(res.token); // 토큰 상태 저장
         setUser(res.user); // 사용자 정보 저장 (email, nickname)
