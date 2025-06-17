@@ -20,11 +20,6 @@ export const socialLogin = async (provider: "kakao", code: string) => {
   return response; // { token, user }
 };
 
-// 로그아웃
-export const logoutRequest = async () => {
-  await axios.post("/auth/logout"); // 쿠키 제거 요청
-};
-
 // 사용자 정보 가져옴
 export const getMe = async () => {
   const response = await axios.get("/auth/me"); // 쿠키 기반
