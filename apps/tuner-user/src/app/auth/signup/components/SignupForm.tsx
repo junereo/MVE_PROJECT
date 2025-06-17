@@ -76,11 +76,11 @@ export default function SignupForm() {
         redirectTo: "/auth",
       });
       setIsModalOpen(true);
-    } catch (error) {
+    } catch (error: any) {
       // 회원가입 실패
       setModalContent({
         image: "x.png",
-        description: "회원가입 중 오류가 발생했습니다.",
+        description: error.message,
         buttonLabel: "회원가입 다시 시도하기",
         redirectTo: "/auth/signup",
       });

@@ -3,8 +3,17 @@ import { LoginFormData } from "../types";
 
 // 로그인
 export const loginRequest = async (data: LoginFormData) => {
-  const response = await axios.post("/auth/login", data);
-  return response;
+  try {
+    const response = await axios.post("/auth/login", data);
+    return response;
+  } catch (error: any) {
+    const status = error.response?.status;
+
+    if (status === 401) {
+      throw new Error("이메일 또는 비밀번호가 일치하지 않습니다.");
+    }
+    throw new Error("로그인 중 오류가 발생했습니다.");
+  }
 };
 
 // 카카오 로그인
