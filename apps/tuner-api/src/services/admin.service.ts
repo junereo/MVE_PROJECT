@@ -29,6 +29,7 @@ export const login = async (email: string, password: string) => {
 
     return {
         token,
+        admin,
         redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
         cookieOptions: defaultCookieOptions,
     };
