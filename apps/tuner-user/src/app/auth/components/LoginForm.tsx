@@ -66,6 +66,7 @@ export default function LoginForm() {
     // !-수정 필요함-!
     try {
       await loginRequest(formData); // 백엔드에 요청
+      router.push("/");
     } catch (error: any) {
       setModalContent({
         image: "x.png",
