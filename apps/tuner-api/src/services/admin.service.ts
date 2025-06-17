@@ -1,7 +1,14 @@
 import { PrismaClient, AdminRole } from '@prisma/client';
-import { authUilts, jwtUilts } from "../utils/index";
+import { signToken } from '../utils/jwt';
+import type { CookieOptions } from 'express';
 
 const prisma = new PrismaClient();
+
+const defaultCookieOptions: CookieOptions = {
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000,// 7일
+};
 
 export const login = async (email: string, password: string) => {
     const admin = await prisma.admin.findUnique({ where: { email } });
@@ -12,25 +19,18 @@ export const login = async (email: string, password: string) => {
     }
 
     const isValid = password === admin.password;
-
     // const isValid = await authUilts.verifyPassword(password, admin.password);
     if (!isValid) {
         throw new Error("비밀번호가 일치하지 않습니다.");
     }
 
-    const token = jwtUilts.signToken({
-        id: admin.id,
-        role: admin.role,
-        email: admin.email,
-    });
+    // STEP 2: JWT 발급
+    const token = signToken({ admin: admin.id });
 
     return {
         token,
-        admin: {
-            id: admin.id,
-            name: admin.name,
-            role: admin.role,
-        },
+        redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
+        cookieOptions: defaultCookieOptions,
     };
 };
 
