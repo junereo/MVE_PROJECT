@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as AdminService from "../services/admin.service"
+import { createAdmin } from "../services/admin.service";
 
 const defaultCookieOptions = {
     httpOnly: true,
@@ -12,18 +13,24 @@ export const dashboard = async (req: Request, res: Response, next: NextFunction)
     // Implementation will be added later
 };
 
-export const manageUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    // Implementation will be added later
+export const adminRegister = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { email, password, name, phone_number, role } = req.body;
+        const admin = await createAdmin({ email, password, name, phone_number, role });
+        res.status(201).json(admin);
+    } catch (error: any) {
+        res.status(400).json({ error: error.message })
+    }
 };
-
-export const adminLoginHandler = async (req: Request, res: Response) => {
+export const adminLogin = async (req: Request, res: Response) => {
 
     try {
-        const result = await AdminService.login(req.body.email, req.body.password);
+        const { email, password } = req.body;
+        const result = await AdminService.login(email, password);
 
         // 토큰을 HTTP Only 쿠키 저장
         res.cookie('token', result.token, defaultCookieOptions);
-        res.status(200).json({ admin: result.admin, success: true});
+        res.status(200).json({ admin: result.admin, success: true });
 
     } catch (err: any) {
         res.status(401).json({ error: err.message });
