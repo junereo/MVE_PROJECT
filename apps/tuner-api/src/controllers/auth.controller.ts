@@ -7,10 +7,6 @@ import {
 } from "../services/auth.service";
 import { RegisterList } from "../types/auth.types";
 
-
-
-
-
 export const emailRegister = async (req: Request, res: Response): Promise<void> => {
   try {
     const userData: RegisterList = req.body;
@@ -25,9 +21,13 @@ export const emaillogin = async (req: Request, res: Response): Promise<void> => 
   try {
     const { email, password } = req.body;
     const result = await loginServices(email, password);
-    console.log(result);
 
-    res.json(result);
+    if ('error' in result) {
+      res.status(400).json(result);
+      return;
+    }
+    res.cookie('token', result.token, result.cookieOptions);
+    res.json({ success: true }); 
   } catch (error: any) {
     res.status(401).json({ error: error.message });
   }
@@ -58,6 +58,22 @@ export const getCurrentUserController = async (
   try {
     const result = await userServices(req);
     res.json({ user: result });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || '서버 오류' });
+  }
+};
+
+export const logout = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+    });
+    res.status(200).json({ message: 'Logged out and cookies cleared', redirect: process.env.CLIENT_IP });
   } catch (error: any) {
     res.status(500).json({ error: error.message || '서버 오류' });
   }
