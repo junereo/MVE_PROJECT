@@ -1,11 +1,11 @@
 "use client";
 
 import Modal from "@/components/ui/Modal";
-import Cookies from "js-cookie";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { logoutRequest } from "@/features/auth/services/api";
 
 export default function LogoutButton() {
   const [openModal, setOpenModal] = useState(false);
@@ -13,10 +13,10 @@ export default function LogoutButton() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutRequest(); // 백엔드 api 로그아웃 요청
     logout(); // Zustand 상태 초기화 (token, user → null)
     queryClient.removeQueries({ queryKey: ["user"] }); // React Query 캐시 삭제
-    Cookies.remove("token"); // 쿠키에 저장된 토큰 삭제
     router.push("/"); // 메인 페이지로 이동
   };
 
