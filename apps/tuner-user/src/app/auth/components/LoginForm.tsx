@@ -11,7 +11,6 @@ import {
 } from "@/features/auth/utils/validateLogin";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/features/auth/store/authStore";
 import { loginRequest } from "@/features/auth/services/login";
 // import { mockLogin } from "@/features/auth/services/login"; // 테스트용
 
@@ -23,7 +22,6 @@ const initialFormData: LoginFormData = {
 export default function LoginForm() {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<LoginFormErrors>({});
-  const { setUser } = useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
     image: "",
