@@ -1,4 +1,4 @@
-// src/store/useSessionStore.ts
+// 전역 으로 관리 되는 로그인 상태관리
 import { create } from 'zustand';
 
 type AdminType = {
@@ -13,6 +13,7 @@ type SessionState = {
     isLoading: boolean;
     isLoggedIn: boolean;
     setAdmin: (admin: AdminType) => void;
+    logout: () => void;
 };
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -26,5 +27,10 @@ export const useSessionStore = create<SessionState>((set) => ({
             isLoading: false,
             isLoggedIn: true,
         }),
-
+    logout: () =>
+        set({
+            admin: null,
+            isLoading: false,
+            isLoggedIn: false,
+        }),
 }));
