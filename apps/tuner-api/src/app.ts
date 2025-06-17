@@ -1,6 +1,6 @@
 import express from "express";
 import { adminRoutes, authRoutes, userRoutes, surveyRoutes } from "../src/routes";
-import  routerWallet  from "../src/wallet/routers/wallet.routes";
+import routerWallet from "../src/wallet/routers/wallet.routes";
 import cors from "cors";
 
 const app = express();
