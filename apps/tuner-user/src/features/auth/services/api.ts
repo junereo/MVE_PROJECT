@@ -4,30 +4,20 @@ import { LoginFormData } from "../types";
 
 // 회원가입
 export const signup = async (data: SignupFormData) => {
-  console.log("fasdf");
-  console.dir(axios);
-
   const response = await axios.post("/auth/signup", data);
-  console.log(data);
-
-  return response.data;
+  return response;
 };
 
 // 로그인
 export const loginRequest = async (data: LoginFormData) => {
-  const response = await axios.post("/auth/login", data);
+  const response = await axios.post("/auth/signup", data);
   return response.data;
 };
 
 // 카카오 로그인
 export const socialLogin = async (provider: "kakao", code: string) => {
   const response = await axios.post(`/auth/${provider}/login`, { code });
-  return response.data; // { token, user }
-};
-
-// 로그아웃
-export const logoutRequest = async () => {
-  await axios.post("/auth/logout"); // 쿠키 제거 요청
+  return response; // { token, user }
 };
 
 // 사용자 정보 가져옴
