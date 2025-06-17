@@ -2,6 +2,7 @@
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import Modal from "@/components/ui/Modal";
 import { useState } from "react";
 import { SignupFormData, SignupFormErrors } from "@/features/auth/types";
 import {
@@ -23,7 +24,24 @@ const initialFormData: SignupFormData = {
 export default function SignupForm() {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<SignupFormErrors>({}); // 에러 상태 관리
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    image: "",
+    description: "",
+    buttonLabel: "",
+    redirectTo: "",
+  });
+
   const router = useRouter();
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleNext = () => {
+    setIsModalOpen(false);
+    router.push(modalContent.redirectTo);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -49,13 +67,24 @@ export default function SignupForm() {
 
     // !-수정 필요함, 모달창으로 회원가입 성공 안내-!
     try {
-      const res = await signup(formData); // 백엔드에 요청
-      console.log(res);
-      if (res.status >= 200 && res.status < 300) {
-        router.push("/login"); // 로그인으로 이동
-      }
-    } catch (err) {
-      alert(err);
+      await signup(formData);
+      // 회원가입 성공
+      setModalContent({
+        image: "check.png",
+        description: "TUNER 회원가입을 완료했습니다.",
+        buttonLabel: "로그인 하기",
+        redirectTo: "/auth",
+      });
+      setIsModalOpen(true);
+    } catch (error) {
+      // 회원가입 실패
+      setModalContent({
+        image: "x.png",
+        description: "회원가입 중 오류가 발생했습니다.",
+        buttonLabel: "회원가입 다시 시도하기",
+        redirectTo: "/auth/signup",
+      });
+      setIsModalOpen(true);
     }
 
     /*
@@ -76,71 +105,83 @@ export default function SignupForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4 max-w-[400px] mx-auto mt-10 p-6"
-    >
-      <div className="flex flex-col gap-2 mb-6">
-        <div className="flex flex-col gap-2 mb-4">
-          <div>
+    <>
+      {isModalOpen && (
+        <Modal
+          image={modalContent.image}
+          description={modalContent.description}
+          buttonLabel={modalContent.buttonLabel}
+          onClick={handleNext}
+          onClose={handleClose}
+          color={modalContent.image === "check.png" ? "blue" : "red"}
+        />
+      )}
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 max-w-[400px] mx-auto mt-10 p-6"
+      >
+        <div className="flex flex-col gap-2 mb-6">
+          <div className="flex flex-col gap-2 mb-4">
+            <div>
+              <Input
+                label="이메일"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+                placeholder="이메일"
+                required
+              />
+            </div>
             <Input
-              label="이메일"
-              name="email"
-              type="email"
-              value={formData.email}
+              label="비밀번호"
+              name="password"
+              type="password"
+              value={formData.password}
               onChange={handleChange}
-              error={errors.email}
-              placeholder="이메일"
+              error={errors.password}
+              placeholder="비밀번호"
+              required
+            />
+            <Input
+              label="비밀번호 확인"
+              name="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              error={errors.confirmPassword}
+              placeholder="비밀번호 확인"
               required
             />
           </div>
           <Input
-            label="비밀번호"
-            name="password"
-            type="password"
-            value={formData.password}
+            label="닉네임"
+            name="nickname"
+            type="text"
+            value={formData.nickname}
             onChange={handleChange}
-            error={errors.password}
-            placeholder="비밀번호"
+            error={errors.nickname}
+            maxLength={8}
+            placeholder="닉네임"
             required
           />
           <Input
-            label="비밀번호 확인"
-            name="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
+            label="휴대전화번호"
+            name="phone_number"
+            type="tel"
+            value={formData.phone_number}
             onChange={handleChange}
-            error={errors.confirmPassword}
-            placeholder="비밀번호 확인"
+            error={errors.phone_number}
+            maxLength={11}
+            placeholder="휴대폰 번호"
             required
           />
         </div>
-        <Input
-          label="닉네임"
-          name="nickname"
-          type="text"
-          value={formData.nickname}
-          onChange={handleChange}
-          error={errors.nickname}
-          maxLength={8}
-          placeholder="닉네임"
-          required
-        />
-        <Input
-          label="휴대전화번호"
-          name="phone_number"
-          type="tel"
-          value={formData.phone_number}
-          onChange={handleChange}
-          error={errors.phone_number}
-          maxLength={11}
-          placeholder="휴대폰 번호"
-          required
-        />
-      </div>
-      <Button type="submit" color="blue">
-        가입하기
-      </Button>
-    </form>
+        <Button type="submit" color="blue">
+          가입하기
+        </Button>
+      </form>
+    </>
   );
 }

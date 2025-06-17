@@ -8,5 +8,4 @@ const instance = axios.create({
   withCredentials: true, // 백엔드에서 쿠키 기반 인증 사용 시 필요
 });
 
-instance.get("/");
 export default instance;

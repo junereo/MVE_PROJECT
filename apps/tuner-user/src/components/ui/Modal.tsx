@@ -62,8 +62,8 @@ export default function Modal({
           <Image
             src={`/images/${image}`}
             alt="modal image"
-            width={60}
-            height={60}
+            width={70}
+            height={70}
           />
         </div>
 
@@ -76,7 +76,7 @@ export default function Modal({
 
         <button
           onClick={onClick}
-          className={`w-full py-3${styles[color]} text-white font-bold rounded-lg transition duration-200`}
+          className={`w-full py-3 ${styles[color]} text-white font-bold rounded-lg transition duration-200`}
         >
           {buttonLabel}
         </button>
