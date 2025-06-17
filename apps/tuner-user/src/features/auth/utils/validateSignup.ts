@@ -23,7 +23,7 @@ export const validateSignupField = (
       return value.length > 1
         ? ""
         : "닉네임은 2자 이상 8자 이하로 입력해주세요.";
-    case "phoneNumber":
+    case "phone_number":
       return /^01([0|1|6|7|8|9])([0-9]{3,4})([0-9]{4})$/.test(value)
         ? ""
         : "유효한 휴대전화번호를 입력해주세요.";
