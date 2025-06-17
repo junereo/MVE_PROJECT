@@ -32,6 +32,11 @@ export default function Navigate() {
                         - Template
                     </Link>
                 </li>
+                <li>
+                    <Link href="/mypage" className="block hover:text-blue-300">
+                        - My Page
+                    </Link>
+                </li>
             </ul>
         </div>
     );

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useOauth } from '@/store/globalStore';
 import { useRouter } from 'next/navigation';
 import Button from '../ui/Button';
+import Link from 'next/link';
 
 export default function Header() {
     const { logout } = useSessionStore();
@@ -52,8 +53,7 @@ export default function Header() {
 
     return (
         <>
-            <div className="fixed top-0 left-[8%] w-[92%] h-[60px] bg-white text-white z-40 flex items-center justify-between px-6">
-                <div className="text-black">my page</div>
+            <div className="fixed top-0 left-[8%] w-[92%] h-[60px] bg-white text-white z-40 flex items-center justify-end px-6">
                 <Button color="blue" onClick={() => setShowModal(true)}>
                     LogOut
                 </Button>
