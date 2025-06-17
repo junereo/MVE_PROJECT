@@ -1,6 +1,7 @@
 import { PrismaClient, AdminRole } from '@prisma/client';
 import { signToken } from '../utils/jwt';
 import type { CookieOptions } from 'express';
+import { RegisterList } from "../types/admin.types";
 
 const prisma = new PrismaClient();
 
@@ -26,20 +27,36 @@ export const login = async (email: string, password: string) => {
 
     // STEP 2: JWT 발급
     const token = signToken({ admin: admin.id });
-
     return {
         token,
+        admin,
         redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
         cookieOptions: defaultCookieOptions,
     };
 };
 
 
-// // TODO: Implement admin service methods
-// export const getDashboardData = async () => {
-//     // Implementation will be added later
-// };
+export const createAdmin = async (data: RegisterList) => {
+    const isAdmin = await prisma.admin.findUnique({ where: { email: data.email } });
+    if (isAdmin) throw new Error("이미 등록된 관리자 입니다");
 
-// export const getUserManagementData = async () => {
-//     // Implementation will be added later
-// }; 
+    const role =
+        data.role === 'superadmin' ? AdminRole.superadmin : AdminRole.admin;
+
+    const newAdmin = await prisma.admin.create({
+        data: {
+            email: data.email,
+            password: data.password,
+            name: data.name,
+            phone_number: data.phone_number,
+            role
+        }
+    });
+    return {
+        id: newAdmin.id,
+        email: newAdmin.email,
+        name: newAdmin.name,
+        phone_number: newAdmin.phone_number,
+        role: newAdmin.role,
+    }
+}
