@@ -1,7 +1,7 @@
 import "./globals.css";
 import Header from "../components/layouts/Header";
 import Footer from "../components/layouts/Footer";
-import Sidebar from "../components/layouts/sidebar";
+import BottomNavbar from "@/components/layouts/BottomNavbar";
 import Wrapper from "../components/layouts/Wrapper";
 import AuthInitializer from "@/features/auth/components/AuthInitializer";
 import QueryClientProvider from "@/lib/react-query/QueryClientProvider";
@@ -20,7 +20,7 @@ export default function RootLayout({
             <AuthInitializer />
             {children}
           </Wrapper>
-          <Sidebar />
+          <BottomNavbar />
           <Footer />
         </QueryClientProvider>
       </body>

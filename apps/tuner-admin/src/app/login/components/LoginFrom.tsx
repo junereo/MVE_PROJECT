@@ -2,9 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useOauth } from '@/store/globalStore';
 import axiosInstance from '@/lib/network/axios';
-import axiosClient from '@/lib/network/axios';
-import { useSessionStore } from '@/store/authmeStore';
-
+// import { useSessionCheck } from '@/hooks/useSessionCheck';
 import { useState } from 'react';
 
 const pushLogin = async (formData: any) => {

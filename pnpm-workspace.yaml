@@ -1,3 +1,9 @@
 packages:
-  - 'apps/tuner-api'
-  - 'packages/*'
+  - apps/tuner-api
+  - packages/*
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - bcrypt
+  - esbuild
+  - prisma

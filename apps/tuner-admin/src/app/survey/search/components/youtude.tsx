@@ -18,7 +18,7 @@ export default function YoutubeSearch() {
         <div className="p-4 max-w-6xl mx-auto">
             <h1 className="text-xl font-bold mb-4">유튜브 영상 검색</h1>
 
-            <div className="flex gap-2 mb-4 max-w-3xl">
+            <div className="flex gap-2 mb-4 max-w-3x">
                 <input
                     className="border border-gray-400 p-2 flex-1 rounded"
                     placeholder="검색어를 입력해주세요"
