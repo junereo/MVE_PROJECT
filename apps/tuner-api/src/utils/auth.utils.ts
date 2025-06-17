@@ -6,3 +6,8 @@ export const verifyPassword = async (plain: string, hashed: string) => {
     return bcrypt.compare(plain, hashed);
 };
 
+
+export default {
+    hashPassword,
+    verifyPassword,
+};

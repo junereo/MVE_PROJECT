@@ -1,7 +1,8 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface ModalProps {
   image: string;
@@ -11,6 +12,8 @@ interface ModalProps {
   color: "blue" | "red";
   onClick: () => void;
   onClose: () => void;
+  showCancel?: boolean;
+  cancelLabel?: string;
 }
 
 export default function Modal({
@@ -21,13 +24,18 @@ export default function Modal({
   color,
   onClick,
   onClose,
+  showCancel,
+  cancelLabel,
 }: ModalProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
   const styles = {
-    blue: " bg-blue-500 hover:bg-blue-600",
+    blue: "bg-blue-500 hover:bg-blue-600",
     red: "bg-red-500 hover:bg-red-600",
   };
 
   useEffect(() => {
+    setIsMounted(true);
     document.body.style.overflow = "hidden"; // 모달창 뜨면 배경 스크롤 막음
     return () => {
       document.body.style.overflow = "auto"; // 모달창 닫히면 스크롤 원래대로
@@ -43,10 +51,12 @@ export default function Modal({
     e.stopPropagation();
   };
 
-  return (
+  if (!isMounted) return null; // document가 없는 SSR 환경에서는 아무것도 렌더링하지 않음
+
+  return createPortal(
     <div
       onClick={handleBackdropClick}
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+      className="fixed inset-0 flex items-center justify-center z-[9999] bg-black bg-opacity-50 "
     >
       <div
         onClick={stopPropagation}
@@ -62,8 +72,8 @@ export default function Modal({
           <Image
             src={`/images/${image}`}
             alt="modal image"
-            width={60}
-            height={60}
+            width={70}
+            height={70}
           />
         </div>
 
@@ -74,13 +84,26 @@ export default function Modal({
         )}
         <div className="text-base text-gray-600 mb-8">{description}</div>
 
-        <button
-          onClick={onClick}
-          className={`w-full py-3${styles[color]} text-white font-bold rounded-lg transition duration-200`}
-        >
-          {buttonLabel}
-        </button>
+        <div className="flex gap-6">
+          {showCancel && (
+            <button
+              onClick={onClose}
+              className="w-full py-3 bg-gray-200 hover:bg-gray-300 text-black font-bold rounded-lg transition duration-200"
+            >
+              {cancelLabel ?? "취소"}
+            </button>
+          )}
+          <button
+            onClick={onClick}
+            className={`w-full py-3 ${
+              styles[color || "blue"]
+            } text-white font-bold rounded-lg transition duration-200`}
+          >
+            {buttonLabel}
+          </button>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

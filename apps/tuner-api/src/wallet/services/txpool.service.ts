@@ -1,4 +1,13 @@
-import { JsonRpcProvider, Contract, Wallet, verifyMessage } from 'ethers';
+import { 
+    JsonRpcProvider, 
+    Contract, 
+    Wallet, 
+    verifyMessage,
+    keccak256,
+    toUtf8Bytes,
+    formatUnits,
+    BigNumberish,
+} from 'ethers';
 import contractABI from '../../../ABI/meta_transction_ABI.json' assert { type: 'json' };
 import dotenv from 'dotenv';
 dotenv.config();
@@ -15,19 +24,20 @@ interface TxPoolItem {
 }
 
 export class TxPoolService {
-  private txpool: TxPoolItem[] = [];
-  private provider!: JsonRpcProvider;
-  private wallet!: Wallet;
-  private msgSigner!: Contract;
+    private txpool: TxPoolItem[] = [];
+    private provider!: JsonRpcProvider;
+    private wallet!: Wallet;
+    private msgSigner!: Contract;
+    private contract!: Contract;
 
-  constructor() {}
+    constructor() {}
 
-  async init(): Promise<void> {
-    this.provider = new JsonRpcProvider(process.env.SEPLOIA_RPC_URL!);
-    this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
-    const contractAddress = process.env.META_CONTRACT_ADDRESS!;
-    this.msgSigner = new Contract(contractAddress, contractABI, this.provider).connect(this.wallet);
-  }
+    async init(): Promise<void> {
+        this.provider = new JsonRpcProvider(process.env.SEPLOIA_RPC_URL!);
+        this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
+        const contractAddress = process.env.META_CONTRACT_ADDRESS!;
+        this.msgSigner = new Contract(contractAddress, contractABI, this.provider).connect(this.wallet) as Contract;
+    }
 
   getPool(): TxPoolItem[] {
     return this.txpool;

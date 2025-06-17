@@ -1,28 +1,45 @@
 "use client";
 
+import Modal from "@/components/ui/Modal";
+import Cookies from "js-cookie";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useRouter } from "next/navigation";
-import { logoutRequest } from "@/features/auth/services/api";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function LogoutButton() {
+  const [openModal, setOpenModal] = useState(false);
   const { logout } = useAuthStore(); // 상태 리셋 함수 가져옴
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const handleLogout = async () => {
-    await logoutRequest(); // 로그아웃 요청
+  const handleLogout = () => {
     logout(); // Zustand 상태 초기화 (token, user → null)
-    queryClient.removeQueries({ queryKey: ["user"] }); // Query 캐시 제거
-    router.push("/auth"); // 로그인 페이지로 이동
+    queryClient.removeQueries({ queryKey: ["user"] }); // React Query 캐시 삭제
+    Cookies.remove("token"); // 쿠키에 저장된 토큰 삭제
+    router.push("/"); // 메인 페이지로 이동
   };
 
+  const handleOpen = () => setOpenModal(true);
+  const handleClose = () => setOpenModal(false);
+
   return (
-    <button
-      onClick={handleLogout}
-      className="text-red-500 text-sm hover:underline"
-    >
-      Logout
-    </button>
+    <>
+      <button onClick={handleOpen} className="text-sm hover:underline">
+        Logout
+      </button>
+      {openModal && (
+        <Modal
+          image="check.png"
+          description="로그아웃 하시겠습니까?"
+          buttonLabel="확인"
+          cancelLabel="취소"
+          color="blue"
+          showCancel
+          onClick={handleLogout}
+          onClose={handleClose}
+        />
+      )}
+    </>
   );
 }
