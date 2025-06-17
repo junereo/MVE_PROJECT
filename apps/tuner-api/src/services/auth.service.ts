@@ -169,7 +169,7 @@ export const oauthCallbackService = async (
 
     return {
         token,
-        redirectUrl: process.env.CLIENT_REDIRECT_URL || 'http://localhost:5173',
+        redirectUrl: process.env.CLIENT_REDIRECT_URL || 'http://localhost:3000',
         cookieOptions: defaultCookieOptions,
     };
 };
