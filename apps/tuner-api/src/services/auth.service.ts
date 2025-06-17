@@ -210,3 +210,18 @@ export const fetchKakaoProfile = async (code: string) => {
         picture: profileRes.properties?.profile_image,
     };
 };
+
+export const getCurrentUserService = async (req: Request) => {
+    console.log("🔥 req.user =", (req as any).user);
+    const decodedUser = (req as any).user;
+    const user = await prisma.user.findUnique({
+        where: { id: decodedUser.userId },
+        select: {
+            id: true,
+            nickname: true,
+        },
+    });
+
+    if (!user) throw new Error('사용자를 찾을 수 없습니다.');
+    return user;
+};

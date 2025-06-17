@@ -1,6 +1,7 @@
 import express from "express";
 import { adminRoutes, authRoutes, userRoutes, surveyRoutes } from "../src/routes";
 import routerWallet from "../src/wallet/routers/wallet.routes";
+import cookieParser from 'cookie-parser';
 import cors from "cors";
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(cors({
 }));
 
 // 미들웨어 설정
+app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
