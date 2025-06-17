@@ -66,10 +66,10 @@ export default function LoginForm() {
     // !-수정 필요함-!
     try {
       await loginRequest(formData); // 백엔드에 요청
-    } catch (error) {
+    } catch (error: any) {
       setModalContent({
         image: "x.png",
-        description: "로그인 중 오류가 발생했습니다.",
+        description: error.message,
         buttonLabel: "로그인 다시 시도하기",
         redirectTo: "/auth",
       });
