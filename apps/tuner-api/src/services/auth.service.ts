@@ -1,23 +1,38 @@
 import { PrismaClient, UserLevel, User, User_OAuth } from '@prisma/client';
 import type { Request, CookieOptions } from 'express';
 import { RegisterList, LoginResponse } from "../types/auth.types";
-import jwt from 'jsonwebtoken';
-import { hashPassword, verifyPassword } from '../utils/auth.utils';
 import { signToken } from '../utils/jwt';
 import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const prisma = new PrismaClient();
+
+const defaultCookieOptions: CookieOptions = {
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000,// 7일
+};
+
+type OAuthCallbackResult =
+    | {
+        token: string;
+        redirectUrl: string;
+        cookieOptions: CookieOptions;
+    }
+    | {
+        error: string;
+        detail?: string;
+    };
 
 export const emailRegister = async (data: RegisterList) => {
     const isUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (isUser) throw new Error("이미 가입된 이메일입니다.");
 
-    const hashedPassword = await hashPassword(data.password);
-
     const newUser = await prisma.user.create({
         data: {
             email: data.email,
-            password: hashedPassword,
+            password: data.password,
             nickname: data.nickname,
             phone_number: data.phone_number,
 
@@ -37,56 +52,28 @@ export const emailRegister = async (data: RegisterList) => {
     };
 };
 
-export const emaillogin = async (email: string, password: string): Promise<LoginResponse> => {
+export const emaillogin = async (email: string, password: string): Promise<OAuthCallbackResult> => {
+
+
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-        throw new Error("가입되지 않은 이메일입니다.");
+        throw new Error("가입되지 않은 이메일입니다. -서버");
     }
-
-    const isValid = await verifyPassword(password, user.password);
+    const isValid = (password === user.password);
+    // const isValid = await verifyPassword(password, user.password);
     if (!isValid) {
-        throw new Error("비밀번호가 일치하지 않습니다.");
+        throw new Error("비밀번호가 일치하지 않습니다.-서버");
     }
-
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-        throw new Error('JWT_SECRET 환경 변수가 설정되지 않았습니다.');
-    }
-
-    const token = jwt.sign(
-        {
-            userId: user.id,
-            nickname: user.nickname
-        },
-        jwtSecret!,
-        { expiresIn: '1d' }
-    );
+    
+    // STEP 2: JWT 발급
+    const token = signToken({ userId: user.id });
 
     return {
         token,
-        user: {
-            id: user.id,
-            nickname: user.nickname,
-        }
+        redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
+        cookieOptions: defaultCookieOptions,
     };
 };
-
-const defaultCookieOptions: CookieOptions = {
-    httpOnly: true,
-    sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
-};
-
-type OAuthCallbackResult =
-    | {
-        token: string;
-        redirectUrl: string;
-        cookieOptions: CookieOptions;
-    }
-    | {
-        error: string;
-        detail?: string;
-    };
 
 export const oauthCallbackService = async (
     req: Request,
@@ -174,9 +161,6 @@ export const oauthCallbackService = async (
     };
 };
 
-
-
-
 export const fetchKakaoProfile = async (code: string) => {
     const { data: tokenRes } = await axios.post(
         'https://kauth.kakao.com/oauth/token',
@@ -212,7 +196,6 @@ export const fetchKakaoProfile = async (code: string) => {
 };
 
 export const getCurrentUserService = async (req: Request) => {
-    console.log("🔥 req.user =", (req as any).user);
     const decodedUser = (req as any).user;
     const user = await prisma.user.findUnique({
         where: { id: decodedUser.userId },
