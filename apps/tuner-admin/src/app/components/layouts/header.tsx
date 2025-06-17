@@ -6,11 +6,12 @@ import { usePathname } from 'next/navigation';
 import { useOauth } from '@/store/globalStore';
 import { useRouter } from 'next/navigation';
 import Button from '../ui/Button';
-import Link from 'next/link';
 
 export default function Header() {
     const { logout } = useSessionStore();
-    const { reset } = useOauth();
+    const { role, name, reset } = useOauth();
+    console.log(role, name);
+
     const router = useRouter();
     const [showModal, setShowModal] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
@@ -53,7 +54,11 @@ export default function Header() {
 
     return (
         <>
-            <div className="fixed top-0 left-[8%] w-[92%] h-[60px] bg-white text-white z-40 flex items-center justify-end px-6">
+            <div className="fixed top-0 left-[8%] w-[92%] h-[60px] gap-3 bg-white text-white z-40 flex items-center justify-end px-6">
+                <div className="flex gap-5">
+                    <div className="text-2xl text-green-600">권한:{role}</div>
+                    <div className="text-2xl text-green-600">닉네임:{name}</div>
+                </div>
                 <Button color="blue" onClick={() => setShowModal(true)}>
                     LogOut
                 </Button>
