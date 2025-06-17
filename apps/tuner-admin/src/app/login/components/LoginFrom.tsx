@@ -1,14 +1,9 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useOauth } from '@/store/globalStore';
-import axiosInstance from '@/lib/network/axios';
 // import { useSessionCheck } from '@/hooks/useSessionCheck';
+import { pushLogin } from '@/lib/network/api';
 import { useState } from 'react';
-
-const pushLogin = async (formData: any) => {
-    const res = await axiosInstance.post('/admin/login', formData);
-    return res.data;
-};
 
 const LoginFrom = () => {
     const router = useRouter();
@@ -28,13 +23,13 @@ const LoginFrom = () => {
 
         try {
             const result = await pushLogin(formData);
-            console.log('서버 응답:', result);
+            console.log('서버 응답:', result.admin);
 
-            setValue('name', result.name);
+            setValue('name', result.admin.name);
             setValue('email', result.email);
             setValue('password', result.password);
             setValue('phone_number', result.phone_number);
-            setValue('role', result.role);
+            setValue('role', result.admin.role);
 
             router.push('/dashboard');
         } catch (error) {

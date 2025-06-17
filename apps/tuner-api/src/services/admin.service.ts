@@ -5,12 +5,15 @@ const prisma = new PrismaClient();
 
 export const login = async (email: string, password: string) => {
     const admin = await prisma.admin.findUnique({ where: { email } });
+    console.log(admin);
 
     if (!admin) {
         throw new Error("존재하지 않는 관리자입니다.");
     }
 
-    const isValid = await authUilts.verifyPassword(password, admin.password);
+    const isValid = password === admin.password;
+
+    // const isValid = await authUilts.verifyPassword(password, admin.password);
     if (!isValid) {
         throw new Error("비밀번호가 일치하지 않습니다.");
     }

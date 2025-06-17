@@ -11,8 +11,11 @@ export const manageUsers = async (req: Request, res: Response, next: NextFunctio
 };
 export const adminLoginHandler = async (req: Request, res: Response) => {
     try {
+
         const result = await AdminService.login(req.body.email, req.body.password);
         res.json(result);
+
+
     } catch (err: any) {
         res.status(401).json({ error: err.message });
     }
