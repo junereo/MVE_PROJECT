@@ -7,7 +7,6 @@ const defaultCookieOptions = {
     maxAge: 24 * 60 * 60 * 1000, // 1일
 };
 
-
 // TODO: Implement admin controller methods
 export const dashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     // Implementation will be added later
@@ -18,22 +17,18 @@ export const manageUsers = async (req: Request, res: Response, next: NextFunctio
 };
 
 export const adminLoginHandler = async (req: Request, res: Response) => {
+
     try {
         const result = await AdminService.login(req.body.email, req.body.password);
 
         // 토큰을 HTTP Only 쿠키 저장
         res.cookie('token', result.token, defaultCookieOptions);
+        res.status(200).json({ admin: result.admin, success: true});
 
-
-        res.status(200).json({ admin: result.admin, redirect: 'http://localhost:3000/dashboard' });
-
-        // 프론트엔드에 관리자 정보전달
-        res.status(200).json(result.admin);
     } catch (err: any) {
         res.status(401).json({ error: err.message });
     }
 };
-
 
 export const logout = async (
     req: Request,
