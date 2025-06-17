@@ -12,8 +12,8 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store/authStore";
-import { loginRequest } from "@/features/auth/services/api";
-// import { mockLogin } from "@/features/auth/services/api"; // 테스트용
+import { loginRequest } from "@/features/auth/services/login";
+// import { mockLogin } from "@/features/auth/services/login"; // 테스트용
 
 const initialFormData: LoginFormData = {
   email: "",
@@ -23,7 +23,7 @@ const initialFormData: LoginFormData = {
 export default function LoginForm() {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<LoginFormErrors>({});
-  const { setToken, setUser } = useAuthStore();
+  const { setUser } = useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
     image: "",
@@ -67,13 +67,7 @@ export default function LoginForm() {
 
     // !-수정 필요함-!
     try {
-      const res = await loginRequest(formData); // 백엔드에 요청
-      console.log(res);
-      if (res.data.token && res.data.user) {
-        setToken(res.data.token); // 토큰 상태 저장
-        setUser(res.data.user); // 사용자 정보 저장 (email, nickname)
-        router.push("/"); // 메인으로 이동
-      }
+      await loginRequest(formData); // 백엔드에 요청
     } catch (error) {
       setModalContent({
         image: "x.png",
