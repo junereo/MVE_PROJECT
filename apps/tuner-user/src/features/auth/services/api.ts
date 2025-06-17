@@ -4,18 +4,13 @@ import { LoginFormData } from "../types";
 
 // 회원가입
 export const signup = async (data: SignupFormData) => {
-  console.log("fasdf");
-  console.dir(axios);
-
   const response = await axios.post("/auth/signup", data);
-  console.log(data);
-
-  return response.data;
+  return response;
 };
 
 // 로그인
 export const loginRequest = async (data: LoginFormData) => {
-  const response = await axios.post("/auth/login", data);
+  const response = await axios.post("/auth/signup", data);
   return response.data;
 };
 

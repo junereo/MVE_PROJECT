@@ -8,3 +8,7 @@ export function verifyToken(token: string) {
     return jwt.verify(token, process.env.JWT_SECRET!);
 }
 
+export default {
+    signToken,
+    verifyToken,
+};
