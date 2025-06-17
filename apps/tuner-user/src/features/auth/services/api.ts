@@ -10,7 +10,7 @@ export const signup = async (data: SignupFormData) => {
 
 // 로그인
 export const loginRequest = async (data: LoginFormData) => {
-  const response = await axios.post("/auth/login", data);
+  const response = await axios.post("/auth/signup", data);
   return response.data;
 };
 

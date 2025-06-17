@@ -5,6 +5,8 @@ import {
   userRoutes,
   surveyRoutes,
 } from "../src/routes";
+import routerWallet from "../src/wallet/routers/wallet.routes";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 
 const app = express();
@@ -12,11 +14,13 @@ const app = express();
 app.use(
   cors({
     origin: process.env.CLIENT_IP || "http://192.168.0.59:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
 
 // 미들웨어 설정
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -25,6 +29,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/surveys", surveyRoutes);
 app.use("/admin", adminRoutes);
+app.use("/contract", routerWallet);
 
 // 기본 라우트
 app.get("/", (req, res) => {
