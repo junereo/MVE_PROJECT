@@ -51,13 +51,14 @@ model User_OAuth {
 }
 
 model Admin {
-  id         Int       @id @default(autoincrement())
-  email      String    @unique
-  password   String
-  name       String
-  role       AdminRole
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  password     String
+  name         String
+  phone_number String
+  role         AdminRole
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
 
   // Relation to survey
   // Relation to rewards 
