@@ -1,7 +1,8 @@
 import { PrismaClient, AdminRole } from '@prisma/client';
 import { signToken } from '../utils/jwt';
 import type { CookieOptions } from 'express';
-import { RegisterList } from "../types/admin.types";
+import { RegisterList, AdminRequest } from "../types/admin.types";
+
 
 const prisma = new PrismaClient();
 
@@ -26,7 +27,7 @@ export const login = async (email: string, password: string) => {
     }
 
     // STEP 2: JWT 발급
-    const token = signToken({ admin: admin.id });
+    const token = signToken({ adminId: admin.id });
     return {
         token,
         admin,
@@ -40,7 +41,7 @@ export const createAdmin = async (data: RegisterList) => {
     const isAdmin = await prisma.admin.findUnique({ where: { email: data.email } });
     if (isAdmin) throw new Error("이미 등록된 관리자 입니다");
 
-    const role = data.role === 1 ? AdminRole.superadmin : AdminRole.admin;
+    const role = data.role === 0 ? AdminRole.superadmin : AdminRole.admin;
 
     const newAdmin = await prisma.admin.create({
         data: {
@@ -59,3 +60,20 @@ export const createAdmin = async (data: RegisterList) => {
         role: newAdmin.role,
     }
 }
+
+export const getAdminService = async (req: AdminRequest) => {
+    const adminId = (req as any).user?.adminId;
+    if (!adminId) throw new Error('인증되지 않은 사용자입니다.');
+
+    const admin = await prisma.admin.findUnique({
+        where: { id: adminId },
+        select: {
+            id: true,
+            name: true,
+        },
+    });
+
+    if (!admin) throw new Error('관리자 정보를 찾을 수 없습니다.');
+
+    return admin;
+};
