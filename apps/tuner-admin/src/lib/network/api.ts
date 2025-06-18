@@ -1,8 +1,14 @@
 import axiosClient from '@/lib/network/axios';
+import axios from 'axios';
 
 // 로그인 요청
 export const pushLogin = async (formData: any) => {
     const res = await axiosClient.post('/admin/login', formData);
+    return res.data;
+};
+// 로그아웃 요청
+export const LogOut = async () => {
+    const res = await axiosClient.post('/admin/logout');
     return res.data;
 };
 // dashbord

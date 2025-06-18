@@ -6,6 +6,9 @@ import {
   getCurrentUserService as userServices
 } from "../services/auth.service";
 import { RegisterList } from "../types/auth.types";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export const emailRegister = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -27,7 +30,7 @@ export const emaillogin = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     res.cookie('token', result.token, result.cookieOptions);
-    res.json({ success: true }); 
+    res.json({ success: true });
   } catch (error: any) {
     res.status(401).json({ error: error.message });
   }
@@ -78,3 +81,4 @@ export const logout = async (
     res.status(500).json({ error: error.message || '서버 오류' });
   }
 };
+
