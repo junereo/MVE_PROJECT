@@ -1,5 +1,5 @@
 // app/video/[videoId]/page.tsx
-import { fetchYoutubeVideos } from '@/lib/network/youtube'; // API 만들어놨다면
+import { fetchYoutubeVideos } from '@/lib/youtube'; // API 만들어놨다면
 import Image from 'next/image';
 
 type Props = {

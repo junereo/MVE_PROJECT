@@ -1,6 +1,7 @@
 // src/lib/axiosClient.ts
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { setupInterceptors } from './ingerceptors';
 
 const getTokenFromCookiesSomehow = () => Cookies.get('access_token');
 
@@ -12,7 +13,10 @@ const axiosClient = axios.create({
     },
     withCredentials: true,
 });
+// 인터셉터 연결
+setupInterceptors(axiosClient);
 
+// 헤더 자동으로 헤더에 Authorization: Bearer 을 붙여서 전송
 axiosClient.interceptors.request.use((config) => {
     const token = getTokenFromCookiesSomehow();
     if (token) config.headers.Authorization = `Bearer ${token}`;

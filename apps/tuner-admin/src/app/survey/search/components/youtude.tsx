@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { fetchYoutubeVideos } from '@/lib/network/youtube';
+import { fetchYoutubeVideos } from '@/lib/youtube';
 import { useRouter } from 'next/navigation';
 
 export default function YoutubeSearch() {
