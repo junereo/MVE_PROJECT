@@ -15,6 +15,7 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     const res = await logoutRequest(); // 백엔드 api 로그아웃 요청
+
     // api 요청 성공 200번일 때 아래 처리되도록-!
     if (res.status === 200) {
       logout(); // Zustand 상태 초기화 (token, user → null)
