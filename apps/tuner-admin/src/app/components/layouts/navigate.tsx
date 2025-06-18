@@ -20,8 +20,8 @@ export default function Navigate() {
                     </Link>
                 </li>
                 <li>
-                    <Link href="/singup" className="block hover:text-blue-300">
-                        - Sing up
+                    <Link href="/signup" className="block hover:text-blue-300">
+                        - Sign up
                     </Link>
                 </li>
                 <li>
