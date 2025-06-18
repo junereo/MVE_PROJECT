@@ -12,7 +12,7 @@ const SignUpForm = () => {
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [phoneNumber, setPhoneNumber] = useState<string>('');
-    const [role, setRole] = useState<string>('');
+    const [role, setRole] = useState<number>();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -105,7 +105,7 @@ const SignUpForm = () => {
                                 type="radio"
                                 name="gender"
                                 value="admin"
-                                onChange={(e) => setRole(e.target.value)}
+                                onChange={(e) => setRole(0)} // 관리자 0 
                                 className="accent-black"
                             />
                             <span>admin</span>
@@ -116,7 +116,7 @@ const SignUpForm = () => {
                                 type="radio"
                                 name="gender"
                                 value="superadmin"
-                                onChange={(e) => setRole(e.target.value)}
+                                onChange={(e) => setRole(1)} // 슈퍼관리자 1
                                 className="accent-black"
                             />
                             <span>superadmin</span>
