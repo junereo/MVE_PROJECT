@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
+import Image from "next/image";
 
 export default function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -16,7 +17,14 @@ export default function Header() {
           </Link>
         </div>
         <nav className="flex gap-4 items-center">
-          <Link href="/search">Search</Link>
+          <Link href="/search">
+            <Image
+              src="/images/search.png"
+              alt="search image"
+              width={17}
+              height={17}
+            />
+          </Link>
           <div
             onClick={() => setSidebarOpen(true)}
             className="text-xl font-bold cursor-pointer"
