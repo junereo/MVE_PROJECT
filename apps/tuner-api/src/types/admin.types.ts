@@ -1,3 +1,12 @@
+export interface RegisterList {
+    email: string;
+    password: string;
+    name: string;
+    phone_number: string;
+    role: number;
+}
+
+
 export interface AdminDashboard {
     total_users: number;
     active_users: number;
