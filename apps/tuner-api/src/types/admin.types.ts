@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 export interface RegisterList {
     email: string;
     password: string;
@@ -6,6 +8,15 @@ export interface RegisterList {
     role: number;
 }
 
+export interface AdminRequest extends Request {
+    user?: {
+        email: string;
+        password: string;
+        name: string;
+        phone_number: string;
+        role: number;
+    };
+}
 
 export interface AdminDashboard {
     total_users: number;
