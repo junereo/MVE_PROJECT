@@ -1,17 +1,23 @@
 import express from "express";
-import { emailRegister, emaillogin, oauthCallbackController, logout } from "../controllers/auth.controller";
-import { validateRegister, validateLogin, verifyToken } from "../middlewares/auth.middleware";
-import { getUserController } from "../controllers/auth.controller"
-
+import {
+  emailRegister,
+  emaillogin,
+  oauthCallbackController,
+  logout,
+} from "../controllers/auth.controller";
+import {
+  validateRegister,
+  validateLogin,
+  verifyToken,
+} from "../middlewares/auth.middleware";
+import { getUserController } from "../controllers/auth.controller";
 
 const router = express.Router();
 
 router.post("/signup", validateRegister, emailRegister);
-router.get("/me", verifyToken, getUserController);
+router.post("/me", verifyToken, getUserController);
 router.post("/login", validateLogin, emaillogin);
 router.get("/oauth/:provider", oauthCallbackController);
-router.post('/logout', logout);
+router.post("/logout", logout);
 
-
-
-export default router; 
+export default router;
