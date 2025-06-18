@@ -15,10 +15,16 @@ const defaultCookieOptions: CookieOptions = {
     maxAge: 24 * 60 * 60 * 1000,// 7일
 };
 
+type LoginUser = {
+    id: number;
+    nickname: string;
+};
+
 type OAuthCallbackResult =
     | {
         token: string;
         redirectUrl: string;
+        user: LoginUser;
         cookieOptions: CookieOptions;
     }
     | {
@@ -69,8 +75,14 @@ export const emaillogin = async (email: string, password: string): Promise<OAuth
     // STEP 2: JWT 발급
     const token = signToken({ userId: user.id });
 
+    const loginUser: LoginUser = {
+        id: user.id,
+        nickname: user.nickname
+    };
+
     return {
         token,
+        user: loginUser,
         redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
         cookieOptions: defaultCookieOptions,
     };
@@ -157,6 +169,7 @@ export const oauthCallbackService = async (
 
     return {
         token,
+        user,
         redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
         cookieOptions: defaultCookieOptions,
     };
