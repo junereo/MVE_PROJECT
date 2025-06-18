@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useOauth } from '@/store/globalStore';
 import { useRouter } from 'next/navigation';
 import Button from '../ui/Button';
+import { LogOut } from '@/lib/network/api';
 
 export default function Header() {
     const { logout } = useSessionStore();
@@ -17,8 +18,7 @@ export default function Header() {
     const modalRef = useRef<HTMLDivElement>(null);
 
     const handleLogoutConfirm = () => {
-        document.cookie =
-            'auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        LogOut();
         logout();
         reset();
         router.push('/login');
