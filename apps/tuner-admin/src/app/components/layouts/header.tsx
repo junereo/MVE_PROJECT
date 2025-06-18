@@ -10,6 +10,8 @@ import ReusableModal from '../ui/modal';
 
 export default function Header() {
     const { logout, admin } = useSessionStore();
+    console.log(admin);
+
     const router = useRouter();
     const [showModal, setShowModal] = useState(false);
 
@@ -31,7 +33,7 @@ export default function Header() {
             <div className="fixed top-0 left-[8%] w-[92%] h-[60px] gap-3 bg-white text-white z-40 flex items-center justify-end px-6">
                 <div className="flex gap-5">
                     <div className="text-2xl text-green-600">
-                        권한:{admin?.role}
+                        권한:{admin?.id}
                     </div>
                     <div className="text-2xl text-green-600">
                         닉네임:{admin?.name}

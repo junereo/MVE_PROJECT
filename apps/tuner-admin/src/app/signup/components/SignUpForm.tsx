@@ -2,7 +2,10 @@
 import Link from 'next/link';
 import axiosInstance from '@/lib/network/axios';
 import { useState } from 'react';
-import { allSignupFields, validateSignupField } from '@/lib/authError/singupHandler';
+import {
+    allSignupFields,
+    validateSignupField,
+} from '@/lib/authError/singupHandler';
 import { SignupFormData, SignupFormErrors } from '@/types';
 import { useRouter } from 'next/navigation';
 const SignUpForm = () => {
@@ -21,7 +24,10 @@ const SignUpForm = () => {
     const handleChange = (field: keyof SignupFormData, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
 
-        const error = validateSignupField(field, value, { ...formData, [field]: value });
+        const error = validateSignupField(field, value, {
+            ...formData,
+            [field]: value,
+        });
         setErrors((prev) => ({ ...prev, [field]: error }));
     };
 
@@ -40,8 +46,7 @@ const SignUpForm = () => {
             const result = await pushOauth(formData);
             alert('회원가입이 완료되었습니다.');
             console.log('서버 응답:', result);
-            router.push("/dashboard")
-
+            router.push('/dashboard');
         } catch (error: any) {
             const status = error.response?.status;
             if (status === 400) {
@@ -73,7 +78,9 @@ const SignUpForm = () => {
                             type="text"
                             placeholder="이름을 입력해주세요"
                             value={formData.name}
-                            onChange={(e) => handleChange('name', e.target.value)}
+                            onChange={(e) =>
+                                handleChange('name', e.target.value)
+                            }
                             className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-400 border-b border-gray-300 focus:outline-none"
                         />
                     </div>
@@ -83,10 +90,16 @@ const SignUpForm = () => {
                             type="email"
                             placeholder="Email"
                             value={formData.email}
-                            onChange={(e) => handleChange('email', e.target.value)}
+                            onChange={(e) =>
+                                handleChange('email', e.target.value)
+                            }
                             className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-400 border-b border-gray-300 focus:outline-none"
                         />
-                        {errors.email && <p className="text-sm text-red-400 mt-1">{errors.email}</p>}
+                        {errors.email && (
+                            <p className="text-sm text-red-400 mt-1">
+                                {errors.email}
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -94,10 +107,16 @@ const SignUpForm = () => {
                             type="password"
                             placeholder="비밀 번호"
                             value={formData.password}
-                            onChange={(e) => handleChange('password', e.target.value)}
+                            onChange={(e) =>
+                                handleChange('password', e.target.value)
+                            }
                             className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-400 border-b border-gray-300 focus:outline-none"
                         />
-                        {errors.password && <p className="text-sm text-red-400 mt-1">{errors.password}</p>}
+                        {errors.password && (
+                            <p className="text-sm text-red-400 mt-1">
+                                {errors.password}
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -105,10 +124,16 @@ const SignUpForm = () => {
                             type="password"
                             placeholder="비밀번호 확인"
                             value={formData.confirmPassword}
-                            onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                            onChange={(e) =>
+                                handleChange('confirmPassword', e.target.value)
+                            }
                             className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-400 border-b border-gray-300 focus:outline-none"
                         />
-                        {errors.confirmPassword && <p className="text-sm text-red-400 mt-1">{errors.confirmPassword}</p>}
+                        {errors.confirmPassword && (
+                            <p className="text-sm text-red-400 mt-1">
+                                {errors.confirmPassword}
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -116,10 +141,16 @@ const SignUpForm = () => {
                             type="text"
                             placeholder="휴대전화 번호 ('-' 제외)"
                             value={formData.phone_number}
-                            onChange={(e) => handleChange('phone_number', e.target.value)}
+                            onChange={(e) =>
+                                handleChange('phone_number', e.target.value)
+                            }
                             className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-400 border-b border-gray-300 focus:outline-none"
                         />
-                        {errors.phone_number && <p className="text-sm text-red-400 mt-1">{errors.phone_number}</p>}
+                        {errors.phone_number && (
+                            <p className="text-sm text-red-400 mt-1">
+                                {errors.phone_number}
+                            </p>
+                        )}
                     </div>
 
                     <div className="flex items-center justify-end gap-4">
