@@ -6,7 +6,7 @@ import { setupInterceptors } from './ingerceptors';
 const getTokenFromCookiesSomehow = () => Cookies.get('access_token');
 
 const axiosClient = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_BACK_API_URL,
+    baseURL: process.env.NEXT_PUBLIC_BACK_API_URL || 'http://localhost:4000',
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',
