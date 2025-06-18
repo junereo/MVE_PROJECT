@@ -105,7 +105,7 @@ const SignUpForm = () => {
                                 type="radio"
                                 name="gender"
                                 value="admin"
-                                onChange={(e) => setRole(0)} // 관리자 0 
+                                onChange={(e) => setRole(1)} // 관리자 1 
                                 className="accent-black"
                             />
                             <span>admin</span>
@@ -116,7 +116,7 @@ const SignUpForm = () => {
                                 type="radio"
                                 name="gender"
                                 value="superadmin"
-                                onChange={(e) => setRole(1)} // 슈퍼관리자 1
+                                onChange={(e) => setRole(0)} // 슈퍼관리자 0
                                 className="accent-black"
                             />
                             <span>superadmin</span>

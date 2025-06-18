@@ -2,7 +2,6 @@ import express from "express";
 import {
   adminRoutes,
   authRoutes,
-  userRoutes,
   surveyRoutes,
 } from "../src/routes";
 import routerWallet from "../src/wallet/routers/wallet.routes";
@@ -25,7 +24,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // 라우트 설정
 app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
 app.use("/surveys", surveyRoutes);
 app.use("/admin", adminRoutes);
 app.use("/contract", routerWallet);
