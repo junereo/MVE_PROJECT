@@ -16,7 +16,8 @@ const LoginForm = () => {
         password: '',
     });
 
-    const [errors, setErrors] = useState<LoginFormErrors>({});
+    const [erros, setErrors] = useState<LoginFormErrors>({});
+    console.log(erros);
 
     const handleChange = (field: keyof LoginFormData, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
