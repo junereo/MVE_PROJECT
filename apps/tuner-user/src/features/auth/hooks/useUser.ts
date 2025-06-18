@@ -16,7 +16,7 @@ export const useUser = () => {
 
   useEffect(() => {
     if (data) {
-      setUser(data); // 로그인 정보 Zustand에 저장
+      setUser(data.data.user); // 로그인 정보 Zustand에 저장
     }
   }, [data, setUser]);
 

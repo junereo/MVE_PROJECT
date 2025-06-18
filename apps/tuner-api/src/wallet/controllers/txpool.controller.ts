@@ -1,62 +1,50 @@
-//txpool.controllers.ts
+// src/controllers/txpool.controller.ts
 import express, { Request, Response, Router } from 'express';
-import { MetaTransctionService } from '../services/meta_transction.service.js';
-const { ethers, Wallet } = require("ethers");
+import { TxPoolService } from '../services/txpool.service.js';
 
 const router: Router = express.Router();
+const txPoolService = new TxPoolService();
 
-// 임시 풀 만듬
-let txpool : any = [];
+await txPoolService.init(); // provider, wallet, contract 초기화
 
-// txpool 조회 (지금 쌓여있는 트랜잭션 작업들이 뭐가있지?)
-export const getTxPool = (req : Request, res: Response) => {
-  res.json(txpool);
+// 1. txpool 조회
+export const getTxPool = (req: Request, res: Response) => {
+  const pool = txPoolService.getPool();
+  res.status(200).json(pool);
 };
 
-// txpool에 트랜잭션 객체를 추가
-export const sign = (req : Request, res: Response) => {
-  // 요청 메시지의 내용과 그사람이 이 메시지를 보낸게 맞는지? 메세지와 개인키로 만든 서명도 받자.
+// 2. txpool에 트랜잭션 객체 추가 (검증 포함)
+export const txSign = (req: Request, res: Response) => {
   const { message, signature } = req.body;
-  // 검증 이사람이 요청을 보낸게 맞는지 서명 검증.
-  const senderSigner = ethers.verifyMessage(JSON.stringify(message), signature);
-  // r s v
-  console.log(senderSigner);
-  // 서명 검증 해서 pool
-  if (message.sender === senderSigner) {
-    txpool.push({ message, signature });
-    res.json("txpool push");
+
+  if (!message || !signature) {
+    res.status(400).json({ error: 'Missing message or signature' });
+    return;
+  }
+
+  const isValid = txPoolService.verifyAndAdd(message, signature);
+  if (isValid) {
+    res.status(200).json({ status: 'Signature verified. Added to txpool.' });
+    return;
   } else {
-    res.json("error");
+    res.status(401).json({ error: 'Signature verification failed' });
+    return;
   }
 };
 
-// txpool에 있는 트랜잭션 작업 목록 처리
-export const metaTransction = async (req : Request, res: Response) => {
-  const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
-  const wallet = new ethers.Wallet(myPrikey, provider);
-  const contractAddress = "0x98391c501f1F3Ce8906a3bcaFB5EC3B49E85A5B3";
-  const contract = new ethers.Contract(contractAddress, contractABI, provider);
-  // web3 from과 서명 추가 했는데
-  const msgSigner = contract.connect(wallet);
+// 3. txpool 처리 (트랜잭션 실행)
+export const submit =  async (req: Request, res: Response) => {
+  try {
+    const result = await txPoolService.processPool();
+    res.status(200).json(result);
+  } catch (err:any) {
+    console.error('TxPool processing error:', err);
+    res.status(500).json({ error: 'Failed to process txpool', details: err.message });
+  }
+};
 
-  // 리듀서로 편하게 작업해보자.
-  // reduce 무척 잘쓰면 편하다.
-  // callback의 인자값 첫번째 유지될값 반환된 값
-  // 두번째 현재 순회하는 인자값 배열의 값이 순서대로 들어온다.
-  // 세번째는 인덱스
-  // reduce 두번째로 전달하는 매개변수는 초기값
-  const txPoolArr = txpool.reduce(
-    (acc, e) => {
-      acc.address.push(e.message.sender);
-      acc.data.push(e.message.data);
-      acc.msg.push(JSON.stringify(e.message));
-      acc.sign.push(e.signature);
-      return acc;
-    },
-    { address: [], data: [], msg: [], sign: [] }
-  );
-
-  const _tx = await msgSigner.mint(txPoolArr.address, txPoolArr.data, txPoolArr.msg, txPoolArr.sign);
-  txpool = [];
-  res.send(_tx);
+// 4. txpool 수동 초기화
+export const txClear =  (req: Request, res: Response) => {
+  txPoolService.clear();
+  res.status(200).json({ status: 'TxPool cleared' });
 };
