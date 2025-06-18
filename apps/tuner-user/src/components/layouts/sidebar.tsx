@@ -16,23 +16,26 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <div
-      className="fixed inset-0 z-60 bg-black bg-opacity-50 flex justify-center"
       onClick={onClose}
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center"
     >
-      <aside
-        className="relative w-full max-w-[485px] h-full"
-        onClick={(e) => e.stopPropagation()} // 내부 클릭 이벤트 버블링 막기
-      >
-        <div className="absolute top-0 right-0 w-64 h-full bg-white p-6 shadow-lg">
-          <button onClick={onClose} className="text-right w-full mb-4">
+      <aside className="relative w-full max-w-[485px] h-full">
+        <div
+          onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()} // 내부 클릭 이벤트 버블링 막기
+          className="absolute top-0 right-0 w-64 h-full bg-white p-6 shadow-lg"
+        >
+          <button
+            onClick={onClose}
+            className="font-bold text-right w-full mb-4"
+          >
             X
           </button>
-          <nav className="flex flex-col gap-4 items-center">
+          <nav onClick={onClose} className="flex flex-col gap-4 items-center">
             <Link href="/">Home</Link>
             <Link href="/survey">Survey</Link>
             <Link href="/mypage">My Page</Link>
           </nav>
-          <nav className="flex flex-col-reverse place-items-end mt-8">
+          <nav onClick={onClose} className="text-right mt-8">
             {user ? <LogoutButton /> : <Link href="/auth">Login</Link>}
           </nav>
         </div>
