@@ -3,7 +3,7 @@ export interface RegisterList {
     password: string;
     name: string;
     phone_number: string;
-    role: string;
+    role: number;
 }
 
 
