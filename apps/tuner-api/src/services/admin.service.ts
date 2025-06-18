@@ -70,6 +70,7 @@ export const getAdminService = async (req: AdminRequest) => {
         select: {
             id: true,
             name: true,
+            role: true
         },
     });
 
