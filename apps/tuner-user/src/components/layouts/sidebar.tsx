@@ -30,13 +30,25 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           >
             X
           </button>
-          <nav onClick={onClose} className="flex flex-col gap-4 items-center">
-            <Link href="/">Home</Link>
-            <Link href="/survey">Survey</Link>
-            <Link href="/mypage">My Page</Link>
+          <nav className="flex flex-col gap-4 items-center">
+            <Link href="/" onClick={onClose}>
+              Home
+            </Link>
+            <Link href="/survey" onClick={onClose}>
+              Survey
+            </Link>
+            <Link href="/mypage" onClick={onClose}>
+              My Page
+            </Link>
           </nav>
-          <nav onClick={onClose} className="text-right mt-8">
-            {user ? <LogoutButton /> : <Link href="/auth">Login</Link>}
+          <nav className="text-right mt-8">
+            {user ? (
+              <LogoutButton />
+            ) : (
+              <Link href="/auth" onClick={onClose}>
+                Login
+              </Link>
+            )}
           </nav>
         </div>
       </aside>
