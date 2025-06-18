@@ -1,6 +1,7 @@
-import { PrismaClient, UserLevel, User, User_OAuth } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import type { Request, CookieOptions } from 'express';
-import { RegisterList, LoginResponse } from "../types/auth.types";
+import { RegisterList } from "../types/auth.types";
+import { AdminRequest } from '../types/admin.types';
 import { signToken } from '../utils/jwt';
 import axios from 'axios';
 import dotenv from 'dotenv';
@@ -195,7 +196,7 @@ export const fetchKakaoProfile = async (code: string) => {
     };
 };
 
-export const getCurrentUserService = async (req: Request) => {
+export const getUserService = async (req: AdminRequest) => {
     const decodedUser = (req as any).user;
     const user = await prisma.user.findUnique({
         where: { id: decodedUser.userId },
