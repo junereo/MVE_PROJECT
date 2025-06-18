@@ -7,7 +7,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { logoutRequest } from "@/features/auth/services/login";
 
-export default function LogoutButton() {
+interface LogoutButtonProps {
+  onClose?: () => void; // 사이드바 닫기
+}
+
+export default function LogoutButton({ onClose }: LogoutButtonProps) {
   const [openModal, setOpenModal] = useState(false);
   const { logout } = useAuthStore(); // 상태 리셋 함수 가져옴
   const router = useRouter();
@@ -20,6 +24,7 @@ export default function LogoutButton() {
     if (res.status === 200) {
       logout(); // Zustand 상태 초기화 (token, user → null)
       queryClient.removeQueries({ queryKey: ["user"] }); // React Query 캐시 삭제
+      onClose?.(); // 사이드바 닫기
       router.push("/"); // 메인 페이지로 이동
     }
   };

@@ -43,7 +43,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </nav>
           <nav className="text-right mt-8">
             {user ? (
-              <LogoutButton />
+              <LogoutButton onClose={onClose} />
             ) : (
               <Link href="/auth" onClick={onClose}>
                 Login
