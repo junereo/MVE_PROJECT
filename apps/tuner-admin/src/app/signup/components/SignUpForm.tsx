@@ -5,7 +5,7 @@ import axiosInstance from '../../../lib/network/axios';
 import { useOauth } from '@/store/globalStore';
 import { useState } from 'react';
 
-const SingUpForm = () => {
+const SignUpForm = () => {
     const { setValue } = useOauth();
     const [name, setName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
@@ -48,7 +48,7 @@ const SingUpForm = () => {
     };
 
     const pushOauth = async (formData: any) => {
-        const res = await axiosInstance.post('/admin/Register', formData);
+        const res = await axiosInstance.post('/admin/signup', formData);
         return res.data;
     };
 
@@ -57,7 +57,7 @@ const SingUpForm = () => {
             <div className="w-96 bg-black bg-opacity-80 p-8 rounded-lg shadow-md text-white">
                 <div className="flex flex-col items-center mb-6">
                     <h2 className="text-2xl font-semibold text-white pb-2">
-                        Sing Up
+                        SignUp
                     </h2>
                     <hr className="w-full border-black  pt-6 border-t-2" />
                 </div>
@@ -143,4 +143,4 @@ const SingUpForm = () => {
     );
 };
 
-export default SingUpForm;
+export default SignUpForm;
