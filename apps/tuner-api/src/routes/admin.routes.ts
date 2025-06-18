@@ -9,6 +9,6 @@ router.get("/dashboard", dashboard);
 router.post("/signup", adminRegister);
 router.post("/login", adminLogin);
 router.post('/logout', logout);
-router.get('/me', verifyAdmin, getAdminController);
+router.post('/me', verifyAdmin, getAdminController);
 
 export default router; 
