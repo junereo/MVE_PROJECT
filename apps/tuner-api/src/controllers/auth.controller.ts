@@ -3,7 +3,7 @@ import {
   emailRegister as registerServices,
   emaillogin as loginServices,
   oauthCallbackService as authServices,
-  getCurrentUserService as userServices
+  getUserService as userServices
 } from "../services/auth.service";
 import { RegisterList } from "../types/auth.types";
 import { PrismaClient } from "@prisma/client";
@@ -54,7 +54,7 @@ export const oauthCallbackController = async (
   }
 };
 
-export const getCurrentUserController = async (
+export const getUserController = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
