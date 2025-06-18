@@ -11,6 +11,7 @@ import {
 } from "@/features/auth/utils/validateLogin";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/features/auth/store/authStore";
 import { loginRequest } from "@/features/auth/services/login";
 // import { mockLogin } from "@/features/auth/services/login"; // 테스트용
 
@@ -29,6 +30,7 @@ export default function LoginForm() {
     buttonLabel: "",
     redirectTo: "",
   });
+  const { setUser } = useAuthStore(); // Zustand 상태 설정
 
   const router = useRouter();
 
@@ -65,7 +67,8 @@ export default function LoginForm() {
 
     // !-수정 필요함-!
     try {
-      await loginRequest(formData); // 백엔드에 요청
+      const res = await loginRequest(formData); // 백엔드에 요청
+      setUser(res.data.user);
       router.push("/");
     } catch (error: any) {
       setModalContent({
