@@ -40,7 +40,7 @@ export const createAdmin = async (data: RegisterList) => {
     const isAdmin = await prisma.admin.findUnique({ where: { email: data.email } });
     if (isAdmin) throw new Error("이미 등록된 관리자 입니다");
 
-    const role = data.role === 1 ? AdminRole.superadmin : AdminRole.admin;
+    const role = data.role === 0 ? AdminRole.superadmin : AdminRole.admin;
 
     const newAdmin = await prisma.admin.create({
         data: {
