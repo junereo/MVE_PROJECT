@@ -30,7 +30,12 @@ export const emaillogin = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     res.cookie('token', result.token, result.cookieOptions);
-    res.json({ success: true });
+    res.status(200).json({
+      token: result.token,
+      user: result.user, // id, nickname
+      redirectUrl: result.redirectUrl,
+    });
+    return
   } catch (error: any) {
     res.status(401).json({ error: error.message });
   }

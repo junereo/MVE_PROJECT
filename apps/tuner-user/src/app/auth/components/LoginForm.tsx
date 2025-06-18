@@ -69,6 +69,7 @@ export default function LoginForm() {
     try {
       const res = await loginRequest(formData); // 백엔드에 요청
       setUser(res.data.user);
+
       router.push("/");
     } catch (error: any) {
       setModalContent({
