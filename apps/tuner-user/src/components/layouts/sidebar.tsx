@@ -9,31 +9,33 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose }): SidebarProps {
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { user } = useAuthStore();
 
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black bg-opacity-50"
+      className="fixed inset-0 z-60 bg-black bg-opacity-50 flex justify-center"
       onClick={onClose}
     >
       <aside
-        className="fixed top-0 left-0 h-full w-64 bg-white p-6 shadow-lg"
-        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-[485px] h-full"
+        onClick={(e) => e.stopPropagation()} // 내부 클릭 이벤트 버블링 막기
       >
-        <button onClick={onClose} className="text-right w-full mb-4">
-          X
-        </button>
-        <Link href="/">Home</Link>
-        <Link href="/survey">Survey</Link>
-        <Link href="/mypage">My Page</Link>
-        <nav className="flex gap-4 items-center">
-          <Link href="/search">Search</Link>
-          {user ? <LogoutButton /> : <Link href="/auth">Login</Link>}
-          <div className="block">☰</div>
-        </nav>
+        <div className="absolute top-0 right-0 w-64 h-full bg-white p-6 shadow-lg">
+          <button onClick={onClose} className="text-right w-full mb-4">
+            X
+          </button>
+          <nav className="flex flex-col gap-4 items-center">
+            <Link href="/">Home</Link>
+            <Link href="/survey">Survey</Link>
+            <Link href="/mypage">My Page</Link>
+          </nav>
+          <nav className="flex flex-col-reverse place-items-end mt-8">
+            {user ? <LogoutButton /> : <Link href="/auth">Login</Link>}
+          </nav>
+        </div>
       </aside>
     </div>
   );
