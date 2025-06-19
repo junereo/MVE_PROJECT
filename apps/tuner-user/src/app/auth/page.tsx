@@ -1,5 +1,6 @@
 import LoginForm from "./components/LoginForm";
 import KakaoLoginButton from "./components/KakaoLoginButton";
+import GoogleLoginButton from "./components/GoogleLoginButton";
 
 export default function auth() {
   return (
@@ -10,7 +11,10 @@ export default function auth() {
       </div>
       <div className="max-w-[350px] w-full mx-auto mt-10 mb-10">
         <LoginForm />
-        <KakaoLoginButton />
+        <div className="flex flex-col gap-3">
+          <GoogleLoginButton />
+          <KakaoLoginButton />
+        </div>
       </div>
     </div>
   );
