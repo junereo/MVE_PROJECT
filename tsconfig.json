@@ -5,6 +5,7 @@
     "strict": true,
     "moduleResolution": "Node",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
