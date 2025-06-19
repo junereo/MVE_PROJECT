@@ -9,7 +9,10 @@ import {
     BigNumberish,
 } from 'ethers';
 import contractABI from '../../../ABI/meta_transction_ABI.json' assert { type: 'json' };
+import { MetaTransctionService } from './meta_transction.service'; // 경로 확인
+
 import dotenv from 'dotenv';
+import { json } from 'express';
 dotenv.config();
 
 interface TxMessage {
@@ -29,8 +32,11 @@ export class TxPoolService {
     private wallet!: Wallet;
     private msgSigner!: Contract;
     private contract!: Contract;
+    private metaService: MetaTransctionService;
 
-    constructor() {}
+    constructor(metaService: MetaTransctionService) {
+        this.metaService = metaService;
+    }
 
     async init(): Promise<void> {
         this.provider = new JsonRpcProvider(process.env.SEPLOIA_RPC_URL!);
@@ -43,13 +49,11 @@ export class TxPoolService {
     return this.txpool;
   }
 
-  verifyAndAdd(message: TxMessage, signature: string): boolean {
-    const signer = verifyMessage(JSON.stringify(message), signature);
-    if (signer === message.sender) {
-      this.txpool.push({ message, signature });
-      return true;
-    }
-    return false;
+  async verifyAndAdd(message: TxMessage, uid: string): Promise<TxPoolItem> {
+    const singer_wallet = await this.metaService.createWallet(uid);
+    const signature = await this.metaService.createSign(singer_wallet, JSON.stringify(message));
+    this.txpool.push({ message, signature });
+    return { message, signature };
   }
 
   async processPool(): Promise<any> {

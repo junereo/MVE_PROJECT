@@ -11,6 +11,12 @@ import metaContractABI from '../../../ABI/meta_transction_ABI.json' assert { typ
 import dotenv from 'dotenv';
 dotenv.config();
 
+interface TxMessage {
+  sender: string;
+  data: string;
+  value?: string;
+}
+
 export class MetaTransctionService {
   provider!: JsonRpcProvider;
   wallet!: Wallet;

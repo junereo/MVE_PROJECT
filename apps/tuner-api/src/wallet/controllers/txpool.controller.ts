@@ -1,9 +1,12 @@
 // src/controllers/txpool.controller.ts
 import express, { Request, Response, Router } from 'express';
 import { TxPoolService } from '../services/txpool.service.js';
+import { MetaTransctionService } from '../services/meta_transction.service.js';
 
 const router: Router = express.Router();
-const txPoolService = new TxPoolService();
+
+const metaTransctionService = new MetaTransctionService();
+const txPoolService = new TxPoolService(metaTransctionService);
 
 await txPoolService.init(); // provider, wallet, contract 초기화
 
@@ -13,21 +16,23 @@ export const getTxPool = (req: Request, res: Response) => {
   res.status(200).json(pool);
 };
 
-// 2. txpool에 트랜잭션 객체 추가 (검증 포함)
+// 2. message 를 트랜잭션으로 변환 및 pool에 저장
 export const txSign = (req: Request, res: Response) => {
-  const { message, signature } = req.body;
-
-  if (!message || !signature) {
-    res.status(400).json({ error: 'Missing message or signature' });
+  const { message } = req.body;
+  const { userId } = req.body.user;
+  
+  if (!message) {
+    res.status(400).json({ error: 'Missing message' });
     return;
   }
 
-  const isValid = txPoolService.verifyAndAdd(message, signature);
-  if (isValid) {
-    res.status(200).json({ status: 'Signature verified. Added to txpool.' });
+  const isValid = txPoolService.verifyAndAdd(message, userId);
+
+  if (!isValid) {
+    res.status(401).json({ error: 'Signature verification failed' });
     return;
   } else {
-    res.status(401).json({ error: 'Signature verification failed' });
+    res.status(200).json({ status: 'Signature verified. Added to txpool.' });
     return;
   }
 };
