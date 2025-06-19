@@ -1,4 +1,6 @@
-import YoutubeSearch from './components/youtude';
+"use client"
+
+import YoutubeSearch from "./components/youtude";
 const Youtube = () => {
     return <YoutubeSearch />;
 };

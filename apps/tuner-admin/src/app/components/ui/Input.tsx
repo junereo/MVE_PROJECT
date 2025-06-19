@@ -1,13 +1,13 @@
 import { InputHTMLAttributes } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-    color?: 'white' | 'black';
+    color?: 'white' | 'black'
     label?: string;
     type?: 'text' | 'textarea';
     id?: string;
 }
 
-export default function Input({ label, type, id, ...rest }: InputProps) {
+export default function Input({ label, type, id, color = 'white', ...rest }: InputProps) {
     const radioColorVariants = {
         white: 'bg-white border-gray-300',
         black: 'bg-black border-gray-800',
