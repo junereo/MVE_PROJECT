@@ -11,7 +11,8 @@ const prisma = new PrismaClient();
 
 const defaultCookieOptions: CookieOptions = {
     httpOnly: true,
-    sameSite: 'lax',
+    secure: true,
+    sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000,// 7일
 };
 
