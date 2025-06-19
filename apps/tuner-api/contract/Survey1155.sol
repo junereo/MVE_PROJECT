@@ -9,13 +9,12 @@ contract Survey1155 is ERC1155, Ownable {
     constructor(string memory baseUri) ERC1155(baseUri) Ownable(msg.sender){}
 
     function mint(
-        address to,
         string memory surveyId,
         uint256 amount,
         string memory _uri
     ) external onlyOwner returns (uint256) {
         uint256 tokenId = uint256(keccak256(abi.encodePacked(surveyId)));
-        _mint(to, tokenId, amount, "");
+        _mint(msg.sender, tokenId, amount, "");
         _setTokenURI(tokenId, _uri);
         return tokenId;
     }
