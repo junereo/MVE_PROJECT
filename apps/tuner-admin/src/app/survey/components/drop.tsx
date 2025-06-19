@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import Dropdown from './components/Dropdown';
+import Dropdown from "@/app/components/ui/DropDown";
 
 const ExamplePage = () => {
     const [selectedType, setSelectedType] = useState('객관식');

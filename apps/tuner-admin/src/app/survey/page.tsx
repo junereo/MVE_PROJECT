@@ -4,6 +4,7 @@ import { useSessionCheck } from '@/hooks/useSessionCheck';
 import YoutubeBtn from '../components/ui/Youtube';
 import YoutuveVideo from './components/youtubeVideo';
 import { useState } from 'react';
+import ExamplePage from './components/drop';
 
 const Survey = () => {
     useSessionCheck();
@@ -49,7 +50,7 @@ const Survey = () => {
                     </YoutubeBtn>
                 </div>
                 <YoutuveVideo />
-
+                <ExamplePage />
                 {/* 질문 영역 */}
                 <div className="mt-6">
                     {questions.map((q, index) => (
