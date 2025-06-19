@@ -1,39 +1,55 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { useOauth } from '@/store/globalStore';
-// import { useSessionCheck } from '@/hooks/useSessionCheck';
-import { pushLogin } from '@/lib/network/api';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { pushLogin } from '@/lib/network/api'; // 서버 요청 함수
+import {
+    validateLoginField,
+    allLoginFields,
+} from '@/lib/authError/loginHandler'; // 네가 만든 함수
+import { LoginFormData, LoginFormErrors } from '@/types';
 
-const LoginFrom = () => {
+const LoginForm = () => {
     const router = useRouter();
 
-    const { setValue } = useOauth();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState<LoginFormData>({
+        email: '',
+        password: '',
+    });
 
-    // 이거 전역 상태로 관리하지 마 내부 컴포넌트 상태로 관리
+    const [erros, setErrors] = useState<LoginFormErrors>({});
+    console.log(erros);
+
+    const handleChange = (field: keyof LoginFormData, value: string) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
+
+        const error = validateLoginField(field, value, formData);
+        setErrors((prev) => ({ ...prev, [field]: error }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('로그인 전송할 값:', { email, password });
-        // 매번 사이트마다 요청 떄리는 게 절때 아니야,
 
-        const formData = { email, password };
+        // 전체 유효성 검사
+        const newErrors = allLoginFields(formData);
+        setErrors(newErrors);
+
+        const hasError = Object.values(newErrors).some((err) => err !== '');
+        if (hasError) {
+            alert('입력값을 다시 확인해주세요.');
+            return;
+        }
 
         try {
             const result = await pushLogin(formData);
             console.log('서버 응답:', result.admin);
-
-            setValue('name', result.admin.name);
-            setValue('email', result.email);
-            setValue('password', result.password);
-            setValue('phone_number', result.phone_number);
-            setValue('role', result.admin.role);
-
             router.push('/dashboard');
-        } catch (error) {
-            alert('로그인 실패하였습니다.');
-            console.error('요청 실패:', error);
+        } catch (error: any) {
+            const status = error.response?.status;
+            if (status === 401) {
+                alert('이메일 또는 비밀번호가 일치하지 않습니다.');
+            } else {
+                alert('로그인 중 오류가 발생했습니다.');
+            }
         }
     };
 
@@ -54,13 +70,18 @@ const LoginFrom = () => {
                     <input
                         type="email"
                         placeholder="Email"
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={formData.email}
+                        onChange={(e) => handleChange('email', e.target.value)}
                         className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-500"
                     />
+
                     <input
                         type="password"
                         placeholder="Password"
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={formData.password}
+                        onChange={(e) =>
+                            handleChange('password', e.target.value)
+                        }
                         className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-500"
                     />
                     <button
@@ -81,5 +102,4 @@ const LoginFrom = () => {
         </div>
     );
 };
-
-export default LoginFrom;
+export default LoginForm;
