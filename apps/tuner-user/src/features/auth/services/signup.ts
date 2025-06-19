@@ -1,19 +1,10 @@
 import axios from "@/lib/network/axios";
 import { SignupFormData } from "../types";
+import { errorHandler } from "@/lib/network/errorHandler";
 
 // 회원가입
 export const signup = async (data: SignupFormData) => {
-  try {
-    const response = await axios.post("/auth/signup", data);
-    return response;
-  } catch (error: any) {
-    const status = error.response?.status;
-
-    if (status === 400) {
-      throw new Error("입력한 정보를 다시 확인해주세요.");
-    }
-    throw new Error("회원가입 중 알 수 없는 오류가 발생했습니다.");
-  }
+  return await axios.post("/auth/signup", data).catch(errorHandler);
 };
 
 /*

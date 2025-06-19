@@ -24,7 +24,7 @@ export const useSessionCheck = () => {
                 if (!data) {
                     router.push('/login');
                 }
-                setAdmin(data);
+                setAdmin(data.admin);
             } catch (err) {
                 console.log(err);
                 // 세션관리 후 정보가 없을시
