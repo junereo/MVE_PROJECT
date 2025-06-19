@@ -10,7 +10,8 @@ import {
   validateSignupField,
 } from "@/features/auth/utils/validateSignup";
 import { useRouter } from "next/navigation";
-import { signup } from "@/features/auth/services/singup";
+import { signup } from "@/features/auth/services/signup";
+import { AxiosError } from "axios";
 // import { mockSignup } from "@/features/auth/services/singup"; // 테스트용
 
 const initialFormData: SignupFormData = {
@@ -76,11 +77,15 @@ export default function SignupForm() {
         redirectTo: "/auth",
       });
       setIsModalOpen(true);
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as AxiosError;
+
+      const message = err.message || "회원가입 중 에러가 발생했습니다.";
+
       // 회원가입 실패
       setModalContent({
         image: "x.png",
-        description: error.message,
+        description: message,
         buttonLabel: "회원가입 다시 시도하기",
         redirectTo: "/auth/signup",
       });
