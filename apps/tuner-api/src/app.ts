@@ -3,8 +3,8 @@ import {
   adminRoutes,
   authRoutes,
   surveyRoutes,
-} from "./routes";
-import routerWallet from "./wallet/routers/wallet.routes";
+} from "./routes/index";
+import routerWallet from "./wallet/routers/index";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from 'dotenv';
