@@ -4,7 +4,8 @@ import { createAdmin, getAdminService } from "../services/admin.service";
 
 const defaultCookieOptions = {
     httpOnly: true,
-    sameSite: 'lax' as const,
+    secure: true,
+    sameSite: 'none' as const,
     maxAge: 24 * 60 * 60 * 1000, // 1일
 };
 
@@ -45,7 +46,7 @@ export const logout = async (
         res.clearCookie('token', {
             httpOnly: true,
             secure: true,
-            sameSite: 'lax',
+            sameSite: 'none',
         });
         res.status(200).json({ message: 'Logged out and cookies cleared', success: true });
     } catch (error: any) {
