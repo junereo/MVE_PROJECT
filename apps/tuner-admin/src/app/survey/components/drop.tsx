@@ -13,7 +13,6 @@ const ExamplePage = () => {
                 selected={selectedType}
                 onSelect={setSelectedType}
             />
-
             <p className="mt-4">
                 선택된 유형: <strong>{selectedType}</strong>
             </p>

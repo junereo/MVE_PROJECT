@@ -56,7 +56,7 @@ export default function YoutubeSearch() {
                         <img
                             src={video.thumbnail}
                             alt={video.title}
-                            className="rounded w-full w-[300px] h-[200px]"
+                            className="rounded  w-[300px] h-[200px]"
                         />
                         <p className="text-blue-600 underline block mt-2">
                             {video.title}

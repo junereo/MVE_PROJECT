@@ -116,104 +116,63 @@ CORS 정책 필요 시, API 서버 응답 헤더에 Access-Control-Allow-Origin:
 쿠키는 SameSite=None; Secure 옵션 필요 (HTTPS에서만 작동)
 
 
-🔷 1. 도메인 세팅 (가비아 + Route 53)
- 가비아에서 mve-front.store 도메인 구매
 
- AWS Route 53 → 호스팅 영역 생성 (mve-front.store)
+## ✅ Next.js + AWS 배포 체크리스트 (mve-front 기준)
 
- Route 53 → NS 레코드 복사
+### 🔷 1. 도메인 세팅 (가비아 + Route 53)
+- [ ] 가비아에서 `mve-front.store` 도메인 구매
+- [ ] AWS Route 53 → 호스팅 영역 생성 (`mve-front.store`)
+- [ ] Route 53 → NS 레코드 4개 복사
+- [ ] 가비아 도메인 관리 → 네임서버(NS) 변경 → AWS NS 4개 붙여넣기
 
- 가비아 도메인 관리 → 네임서버(NS) 변경 → AWS NS 4개 붙여넣기
+### 🔷 2. A 레코드 설정 (도메인 ↔ 서버 IP 연결)
+- [ ] Route 53 → A 레코드 추가: `mve-front.store` → 프론트 EC2 IP
+- [ ] Route 53 → A 레코드 추가: `admin.mve-front.store` → 프론트 EC2 IP
 
-🔷 2. A 레코드 설정 (도메인 ↔ 서버 IP 연결)
- Route 53 → A 레코드 추가: mve-front.store → 프론트엔드 EC2 IP
+### 🔷 3. EC2 인스턴스 생성 및 설정
+- [ ] EC2 인스턴스 1개 생성 (이름: `mve-front`)
+- [ ] 인스턴스 OS: Ubuntu 22.04 LTS / 타입: t2.micro
+- [ ] 보안 그룹: 포트 22, 80, 443, 3000 허용
+- [ ] 탄력 IP 할당 및 인스턴스에 연결
+- [ ] SSH 접속 확인 (`chmod 400`, `ssh -i`)
 
- Route 53 → A 레코드 추가: admin.mve-front.store → 프론트엔드 EC2 IP
+### 🔷 4. 서버 초기 세팅
+- [ ] 시스템 업데이트  
+  `sudo apt update && sudo apt upgrade -y`
+- [ ] Node.js 18 설치  
+  `curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -`  
+  `sudo apt install -y nodejs`
+- [ ] Git, Nginx, PM2 설치  
+  `sudo apt install -y git nginx`  
+  `npm install -g pm2`
 
-🔷 3. EC2 인스턴스 생성 및 설정
- EC2 인스턴스 1개 생성 (이름: mve-front)
+### 🔷 5. Next.js 앱 배포
+- [ ] Git에서 프로젝트 클론 or 직접 업로드
+- [ ] `.env.local` 등 환경변수 설정
+- [ ] 의존성 설치 (`npm install`)
+- [ ] 앱 빌드 (`npm run build`)
+- [ ] 앱 실행 및 PM2 등록  
+  `pm2 start npm --name "mve-front" -- start`  
+  `pm2 save && pm2 startup`
 
-Ubuntu 22.04 LTS / t2.micro
+### 🔷 6. Nginx 설정
+- [ ] `/etc/nginx/sites-available/default` 수정
+- [ ] `server_name`에 `mve-front.store`, `admin.mve-front.store` 등록
+- [ ] `proxy_pass http://localhost:3000;` 설정
+- [ ] Nginx 재시작  
+  `sudo systemctl restart nginx`
 
-보안그룹: 포트 22, 80, 443, 3000 허용
+### 🔷 7. HTTPS 인증서 적용 (Certbot)
+- [ ] Certbot 설치  
+  `sudo apt install certbot python3-certbot-nginx -y`
+- [ ] HTTPS 인증서 발급  
+  `sudo certbot --nginx -d mve-front.store -d admin.mve-front.store`
 
- 탄력 IP 할당 및 인스턴스에 연결
+### 🔷 8. 인증서 자동 갱신 테스트
+- [ ] 자동 갱신 dry-run 테스트  
+  `sudo certbot renew --dry-run`
 
- SSH 접속 확인 (키 권한 설정 및 접속 테스트)
-
-🔷 4. 서버 초기 세팅
- 시스템 업데이트
-
-bash
-복사
-편집
-sudo apt update && sudo apt upgrade -y
- Node.js 18 설치
-
-bash
-복사
-편집
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt install -y nodejs
- Git, Nginx, PM2 설치
-
-bash
-복사
-편집
-sudo apt install -y git nginx
-npm install -g pm2
-🔷 5. Next.js 앱 배포
- Git에서 프로젝트 클론 or 직접 업로드
-
- .env.local 등 환경변수 파일 설정
-
- 의존성 설치 (npm install)
-
- 앱 빌드 (npm run build)
-
- 앱 실행 및 PM2 등록
-
-bash
-복사
-편집
-pm2 start npm --name "mve-front" -- start
-pm2 save && pm2 startup
-🔷 6. Nginx 설정
- /etc/nginx/sites-available/default 수정
-
- server_name에 mve-front.store, admin.mve-front.store 등록
-
- proxy_pass로 localhost:3000 연결
-
- 설정 저장 후 Nginx 재시작
-
-bash
-복사
-편집
-sudo systemctl restart nginx
-🔷 7. HTTPS 인증서 적용 (Certbot)
- Certbot 설치
-
-bash
-복사
-편집
-sudo apt install certbot python3-certbot-nginx -y
- HTTPS 인증서 발급
-
-bash
-복사
-편집
-sudo certbot --nginx -d mve-front.store -d admin.mve-front.store
-🔷 8. 인증서 자동 갱신 테스트
- 자동 갱신 dry-run 확인
-
-bash
-복사
-편집
-sudo certbot renew --dry-run
-🔷 9. 최종 확인
- https://mve-front.store 접속 시 자물쇠 아이콘 + 보안 연결 확인
-
- https://admin.mve-front.store 접속 시도 + 정상 연결 확인
-
- pm2 logs로 앱 정상 작동 확인
+### 🔷 9. 최종 확인
+- [ ] https://mve-front.store 접속 확인 (🔒 자물쇠 보임)
+- [ ] https://admin.mve-front.store 접속 확인 (🔒 보안 연결)
+- [ ] `pm2 logs`로 앱 상태 확인
