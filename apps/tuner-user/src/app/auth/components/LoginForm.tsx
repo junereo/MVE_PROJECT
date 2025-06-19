@@ -70,10 +70,16 @@ export default function LoginForm() {
       const res = await loginRequest(formData); // 백엔드에 요청
       setUser(res.data.user);
       router.push("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage = "로그인 중 에러가 발생했습니다.";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       setModalContent({
         image: "x.png",
-        description: error.message,
+        description: errorMessage,
         buttonLabel: "로그인 다시 시도하기",
         redirectTo: "/auth",
       });
