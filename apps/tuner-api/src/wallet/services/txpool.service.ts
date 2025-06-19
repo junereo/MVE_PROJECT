@@ -1,24 +1,16 @@
 import { 
     JsonRpcProvider, 
     Contract, 
-    Wallet, 
-    verifyMessage,
-    keccak256,
-    toUtf8Bytes,
-    formatUnits,
-    BigNumberish,
+    Wallet,
 } from 'ethers';
 import contractABI from '../../../ABI/meta_transction_ABI.json' assert { type: 'json' };
-import { MetaTransctionService } from './meta_transction.service'; // 경로 확인
-
+import { MetaTransctionService } from './meta_transction.service';
 import dotenv from 'dotenv';
-import { json } from 'express';
 dotenv.config();
 
 interface TxMessage {
   sender: string;
   data: string;
-  value?: string;
 }
 
 interface TxPoolItem {
@@ -31,7 +23,6 @@ export class TxPoolService {
     private provider!: JsonRpcProvider;
     private wallet!: Wallet;
     private msgSigner!: Contract;
-    private contract!: Contract;
     private metaService: MetaTransctionService;
 
     constructor(metaService: MetaTransctionService) {
@@ -49,11 +40,12 @@ export class TxPoolService {
     return this.txpool;
   }
 
-  async verifyAndAdd(message: TxMessage, uid: string): Promise<TxPoolItem> {
+  async verifyAndAdd(message: string, uid: string): Promise<TxPoolItem> {
     const singer_wallet = await this.metaService.createWallet(uid);
     const signature = await this.metaService.createSign(singer_wallet, JSON.stringify(message));
-    this.txpool.push({ message, signature });
-    return { message, signature };
+    const txData = { message : {sender: singer_wallet.address, data: message}, signature };
+    this.txpool.push(txData);
+    return txData;
   }
 
   async processPool(): Promise<any> {
@@ -86,7 +78,9 @@ export class TxPoolService {
     return tx;
   }
 
-  clear(): void {
+  clear(): Number {
+    const totalNum = this.txpool.length;
     this.txpool = [];
+    return totalNum;
   }
 }

@@ -4,7 +4,7 @@ import {
   authRoutes,
   surveyRoutes,
 } from "../src/routes";
-import routerWallet from "../src/wallet/routers/wallet.routes";
+import routerWallet from "../src/wallet/routers";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
