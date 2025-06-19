@@ -1,10 +1,15 @@
-import { clearTxPool } from '../services/txpool.service';
+//txpool.worker.ts
+import { TxPoolService } from '../services/txpool.service.js';
+
+const txPoolService = new TxPoolService();
+
+await txPoolService.init(); // provider, wallet, contract 초기화
 
 const INTERVAL_MS = 10000; // 10초마다
 
 export function startTxPoolWorker() {
   setInterval(() => {
-    const clearedTx = clearTxPool();
+    const clearedTx = txPoolService.getPool();
 
     if (clearedTx.length > 0) {
       console.log(`[TXPool Worker] Cleared ${clearedTx.length} transactions`);
