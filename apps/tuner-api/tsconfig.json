@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "esnext",
+    "moduleResolution": "node",
     "rootDir": "src", // ⬅️ TypeScript 입력 파일 루트
     "outDir": "dist", // ⬅️ 컴파일된 JS 출력 디렉토리
     "esModuleInterop": true,

@@ -14,7 +14,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_IP || "http://localhost:3000",
+    origin: [`${process.env.CLIENT_IP}`, `${process.env.CLIENT_USER_IP}`, `${process.env.CLIENT_ADMIN_IP}`],
     credentials: true,
   })
 );
