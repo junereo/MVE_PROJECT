@@ -6,6 +6,7 @@
     "rootDir": "src", // ⬅️ TypeScript 입력 파일 루트
     "outDir": "dist", // ⬅️ 컴파일된 JS 출력 디렉토리
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true
