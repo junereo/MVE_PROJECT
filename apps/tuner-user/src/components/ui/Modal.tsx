@@ -95,8 +95,9 @@ export default function Modal({
           )}
           <button
             onClick={onClick}
-            className={`w-full py-3 ${styles[color || "blue"]
-              } text-white font-bold rounded-lg transition duration-200`}
+            className={`w-full py-3 ${
+              styles[color || "blue"]
+            } text-white font-bold rounded-lg transition duration-200`}
           >
             {buttonLabel}
           </button>
