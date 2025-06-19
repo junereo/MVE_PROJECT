@@ -1,4 +1,5 @@
 import Disclosure from "@/components/ui/Disclosure";
+import SutveyAccordion from "./components/SurveyAccordion";
 
 export default function Survey() {
   return (
@@ -9,6 +10,7 @@ export default function Survey() {
       <Disclosure title="Disclosure">
         <p>Disclosure 내용입니당</p>
       </Disclosure>
+      <SutveyAccordion />
     </div>
   );
 }
