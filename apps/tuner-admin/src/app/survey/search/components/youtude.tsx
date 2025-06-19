@@ -4,9 +4,14 @@ import { useState } from 'react';
 import { fetchYoutubeVideos } from '@/lib/youtube';
 import { useRouter } from 'next/navigation';
 
+type YoutubeVideo = {
+    videoId: string;
+    title: string;
+    thumbnail: string;
+};
 export default function YoutubeSearch() {
     const [query, setQuery] = useState('');
-    const [videos, setVideos] = useState<any[]>([]);
+    const [videos, setVideos] = useState<YoutubeVideo[]>([]);
     const router = useRouter();
     const handleSearch = async () => {
         if (!query.trim()) return;
@@ -43,14 +48,13 @@ export default function YoutubeSearch() {
                         key={video.videoId}
                         className="mb-6 cursor-pointer "
                         onClick={() => {
-                            router.push(
-                                `/survey?videoId=${video.videoId
-                                }&title=${encodeURIComponent(
-                                    video.title,
-                                )}&thumbnail=${encodeURIComponent(
-                                    video.thumbnail,
-                                )}`,
-                            );
+                            const query = new URLSearchParams({
+                                videoId: video.videoId,
+                                title: video.title,
+                                thumbnail: video.thumbnail,
+                            }).toString();
+
+                            router.push(`/survey?${query}`);
                         }}
                     >
                         <img

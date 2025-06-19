@@ -40,7 +40,7 @@ export const allSignupFields = (formData: SignupFormData): SignupFormErrors => {
 
     // 'email' | 'password'... 순서대로 각 필드에 대해 유효성 검사 수행
     (Object.keys(formData) as (keyof SignupFormData)[]).forEach((field) => {
-        const error = validateSignupField(field, formData[field], formData); // 각 필드에 대해 유효성 검사 수행
+        const error = validateSignupField(field, formData[field] as string, formData); // 각 필드에 대해 유효성 검사 수행
         if (error) errors[field] = error; // 에러 있는 경우 errors 객체에 추가
     });
     return errors;

@@ -14,7 +14,8 @@ export interface SignupFormData {
     confirmPassword: string;
     name: string;
     phone_number: string;
-    role: string;
+    role: string | number;
+
 }
 // 회원가입 데이터 에러
 export type SignupFormErrors = Partial<Record<keyof SignupFormData, string>>;

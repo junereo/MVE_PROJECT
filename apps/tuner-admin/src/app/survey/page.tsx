@@ -3,7 +3,7 @@
 import { useSessionCheck } from '@/hooks/useSessionCheck';
 import YoutubeBtn from '../components/ui/Youtube';
 import YoutuveVideo from './components/youtubeVideo';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import ExamplePage from './components/drop';
 
 const Survey = () => {
@@ -49,7 +49,9 @@ const Survey = () => {
                         유튜브 영상 찾으러 가기
                     </YoutubeBtn>
                 </div>
-                <YoutuveVideo />
+                <Suspense fallback={<div>유튜브 로딩 중...</div>}>
+                    <YoutuveVideo />
+                </Suspense>
                 <ExamplePage />
                 {/* 질문 영역 */}
                 <div className="mt-6">
