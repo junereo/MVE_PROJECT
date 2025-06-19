@@ -18,6 +18,7 @@
   },
   "include": [
     "apps/*/src",
-    "packages/*/src"
+    "packages/*/src",
+    "apps/tuner-api/tsconfig.json"
   ]
 }
