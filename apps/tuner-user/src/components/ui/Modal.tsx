@@ -43,7 +43,7 @@ export default function Modal({
   }, []);
 
   //   모달 외부 클릭 시 모달 닫힘
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleBackdropClick = () => {
     onClose();
   };
 

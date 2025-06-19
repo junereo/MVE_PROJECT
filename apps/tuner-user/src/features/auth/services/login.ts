@@ -1,4 +1,5 @@
 import axios from "@/lib/network/axios";
+import { AxiosError } from "axios";
 import { LoginFormData } from "../types";
 
 // 로그인
@@ -6,8 +7,9 @@ export const loginRequest = async (data: LoginFormData) => {
   try {
     const response = await axios.post("/auth/login", data);
     return response;
-  } catch (error: any) {
-    const status = error.response?.status;
+  } catch (error) {
+    const err = error as AxiosError;
+    const status = err.response?.status as number;
 
     if (status === 401) {
       throw new Error("이메일 또는 비밀번호가 일치하지 않습니다.");
