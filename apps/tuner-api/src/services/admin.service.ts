@@ -8,7 +8,8 @@ const prisma = new PrismaClient();
 
 const defaultCookieOptions: CookieOptions = {
     httpOnly: true,
-    sameSite: 'lax',
+    secure: true,
+    sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000,// 7일
 };
 
@@ -31,7 +32,7 @@ export const login = async (email: string, password: string) => {
     return {
         token,
         admin,
-        redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
+        redirectUrl: process.env.CLIENT_ADMIN_IP || 'http://localhost:3000',
         cookieOptions: defaultCookieOptions,
     };
 };

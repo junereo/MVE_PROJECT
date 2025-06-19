@@ -79,7 +79,7 @@ export const logout = async (
     res.clearCookie('token', {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      sameSite: 'none',
     });
     res.status(200).json({ message: 'Logged out and cookies cleared', redirect: process.env.CLIENT_IP });
   } catch (error: any) {
