@@ -18,7 +18,7 @@ export default function Slider() {
     <div className="w-full">
       <Swiper
         modules={[Autoplay]}
-        slidesPerView={1.3}
+        slidesPerView={1.2}
         spaceBetween={12}
         centeredSlides={true}
         loop={true}
