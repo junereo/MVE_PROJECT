@@ -1,3 +1,4 @@
+//src/wallet/routers/wallet.routes.ts
 import express, { Router }  from "express";
 import { createWallet, 
         createToken, 
@@ -8,7 +9,7 @@ import { createWallet,
 
 const router: Router = express.Router();
 
-router.post('/wallet', createWallet ); // 유저 지갑 생성
+router.post('/', createWallet ); // 유저 지갑 생성
 
 router.post('/token', createToken ); // 토큰 생성
 

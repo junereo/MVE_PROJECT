@@ -3,16 +3,18 @@ import {
   adminRoutes,
   authRoutes,
   surveyRoutes,
-} from "../src/routes";
-import routerWallet from "../src/wallet/routers/wallet.routes";
+} from "./routes/index";
+import routerWallet from "./wallet/routers/index";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_IP || "http://localhost:3000",
+    origin: [`${process.env.CLIENT_IP}`, `${process.env.CLIENT_USER_IP}`, `${process.env.CLIENT_ADMIN_IP}`],
     credentials: true,
   })
 );

@@ -1,4 +1,4 @@
-//txpool.routes.ts
+//src/wallet/routers/txpool.routes.ts
 import express, { Router }  from "express";
 import { getTxPool,
         txSign,
@@ -8,12 +8,12 @@ import { getTxPool,
 
 const router: Router = express.Router();
 
-router.post('/txpool/submit', submit ); // 유저 지갑 생성
+router.post('/submit', submit ); // tx 처리
 
-router.post('/sign', txSign ); // 토큰 생성
+router.post('/sign', txSign ); // 클레임
 
-router.get('/getTxPool', getTxPool ); // 토큰 조회
+router.get('/pool', getTxPool ); // 풀 조회
 
-router.get('/clear', txClear ); // 토큰 조회
+router.get('/clear', txClear ); // 풀 초기화
 
 export default router; 

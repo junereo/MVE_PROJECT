@@ -1,7 +1,9 @@
 //txpool.worker.ts
 import { TxPoolService } from '../services/txpool.service.js';
+import { MetaTransctionService } from '../services/meta_transction.service'; // 경로 확인
 
-const txPoolService = new TxPoolService();
+const metaService = new MetaTransctionService();
+const txPoolService = new TxPoolService(metaService);
 
 await txPoolService.init(); // provider, wallet, contract 초기화
 
