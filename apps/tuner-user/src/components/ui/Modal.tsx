@@ -43,7 +43,7 @@ export default function Modal({
   }, []);
 
   //   모달 외부 클릭 시 모달 닫힘
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleBackdropClick = () => {
     onClose();
   };
 
@@ -95,8 +95,9 @@ export default function Modal({
           )}
           <button
             onClick={onClick}
-            className={`w-full py-3 ${styles[color || "blue"]
-              } text-white font-bold rounded-lg transition duration-200`}
+            className={`w-full py-3 ${
+              styles[color || "blue"]
+            } text-white font-bold rounded-lg transition duration-200`}
           >
             {buttonLabel}
           </button>

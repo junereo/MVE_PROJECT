@@ -3,10 +3,12 @@ import {
   adminRoutes,
   authRoutes,
   surveyRoutes,
-} from "../src/routes";
-import routerWallet from "../src/wallet/routers/wallet.routes";
+} from "./routes";
+import routerWallet from "./wallet/routers/wallet.routes";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
