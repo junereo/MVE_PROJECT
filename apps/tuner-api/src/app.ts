@@ -12,12 +12,25 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  process.env.CLIENT_IP,
+  process.env.CLIENT_ADMIN_IP,
+  process.env.CLIENT_USER_IP,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: [`${process.env.CLIENT_IP}`, `${process.env.CLIENT_USER_IP}`, `${process.env.CLIENT_ADMIN_IP}`],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS BLOCKED: ${origin} not allowed`));
+      }
+    },
     credentials: true,
   })
 );
+
 
 // 미들웨어 설정
 app.use(cookieParser());

@@ -33,6 +33,7 @@ type OAuthCallbackResult =
         detail?: string;
     };
 
+// 이메일 
 export const emailRegister = async (data: RegisterList) => {
     const isUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (isUser) throw new Error("이미 가입된 이메일입니다.");
@@ -89,6 +90,7 @@ export const emaillogin = async (email: string, password: string): Promise<OAuth
     };
 };
 
+// 카카오
 export const oauthCallbackService = async (
     req: Request,
 ): Promise<OAuthCallbackResult> => {
@@ -184,7 +186,7 @@ export const fetchKakaoProfile = async (code: string) => {
             params: {
                 grant_type: 'authorization_code',
                 client_id: process.env.KAKAO_API_KEY!,
-                redirect_uri: process.env.KAKAO_REDIRECT_URI!,
+                redirectUrl: process.env.KAKAO_REDIRECT_URI!,
                 code,
             },
             headers: {
@@ -223,3 +225,84 @@ export const getUserService = async (req: AdminRequest) => {
     if (!user) throw new Error('사용자를 찾을 수 없습니다.');
     return user;
 };
+
+// 구글
+export const googleCallbackService = async (req: Request) => {
+    const { code } = req.body;
+    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
+    const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
+
+    // token 요청
+    const tokenRe = await axios.post(
+        'https://oauth2.googleapis.com/token',
+        {
+            code,
+            client_id: GOOGLE_CLIENT_ID,
+            client_secret: GOOGLE_CLIENT_SECRET,
+            redirect_uri: REDIRECT_URI,
+            grant_type: 'authorization_code',
+        },
+        {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+    );
+    const { access_token } = tokenRe.data;
+
+    // 유저 정보 가져오기 
+    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+            Authorization: `Bearer ${access_token}`,
+        },
+    });
+
+    const { id: provider_id, email, name } = userInfo.data;
+
+    // 기존 유저 확인
+    let oauth = await prisma.user_OAuth.findUnique({
+        where: { provider_id },
+        include: { user: true },
+    });
+
+    // 없으면 새 유저 생성
+    if (!oauth) {
+        const newUser = await prisma.user.create({
+            data: {
+                email,
+                nickname: name,
+                password: '',
+                phone_number: '',
+                wallet_address: '',
+                simple_password: '',
+                level: 'Regular',
+                oauths: {
+                    create: [
+                        {
+                            provider: 'google',
+                            provider_id: String(provider_id),
+                            nickname: name,
+                            email,
+                        },
+                    ],
+                }
+            }
+        });
+        oauth = await prisma.user_OAuth.findUnique({
+            where: { provider_id },
+            include: { user: true },
+        });
+    }
+
+    const token = signToken({ userId: oauth!.user.id });
+
+    return {
+        token,
+        rediretUrl: process.env.CLIENT_IP || 'http://localhost:3000',
+        cookieOptions: defaultCookieOptions,
+
+    }
+
+}
+
