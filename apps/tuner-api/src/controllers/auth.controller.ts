@@ -3,10 +3,12 @@ import {
   emailRegister as registerServices,
   emaillogin as loginServices,
   oauthCallbackService as authServices,
-  getUserService as userServices
+  getUserService as userServices,
+  googleCallbackService as googleService
 } from "../services/auth.service";
 import { RegisterList } from "../types/auth.types";
 import { PrismaClient } from "@prisma/client";
+
 
 const prisma = new PrismaClient();
 
@@ -87,3 +89,14 @@ export const logout = async (
   }
 };
 
+
+export const googleCallbackController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const result = await googleService(req);
+
+    res.cookie('token', result.token, result.cookieOptions);
+    res.redirect(result.redirectUrl);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
