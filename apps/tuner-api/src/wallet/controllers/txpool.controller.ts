@@ -25,15 +25,16 @@ export const getTxPool = (req: Request, res: Response) => {
 
 // 2. message 를 트랜잭션으로 변환 및 pool에 저장
 export const txSign = async(req: Request, res: Response) => {
-  const { message } = req.body;
-  const { userId } = (req as AuthRequest).user!;
+  const { message, uid } = req.body;
+  // const { userId } = (req as AuthRequest).user!;
+
 
   if (!message) {
     res.status(400).json({ error: 'Missing message' });
     return;
   }
 
-  const isValid = await txPoolService.verifyAndAdd(message, String(userId));
+  const isValid = await txPoolService.verifyAndAdd(message, String(uid));
 
   if (!isValid) {
     res.status(401).json({ error: 'failed to txpool' });
