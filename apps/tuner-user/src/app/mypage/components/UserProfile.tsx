@@ -1,0 +1,19 @@
+import { UserIcon } from "lucide-react";
+
+export default function UserProfile() {
+  return (
+    <div className="bg-white p-4 flex items-center gap-4">
+      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+        <UserIcon className="text-gray-400 w-8 h-8" />
+      </div>
+      <div className="flex-1">
+        <p className="text-sm text-gray-500">OOO 님</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <button className="px-4 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition">
+          프로필 관리
+        </button>
+      </div>
+    </div>
+  );
+}
