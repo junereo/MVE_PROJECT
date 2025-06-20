@@ -289,6 +289,7 @@ export const googleCallbackService = async (req: Request) => {
                 }
             }
         });
+        // 만들어진 유저 다시 조회
         oauth = await prisma.user_OAuth.findUnique({
             where: { provider_id },
             include: { user: true },
@@ -299,7 +300,7 @@ export const googleCallbackService = async (req: Request) => {
 
     return {
         token,
-        rediretUrl: process.env.CLIENT_IP || 'http://localhost:3000',
+        redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
         cookieOptions: defaultCookieOptions,
 
     }

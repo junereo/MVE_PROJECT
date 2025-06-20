@@ -12,21 +12,13 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = [
-  process.env.CLIENT_IP,
-  process.env.CLIENT_ADMIN_IP,
-  process.env.CLIENT_USER_IP,
-].filter(Boolean);
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS BLOCKED: ${origin} not allowed`));
-      }
-    },
+    origin: [
+      "https://tunemate.store",
+      "https://admin.tunemate.store",
+      "http://localhost:3000",
+    ],
     credentials: true,
   })
 );
