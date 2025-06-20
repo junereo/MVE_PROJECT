@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useSurveyStore } from "@/store/surceyStore"; // ✅ Zustand 스토어 import
 import Dropdown from "../../../components/ui/DropDown";
 import Link from "next/link";
+import HashTag from "./components/hash";
 
 const SurveyStep1 = () => {
   const genreOptions = [
@@ -79,8 +80,8 @@ const SurveyStep1 = () => {
           <div className="font-bold text-xl">아티스트 명(체널명)</div>
           <div>
             <input
-              placeholder="아티스트명"
-              value={step1.channelTitle}
+              placeholder={step1.channelTitle}
+              value={step1.artist || ""}
               onChange={(e) => handleInputChange("artist", e.target.value)}
               className="border p-2 mt-4 w-full"
             />
@@ -136,7 +137,6 @@ const SurveyStep1 = () => {
           handleInputChange("genre", mapToValue[selectedOption]);
         }}
       />
-
       {/* 설문 기간 */}
       <div className="font-bold text-xl pb-2">설문 기간</div>
       <div className="flex gap-4">
@@ -153,6 +153,7 @@ const SurveyStep1 = () => {
           className="border p-2"
         />
       </div>
+      <HashTag />
 
       {/* 리워드 타입 & 총량 */}
       <div className="flex gap-4 mt-4 items-center">
@@ -208,7 +209,7 @@ const SurveyStep1 = () => {
       {/* NEXT 버튼 */}
       <button
         onClick={() => {
-          // 다음 단계로 이동
+          router.push("/surveyTest/create/step2");
         }}
         className="mt-6 bg-black text-white px-6 py-2 rounded"
       >
