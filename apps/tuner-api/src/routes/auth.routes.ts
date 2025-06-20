@@ -4,6 +4,7 @@ import {
   emaillogin,
   oauthCallbackController,
   googleCallbackController,
+  getUserController,
   logout,
 } from "../controllers/auth.controller";
 import {
@@ -11,7 +12,7 @@ import {
   validateLogin,
   verifyToken,
 } from "../middlewares/auth.middleware";
-import { getUserController } from "../controllers/auth.controller";
+import { validateOAuthRequest } from '../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.post("/me", verifyToken, getUserController);
 router.post("/login", validateLogin, emaillogin);
 router.get("/oauth/:provider", oauthCallbackController);
 router.get('/google/callback', googleCallbackController);
+router.get('/auth/oauth/:provider', validateOAuthRequest, oauthCallbackController);
 router.post("/logout", logout);
 
 export default router;
