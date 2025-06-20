@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 type Props = {
   image: string;
   singer: string;
@@ -8,15 +9,15 @@ type Props = {
 
 export default function ListItem({ image, singer, title, period }: Props) {
   return (
-    <div className="flex justify-between items-center gap-3 mb-4 p-2 bg-white rounded-xl shadow-sm">
+    <div className="flex items-center gap-4 p-2 hover:shadow-md transition">
       <Image
         src={image}
         alt={title}
         width={60}
         height={80}
-        className="rounded-md"
+        className="rounded-md object-cover"
       />
-      <div className="flex-1 ml-2">
+      <div className="flex-1">
         <p className="text-sm font-semibold">{singer}</p>
         <p className="text-base font-bold">{title}</p>
         <p className="text-xs text-gray-500">{period}</p>
