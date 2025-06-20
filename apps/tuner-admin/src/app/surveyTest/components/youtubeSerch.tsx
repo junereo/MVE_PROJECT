@@ -8,14 +8,17 @@ type YoutubeVideo = {
   videoId: string;
   title: string;
   thumbnail: string;
+  channelTitle: string;
 };
 export default function YoutubeSearch() {
   const [query, setQuery] = useState("");
   const [videos, setVideos] = useState<YoutubeVideo[]>([]);
   const router = useRouter();
+
   const handleSearch = async () => {
     if (!query.trim()) return;
     const results = await fetchYoutubeVideos(query);
+
     setVideos(results);
   };
 
@@ -52,9 +55,10 @@ export default function YoutubeSearch() {
                 videoId: video.videoId,
                 title: video.title,
                 thumbnail: video.thumbnail,
+                channelTitle: video.channelTitle,
               }).toString();
 
-              router.push(`/survey?${query}`);
+              router.push(`/surveyTest/create/step1?${query}`);
             }}
           >
             <img
