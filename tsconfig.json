@@ -5,6 +5,7 @@
     "strict": true,
     "moduleResolution": "Node",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
@@ -18,6 +19,7 @@
   },
   "include": [
     "apps/*/src",
-    "packages/*/src"
+    "packages/*/src",
+    "apps/tuner-api/tsconfig.json"
   ]
 }

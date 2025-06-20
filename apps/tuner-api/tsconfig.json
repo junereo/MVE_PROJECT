@@ -1,19 +1,20 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "esnext",
-    "moduleResolution": "Node",
     "target": "ES2022",
-    "outDir": "dist",
-    "rootDir": "../../", // 🔥 루트 기준
+    "module": "esnext",
+    "moduleResolution": "node",
+    "rootDir": "src", // ⬅️ TypeScript 입력 파일 루트
+    "outDir": "dist", // ⬅️ 컴파일된 JS 출력 디렉토리
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src", // API 소스
-    "prisma", // Prisma 스키마
-    "../../packages/utils", // 공통 유틸
-    "../../packages/types" // 공통 타입
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

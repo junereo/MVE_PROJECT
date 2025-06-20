@@ -1,21 +1,16 @@
 import { 
     JsonRpcProvider, 
     Contract, 
-    Wallet, 
-    verifyMessage,
-    keccak256,
-    toUtf8Bytes,
-    formatUnits,
-    BigNumberish,
+    Wallet,
 } from 'ethers';
 import contractABI from '../../../ABI/meta_transction_ABI.json' assert { type: 'json' };
+import { MetaTransctionService } from './meta_transction.service';
 import dotenv from 'dotenv';
 dotenv.config();
 
 interface TxMessage {
   sender: string;
   data: string;
-  value?: string;
 }
 
 interface TxPoolItem {
@@ -28,9 +23,11 @@ export class TxPoolService {
     private provider!: JsonRpcProvider;
     private wallet!: Wallet;
     private msgSigner!: Contract;
-    private contract!: Contract;
+    private metaService: MetaTransctionService;
 
-    constructor() {}
+    constructor(metaService: MetaTransctionService) {
+        this.metaService = metaService;
+    }
 
     async init(): Promise<void> {
         this.provider = new JsonRpcProvider(process.env.SEPLOIA_RPC_URL!);
@@ -43,13 +40,12 @@ export class TxPoolService {
     return this.txpool;
   }
 
-  verifyAndAdd(message: TxMessage, signature: string): boolean {
-    const signer = verifyMessage(JSON.stringify(message), signature);
-    if (signer === message.sender) {
-      this.txpool.push({ message, signature });
-      return true;
-    }
-    return false;
+  async verifyAndAdd(message: string, uid: string): Promise<TxPoolItem> {
+    const singer_wallet = await this.metaService.createWallet(uid);
+    const signature = await this.metaService.createSign(singer_wallet, JSON.stringify(message));
+    const txData = { message : {sender: singer_wallet.address, data: message}, signature };
+    this.txpool.push(txData);
+    return txData;
   }
 
   async processPool(): Promise<any> {
@@ -82,7 +78,9 @@ export class TxPoolService {
     return tx;
   }
 
-  clear(): void {
+  clear(): Number {
+    const totalNum = this.txpool.length;
     this.txpool = [];
+    return totalNum;
   }
 }
