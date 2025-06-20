@@ -21,7 +21,7 @@ router.post("/me", verifyToken, getUserController);
 router.post("/login", validateLogin, emaillogin);
 router.get("/oauth/:provider", oauthCallbackController);
 router.get('/google/callback', googleCallbackController);
-router.get('/auth/oauth/:provider', validateOAuthRequest, oauthCallbackController);
+// router.get('/auth/oauth/:provider', validateOAuthRequest, oauthCallbackController);
 router.post("/logout", logout);
 
 export default router;
