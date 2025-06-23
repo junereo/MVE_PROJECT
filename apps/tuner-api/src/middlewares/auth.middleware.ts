@@ -71,3 +71,20 @@ export const verifyToken = (
     res.status(401).json({ error: "유효하지 않은 토큰입니다." });
   }
 };
+
+export const validateOAuthRequest = async (req: Request, res: Response, next: NextFunction) => {
+  const provider = req.params.provider;
+  const code = req.query.code || req.body.code;
+
+  if (!provider || typeof provider !== 'string') {
+    res.status(400).json({ error: 'provider가 없음' });
+    return
+  }
+
+  if (!code) {
+    res.status(400).json({ error: 'OAuth code 없음' });
+    return
+  }
+
+  next();
+};

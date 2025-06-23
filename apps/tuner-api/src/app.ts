@@ -14,10 +14,15 @@ const app = express();
 
 app.use(
   cors({
-    origin: [`${process.env.CLIENT_IP}`, `${process.env.CLIENT_USER_IP}`, `${process.env.CLIENT_ADMIN_IP}`],
+    origin: [
+      "https://tunemate.store",
+      "https://admin.tunemate.store",
+      "http://localhost:3000",
+    ],
     credentials: true,
   })
 );
+
 
 // 미들웨어 설정
 app.use(cookieParser());

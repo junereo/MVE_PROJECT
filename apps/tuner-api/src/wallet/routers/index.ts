@@ -8,8 +8,8 @@ import { verifyToken } from "../middlewares/auth.middleware";
 const router: Router = express.Router();
 
 // ✅ 공통 인증 미들웨어 적용
-router.use('/wallet', verifyToken, walletRoutes);
-router.use('/tx', verifyToken, txpoolRoutes);
-router.use('/survey', verifyToken, surveyRoutes);
+router.use('/wallet',  walletRoutes);
+router.use('/tx',  txpoolRoutes);
+router.use('/survey',  surveyRoutes);
 
 export default router;

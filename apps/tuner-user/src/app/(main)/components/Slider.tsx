@@ -15,7 +15,7 @@ const slideItems = [
 
 export default function Slider() {
   return (
-    <div className="w-full">
+    <div className="overflow-hidden">
       <Swiper
         modules={[Autoplay]}
         slidesPerView={1.2}

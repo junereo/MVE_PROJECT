@@ -39,6 +39,11 @@ export default function Navigate() {
             - Survey Test
           </Link>
         </li>
+        <li>
+          <Link href="/wallet" className="block hover:text-blue-300">
+            - wallet
+          </Link>
+        </li>
       </ul>
     </div>
   );
