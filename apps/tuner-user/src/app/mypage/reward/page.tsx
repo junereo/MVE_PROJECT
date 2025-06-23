@@ -60,10 +60,8 @@ export default function Reward() {
         />
       )}
 
-      <div className="max-w-xl mx-auto space-y-6 px-4 pt-8 pb-16">
-        <h1 className="text-2xl font-bold text-gray-800">리워드 출금</h1>
-
-        <div className="bg-white p-4 rounded-2xl shadow space-y-2">
+      <div className="max-w-xl mx-auto space-y-6">
+        <div className="bg-white p-4 space-y-2">
           <div className="flex items-center gap-2 mb-2">
             <Wallet className="w-5 h-5 text-blue-500" />
             <h2 className="text-lg font-semibold text-gray-700">지갑 정보</h2>
@@ -76,10 +74,7 @@ export default function Reward() {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-4 rounded-2xl shadow space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="bg-white p-4 space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <ArrowDown className="w-5 h-5 text-green-500" />
             <h2 className="text-lg font-semibold text-gray-700">출금 신청</h2>

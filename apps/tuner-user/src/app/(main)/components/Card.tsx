@@ -6,28 +6,28 @@ const cardItems = [
   {
     id: 1,
     image: "/images/slide1.jpeg",
-    singer: "가수1",
+    artist: "가수1",
     title: "제목1",
     period: "25.06.19 - 25.06.26",
   },
   {
     id: 2,
     image: "/images/slide2.jpeg",
-    singer: "가수2",
+    artist: "가수2",
     title: "제목2",
     period: "25.06.19 - 25.06.26",
   },
   {
     id: 3,
     image: "/images/slide3.jpeg",
-    singer: "가수3",
+    artist: "가수3",
     title: "제목3",
     period: "25.06.19 - 25.06.26",
   },
   {
     id: 4,
     image: "/images/slide4.jpeg",
-    singer: "가수4",
+    artist: "가수4",
     title: "제목4",
     period: "25.06.19 - 25.06.26",
   },
@@ -52,7 +52,7 @@ export default function Card() {
             <p className="text-base font-semibold text-gray-900 truncate">
               {item.title}
             </p>
-            <p className="text-sm text-gray-500 truncate">{item.singer}</p>
+            <p className="text-sm text-gray-500 truncate">{item.artist}</p>
             <p className="text-xs text-gray-400">{item.period}</p>
           </div>
         </div>
