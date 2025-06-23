@@ -1,37 +1,73 @@
 "use client";
-import { useSurveyStore } from "@/store/surceyStore";
+import { useSurveyStore } from "@/store/surveyStore";
+import templates from "@/app/template/components/Templates";
 
 export default function SurveyComplete() {
   const { step1, step2 } = useSurveyStore();
 
+  // 🔥 템플릿 키로 해당 세트에서 문항 불러오기
+  const templateData = templates[step1.templateSetKey] || {};
+
+  // 🔥 템플릿 문항들을 categoryQuestions 형태로 구성
+  const templateQuestions = Object.entries(templateData).flatMap(
+    ([categoryKey, questions]) =>
+      Array.isArray(questions)
+        ? questions.map((q) => ({
+            category: categoryKey,
+            text: q.question,
+            type: "multiple",
+            options: q.options,
+          }))
+        : []
+  );
+
+  // ✅ 기본 템플릿 문항 + 커스텀 문항 포함
+  const combinedQuestions = [
+    ...templateQuestions,
+    ...step2.customQuestions.map((q) => ({
+      category: "custom",
+      text: q.text,
+      type: q.type,
+      options: q.type === "subjective" ? [] : q.options,
+    })),
+  ];
+
+  // ✅ 최종 제출 데이터
   const dataToSubmit = {
-    youtubeInfo: {
-      title: step1.youtubeTitle,
-      url: step1.url,
-      thumbnail: step1.youtubeThumbnail,
-      channelTitle: step1.channelTitle,
-    },
+    // 음원 정보
+    title: step1.youtubeTitle,
     artist: step1.artist,
-    isReleased: step1.isReleased,
-    releaseDate: step1.releaseDate,
+    release_date: step1.releaseDate,
+    is_released: step1.isReleased,
+    thumbnailUrl: step1.youtubeThumbnail,
+    sample_url: step1.url,
+    channelTitle: step1.channelTitle,
     genre: step1.genre,
-    surveyPeriod: {
-      start: step1.startDate,
-      end: step1.endDate,
-    },
-    surveyType: step1.surveyType,
-    reward: {
-      total: step1.totalReward,
-      normal: step1.normalReward,
-      expert: step1.expertReward,
-    },
+
+    // 설문 정보
+    start_at: step1.start_at,
+    end_at: step1.end_at,
+    type: step1.surveyType,
+    reward_amount: step1.reward_amount ?? 0,
+    reward: step1.reward ?? 0,
+    expert_reward: step1.expertReward ?? 0,
+    templateSetKey: step1.templateSetKey,
+
     evaluationScores: step2.answers,
     hashtags: step2.hashtags,
-    customQuestions: step2.customQuestions,
+
+    // ✅ 문자열로 변환하지 않은 상태 (출력용 및 화면용)
+    allQuestions: combinedQuestions,
   };
 
   const handleSubmit = () => {
-    console.log("제출할 데이터:", dataToSubmit);
+    // 서버 전송을 위한 JSON 변환 (allQuestions만 문자열로)
+    const serverPayload = {
+      ...dataToSubmit,
+      allQuestions: JSON.stringify(combinedQuestions),
+    };
+
+    console.log("🔥 서버 전송용 JSON:", serverPayload);
     alert("데이터가 콘솔에 출력되었습니다. (API 연동 예정)");
   };
 
@@ -77,34 +113,40 @@ export default function SurveyComplete() {
         </div>
       </div>
 
-      {/* 📋 커스텀 질문 */}
-      {step2.customQuestions.length > 0 && (
-        <div className="mb-6">
-          <p className="font-semibold">📋 커스텀 객관식 설문</p>
-          {step2.customQuestions.map((q) => (
-            <div key={q.id} className="border p-3 rounded mt-3">
-              <p className="font-medium mb-2">
-                Q{q.id}. {q.text}
-              </p>
+      {/* 📋 문항 전체 출력 */}
+      <div className="mb-6">
+        <p className="font-semibold">📋 전체 문항 미리보기</p>
+        {combinedQuestions.map((q, i) => (
+          <div key={i} className="border p-3 rounded mt-3">
+            <p className="font-medium mb-2">
+              [{q.category}] {q.text}
+            </p>
+            {q.type !== "subjective" && (
               <ul className="list-disc pl-5 text-sm">
-                {q.options.map((opt, i) => (
-                  <li key={i}>{opt}</li>
+                {q.options.map((opt: string, j: number) => (
+                  <li key={j}>{opt}</li>
                 ))}
               </ul>
-            </div>
-          ))}
-        </div>
-      )}
+            )}
+          </div>
+        ))}
+      </div>
 
-      {/* 📨 JSON 미리보기 */}
+      {/* JSON 출력 */}
       <div className="bg-gray-100 p-4 rounded mb-6 text-sm max-h-[300px] overflow-auto">
         <p className="font-semibold mb-2">📦 제출 데이터(JSON)</p>
-        <pre className="whitespace-pre-wrap">
-          {JSON.stringify(dataToSubmit, null, 2)}
+        <pre className="whitespace-pre-wrap text-xs">
+          {JSON.stringify(
+            {
+              ...dataToSubmit,
+              allQuestions: JSON.stringify(dataToSubmit.allQuestions, null, 2),
+            },
+            null,
+            2
+          )}
         </pre>
       </div>
 
-      {/* 제출 버튼 */}
       <div className="text-center">
         <button
           onClick={handleSubmit}

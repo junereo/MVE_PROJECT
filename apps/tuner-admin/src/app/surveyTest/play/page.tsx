@@ -22,7 +22,7 @@ const surveyData = {
       id: 2,
       text: "체크박스",
       type: "checkbox",
-      options: ["1.", "2.", "3.", "4."],
+      options: ["1.", "2.", "3.", "4.", "5.", "6.", "7.", "8."],
     },
     {
       id: 3,
@@ -45,7 +45,9 @@ export default function SurveyParticipatePage() {
   const categories = Object.keys(labelMap);
   const [stepIndex, setStepIndex] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
-  const [customAnswers, setCustomAnswers] = useState<Record<number, any>>({});
+  const [customAnswers, setCustomAnswers] = useState<
+    Record<number, string | string[]>
+  >({});
 
   // 점수 선택
   const handleScoreSelect = (category: string, score: number) => {
@@ -55,8 +57,11 @@ export default function SurveyParticipatePage() {
   const handleRadioAnswer = (questionId: number, option: string) => {
     setCustomAnswers((prev) => ({ ...prev, [questionId]: option }));
   };
+  // 체크박스 답변
   const handleCheckboxAnswer = (questionId: number, option: string) => {
-    const current = customAnswers[questionId] || [];
+    const current = Array.isArray(customAnswers[questionId])
+      ? (customAnswers[questionId] as string[])
+      : [];
     const updated = current.includes(option)
       ? current.filter((o: string) => o !== option)
       : [...current, option];
