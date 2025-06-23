@@ -3,33 +3,38 @@ import { create } from "zustand";
 type SurveyType = "general" | "reward";
 
 interface SurveyStep1 {
-  youtubeVideoId: string;
-  youtubeTitle: string;
-  youtubeThumbnail: string;
-  artist: string;
-  title: string;
-  isReleased: boolean;
-  releaseDate: string;
-  url: string;
-  genre: string;
-  startDate: string;
-  endDate: string;
-  surveyType: SurveyType;
-  channelTitle: string;
-  totalReward?: number;
-  normalReward?: number;
-  expertReward?: number;
+  youtubeVideoId: string; // 유튜브 영상 ID
+  youtubeTitle: string; // 유튜브 영상 제목
+  youtubeThumbnail: string; // 유튜브 영상 썸네일
+  artist: string; // 아티스트명
+  title: string; // 곡 제목
+  isReleased: boolean; // 발매 여부
+  releaseDate: string; // 발매일
+  url: string; // 유튜브 URL
+  genre: string; // 장르
+  startDate: string; // 설문 시작일
+  endDate: string; // 설문 종료일
+  surveyType: SurveyType; // 설문 타입 (일반, 리워드)
+  channelTitle: string; // 채널명
+  totalReward?: number; // 리워드 총량 (리워드 타입일 때)
+  normalReward?: number; // 일반 유저 리워드 (리워드 타입일 때)
+  expertReward?: number; // Expert 유저 리워드 (리워드 타입일 때)
 }
 
 interface SurveyStep2 {
   answers: {
-    originality?: string;
-    popularity?: string;
-    sustainability?: string;
-    expandability?: string;
-    stardom?: string;
+    originality?: number; // 작품성
+    popularity?: number; // 대중성
+    sustainability?: number; // 지속성
+    expandability?: number; // 확장성
+    stardom?: number; // 스타성
   };
   hashtags: string[];
+  customQuestions: {
+    id: number; // 질문 ID
+    text: string; // 질문 내용
+    options: string[]; // 선택지 (서술형 질문은 빈 배열)
+  }[];
 }
 
 interface SurveyState {
@@ -71,6 +76,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
   step2: {
     answers: {},
     hashtags: [],
+    customQuestions: [],
   },
   setStep2: (data) =>
     set((state) => ({
