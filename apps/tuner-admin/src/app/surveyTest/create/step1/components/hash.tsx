@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSurveyStore } from "@/store/surceyStore";
+import { useSurveyStore } from "@/store/surveyStore";
 const HashTag = () => {
   const [hashtagInput, setHashtagInput] = useState("");
   const { step2, setStep2 } = useSurveyStore();
