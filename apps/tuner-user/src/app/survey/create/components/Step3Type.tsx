@@ -2,15 +2,19 @@
 
 import Button from "@/components/ui/Button";
 
-interface Step1Props {
+interface Step3Props {
   onNext: () => void;
 }
 
-export default function Step1YouTube({ onNext }: Step1Props) {
+export default function Step3Type({ onNext }: Step3Props) {
   return (
     <div className="p-4 space-y-4">
-      <h2 className="text-xl font-bold">Step 1: 유튜브</h2>
-      <input type="text" placeholder="YouTube" className="border p-2 w-full" />
+      <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
+      <input
+        type="text"
+        placeholder="Survey Type"
+        className="border p-2 w-full"
+      />
       <button
         onClick={onNext}
         className="bg-blue-500 text-white px-4 py-2 rounded"
