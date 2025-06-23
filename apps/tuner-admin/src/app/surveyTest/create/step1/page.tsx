@@ -1,12 +1,14 @@
+// ✅ SurveyStep1.tsx - 모바일 반응형 + 주석 추가
 "use client";
-import { useRouter, useSearchParams } from "next/navigation"; // ✅ 추가
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { useSurveyStore } from "@/store/surceyStore"; // ✅ Zustand 스토어 import
+import { useSurveyStore } from "@/store/surceyStore";
 import Dropdown from "../../../components/ui/DropDown";
 import Link from "next/link";
 import HashTag from "./components/hash";
-
+// import Image from "next/image";
 const SurveyStep1 = () => {
+  // 장르 목록
   const genreOptions = [
     "발라드",
     "힙합",
@@ -21,16 +23,18 @@ const SurveyStep1 = () => {
     "포크",
     "OST",
   ];
+
   const { step1, setStep1 } = useSurveyStore();
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ✅ 쿼리에서 유튜브 정보 가져오기
+  // 쿼리스트링에서 유튜브 관련 데이터 가져오기
   const videoId = searchParams.get("videoId");
   const title = searchParams.get("title");
   const thumbnail = searchParams.get("thumbnail");
   const channelTitle = searchParams.get("channelTitle");
-  // ✅ 페이지 들어오자마자 쿼리값이 있으면 Zustand에 저장
+
+  // 처음 로딩 시 step1에 유튜브 정보 저장
   useEffect(() => {
     if (videoId && title && thumbnail) {
       setStep1({
@@ -41,62 +45,67 @@ const SurveyStep1 = () => {
         url: `https://www.youtube.com/watch?v=${videoId}`,
       });
     }
-  }, [videoId, title, thumbnail, channelTitle]);
+  }, [videoId, title, thumbnail, channelTitle, setStep1]);
 
+  // 입력값 변경 핸들러
   const handleInputChange = (
     field: keyof typeof step1,
     value: string | boolean | number
   ) => {
     setStep1({ [field]: value });
   };
+
   return (
-    <div className="w-[1200px] mx-auto bg-white p-6 shadow rounded">
-      {/* ✅ 유튜브 영상 등록 */}
+    <div className="w-full max-w-[485px] md:max-w-3xl mx-auto bg-white p-4 sm:p-6 md:p-8 shadow rounded">
+      {/* 유튜브 영상 등록 버튼 */}
       <button
-        onClick={() => {
-          router.push("/surveyTest/search"); // ✅ 검색 페이지로 이동
-        }}
-        className="bg-blue-500 text-white p-2 rounded"
+        onClick={() => router.push("/surveyTest/search")}
+        className="bg-blue-500 text-white p-2 rounded w-full"
       >
         유튜브 영상 등록
       </button>
 
-      {/* ✅ 영상 정보 표시 */}
+      {/* 유튜브 정보 표시 */}
       {step1.youtubeTitle && (
-        <div className="mt-2">
-          <div className="font-bold text-xl pb-2">곡 제목</div>
-          <p>🎵{step1.youtubeTitle} </p>
-          <div className="flex gap-4 items-end justify-between ">
-            {" "}
-            <img src={step1.youtubeThumbnail} className="w-48 mt-2 rounded" />
+        <div className="mt-4">
+          <div className="font-bold text-lg sm:text-xl pb-2">곡 제목</div>
+          <p>🎵{step1.youtubeTitle}</p>
+
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end justify-between mt-2">
+            <img
+              alt="유튜브 썸네일"
+              src={step1.youtubeThumbnail}
+              className="w-full sm:w-48 rounded"
+            />
             <Link
               href={step1.url}
-              className="bg-red-500 text-white p-2 rounded mt-2 inline-block"
+              className="bg-red-500 text-white p-2 rounded mt-2 text-center"
             >
               유튜브에서 보기
             </Link>
           </div>
-          {/* 아티스트명, 곡 제목 */}
-          <div className="font-bold text-xl">아티스트 명(체널명)</div>
-          <div>
-            <input
-              placeholder={step1.channelTitle}
-              value={step1.artist || ""}
-              onChange={(e) => handleInputChange("artist", e.target.value)}
-              className="border p-2 mt-4 w-full"
-            />
+
+          {/* 아티스트명 입력 */}
+          <div className="font-bold text-lg sm:text-xl mt-4">
+            아티스트 명(체널명)
           </div>
+          <input
+            placeholder={step1.channelTitle}
+            value={step1.artist || ""}
+            onChange={(e) => handleInputChange("artist", e.target.value)}
+            className="border p-2 mt-2 w-full"
+          />
         </div>
       )}
 
-      {/* 발매 여부 */}
-      <div className="flex gap-4 mt-4">
+      {/* 발매 여부 및 날짜 */}
+      <div className="flex flex-wrap gap-4 mt-6">
         <label>
           <input
             type="radio"
             checked={step1.isReleased}
             onChange={() => handleInputChange("isReleased", true)}
-          />
+          />{" "}
           발매
         </label>
         <label>
@@ -104,7 +113,7 @@ const SurveyStep1 = () => {
             type="radio"
             checked={!step1.isReleased}
             onChange={() => handleInputChange("isReleased", false)}
-          />
+          />{" "}
           미발매
         </label>
         <input
@@ -114,7 +123,9 @@ const SurveyStep1 = () => {
           className="border p-2"
         />
       </div>
-      <div className="font-bold text-xl pb-2">장르 선택</div>
+
+      {/* 장르 선택 드롭다운 */}
+      <div className="font-bold text-lg sm:text-xl pb-2 mt-6">장르 선택</div>
       <Dropdown
         options={genreOptions}
         selected={step1.genre || "장르 선택"}
@@ -133,85 +144,98 @@ const SurveyStep1 = () => {
             포크: "folk",
             OST: "ost",
           };
-
           handleInputChange("genre", mapToValue[selectedOption]);
         }}
       />
-      {/* 설문 기간 */}
-      <div className="font-bold text-xl pb-2">설문 기간</div>
-      <div className="flex gap-4">
+
+      {/* 설문 기간 입력 */}
+      <div className="font-bold text-lg sm:text-xl pb-2 mt-6">설문 기간</div>
+      <div className="flex flex-col sm:flex-row gap-4">
         <input
           type="date"
           value={step1.startDate}
           onChange={(e) => handleInputChange("startDate", e.target.value)}
-          className="border p-2"
+          className="border p-2 w-full"
         />
         <input
           type="date"
           value={step1.endDate}
           onChange={(e) => handleInputChange("endDate", e.target.value)}
-          className="border p-2"
+          className="border p-2 w-full"
         />
       </div>
+
+      {/* 해시태그 입력 */}
       <HashTag />
 
-      {/* 리워드 타입 & 총량 */}
-      <div className="flex gap-4 mt-4 items-center">
-        <label>
+      {/* 설문 유형 선택 */}
+      <div className="flex gap-2 mt-4">
+        <label className="cursor-pointer">
           <input
             type="radio"
+            name="surveyType"
+            value="general"
             checked={step1.surveyType === "general"}
             onChange={() => handleInputChange("surveyType", "general")}
+            className="peer hidden"
           />
-          General
+          <div className="px-4 py-2 rounded border border-gray-300 peer-checked:bg-blue-500 peer-checked:text-white transition">
+            General
+          </div>
         </label>
-        <label>
+
+        <label className="cursor-pointer">
           <input
             type="radio"
+            name="surveyType"
+            value="reward"
             checked={step1.surveyType === "reward"}
             onChange={() => handleInputChange("surveyType", "reward")}
+            className="peer hidden"
           />
-          Reward
-        </label>
-        {step1.surveyType === "reward" && (
-          <div className="flex gap-4 mt-4">
-            <input
-              type="number"
-              placeholder="리워드 총량"
-              value={step1.totalReward || ""}
-              onChange={(e) =>
-                handleInputChange("totalReward", parseInt(e.target.value))
-              }
-              className="border p-2 w-1/3"
-            />
-            <input
-              type="number"
-              placeholder="일반 유저 리워드"
-              value={step1.normalReward || ""}
-              onChange={(e) =>
-                handleInputChange("normalReward", parseInt(e.target.value))
-              }
-              className="border p-2 w-1/3"
-            />
-            <input
-              type="number"
-              placeholder="Expert 유저 리워드"
-              value={step1.expertReward || ""}
-              onChange={(e) =>
-                handleInputChange("expertReward", parseInt(e.target.value))
-              }
-              className="border p-2 w-1/3"
-            />
+          <div className="px-4 py-2 rounded border border-gray-300 peer-checked:bg-blue-500 peer-checked:text-white transition">
+            Reward
           </div>
-        )}
+        </label>
       </div>
 
-      {/* NEXT 버튼 */}
+      {/*  리워드 입력 (선택 시) */}
+      {step1.surveyType === "reward" && (
+        <div className="flex flex-col sm:flex-row gap-4 mt-4">
+          <input
+            type="number"
+            placeholder="리워드 총량"
+            value={step1.totalReward || ""}
+            onChange={(e) =>
+              handleInputChange("totalReward", parseInt(e.target.value))
+            }
+            className="border p-2 w-full"
+          />
+          <input
+            type="number"
+            placeholder="일반 유저 리워드"
+            value={step1.normalReward || ""}
+            onChange={(e) =>
+              handleInputChange("normalReward", parseInt(e.target.value))
+            }
+            className="border p-2 w-full"
+          />
+          <input
+            type="number"
+            placeholder="Expert 유저 리워드"
+            value={step1.expertReward || ""}
+            onChange={(e) =>
+              handleInputChange("expertReward", parseInt(e.target.value))
+            }
+            className="border p-2 w-full"
+          />
+        </div>
+      )}
+
+      {/* 다음 단계로 이동 */}
       <button
-        onClick={() => {
-          router.push("/surveyTest/create/step2");
-        }}
-        className="mt-6 bg-black text-white px-6 py-2 rounded"
+        onClick={() => router.push("/surveyTest/create/step2")}
+        className="mt-6 bg-black text-white px-6 py-2 rounded w-full"
       >
         NEXT
       </button>

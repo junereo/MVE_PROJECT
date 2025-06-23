@@ -1,12 +1,19 @@
-// ✅ SurveyStep2: 스타성에서 커스텀 탭 생성 + 자동 이동 + 기본 설문 포함
+// ✅ SurveyStep2.tsx - 반응형 + 컴포넌트 분리 완성본 (with 주석)
 "use client";
 import { useState } from "react";
 import { useSurveyStore } from "@/store/surceyStore";
 import { useRouter } from "next/navigation";
+import SurveyTabs from "@/app/surveyTest/create/step2/components/SurveyTabs";
+import SurveyQuestionBase from "@/app/surveyTest/create/step2/components/SurveyQuestionBase";
+import SurveyCustomForm from "@/app/surveyTest/create/step2/components/SurveyCustomForm";
+import SurveyActions from "@/app/surveyTest/create/step2/components/SurveyActions";
+import SurveyNavigation from "@/app/surveyTest/create/step2/components/SurveyNavigation";
 
 export default function SurveyStep2() {
   const router = useRouter();
   const { step1, setStep2 } = useSurveyStore();
+
+  // 기본 카테고리 탭
   const baseCategories = [
     { key: "originality", label: "작품성" },
     { key: "popularity", label: "대중성" },
@@ -15,190 +22,166 @@ export default function SurveyStep2() {
     { key: "stardom", label: "스타성" },
   ];
 
-  const [customQuestions, setCustomQuestions] = useState([]);
+  // 상태 정의
+  const [customQuestions, setCustomQuestions] = useState([
+    { id: 1, text: "", type: "multiple", options: ["", "", "", ""] },
+  ]);
   const [tabIndex, setTabIndex] = useState(0);
-
   const [customTabCreated, setCustomTabCreated] = useState(false);
 
+  // 질문 유형 옵션
+  const typeOptions = [
+    { label: "객관식", value: "multiple" },
+    { label: "체크박스형", value: "checkbox" },
+    { label: "서술형", value: "subjective" },
+  ] as const;
+  type QuestionType = (typeof typeOptions)[number]["value"];
+
+  // 전체 탭 (기본 + 커스텀)
   const allTabs = [
     ...baseCategories,
     ...(customTabCreated ? [{ key: "custom", label: "커스텀" }] : []),
   ];
+
   const currentTab = allTabs[tabIndex];
   const isStardomTab = currentTab.key === "stardom";
   const isCustomTab = currentTab.key === "custom";
 
+  // 커스텀 탭 생성
   const createCustomTab = () => {
     if (!customTabCreated) {
-      setCustomQuestions([{ id: 1, text: "", options: ["", "", "", ""] }]);
+      setCustomQuestions([
+        { id: 1, text: "", type: "multiple", options: ["", "", "", ""] },
+      ]);
       setCustomTabCreated(true);
-      setTabIndex(baseCategories.length); // 커스텀으로 자동 이동
+      setTabIndex(baseCategories.length); // 커스텀 탭으로 자동 이동
     }
   };
 
+  // 커스텀 질문 추가
   const addCustomQuestion = () => {
     const newId = customQuestions.length + 1;
     setCustomQuestions([
       ...customQuestions,
-      { id: newId, text: "", options: ["", "", "", ""] },
+      { id: newId, text: "", type: "multiple", options: ["", "", "", ""] },
     ]);
   };
 
-  const handleQuestionChange = (index, text) => {
-    const updated = [...customQuestions];
-    updated[index].text = text;
-    setCustomQuestions(updated);
+  // 질문 텍스트 수정
+  const handleQuestionChange = (index: number, text: string) => {
+    setCustomQuestions((prev) =>
+      prev.map((q, i) => (i === index ? { ...q, text } : q))
+    );
   };
 
-  const handleOptionChange = (qIndex, optIndex, value) => {
-    const updated = [...customQuestions];
-    updated[qIndex].options[optIndex] = value;
-    setCustomQuestions(updated);
+  // 객관식 옵션 텍스트 수정
+  const handleOptionChange = (
+    qIndex: number,
+    optIndex: number,
+    value: string
+  ) => {
+    setCustomQuestions((prev) =>
+      prev.map((q, i) =>
+        i === qIndex
+          ? {
+              ...q,
+              options: q.options.map((opt, j) =>
+                j === optIndex ? value : opt
+              ),
+            }
+          : q
+      )
+    );
+  };
+  // 체크박스 옵션 증가
+  // const handleAddOption = (qIndex: number) => {
+  //   setCustomQuestions((prev) =>
+  //     prev.map((q, i) => {
+  //       if (i === qIndex && q.options.length < 8) {
+  //         return { ...q, options: [...q.options, ""] };
+  //       }
+  //       return q;
+  //     })
+  //   );
+  // };
+
+  // 질문 유형 수정
+  const handleTypeChange = (index: number, newType: string) => {
+    setCustomQuestions((prev) =>
+      prev.map((q, i) =>
+        i === index
+          ? {
+              ...q,
+              type: newType as QuestionType,
+              options:
+                newType === "subjective"
+                  ? []
+                  : q.options.length
+                  ? q.options
+                  : ["", "", "", ""],
+            }
+          : q
+      )
+    );
   };
 
+  // 설문 완료 처리
   const handleComplete = () => {
     setStep2({ customQuestions });
     router.push("/surveyTest/create/complete");
   };
 
+  // 다음 탭 이동
   const goNext = () => {
     if (tabIndex < allTabs.length - 1) setTabIndex(tabIndex + 1);
   };
 
+  // 이전 탭 이동
   const goBack = () => {
     if (tabIndex > 0) setTabIndex(tabIndex - 1);
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      {/* 탭 라벨 영역 */}
-      <div className="sticky top-0 bg-white z-10 pb-2 mb-4 flex justify-between items-center border-b">
-        <div className="flex gap-4">
-          {allTabs.map((cat, i) => (
-            <button
-              key={cat.key}
-              onClick={() => setTabIndex(i)}
-              className={`px-3 py-1 rounded-t-md border-b-2 ${
-                tabIndex === i
-                  ? "border-pink-400 bg-pink-100"
-                  : "border-transparent"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="w-full max-w-[485px] md:max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
+      {/* 탭 영역 */}
+      <SurveyTabs tabs={allTabs} current={tabIndex} setTab={setTabIndex} />
 
-      <h1 className="text-2xl font-bold mb-2">
+      {/* 유튜브 타이틀 */}
+      <h1 className="text-lg md:text-2xl font-bold mb-4">
         🎵 {step1.youtubeTitle}에 대한 설문
       </h1>
 
-      {/* 기본 평가 영역 */}
+      {/* 탭 콘텐츠 렌더링 */}
       {!isCustomTab ? (
-        <div className="mb-10">
-          <p className="font-semibold mb-2">
-            {currentTab.label} 항목은 점수 입력만 가능합니다.
-          </p>
-          <div className="flex gap-2 mb-4">
-            {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-              <button
-                key={num}
-                className="px-3 py-1 border rounded bg-gray-200 text-gray-500 cursor-not-allowed"
-                disabled
-              >
-                {num}
-              </button>
-            ))}
-          </div>
-
-          {/* 스타성 탭에서만 버튼 노출 */}
-          {isStardomTab && !customTabCreated && (
-            <div className="text-right">
-              <button
-                onClick={createCustomTab}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                + 커스텀 설문 추가하기
-              </button>
-            </div>
-          )}
-        </div>
+        <SurveyQuestionBase
+          label={currentTab.label}
+          showCustomButton={isStardomTab && !customTabCreated}
+          onCustomClick={createCustomTab}
+        />
       ) : (
-        <>
-          {/* 커스텀 질문 전체 누적형 */}
-          <div className="mb-12">
-            <p className="text-lg font-semibold mb-4">커스텀 객관식 설문</p>
-            {customQuestions.map((q, qIndex) => (
-              <div key={q.id} className="mb-6 border p-4 rounded">
-                <input
-                  type="text"
-                  placeholder="질문을 입력해주세요"
-                  className="w-full mb-3 p-2 border rounded"
-                  value={q.text}
-                  onChange={(e) => handleQuestionChange(qIndex, e.target.value)}
-                />
-                {q.options.map((opt, optIndex) => (
-                  <input
-                    key={optIndex}
-                    type="text"
-                    placeholder={`선택지 ${optIndex + 1}`}
-                    value={opt}
-                    onChange={(e) =>
-                      handleOptionChange(qIndex, optIndex, e.target.value)
-                    }
-                    className="w-full mb-2 p-2 border rounded"
-                  />
-                ))}
-              </div>
-            ))}
-            <div className="text-right">
-              <button
-                onClick={addCustomQuestion}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                + 설문 추가하기
-              </button>
-            </div>
-          </div>
-        </>
+        <SurveyCustomForm
+          questions={customQuestions}
+          typeOptions={typeOptions as any}
+          onAdd={addCustomQuestion}
+          onChangeText={handleQuestionChange}
+          onChangeType={handleTypeChange}
+          onChangeOption={handleOptionChange}
+          //onAddOption={handleAddOption}
+        />
       )}
 
-      {/* 해시태그, 완료버튼, 임시저장 → 스타성 또는 커스텀 탭 */}
-      {isStardomTab || isCustomTab ? (
-        <>
-          {/* 버튼들 */}
-          <div className="flex justify-center gap-4">
-            <button className="bg-gray-400 text-white px-6 py-2 rounded">
-              임시 저장
-            </button>
-            <button
-              onClick={handleComplete}
-              className="bg-green-600 text-white px-6 py-2 rounded"
-            >
-              설문지 생성 완료
-            </button>
-          </div>
-        </>
-      ) : null}
+      {/* 커스텀/스타성 탭일 경우에만 버튼 보임 */}
+      {(isStardomTab || isCustomTab) && (
+        <SurveyActions onTempSave={() => {}} onComplete={handleComplete} />
+      )}
 
-      {/* 이전/다음 버튼 */}
-      <div className="flex justify-between mt-12">
-        <button
-          onClick={goBack}
-          disabled={tabIndex === 0}
-          className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
-        >
-          이전
-        </button>
-        <button
-          onClick={goNext}
-          disabled={tabIndex >= allTabs.length - 1}
-          className="px-4 py-2 bg-black text-white rounded disabled:opacity-50"
-        >
-          다음
-        </button>
-      </div>
+      {/* 하단 이전/다음 내비게이션 */}
+      <SurveyNavigation
+        tabIndex={tabIndex}
+        totalTabs={allTabs.length}
+        onPrev={goBack}
+        onNext={goNext}
+      />
     </div>
   );
 }
