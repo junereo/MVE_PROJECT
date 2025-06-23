@@ -3,7 +3,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { useSurveyStore } from "@/store/surceyStore";
+import { useSurveyStore } from "@/store/surveyStore";
 
 const YoutuveVideo = () => {
   const searchParams = useSearchParams();

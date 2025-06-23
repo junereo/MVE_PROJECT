@@ -2,7 +2,7 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { useSurveyStore } from "@/store/surceyStore";
+import { useSurveyStore } from "@/store/surveyStore";
 import Dropdown from "../../../components/ui/DropDown";
 import Link from "next/link";
 import HashTag from "./components/hash";
@@ -153,14 +153,14 @@ const SurveyStep1 = () => {
       <div className="flex flex-col sm:flex-row gap-4">
         <input
           type="date"
-          value={step1.startDate}
-          onChange={(e) => handleInputChange("startDate", e.target.value)}
+          value={step1.start_at}
+          onChange={(e) => handleInputChange("start_at", e.target.value)}
           className="border p-2 w-full"
         />
         <input
           type="date"
-          value={step1.endDate}
-          onChange={(e) => handleInputChange("endDate", e.target.value)}
+          value={step1.end_at}
+          onChange={(e) => handleInputChange("end_at", e.target.value)}
           className="border p-2 w-full"
         />
       </div>
@@ -205,18 +205,18 @@ const SurveyStep1 = () => {
           <input
             type="number"
             placeholder="리워드 총량"
-            value={step1.totalReward || ""}
+            value={step1.reward_amount || ""}
             onChange={(e) =>
-              handleInputChange("totalReward", parseInt(e.target.value))
+              handleInputChange("reward_amount", parseInt(e.target.value))
             }
             className="border p-2 w-full"
           />
           <input
             type="number"
             placeholder="일반 유저 리워드"
-            value={step1.normalReward || ""}
+            value={step1.reward || ""}
             onChange={(e) =>
-              handleInputChange("normalReward", parseInt(e.target.value))
+              handleInputChange("reward", parseInt(e.target.value))
             }
             className="border p-2 w-full"
           />

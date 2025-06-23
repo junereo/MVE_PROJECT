@@ -2,18 +2,34 @@ interface SurveyQuestionBaseProps {
   label: string;
   showCustomButton: boolean;
   onCustomClick: () => void;
+  showTemplateButton?: boolean;
+  onTemplateClick?: () => void;
 }
 
 export default function SurveyQuestionBase({
   label,
   showCustomButton,
   onCustomClick,
+  showTemplateButton,
+  onTemplateClick,
 }: SurveyQuestionBaseProps) {
   return (
     <div className="mb-10">
+      {showTemplateButton && onTemplateClick && (
+        <div className="text-right mb-2">
+          <button
+            onClick={onTemplateClick}
+            className="bg-pink-500 text-white px-4 py-2 rounded"
+          >
+            📦 템플릿 불러오기
+          </button>
+        </div>
+      )}
+
       <p className="font-semibold mb-2">
         {label} 항목은 점수 입력만 가능합니다.
       </p>
+
       <div className="grid grid-cols-5 gap-2 mb-4">
         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
           <button
@@ -25,6 +41,7 @@ export default function SurveyQuestionBase({
           </button>
         ))}
       </div>
+
       <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4">
         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
           <button
@@ -36,6 +53,7 @@ export default function SurveyQuestionBase({
           </button>
         ))}
       </div>
+
       {showCustomButton && (
         <div className="text-right">
           <button
