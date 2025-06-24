@@ -12,6 +12,29 @@ enum UserLevel {
   Expert
 }
 
+enum Gender {
+  male
+  female
+}
+
+enum AgeGroup {
+  teen // 10대
+  twenties // 20대
+  thirties // 30대
+  forties // 40대
+  fifties // 50대
+  sixties // 60대
+}
+
+enum Genre {
+  dance
+  ballad
+  trot
+  pop
+  gukak
+  ccm
+}
+
 enum AdminRole {
   admin
   superadmin
@@ -23,12 +46,50 @@ enum OAuthProvider {
   // 필요 시 naver, apple 등등 추가
 }
 
+enum SurveyType {
+  general
+  official
+}
+
+enum SurveyTags {
+  감각적인
+  화려한
+  감성적인
+  몽환적인
+  트렌디한
+  복고풍
+  중독성있는
+  잔잔한
+  역동적인
+  독창적인
+}
+
+enum SurveyActive {
+  upcoming // 설문예정
+  ongoing // 설문중
+  closed // 설문종료
+}
+
+enum SurveyStatus {
+  draft // 작성중
+  complete //완료
+}
+
+enum EndedBy {
+  expired // 기간 종료
+  outOfRewards // 보상 소진
+  closedByCreator // 생성자 종료
+}
+
 model User {
   id              Int       @id @default(autoincrement())
   email           String    @unique
   phone_number    String
   password        String
   nickname        String
+  gender          Gender?
+  ageGroup        AgeGroup?
+  genre           Genre
   wallet_address  String?
   simple_password String?
   level           UserLevel @default(Regular)
@@ -37,8 +98,10 @@ model User {
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
 
-  oauths User_OAuth[] // Relation (1:N)
-  // surveys Surveys[] // 내가 만든설문 연결
+  oauths    User_OAuth[] // Relation (1:N)
+  balances  User_Balance[]
+  surveys   Survey[]           @relation("SurveyCreator") // 내가 만든설문 연결
+  responses Survey_Responses[]
 }
 
 model User_OAuth {
@@ -56,6 +119,16 @@ model User_OAuth {
   user   User @relation(fields: [userId], references: [id])
 }
 
+model User_Balance {
+  id              Int      @id @default(autoincrement())
+  user_id         Int
+  current_reward  Int
+  total_withdrawn Int
+  updated_at      DateTime
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
 model Admin {
   id           Int       @id @default(autoincrement())
   email        String    @unique
@@ -70,4 +143,52 @@ model Admin {
   // Relation to rewards 
   // Relation to sbt_issuances
   // Relation to withdrawal_requests
+}
+
+model Survey {
+  id               Int          @id @default(autoincrement())
+  create_id        Int
+  music_id         Int
+  type             SurveyType
+  tags             SurveyTags?
+  music_sample_url String?
+  start_at         DateTime
+  end_at           DateTime
+  reward_amount    Int?
+  reward           Int?
+  expert_reward    Int?
+  is_active        SurveyActive
+  ended_by         EndedBy?
+  metadata_cid     String?
+  status           SurveyStatus @default(draft)
+  create_at        DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+
+  creator   User               @relation("SurveyCreator", fields: [create_id], references: [id])
+  //   music     Music              @relation(fields: [music_id], references: [id])
+  responses Survey_Responses[]
+  //   result    Survey_Result?
+  //   rewards   Rewards[]
+}
+
+model Survey_Template {
+  id            Int      @id @default(autoincrement())
+  template_name String
+  template      Json
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+}
+
+model Survey_Responses {
+  id         Int          @id @default(autoincrement())
+  user_id    Int
+  survey_id  Int
+  answers    Json
+  status     SurveyStatus @default(draft)
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  rewarded   Boolean
+
+  user   User   @relation(fields: [user_id], references: [id])
+  survey Survey @relation(fields: [survey_id], references: [id])
 }
