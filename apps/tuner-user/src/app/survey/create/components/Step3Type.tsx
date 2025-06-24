@@ -10,8 +10,8 @@ interface Step3Props {
 }
 
 export default function Step3Type({ onPrev, onNext }: Step3Props) {
-  const [surveyType, setSurveyType] = useState<"official" | "common" | null>(
-    null
+  const [surveyType, setSurveyType] = useState<"official" | "common">(
+    "official"
   );
 
   return (
