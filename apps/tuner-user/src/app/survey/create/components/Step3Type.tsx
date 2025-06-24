@@ -1,26 +1,78 @@
 "use client";
 
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { useState } from "react";
 
 interface Step3Props {
   onNext: () => void;
 }
 
 export default function Step3Type({ onNext }: Step3Props) {
+  const [surveyType, setSurveyType] = useState<"official" | "common" | null>(
+    null
+  );
+
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-6">
       <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
-      <input
-        type="text"
-        placeholder="Survey Type"
-        className="border p-2 w-full"
-      />
-      <button
-        onClick={onNext}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        다음
-      </button>
+
+      <div className="flex gap-2">
+        <Button
+          color={surveyType === "common" ? "blue" : "white"}
+          onClick={() => setSurveyType("common")}
+        >
+          일반
+        </Button>
+        <Button
+          color={surveyType === "official" ? "blue" : "white"}
+          onClick={() => setSurveyType("official")}
+        >
+          공식
+        </Button>
+      </div>
+
+      {surveyType === "common" && (
+        <Input
+          label="일반 리워드"
+          type="number"
+          placeholder="기본으로 지급되는 리워드입니다."
+        />
+      )}
+
+      {surveyType === "official" && (
+        <>
+          <p className="text-sm text-gray-600 bg-gray-50 border rounded-md p-3">
+            공식 서베이는 리워드를 가지고 있어야 합니다.
+            <br />
+            또한 일반 회원과 Expert 회원의 지급량은 다릅니다.
+            <br />
+            참여자 수, 점수, 결과 등이 외부로 공개됩니다.
+          </p>
+          <Input
+            label="리워드 총량"
+            type="number"
+            placeholder="리워드 총량을 입력해주세요."
+          />
+          <Input
+            label="일반 회원 리워드"
+            type="number"
+            placeholder="일반 회원에게 지급할 리워드를 입력해주세요."
+          />
+          <Input
+            label="Expert 회원 리워드"
+            type="number"
+            placeholder="Expert 회원에게 지급할 리워드를 입력해주세요."
+          />
+        </>
+      )}
+
+      <div className="flex justify-between pt-4">
+        <Button color="white">이전</Button>
+        <Button color="blue" onClick={onNext}>
+          다음
+        </Button>
+      </div>
     </div>
   );
 }
