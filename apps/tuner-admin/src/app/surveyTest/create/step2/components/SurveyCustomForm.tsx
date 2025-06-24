@@ -90,8 +90,8 @@ export default function SurveyCustomForm({
                 />
               ))}
 
-              {/* 선택지 추가 버튼 (8개 미만일 때만 표시) */}
-              {q.type === "checkbox" && q.options.length < 8 && (
+              {/* checkbox 선택지 추가 버튼 (5개 미만일 때만 표시) */}
+              {q.type === "checkbox" && q.options.length < 5 && (
                 <button
                   type="button"
                   onClick={() => onAddOption(qIndex)}
