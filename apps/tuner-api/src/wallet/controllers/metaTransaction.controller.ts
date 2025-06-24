@@ -1,3 +1,4 @@
+// src/controllers/metaTransaction.controller.ts
 import express, { Request, Response, Router } from 'express';
 import { MetaTransctionService } from '../services/meta_transction.service.js';
 
@@ -21,13 +22,15 @@ export const createWallet =  async (req: Request, res: Response) => {
 // 토큰 생성
 export const createToken = async (req: Request, res: Response) => {
   const { uid, value } = req.body as { uid: string; value: string };
+  console.log(uid, value);
   try {
     const wallet = await metaTransctionService.createWallet(uid);
     const address = wallet.address;
     const txMessage = { sender: address, value };
 
     const sign = await metaTransctionService.createSign(wallet, JSON.stringify(txMessage));
-    console.log("sign", sign);
+    console.log("sign", sign );
+
     const result = await metaTransctionService.createKGTToken(address, value, txMessage, sign);
 
     res.json(result);
