@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import Select from "@/components/ui/Select";
 import DatePicker from "./DatePicker";
+import Dropdown from "@/components/ui/DropDown";
 
 interface Step2Props {
   onPrev: () => void;
@@ -32,7 +32,8 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
         <button onClick={onPrev}>←</button>
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
       </div>
-      <div className="p-4 space-y-6">
+
+      <div className="p-4 space-y-4">
         <h2 className="text-xl font-bold">Step 2: 음원 정보</h2>
 
         <Input label="설문 제목" placeholder="예) 6월 감성 R&B 설문" />
@@ -63,22 +64,30 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
           />
         )}
 
-        <Select
-          label="음악 장르"
-          options={genreOptions}
-          value={genre}
-          onChange={(value) => setGenre(value)}
-          placeholder="장르 선택"
-        />
-
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
-          <Button onClick={onPrev} color="white">
-            이전
-          </Button>
-          <Button onClick={onNext} color="blue">
-            다음
-          </Button>
+        <div className="space-y-2">
+          <div className="text-sm font-medium">음악 장르</div>
+          <Dropdown
+            options={genreOptions.map((g) => g.label)}
+            selected={
+              genreOptions.find((g) => g.value === genre)?.label || "장르 선택"
+            }
+            onSelect={(label) => {
+              const selectedGenre = genreOptions.find((g) => g.label === label);
+              if (selectedGenre) {
+                setGenre(selectedGenre.value);
+              }
+            }}
+          />
         </div>
+      </div>
+
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
+        <Button onClick={onPrev} color="white">
+          이전
+        </Button>
+        <Button onClick={onNext} color="blue">
+          다음
+        </Button>
       </div>
     </>
   );
