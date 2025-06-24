@@ -17,11 +17,11 @@ enum AdminRole {
   superadmin
 }
 
-// enum OAuthProvider {
-//   kakao
-//   google
-//   // 필요 시 naver, apple 등등 추가
-// }
+enum OAuthProvider {
+  kakao
+  google
+  // 필요 시 naver, apple 등등 추가
+}
 
 model User {
   id              Int       @id @default(autoincrement())
@@ -42,14 +42,14 @@ model User {
 }
 
 model User_OAuth {
-  id            Int      @id @default(autoincrement())
-  provider      String
-  provider_id   String   @unique
+  id            Int           @id @default(autoincrement())
+  provider      OAuthProvider
+  provider_id   String        @unique
   nickname      String
   email         String
   profile_image String?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
 
   // Relation to User
   userId Int
