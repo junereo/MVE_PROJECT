@@ -14,7 +14,7 @@ export default function SurveyTabs({ tabs, current, setTab }: TabProps) {
           <button
             key={cat.key}
             onClick={() => setTab(i)}
-            className={`px-3 py-1.5 text-xs sm:text-sm md:text-base rounded-md text-center flex ${
+            className={`px-3 py-1.5 text-sm md:text-base rounded-md text-center flex ${
               current === i ? "bg-blue-500 text-white" : "border-transparent"
             }`}
           >

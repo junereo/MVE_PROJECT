@@ -16,7 +16,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
 
   return (
     <>
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex  bg-white text-black border border-red-500 z-30flex items-center justify-between px-4 py-3">
+      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex  bg-white text-black border border-red-500 z-30 items-center justify-between px-4 py-3">
         <button>
           <Link href="/survey">←</Link>
         </button>
