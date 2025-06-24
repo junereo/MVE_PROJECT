@@ -3,7 +3,6 @@
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import DatePicker from "../../components/DataPicker";
-import TagInput from "../../components/TagInput";
 import Select from "@/components/ui/Select";
 import { useState } from "react";
 
@@ -25,7 +24,6 @@ export default function Step2Meta({ onNext }: Step2Props) {
   >(null);
   const [releaseDate, setReleaseDate] = useState<Date | null>(null);
   const [genre, setGenre] = useState<string | null>(null);
-  const [tags, setTags] = useState<string[]>([]);
 
   return (
     <div className="p-4 space-y-6">
@@ -65,13 +63,6 @@ export default function Step2Meta({ onNext }: Step2Props) {
         value={genre}
         onChange={(value) => setGenre(value)}
         placeholder="장르 선택"
-      />
-
-      <TagInput
-        label="해시태그"
-        placeholder="예: 감성, 여름, R&B"
-        tags={tags}
-        onChange={(newTags) => setTags(newTags)}
       />
 
       <div className="flex justify-between pt-4">
