@@ -2,10 +2,9 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { useSurveyStore } from "@/store/surveyStore";
+import { useSurveyStore } from "@/store/useSurveyCreateStore";
 import Dropdown from "../../../components/ui/DropDown";
 import Link from "next/link";
-import HashTag from "./components/hash";
 // import Image from "next/image";
 const SurveyStep1 = () => {
   // 장르 목록
@@ -56,7 +55,7 @@ const SurveyStep1 = () => {
   };
 
   return (
-    <div className="w-full max-w-[485px] md:max-w-3xl mx-auto bg-white p-4 sm:p-6 md:p-8 shadow rounded">
+    <div className="min-w-[1000px] max-w-[485px] md:max-w-3xl mx-auto bg-white p-4 sm:p-6 md:p-8 shadow rounded">
       {/* 유튜브 영상 등록 버튼 */}
       <button
         onClick={() => router.push("/surveyTest/search")}
@@ -164,9 +163,6 @@ const SurveyStep1 = () => {
           className="border p-2 w-full"
         />
       </div>
-
-      {/* 해시태그 입력 */}
-      <HashTag />
 
       {/* 설문 유형 선택 */}
       <div className="flex gap-2 mt-4">
