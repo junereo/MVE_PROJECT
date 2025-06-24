@@ -17,6 +17,12 @@ enum AdminRole {
   superadmin
 }
 
+// enum OAuthProvider {
+//   kakao
+//   google
+//   // 필요 시 naver, apple 등등 추가
+// }
+
 model User {
   id              Int       @id @default(autoincrement())
   email           String    @unique
