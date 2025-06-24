@@ -120,7 +120,7 @@ export const oauthCallbackService = async (
     // STEP 1: 사용자 및 계정 등록 (DB 트랜잭션)
     try {
         user = await prisma.$transaction(async (tx) => {
-            const existingAccount = await tx.user_OAuth.findFirst({
+            const existingAccount = await tx.user_OAuth.findUnique({
                 where: {
                     provider: OAuthProvider.kakao,
                     provider_id: profile.id,
@@ -145,7 +145,7 @@ export const oauthCallbackService = async (
             if (!existingAccount) {
                 await tx.user_OAuth.create({
                     data: {
-                        provider: OAuthProvider.kakao,
+                        provider,
                         provider_id: profile.id,
                         email: safeEmail,
                         profile_image: profile.picture,
@@ -261,11 +261,8 @@ export const googleCallbackService = async (req: Request) => {
     const { id: provider_id, email, name } = userInfo.data;
 
     // 기존 유저 확인
-    let oauth = await prisma.user_OAuth.findFirst({
-        where: {
-            provider: OAuthProvider.google,
-            provider_id,
-        },
+    let oauth = await prisma.user_OAuth.findUnique({
+        where: { provider_id },
         include: { user: true },
     });
 
@@ -283,9 +280,9 @@ export const googleCallbackService = async (req: Request) => {
                 oauths: {
                     create: [
                         {
-                            provider: OAuthProvider.google,
-                            provider_id,
-                            nickname: name || email.split('@')[0],
+                            provider: 'google',
+                            provider_id: String(provider_id),
+                            nickname: name,
                             email,
                         },
                     ],
