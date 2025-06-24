@@ -7,7 +7,8 @@ export default function UserProfile() {
         <UserIcon className="text-gray-400 w-8 h-8" />
       </div>
       <div className="flex-1">
-        <p className="text-sm text-gray-500">OOO 님</p>
+        <p className="text-m text-gray-500">OOO 님</p>
+        <p className="text-sm text-gray-500">일반 회원</p>
       </div>
       <div className="flex flex-col gap-2">
         <button className="px-4 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition">
