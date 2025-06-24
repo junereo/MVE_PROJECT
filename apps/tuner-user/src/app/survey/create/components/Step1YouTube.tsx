@@ -36,17 +36,16 @@ export default function Step1YouTube({ onNext }: Step1Props) {
         <div className="space-y-4">
           <Input label="곡 제목" placeholder="곡 제목을 입력해주세요." />
           <Input label="아티스트" placeholder="아티스트명을 입력해주세요." />
+          <DateRangePicker
+            label="설문 기간"
+            startDate={startDate}
+            endDate={endDate}
+            onChange={(start, end) => {
+              setStartDate(start);
+              setEndDate(end);
+            }}
+          />
         </div>
-
-        <DateRangePicker
-          label="설문 기간"
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(start, end) => {
-            setStartDate(start);
-            setEndDate(end);
-          }}
-        />
 
         <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
           <Button onClick={onNext} color="blue">

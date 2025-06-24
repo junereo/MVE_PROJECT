@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import DatePicker from "./DatePicker";
+import DatePicker from "./ui/DatePicker";
 import Dropdown from "@/components/ui/DropDown";
 
 interface Step2Props {
