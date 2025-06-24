@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSurveyStore } from "@/store/surveyStore";
+import { useSurveyStore } from "@/store/useSurveyCreateStore";
 import { useRouter } from "next/navigation";
 import SurveyTabs from "@/app/surveyTest/create/step2/components/SurveyTabs";
 import SurveyQuestionBase from "@/app/surveyTest/create/step2/components/SurveyQuestionBase";
@@ -8,6 +8,7 @@ import SurveyCustomForm from "@/app/surveyTest/create/step2/components/SurveyCus
 import SurveyActions from "@/app/surveyTest/create/step2/components/SurveyActions";
 import SurveyNavigation from "@/app/surveyTest/create/step2/components/SurveyNavigation";
 import templates from "@/app/template/components/Templates";
+import TagCreate from "./components/SurveyTag";
 
 export default function SurveyStep2() {
   const router = useRouter();
@@ -168,7 +169,7 @@ export default function SurveyStep2() {
   };
 
   return (
-    <div className="w-full max-w-[485px] md:max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
+    <div className="w-[1200px] max-w-[485px] md:max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
       {/* 상단 탭 영역 */}
       <SurveyTabs tabs={allTabs} current={tabIndex} setTab={setTabIndex} />
 
@@ -177,6 +178,8 @@ export default function SurveyStep2() {
         🎵 {step1.youtubeTitle}에 대한 설문
       </h1>
 
+      {/* 해시태그 입력 */}
+      <TagCreate />
       {/* 기본 카테고리 */}
       {!isCustomTab ? (
         <>

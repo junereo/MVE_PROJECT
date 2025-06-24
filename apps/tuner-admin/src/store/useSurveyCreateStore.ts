@@ -35,7 +35,8 @@ type SurveyStep2 = {
     expandability?: number;
     stardom?: number;
   };
-  hashtags: string[];
+  tags: { [key: string]: string };
+  selectedTags: string[];
   customQuestions: {
     id: number;
     text: string;
@@ -89,9 +90,10 @@ export const useSurveyStore = create<SurveyState>((set) => ({
 
   step2: {
     answers: {},
-    hashtags: [],
+    tags: {},
     customQuestions: [],
     categoryQuestions: {},
+    selectedTags: [],
   },
   setStep2: (data) =>
     set((state) => ({

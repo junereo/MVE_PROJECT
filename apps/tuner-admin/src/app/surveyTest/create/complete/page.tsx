@@ -1,14 +1,15 @@
 "use client";
-import { useSurveyStore } from "@/store/surveyStore";
+import { useSurveyStore } from "@/store/useSurveyCreateStore";
 import templates from "@/app/template/components/Templates";
 
 export default function SurveyComplete() {
   const { step1, step2 } = useSurveyStore();
 
-  // 🔥 템플릿 키로 해당 세트에서 문항 불러오기
+  //  템플릿 키로 해당 세트에서 문항 불러오기
   const templateData = templates[step1.templateSetKey] || {};
-
-  // 🔥 템플릿 문항들을 categoryQuestions 형태로 구성
+  // 해시태그 키 추출
+  const tagKeys = Object.keys(step2.tags);
+  //  템플릿 문항들을 categoryQuestions 형태로 구성
   const templateQuestions = Object.entries(templateData).flatMap(
     ([categoryKey, questions]) =>
       Array.isArray(questions)
@@ -21,7 +22,7 @@ export default function SurveyComplete() {
         : []
   );
 
-  // ✅ 기본 템플릿 문항 + 커스텀 문항 포함
+  // 기본 템플릿 문항 + 커스텀 문항 포함
   const combinedQuestions = [
     ...templateQuestions,
     ...step2.customQuestions.map((q) => ({
@@ -32,7 +33,7 @@ export default function SurveyComplete() {
     })),
   ];
 
-  // ✅ 최종 제출 데이터
+  // 최종 제출 데이터
   const dataToSubmit = {
     // 음원 정보
     title: step1.youtubeTitle,
@@ -54,9 +55,9 @@ export default function SurveyComplete() {
     templateSetKey: step1.templateSetKey,
 
     evaluationScores: step2.answers,
-    hashtags: step2.hashtags,
+    tags: step2.tags,
 
-    // ✅ 문자열로 변환하지 않은 상태 (출력용 및 화면용)
+    // 문자열로 변환하지 않은 상태 (출력용 및 화면용)
     allQuestions: combinedQuestions,
   };
 
@@ -70,9 +71,9 @@ export default function SurveyComplete() {
     console.log("🔥 서버 전송용 JSON:", serverPayload);
     alert("데이터가 콘솔에 출력되었습니다. (API 연동 예정)");
   };
-
+  // max-w-4xl
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="w-[1200px] max-w-[485px] md:max-w-3xl mx-auto bg-white p-4 sm:p-6 md:p-8 shadow rounded">
       <h1 className="text-2xl font-bold mb-4">✅ 설문지 생성 완료</h1>
 
       {/* 🎵 유튜브 정보 */}
@@ -102,12 +103,12 @@ export default function SurveyComplete() {
       <div className="mb-6">
         <p className="font-semibold">🏷️ 해시태그</p>
         <div className="flex gap-2 flex-wrap">
-          {step2.hashtags.map((tag) => (
+          {tagKeys.map((tag) => (
             <span
               key={tag}
               className="bg-gray-200 px-3 py-1 rounded-full text-sm"
             >
-              #{tag}
+              #{step2.tags[tag]}
             </span>
           ))}
         </div>
