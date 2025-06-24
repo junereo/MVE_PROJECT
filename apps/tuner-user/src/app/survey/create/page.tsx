@@ -18,16 +18,25 @@ export default function SurveyCreatePage() {
           <Step1YouTube onNext={() => setStep("step2")} />
         </Funnel.Step>
         <Funnel.Step name="step2">
-          <Step2Meta onNext={() => setStep("step3")} />
+          <Step2Meta
+            onPrev={() => setStep("step1")}
+            onNext={() => setStep("step3")}
+          />
         </Funnel.Step>
         <Funnel.Step name="step3">
-          <Step3Type onNext={() => setStep("step4")} />
+          <Step3Type
+            onPrev={() => setStep("step2")}
+            onNext={() => setStep("step4")}
+          />
         </Funnel.Step>
         <Funnel.Step name="step4">
-          <Step4Default onNext={() => setStep("step5")} />
+          <Step4Default
+            onPrev={() => setStep("step3")}
+            onNext={() => setStep("step5")}
+          />
         </Funnel.Step>
         <Funnel.Step name="step5">
-          <Step5Custom />
+          <Step5Custom onPrev={() => setStep("step4")} />
         </Funnel.Step>
       </Funnel>
 

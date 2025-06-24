@@ -5,74 +5,83 @@ import Input from "@/components/ui/Input";
 import { useState } from "react";
 
 interface Step3Props {
+  onPrev: () => void;
   onNext: () => void;
 }
 
-export default function Step3Type({ onNext }: Step3Props) {
+export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const [surveyType, setSurveyType] = useState<"official" | "common" | null>(
     null
   );
 
   return (
-    <div className="p-4 space-y-6">
-      <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
-
-      <div className="flex gap-2">
-        <Button
-          color={surveyType === "common" ? "blue" : "white"}
-          onClick={() => setSurveyType("common")}
-        >
-          일반
-        </Button>
-        <Button
-          color={surveyType === "official" ? "blue" : "white"}
-          onClick={() => setSurveyType("official")}
-        >
-          공식
-        </Button>
+    <>
+      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex  bg-white text-black border border-red-500 z-30flex items-center justify-between px-4 py-3">
+        <button onClick={onPrev}>←</button>
+        <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
       </div>
+      <div className="p-4 space-y-6">
+        <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
 
-      {surveyType === "common" && (
-        <Input
-          label="일반 리워드"
-          type="number"
-          placeholder="기본으로 지급되는 리워드입니다."
-        />
-      )}
+        <div className="flex gap-2">
+          <Button
+            color={surveyType === "common" ? "blue" : "white"}
+            onClick={() => setSurveyType("common")}
+          >
+            일반
+          </Button>
+          <Button
+            color={surveyType === "official" ? "blue" : "white"}
+            onClick={() => setSurveyType("official")}
+          >
+            공식
+          </Button>
+        </div>
 
-      {surveyType === "official" && (
-        <>
-          <p className="text-sm text-gray-600 bg-gray-50 border rounded-md p-3">
-            공식 서베이는 리워드를 가지고 있어야 합니다.
-            <br />
-            또한 일반 회원과 Expert 회원의 지급량은 다릅니다.
-            <br />
-            참여자 수, 점수, 결과 등이 외부로 공개됩니다.
-          </p>
+        {surveyType === "common" && (
           <Input
-            label="리워드 총량"
+            label="일반 리워드"
             type="number"
-            placeholder="리워드 총량을 입력해주세요."
+            placeholder="기본으로 지급되는 리워드입니다."
           />
-          <Input
-            label="일반 회원 리워드"
-            type="number"
-            placeholder="일반 회원에게 지급할 리워드를 입력해주세요."
-          />
-          <Input
-            label="Expert 회원 리워드"
-            type="number"
-            placeholder="Expert 회원에게 지급할 리워드를 입력해주세요."
-          />
-        </>
-      )}
+        )}
 
-      <div className="flex justify-between pt-4">
-        <Button color="white">이전</Button>
-        <Button color="blue" onClick={onNext}>
-          다음
-        </Button>
+        {surveyType === "official" && (
+          <>
+            <p className="text-sm text-gray-600 bg-gray-50 border rounded-md p-3">
+              공식 서베이는 리워드를 가지고 있어야 합니다.
+              <br />
+              또한 일반 회원과 Expert 회원의 지급량은 다릅니다.
+              <br />
+              참여자 수, 점수, 결과 등이 외부로 공개됩니다.
+            </p>
+            <Input
+              label="리워드 총량"
+              type="number"
+              placeholder="리워드 총량을 입력해주세요."
+            />
+            <Input
+              label="일반 회원 리워드"
+              type="number"
+              placeholder="일반 회원에게 지급할 리워드를 입력해주세요."
+            />
+            <Input
+              label="Expert 회원 리워드"
+              type="number"
+              placeholder="Expert 회원에게 지급할 리워드를 입력해주세요."
+            />
+          </>
+        )}
+
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
+          <Button onClick={onPrev} color="white">
+            이전
+          </Button>
+          <Button onClick={onNext} color="blue">
+            다음
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

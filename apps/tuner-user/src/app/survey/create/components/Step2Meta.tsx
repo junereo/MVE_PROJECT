@@ -1,12 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import DatePicker from "../../components/DataPicker";
 import Select from "@/components/ui/Select";
-import { useState } from "react";
+import DatePicker from "./DatePicker";
 
 interface Step2Props {
+  onPrev: () => void;
   onNext: () => void;
 }
 
@@ -18,7 +19,7 @@ const genreOptions = [
   { value: "indie", label: "Indie" },
 ];
 
-export default function Step2Meta({ onNext }: Step2Props) {
+export default function Step2Meta({ onPrev, onNext }: Step2Props) {
   const [releaseType, setReleaseType] = useState<
     "released" | "unreleased" | null
   >(null);
@@ -26,51 +27,59 @@ export default function Step2Meta({ onNext }: Step2Props) {
   const [genre, setGenre] = useState<string | null>(null);
 
   return (
-    <div className="p-4 space-y-6">
-      <h2 className="text-xl font-bold">Step 2: 음원 정보</h2>
+    <>
+      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex  bg-white text-black border border-red-500 z-30flex items-center justify-between px-4 py-3">
+        <button onClick={onPrev}>←</button>
+        <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
+      </div>
+      <div className="p-4 space-y-6">
+        <h2 className="text-xl font-bold">Step 2: 음원 정보</h2>
 
-      <Input label="설문 제목" placeholder="예) 6월 감성 R&B 설문" />
+        <Input label="설문 제목" placeholder="예) 6월 감성 R&B 설문" />
 
-      <div className="space-y-2">
-        <div className="text-sm font-medium">음원 상태</div>
-        <div className="flex gap-2">
-          <Button
-            color={releaseType === "unreleased" ? "blue" : "white"}
-            onClick={() => setReleaseType("unreleased")}
-          >
-            미발매
+        <div className="space-y-2">
+          <div className="text-sm font-medium">음원 상태</div>
+          <div className="flex gap-2">
+            <Button
+              color={releaseType === "unreleased" ? "blue" : "white"}
+              onClick={() => setReleaseType("unreleased")}
+            >
+              미발매
+            </Button>
+            <Button
+              color={releaseType === "released" ? "blue" : "white"}
+              onClick={() => setReleaseType("released")}
+            >
+              발매
+            </Button>
+          </div>
+        </div>
+
+        {releaseType === "released" && (
+          <DatePicker
+            label="발매일"
+            selected={releaseDate}
+            onChange={(date) => setReleaseDate(date)}
+          />
+        )}
+
+        <Select
+          label="음악 장르"
+          options={genreOptions}
+          value={genre}
+          onChange={(value) => setGenre(value)}
+          placeholder="장르 선택"
+        />
+
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
+          <Button onClick={onPrev} color="white">
+            이전
           </Button>
-          <Button
-            color={releaseType === "released" ? "blue" : "white"}
-            onClick={() => setReleaseType("released")}
-          >
-            발매
+          <Button onClick={onNext} color="blue">
+            다음
           </Button>
         </div>
       </div>
-
-      {releaseType === "released" && (
-        <DatePicker
-          label="발매일"
-          selected={releaseDate}
-          onChange={(date) => setReleaseDate(date)}
-        />
-      )}
-
-      <Select
-        label="음악 장르"
-        options={genreOptions}
-        value={genre}
-        onChange={(value) => setGenre(value)}
-        placeholder="장르 선택"
-      />
-
-      <div className="flex justify-between pt-4">
-        <Button color="white">이전</Button>
-        <Button color="blue" onClick={onNext}>
-          다음
-        </Button>
-      </div>
-    </div>
+    </>
   );
 }
