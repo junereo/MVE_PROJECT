@@ -1,4 +1,4 @@
-import { FC, isValidElement, ReactNode, useState } from "react";
+import { useState, ReactNode, FC, isValidElement } from "react";
 
 type StepProps = {
   name: string;
@@ -6,36 +6,29 @@ type StepProps = {
 };
 
 type FunnelProps = {
-  children: ReactNode[]; // step 배열 형태로 받음
+  children: ReactNode | ReactNode[];
 };
 
 interface FunnelComponent extends FC<FunnelProps> {
   Step: FC<StepProps>;
 }
 
-type UseFunnelReturn<T> = {
-  Funnel: FunnelComponent;
-  setStep: (step: T) => void;
-  currentStep: T;
-};
-
-export function useFunnel<T extends string>(
-  initialStep: T
-): UseFunnelReturn<T> {
+export function useFunnel<T extends string>(initialStep: T) {
   const [step, setStep] = useState<T>(initialStep);
 
   const Step: FC<StepProps> = ({ children }) => <>{children}</>;
 
-  //   Funnel 컴포넌트 정의
   const Funnel: FunnelComponent = ({ children }) => {
-    const current = children.find(
-      (child) => isValidElement(child) && child.props.name === step // 현재 step만 찾아서 렌더링
+    const childArray = Array.isArray(children) ? children : [children];
+
+    const current = childArray.find(
+      (child) => isValidElement(child) && child.props.name === step
     );
+
     return <>{current}</>;
   };
 
-  Funnel.Step = Step; // Funnel에 Step 연결
+  Funnel.Step = Step;
 
-  // Funnel : 각 단계 / setStep : 다음, 이전 상태 / currentStep: 현재 상태
   return { Funnel, setStep, currentStep: step };
 }
