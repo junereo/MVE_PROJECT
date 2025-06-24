@@ -1,7 +1,8 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import SurveyTabs from "./ui/SurveyTabs";
+import SurveyTabs from "../../components/SurveyTabs";
+import SurveyTag from "../../components/SurveyTag";
 import { useState } from "react";
 
 interface Step4Props {
@@ -21,8 +22,6 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
   const [tabIndex, setTabIndex] = useState(0);
 
   const allTabs = [...baseCategories];
-  const currentTab = allTabs[tabIndex];
-  const isStardomTab = currentTab.key === "stardom";
 
   return (
     <>
@@ -30,21 +29,22 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
         <button onClick={onPrev}>←</button>
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
       </div>
-      <div className="p-4 space-y-6">
-        <h2 className="text-xl font-bold">Step 4: 기본 설문</h2>
 
+      <div className="flex-1 overflow-y-auto px-4 pb-28 pt-4">
+        <h2 className="text-xl font-bold mb-4">Step 4: 기본 설문</h2>
         <div className="space-y-2">
           <SurveyTabs tabs={allTabs} current={tabIndex} setTab={setTabIndex} />
+          <SurveyTag />
         </div>
+      </div>
 
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
-          <Button onClick={onPrev} color="white">
-            이전
-          </Button>
-          <Button onClick={onNext} color="blue">
-            다음
-          </Button>
-        </div>
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
+        <Button onClick={onPrev} color="white">
+          이전
+        </Button>
+        <Button onClick={onNext} color="blue">
+          다음
+        </Button>
       </div>
     </>
   );

@@ -20,24 +20,23 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
         <button onClick={onPrev}>←</button>
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
       </div>
-      <div className="p-4 space-y-6">
-        <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
 
+      <div className="p-4 space-y-6 min-h-screen">
+        <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
         <div className="flex gap-2">
-          <Button
-            color={surveyType === "common" ? "blue" : "white"}
-            onClick={() => setSurveyType("common")}
-          >
-            일반
-          </Button>
           <Button
             color={surveyType === "official" ? "blue" : "white"}
             onClick={() => setSurveyType("official")}
           >
             공식
           </Button>
+          <Button
+            color={surveyType === "common" ? "blue" : "white"}
+            onClick={() => setSurveyType("common")}
+          >
+            일반
+          </Button>
         </div>
-
         {surveyType === "common" && (
           <Input
             label="일반 리워드"
@@ -45,7 +44,6 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
             placeholder="기본으로 지급되는 리워드입니다."
           />
         )}
-
         {surveyType === "official" && (
           <>
             <p className="text-sm text-gray-600 bg-gray-50 border rounded-md p-3">
@@ -72,15 +70,15 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
             />
           </>
         )}
+      </div>
 
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
-          <Button onClick={onPrev} color="white">
-            이전
-          </Button>
-          <Button onClick={onNext} color="blue">
-            다음
-          </Button>
-        </div>
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
+        <Button onClick={onPrev} color="white">
+          이전
+        </Button>
+        <Button onClick={onNext} color="blue">
+          다음
+        </Button>
       </div>
     </>
   );

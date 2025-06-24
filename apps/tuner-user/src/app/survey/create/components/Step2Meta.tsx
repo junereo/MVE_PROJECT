@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import DatePicker from "./ui/DatePicker";
+import DatePicker from "../../components/DataPicker";
 import Dropdown from "@/components/ui/DropDown";
 
 interface Step2Props {
@@ -33,11 +33,9 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 min-h-screen">
         <h2 className="text-xl font-bold">Step 2: 음원 정보</h2>
-
         <Input label="설문 제목" placeholder="예) 6월 감성 R&B 설문" />
-
         <div className="space-y-2">
           <div className="text-sm font-medium">음원 상태</div>
           <div className="flex gap-2">
@@ -55,15 +53,6 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
             </Button>
           </div>
         </div>
-
-        {releaseType === "released" && (
-          <DatePicker
-            label="발매일"
-            selected={releaseDate}
-            onChange={(date) => setReleaseDate(date)}
-          />
-        )}
-
         <div className="space-y-2">
           <div className="text-sm font-medium">음악 장르</div>
           <Dropdown
@@ -79,6 +68,13 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
             }}
           />
         </div>
+        {releaseType === "released" && (
+          <DatePicker
+            label="발매일"
+            selected={releaseDate}
+            onChange={(date) => setReleaseDate(date)}
+          />
+        )}
       </div>
 
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
