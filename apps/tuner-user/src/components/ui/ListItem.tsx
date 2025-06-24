@@ -2,12 +2,12 @@ import Image from "next/image";
 
 type Props = {
   image: string;
-  singer: string;
+  artist: string;
   title: string;
   period: string;
 };
 
-export default function ListItem({ image, singer, title, period }: Props) {
+export default function ListItem({ image, artist, title, period }: Props) {
   return (
     <div className="flex items-center gap-4 p-2 hover:shadow-md transition">
       <Image
@@ -18,7 +18,7 @@ export default function ListItem({ image, singer, title, period }: Props) {
         className="rounded-md object-cover"
       />
       <div className="flex-1">
-        <p className="text-sm font-semibold">{singer}</p>
+        <p className="text-sm font-semibold">{artist}</p>
         <p className="text-base font-bold">{title}</p>
         <p className="text-xs text-gray-500">{period}</p>
       </div>
