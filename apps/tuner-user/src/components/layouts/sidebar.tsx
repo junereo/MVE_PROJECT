@@ -37,9 +37,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <Link href="/survey" onClick={onClose}>
               Survey
             </Link>
-            <Link href="/survey/create" onClick={onClose}>
-              Create
-            </Link>
             <Link href="/mypage" onClick={onClose}>
               My Page
             </Link>
