@@ -1,4 +1,4 @@
-import { PrismaClient, AdminRole } from '@prisma/client';
+import { PrismaClient, AdminRole, SurveyTags, QuestionType } from '@prisma/client';
 import { signToken } from '../utils/jwt';
 import type { CookieOptions } from 'express';
 import { RegisterList, AdminRequest } from "../types/admin.types";
@@ -79,3 +79,4 @@ export const getAdminService = async (req: AdminRequest) => {
 
     return admin;
 };
+

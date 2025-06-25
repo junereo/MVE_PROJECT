@@ -19,9 +19,8 @@ const router = express.Router();
 router.post("/signup", validateRegister, emailRegister);
 router.post("/me", verifyToken, getUserController);
 router.post("/login", validateLogin, emaillogin);
-router.get("/oauth/:provider", oauthCallbackController);
+router.get("/oauth/:provider", oauthCallbackController, validateOAuthRequest, oauthCallbackController);
 router.get('/google/callback', googleCallbackController);
-// router.get('/auth/oauth/:provider', validateOAuthRequest, oauthCallbackController);
 router.post("/logout", logout);
 
 export default router;

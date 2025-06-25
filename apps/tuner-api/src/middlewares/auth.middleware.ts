@@ -72,7 +72,7 @@ export const verifyToken = (
   }
 };
 
-export const validateOAuthRequest = async (req: Request, res: Response, next: NextFunction) => {
+export const validateOAuthRequest = (req: Request, res: Response, next: NextFunction) => {
   const provider = req.params.provider;
   const code = req.query.code || req.body.code;
 
