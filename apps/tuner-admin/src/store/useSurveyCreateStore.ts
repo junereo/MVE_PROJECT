@@ -1,9 +1,10 @@
 import { create } from "zustand";
 
-type SurveyType = "general" | "reward";
+type SurveyType = "general" | "official";
 
 // 설문 생성 1단계 정보 구조 정의
 type SurveyStep1 = {
+  surveyTitle: string; //설문 제목
   youtubeVideoId: string; // 유튜브 영상 ID
   youtubeTitle: string; // 유튜브 영상 제목
   youtubeThumbnail: string; // 유튜브 영상 썸네일
@@ -61,6 +62,7 @@ interface SurveyState {
 // Zustand 스토어 생성
 export const useSurveyStore = create<SurveyState>((set) => ({
   step1: {
+    surveyTitle: "",
     youtubeVideoId: "",
     youtubeTitle: "",
     youtubeThumbnail: "",

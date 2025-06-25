@@ -26,10 +26,11 @@ export default function SurveyTabs({ tabs, current, setTab }: TabProps) {
             key={cat.key}
             ref={cat.key === "custom" ? customTabRef : undefined}
             onClick={() => setTab(i)}
-            className={`px-2 sm:px-3 py-1 text-xs sm:text-sm md:text-base rounded-md border-b-2 ${
+            className={`px-2 sm:px-3 py-1 text-xs sm:text-sm md:text-base rounded-md border-b-2 transition-colors duration-200
+            ${
               current === i
-                ? "border-pink-400 bg-pink-100"
-                : "border-transparent"
+                ? "border-blue-400 bg-blue-500 text-white"
+                : "border-transparent text-gray-600 hover:bg-blue-100"
             }`}
           >
             <span className="inline-block max-w-[70px] sm:max-w-[100px] truncate">

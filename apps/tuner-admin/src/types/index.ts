@@ -1,3 +1,4 @@
+export type SurveyType = "general" | "official";
 // 로그인
 export interface LoginFormData {
   email: string;
@@ -11,7 +12,7 @@ export interface SurveyCreatePayload {
   artist: string;
   release_date: string;
   is_released: boolean;
-  thumbnailUrl: string;
+  thumbnail_url: string;
   sample_url: string;
   channelTitle: string;
   genre: string;
@@ -19,7 +20,7 @@ export interface SurveyCreatePayload {
   // 설문 정보
   start_at: string;
   end_at: string;
-  type: string;
+  type: SurveyType;
   reward_amount: number;
   reward: number;
   expert_reward: number;

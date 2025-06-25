@@ -170,66 +170,68 @@ export default function SurveyStep2() {
 
   return (
     <div>
-      <div className="w-full  text-black text-2xl py-3 ">
+      <div className="w-full  text-black font-bold text-2xl py-3 ">
         Survey create Step2
       </div>
-      <div className="w-[1200px] max-w-[485px] md:max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
-        {/* 상단 탭 영역 */}
-        <SurveyTabs tabs={allTabs} current={tabIndex} setTab={setTabIndex} />
+      <div className="p-6 ">
+        <div className=" w-[50%] min-h-[800px] pb-[20px] rounded-xl max-w-[485px] md:max-w-3xl bg-white px-4 sm:px-6 md:px-8">
+          {/* 상단 탭 영역 */}
+          <SurveyTabs tabs={allTabs} current={tabIndex} setTab={setTabIndex} />
 
-        {/* 음원 타이틀 */}
-        <h1 className="text-lg md:text-2xl font-bold mb-4 pt-[30px]">
-          🎵 {step1.youtubeTitle}에 대한 설문
-        </h1>
+          {/* 음원 타이틀 */}
+          <h1 className="text-lg md:text-2xl font-bold mb-4 pt-[30px]">
+            🎵 {step1.title?.trim() || step1.youtubeTitle || "제목 없음"}에 대한
+            설문
+          </h1>
 
-        {/* 해시태그 입력 */}
-        <TagCreate />
-        {/* 기본 카테고리 */}
-        {!isCustomTab ? (
-          <>
-            {/* 기본 질문 출력 */}
-            {(categoryQuestions[currentTab.key] || []).map((q) => (
-              <div key={q.id} className="mb-6 border p-4 rounded">
-                <p className="font-medium mb-1">{q.text}</p>
-                {q.options.map((opt: string, i: number) => (
-                  <div key={i} className="text-sm text-gray-600">
-                    ⦿ {opt}
-                  </div>
-                ))}
-              </div>
-            ))}
-            {/* 점수 영역 + 커스텀 버튼 */}
-            <SurveyQuestionBase
-              label={currentTab.label}
-              showCustomButton={isStardomTab && !customTabCreated}
-              onCustomClick={createCustomTab}
+          {/* 해시태그 입력 */}
+          <TagCreate />
+          {/* 기본 카테고리 */}
+          {!isCustomTab ? (
+            <>
+              {/* 기본 질문 출력 */}
+              {(categoryQuestions[currentTab.key] || []).map((q) => (
+                <div key={q.id} className="mb-6 border p-4 rounded">
+                  <p className="font-medium mb-1">{q.text}</p>
+                  {q.options.map((opt: string, i: number) => (
+                    <div key={i} className="text-sm text-gray-600">
+                      ⦿ {opt}
+                    </div>
+                  ))}
+                </div>
+              ))}
+              {/* 점수 영역 + 커스텀 버튼 */}
+              <SurveyQuestionBase
+                label={currentTab.label}
+                showCustomButton={isStardomTab && !customTabCreated}
+                onCustomClick={createCustomTab}
+              />
+            </>
+          ) : (
+            // 커스텀 탭 영역
+            <SurveyCustomForm
+              questions={customQuestions}
+              typeOptions={[...typeOptions]}
+              onAdd={addCustomQuestion}
+              onChangeText={handleQuestionChange}
+              onChangeType={handleTypeChange}
+              onChangeOption={handleOptionChange}
+              onAddOption={handleAddOption}
             />
-          </>
-        ) : (
-          // 커스텀 탭 영역
-          <SurveyCustomForm
-            questions={customQuestions}
-            typeOptions={[...typeOptions]}
-            onAdd={addCustomQuestion}
-            onChangeText={handleQuestionChange}
-            onChangeType={handleTypeChange}
-            onChangeOption={handleOptionChange}
-            onAddOption={handleAddOption}
+          )}
+
+          {/* 하단 이동 네비게이션 */}
+          <SurveyNavigation
+            tabIndex={tabIndex}
+            totalTabs={allTabs.length}
+            onPrev={goBack}
+            onNext={goNext}
           />
-        )}
-
-        {/* 완료 버튼 영역 */}
-        {(isStardomTab || isCustomTab) && (
-          <SurveyActions onTempSave={() => {}} onComplete={handleComplete} />
-        )}
-
-        {/* 하단 이동 네비게이션 */}
-        <SurveyNavigation
-          tabIndex={tabIndex}
-          totalTabs={allTabs.length}
-          onPrev={goBack}
-          onNext={goNext}
-        />
+          {/* 완료 버튼 영역 */}
+          {(isStardomTab || isCustomTab) && (
+            <SurveyActions onTempSave={() => {}} onComplete={handleComplete} />
+          )}
+        </div>
       </div>
     </div>
   );

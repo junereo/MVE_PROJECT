@@ -14,11 +14,11 @@ export default function SurveyComplete() {
     ([categoryKey, questions]) =>
       Array.isArray(questions)
         ? questions.map((q) => ({
-          category: categoryKey,
-          text: q.question,
-          type: "multiple",
-          options: q.options,
-        }))
+            category: categoryKey,
+            text: q.question,
+            type: "multiple",
+            options: q.options,
+          }))
         : []
   );
 
@@ -36,15 +36,15 @@ export default function SurveyComplete() {
   // 최종 제출 데이터
   const dataToSubmit = {
     // 음원 정보
-    title: step1.title,
-    artist: step1.artist,
+    surveytitle: "문자",
+    title: step1.title, //
+    artist: step1.artist, //곡제목
     release_date: step1.releaseDate,
     is_released: step1.isReleased,
-    thumbnailUrl: step1.youtubeThumbnail,
+    thumbnail_url: step1.youtubeThumbnail,
     sample_url: step1.url,
     channelTitle: step1.channelTitle,
     genre: step1.genre,
-
     // 설문 정보
     start_at: step1.start_at,
     end_at: step1.end_at,
@@ -53,7 +53,6 @@ export default function SurveyComplete() {
     reward: step1.reward ?? 0,
     expert_reward: step1.expertReward ?? 0,
     templateSetKey: step1.templateSetKey,
-
     evaluationScores: step2.answers,
     tags: step2.tags,
 
