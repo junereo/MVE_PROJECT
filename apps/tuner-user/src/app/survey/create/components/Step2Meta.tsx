@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import DatePicker from "../../components/DataPicker";
@@ -20,11 +21,27 @@ const genreOptions = [
 ];
 
 export default function Step2Meta({ onPrev, onNext }: Step2Props) {
+  const { step2, setStep2 } = useSurveyStore();
+
+  const [title, setTitle] = useState(step2.title);
   const [releaseType, setReleaseType] = useState<
     "released" | "unreleased" | null
-  >(null);
-  const [releaseDate, setReleaseDate] = useState<Date | null>(null);
-  const [genre, setGenre] = useState<string | null>(null);
+  >(step2.isReleased ? "released" : "unreleased");
+  const [releaseDate, setReleaseDate] = useState<Date | null>(
+    step2.releaseDate ? new Date(step2.releaseDate) : null
+  );
+  const [genre, setGenre] = useState<string | undefined>(step2.genre);
+
+  const handleNext = () => {
+    setStep2({
+      title,
+      isReleased: releaseType === "released",
+      releaseDate: releaseDate?.toISOString() || "",
+      genre,
+    });
+
+    onNext();
+  };
 
   return (
     <>
@@ -35,7 +52,12 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
 
       <div className="p-4 space-y-4 min-h-screen">
         <h2 className="text-xl font-bold">Step 2: 음원 정보</h2>
-        <Input label="설문 제목" placeholder="예) 6월 감성 R&B 설문" />
+        <Input
+          label="설문 제목"
+          placeholder="예) 6월 감성 R&B 설문"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
         <div className="space-y-2">
           <div className="text-sm font-medium">음원 상태</div>
           <div className="flex gap-2">
@@ -81,7 +103,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
         <Button onClick={onPrev} color="white">
           이전
         </Button>
-        <Button onClick={onNext} color="blue">
+        <Button onClick={handleNext} color="blue">
           다음
         </Button>
       </div>
