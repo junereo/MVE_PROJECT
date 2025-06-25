@@ -1,4 +1,4 @@
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, User, OAuthProvider } from '@prisma/client';
 import type { Request, CookieOptions } from 'express';
 import { RegisterList } from "../types/auth.types";
 import { AdminRequest } from '../types/admin.types';
@@ -122,7 +122,7 @@ export const oauthCallbackService = async (
         user = await prisma.$transaction(async (tx) => {
             const existingAccount = await tx.user_OAuth.findUnique({
                 where: {
-                    provider,
+                    provider: OAuthProvider.kakao,
                     provider_id: profile.id,
 
                 },
@@ -145,7 +145,7 @@ export const oauthCallbackService = async (
             if (!existingAccount) {
                 await tx.user_OAuth.create({
                     data: {
-                        provider,
+                        provider: OAuthProvider.kakao,
                         provider_id: profile.id,
                         email: safeEmail,
                         profile_image: profile.picture,
@@ -280,7 +280,7 @@ export const googleCallbackService = async (req: Request) => {
                 oauths: {
                     create: [
                         {
-                            provider: 'google',
+                            provider: OAuthProvider.google,
                             provider_id: String(provider_id),
                             nickname: name,
                             email,
