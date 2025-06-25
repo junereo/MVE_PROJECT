@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
+import type {
+  CustomQuestion,
+  QuestionType,
+} from "@/features/survey/store/useSurveyStore";
 import Button from "@/components/ui/Button";
 import CustomForm from "../../components/CustomForm"; // 상대 경로 확인
 
@@ -15,17 +20,9 @@ const typeOptions = [
   { label: "서술형", value: "subjective" },
 ];
 
-type QuestionType = (typeof typeOptions)[number]["value"];
-
-type Question = {
-  id: number;
-  text: string;
-  type: QuestionType;
-  options: string[];
-};
-
 export default function Step5Custom({ onPrev }: Step5Props) {
-  const [questions, setQuestions] = useState<Question[]>([
+  const { setStep5 } = useSurveyStore();
+  const [questions, setQuestions] = useState<CustomQuestion[]>([
     { id: 1, text: "", type: "multiple", options: ["", "", "", "", ""] },
   ]);
 
@@ -96,6 +93,13 @@ export default function Step5Custom({ onPrev }: Step5Props) {
     );
   };
 
+  // !-완료 시 전체 설문 api 요청 필요-!
+  const handleSubmit = () => {
+    setStep5({ customQuestions: questions });
+    console.log("최종 저장된 커스텀 질문:", questions);
+    // 이후 서버로 전송 또는 다음 라우터 이동
+  };
+
   return (
     <>
       <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex  bg-white text-black border border-red-500 z-30 items-center justify-between px-4 py-3">
@@ -123,7 +127,9 @@ export default function Step5Custom({ onPrev }: Step5Props) {
         <Button onClick={onPrev} color="white">
           이전
         </Button>
-        <Button color="blue">작성 완료</Button>
+        <Button onClick={handleSubmit} color="blue">
+          작성 완료
+        </Button>
       </div>
     </>
   );
