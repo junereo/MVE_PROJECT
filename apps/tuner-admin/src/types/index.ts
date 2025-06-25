@@ -11,9 +11,9 @@ export interface SurveyCreatePayload {
   artist: string;
   release_date: string;
   is_released: boolean;
-  thumbnailUrl: string;
+  thumbnail_url: string;
   sample_url: string;
-  channelTitle: string;
+  channel_title: string;
   genre: string;
 
   // 설문 정보
