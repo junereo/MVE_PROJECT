@@ -16,7 +16,7 @@ app.use(
   cors({
     origin: [
       "https://tunemate.store",
-      "https://admin.tunem>ate.store",
+      "https://admin.tunemate.store",
       "http://localhost:3000",
     ],
     credentials: true,
@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // 라우트 설정
 app.use("/auth", authRoutes);
-// app.use("/surveys", surveyRoutes);
+app.use("/survey", surveyRoutes);
 app.use("/admin", adminRoutes);
 app.use("/contract", routerWallet);
 

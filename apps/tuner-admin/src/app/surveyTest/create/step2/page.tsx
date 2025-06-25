@@ -8,12 +8,8 @@ import SurveyCustomForm from "@/app/surveyTest/create/step2/components/SurveyCus
 import SurveyActions from "@/app/surveyTest/create/step2/components/SurveyActions";
 import SurveyNavigation from "@/app/surveyTest/create/step2/components/SurveyNavigation";
 import templates from "@/app/template/components/Templates";
-<<<<<<< HEAD
 import TagCreate from "./components/SurveyTag";
 
-=======
-import axios from "axios";
->>>>>>> feature/yj
 export default function SurveyStep2() {
   const router = useRouter();
   const { step1, setStep2, setTemplateSetKey } = useSurveyStore();

@@ -48,7 +48,7 @@ CREATE TYPE "SbtCondition" AS ENUM ('auto', 'manual');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone_number" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE "User_OAuth" (
     "profile_image" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
 
     CONSTRAINT "User_OAuth_pkey" PRIMARY KEY ("id")
 );
@@ -85,7 +85,7 @@ CREATE TABLE "User_OAuth" (
 -- CreateTable
 CREATE TABLE "User_Balance" (
     "id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
+    "user_id" TEXT NOT NULL,
     "current_reward" INTEGER NOT NULL,
     "total_withdrawn" INTEGER NOT NULL,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE "User_Balance" (
 
 -- CreateTable
 CREATE TABLE "Admin" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -110,7 +110,8 @@ CREATE TABLE "Admin" (
 -- CreateTable
 CREATE TABLE "Survey" (
     "id" SERIAL NOT NULL,
-    "create_id" INTEGER NOT NULL,
+    "create_userId" TEXT,
+    "create_adminId" TEXT,
     "music_id" INTEGER NOT NULL,
     "type" "SurveyType" NOT NULL,
     "tags" "SurveyTags"[],
@@ -126,7 +127,6 @@ CREATE TABLE "Survey" (
     "status" "SurveyStatus" NOT NULL DEFAULT 'draft',
     "create_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "musicId" INTEGER,
 
     CONSTRAINT "Survey_pkey" PRIMARY KEY ("id")
 );
@@ -134,7 +134,7 @@ CREATE TABLE "Survey" (
 -- CreateTable
 CREATE TABLE "Survey_Responses" (
     "id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
+    "user_id" TEXT NOT NULL,
     "survey_id" INTEGER NOT NULL,
     "answers" JSONB NOT NULL,
     "status" "SurveyStatus" NOT NULL DEFAULT 'draft',
@@ -157,7 +157,7 @@ CREATE TABLE "Survey_Template" (
 );
 
 -- CreateTable
-CREATE TABLE "Survey_Customer" (
+CREATE TABLE "Survey_Custom" (
     "id" SERIAL NOT NULL,
     "survey_id" INTEGER NOT NULL,
     "question_text" TEXT NOT NULL,
@@ -166,7 +166,7 @@ CREATE TABLE "Survey_Customer" (
     "is_required" BOOLEAN NOT NULL DEFAULT true,
     "question_order" INTEGER NOT NULL,
 
-    CONSTRAINT "Survey_Customer_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Survey_Custom_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -204,7 +204,7 @@ CREATE TABLE "Music" (
 -- CreateTable
 CREATE TABLE "Rewards" (
     "id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
+    "user_id" TEXT NOT NULL,
     "survey_id" INTEGER NOT NULL,
     "token_amount" INTEGER NOT NULL,
     "status" "RewardStatus" NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE "Rewards" (
     "source_ref" TEXT NOT NULL,
     "reward_type" "RewardType" NOT NULL,
     "rewarded_at" TIMESTAMP(3) NOT NULL,
-    "adminId" INTEGER,
+    "adminId" TEXT,
 
     CONSTRAINT "Rewards_pkey" PRIMARY KEY ("id")
 );
@@ -220,12 +220,13 @@ CREATE TABLE "Rewards" (
 -- CreateTable
 CREATE TABLE "Withdrawal_Requests" (
     "id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
+    "user_id" TEXT NOT NULL,
     "total_token_amount" INTEGER NOT NULL,
     "requested_at" TIMESTAMP(3) NOT NULL,
     "processed_at" TIMESTAMP(3),
     "tx_hash" TEXT NOT NULL,
     "status" "RewardStatus" NOT NULL,
+    "admin_id" TEXT,
 
     CONSTRAINT "Withdrawal_Requests_pkey" PRIMARY KEY ("id")
 );
@@ -233,7 +234,7 @@ CREATE TABLE "Withdrawal_Requests" (
 -- CreateTable
 CREATE TABLE "SBT_Issuance" (
     "id" SERIAL NOT NULL,
-    "admin_id" INTEGER NOT NULL,
+    "admin_id" TEXT NOT NULL,
     "sbt_type" "SbtType" NOT NULL,
     "name" TEXT NOT NULL,
     "amount" INTEGER,
@@ -241,25 +242,9 @@ CREATE TABLE "SBT_Issuance" (
     "condition_note" "SbtCondition" NOT NULL,
     "metadata_cid" TEXT,
     "token_id" TEXT,
-    "chain_tx_hash" TEXT NOT NULL,
+    "chain_tx_hash" TEXT,
 
     CONSTRAINT "SBT_Issuance_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "_AdminToSurvey" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL,
-
-    CONSTRAINT "_AdminToSurvey_AB_pkey" PRIMARY KEY ("A","B")
-);
-
--- CreateTable
-CREATE TABLE "_AdminToWithdrawal_Requests" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL,
-
-    CONSTRAINT "_AdminToWithdrawal_Requests_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -274,12 +259,6 @@ CREATE UNIQUE INDEX "Admin_email_key" ON "Admin"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "Survey_Result_survey_id_key" ON "Survey_Result"("survey_id");
 
--- CreateIndex
-CREATE INDEX "_AdminToSurvey_B_index" ON "_AdminToSurvey"("B");
-
--- CreateIndex
-CREATE INDEX "_AdminToWithdrawal_Requests_B_index" ON "_AdminToWithdrawal_Requests"("B");
-
 -- AddForeignKey
 ALTER TABLE "User_OAuth" ADD CONSTRAINT "User_OAuth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -287,7 +266,10 @@ ALTER TABLE "User_OAuth" ADD CONSTRAINT "User_OAuth_userId_fkey" FOREIGN KEY ("u
 ALTER TABLE "User_Balance" ADD CONSTRAINT "User_Balance_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Survey" ADD CONSTRAINT "Survey_create_id_fkey" FOREIGN KEY ("create_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Survey" ADD CONSTRAINT "Survey_create_userId_fkey" FOREIGN KEY ("create_userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Survey" ADD CONSTRAINT "Survey_create_adminId_fkey" FOREIGN KEY ("create_adminId") REFERENCES "Admin"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Survey" ADD CONSTRAINT "Survey_music_id_fkey" FOREIGN KEY ("music_id") REFERENCES "Music"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -299,7 +281,7 @@ ALTER TABLE "Survey_Responses" ADD CONSTRAINT "Survey_Responses_user_id_fkey" FO
 ALTER TABLE "Survey_Responses" ADD CONSTRAINT "Survey_Responses_survey_id_fkey" FOREIGN KEY ("survey_id") REFERENCES "Survey"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Survey_Customer" ADD CONSTRAINT "Survey_Customer_survey_id_fkey" FOREIGN KEY ("survey_id") REFERENCES "Survey"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Survey_Custom" ADD CONSTRAINT "Survey_Custom_survey_id_fkey" FOREIGN KEY ("survey_id") REFERENCES "Survey"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Survey_Result" ADD CONSTRAINT "Survey_Result_survey_id_fkey" FOREIGN KEY ("survey_id") REFERENCES "Survey"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -317,16 +299,7 @@ ALTER TABLE "Rewards" ADD CONSTRAINT "Rewards_adminId_fkey" FOREIGN KEY ("adminI
 ALTER TABLE "Withdrawal_Requests" ADD CONSTRAINT "Withdrawal_Requests_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Withdrawal_Requests" ADD CONSTRAINT "Withdrawal_Requests_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "Admin"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "SBT_Issuance" ADD CONSTRAINT "SBT_Issuance_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "Admin"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_AdminToSurvey" ADD CONSTRAINT "_AdminToSurvey_A_fkey" FOREIGN KEY ("A") REFERENCES "Admin"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_AdminToSurvey" ADD CONSTRAINT "_AdminToSurvey_B_fkey" FOREIGN KEY ("B") REFERENCES "Survey"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_AdminToWithdrawal_Requests" ADD CONSTRAINT "_AdminToWithdrawal_Requests_A_fkey" FOREIGN KEY ("A") REFERENCES "Admin"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_AdminToWithdrawal_Requests" ADD CONSTRAINT "_AdminToWithdrawal_Requests_B_fkey" FOREIGN KEY ("B") REFERENCES "Withdrawal_Requests"("id") ON DELETE CASCADE ON UPDATE CASCADE;

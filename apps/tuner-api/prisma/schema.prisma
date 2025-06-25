@@ -110,7 +110,7 @@ enum SbtCondition {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
+  id              String    @id @default(uuid())
   email           String    @unique
   phone_number    String
   password        String
@@ -145,13 +145,13 @@ model User_OAuth {
   updated_at    DateTime      @updatedAt
 
   // Relation to User
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 model User_Balance {
   id              Int      @id @default(autoincrement())
-  user_id         Int
+  user_id         String
   current_reward  Int
   total_withdrawn Int
   updated_at      DateTime
@@ -160,7 +160,7 @@ model User_Balance {
 }
 
 model Admin {
-  id           Int       @id @default(autoincrement())
+  id           String    @id @default(uuid())
   email        String    @unique
   password     String
   name         String
@@ -169,7 +169,7 @@ model Admin {
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
 
-  surveys      Survey[]
+  surveys      Survey[]              @relation("SurveyDirector")
   rewards      Rewards[]
   withdrawal   Withdrawal_Requests[]
   SBT_Issuance SBT_Issuance[]
@@ -177,7 +177,8 @@ model Admin {
 
 model Survey {
   id               Int          @id @default(autoincrement())
-  create_id        Int
+  create_userId    String?
+  create_adminId   String?
   music_id         Int
   type             SurveyType
   tags             SurveyTags[]
@@ -194,19 +195,19 @@ model Survey {
   create_at        DateTime     @default(now())
   updated_at       DateTime     @updatedAt
 
-  creator         User               @relation("SurveyCreator", fields: [create_id], references: [id])
-  responses       Survey_Responses[]
-  result          Survey_Result?
-  Survey_Customer Survey_Customer[]
-  Music           Music?             @relation(fields: [music_id], references: [id])
-  musicId         Int?
-  Rewards         Rewards[]
-  Admin           Admin[]
+  creator       User?              @relation("SurveyCreator", fields: [create_userId], references: [id])
+  director      Admin?             @relation("SurveyDirector", fields: [create_adminId], references: [id])
+  responses     Survey_Responses[]
+  result        Survey_Result?
+  Survey_Custom Survey_Custom[]
+  Music         Music              @relation(fields: [music_id], references: [id])
+
+  Rewards Rewards[]
 }
 
 model Survey_Responses {
   id         Int          @id @default(autoincrement())
-  user_id    Int
+  user_id    String
   survey_id  Int
   answers    Json
   status     SurveyStatus @default(draft)
@@ -226,7 +227,7 @@ model Survey_Template {
   updated_at    DateTime @updatedAt
 }
 
-model Survey_Customer {
+model Survey_Custom {
   id             Int          @id @default(autoincrement())
   survey_id      Int
   question_text  String
@@ -270,7 +271,7 @@ model Music {
 
 model Rewards {
   id            Int          @id @default(autoincrement())
-  user_id       Int
+  user_id       String
   survey_id     Int
   token_amount  Int
   status        RewardStatus
@@ -279,15 +280,15 @@ model Rewards {
   reward_type   RewardType
   rewarded_at   DateTime
 
-  user    User   @relation(fields: [user_id], references: [id])
-  survey  Survey @relation(fields: [survey_id], references: [id])
-  Admin   Admin? @relation(fields: [adminId], references: [id])
-  adminId Int?
+  user    User    @relation(fields: [user_id], references: [id])
+  survey  Survey  @relation(fields: [survey_id], references: [id])
+  adminId String?
+  admin   Admin?  @relation(fields: [adminId], references: [id])
 }
 
 model Withdrawal_Requests {
   id                 Int          @id @default(autoincrement())
-  user_id            Int
+  user_id            String
   total_token_amount Int
   requested_at       DateTime
   processed_at       DateTime?
@@ -296,12 +297,13 @@ model Withdrawal_Requests {
 
   user User @relation(fields: [user_id], references: [id])
 
-  Admin Admin[]
+  admin_id String?
+  Admin    Admin?  @relation(fields: [admin_id], references: [id])
 }
 
 model SBT_Issuance {
   id             Int          @id @default(autoincrement())
-  admin_id       Int
+  admin_id       String
   sbt_type       SbtType
   name           String
   amount         Int?
@@ -309,7 +311,7 @@ model SBT_Issuance {
   condition_note SbtCondition
   metadata_cid   String?
   token_id       String?
-  chain_tx_hash  String
+  chain_tx_hash  String?
 
   admin Admin @relation(fields: [admin_id], references: [id])
 }
