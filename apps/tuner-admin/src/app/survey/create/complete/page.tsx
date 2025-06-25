@@ -40,7 +40,7 @@ export default function SurveyComplete() {
     artist: step1.artist,
     release_date: step1.releaseDate,
     is_released: step1.isReleased,
-    thumbnailUrl: step1.youtubeThumbnail,
+    rl: step1.youtubeThumbnail,
     sample_url: step1.url,
     channelTitle: step1.channelTitle,
     genre: step1.genre,
