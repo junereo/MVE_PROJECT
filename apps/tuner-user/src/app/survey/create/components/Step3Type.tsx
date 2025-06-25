@@ -3,6 +3,7 @@
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { useState } from "react";
+import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 
 interface Step3Props {
   onPrev: () => void;
@@ -10,9 +11,24 @@ interface Step3Props {
 }
 
 export default function Step3Type({ onPrev, onNext }: Step3Props) {
+  const { step3, setStep3 } = useSurveyStore();
+
   const [surveyType, setSurveyType] = useState<"official" | "common">(
-    "official"
+    step3.surveyType
   );
+  const [rewardAmount, setRewardAmount] = useState(step3.reward_amount);
+  const [reward, setReward] = useState(step3.reward);
+  const [expertReward, setExpertReward] = useState(step3.expertReward);
+
+  const handleNext = () => {
+    setStep3({
+      surveyType,
+      reward_amount: rewardAmount,
+      reward,
+      expertReward,
+    });
+    onNext();
+  };
 
   return (
     <>
@@ -56,16 +72,22 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
             <Input
               label="리워드 총량"
               type="number"
+              value={rewardAmount}
+              onChange={(e) => setRewardAmount(Number(e.target.value))}
               placeholder="리워드 총량을 입력해주세요."
             />
             <Input
               label="일반 회원 리워드"
               type="number"
+              value={reward}
+              onChange={(e) => setReward(Number(e.target.value))}
               placeholder="일반 회원에게 지급할 리워드를 입력해주세요."
             />
             <Input
               label="Expert 회원 리워드"
               type="number"
+              value={expertReward}
+              onChange={(e) => setExpertReward(Number(e.target.value))}
               placeholder="Expert 회원에게 지급할 리워드를 입력해주세요."
             />
           </>
@@ -76,7 +98,7 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
         <Button onClick={onPrev} color="white">
           이전
         </Button>
-        <Button onClick={onNext} color="blue">
+        <Button onClick={handleNext} color="blue">
           다음
         </Button>
       </div>
