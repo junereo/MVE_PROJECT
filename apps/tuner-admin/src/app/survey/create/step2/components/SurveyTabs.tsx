@@ -19,7 +19,7 @@ export default function SurveyTabs({ tabs, current, setTab }: TabProps) {
   }, [current, tabs]);
 
   return (
-    <div className="sticky top-0 z-10 bg-white border-b shadow-sm">
+    <div className="sticky top-0 z-10 border-b shadow-sm">
       <div className="flex gap-2 sm:gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide px-4 py-2">
         {tabs.map((cat, i) => (
           <button

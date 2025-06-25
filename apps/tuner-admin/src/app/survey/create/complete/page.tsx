@@ -1,7 +1,7 @@
 "use client";
 import { useSurveyStore } from "@/store/useSurveyCreateStore";
 import templates from "@/app/template/components/Templates";
-
+import { surveyCreate } from "@/lib/network/api";
 export default function SurveyComplete() {
   const { step1, step2 } = useSurveyStore();
 
@@ -14,11 +14,11 @@ export default function SurveyComplete() {
     ([categoryKey, questions]) =>
       Array.isArray(questions)
         ? questions.map((q) => ({
-            category: categoryKey,
-            text: q.question,
-            type: "multiple",
-            options: q.options,
-          }))
+          category: categoryKey,
+          text: q.question,
+          type: "multiple",
+          options: q.options,
+        }))
         : []
   );
 
@@ -36,11 +36,11 @@ export default function SurveyComplete() {
   // 최종 제출 데이터
   const dataToSubmit = {
     // 음원 정보
-    title: step1.youtubeTitle,
+    title: step1.title,
     artist: step1.artist,
     release_date: step1.releaseDate,
     is_released: step1.isReleased,
-    thumbnailUrl: step1.youtubeThumbnail,
+    rl: step1.youtubeThumbnail,
     sample_url: step1.url,
     channelTitle: step1.channelTitle,
     genre: step1.genre,
@@ -61,13 +61,19 @@ export default function SurveyComplete() {
     allQuestions: combinedQuestions,
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // 서버 전송을 위한 JSON 변환 (allQuestions만 문자열로)
     const serverPayload = {
       ...dataToSubmit,
       allQuestions: JSON.stringify(combinedQuestions),
     };
 
+    try {
+      const res = await surveyCreate(serverPayload);
+      console.log(res);
+    } catch (error) {
+      console.log("서버 전송 중 오류 발생:", error);
+    }
     console.log("🔥 서버 전송용 JSON:", serverPayload);
     alert("데이터가 콘솔에 출력되었습니다. (API 연동 예정)");
   };
