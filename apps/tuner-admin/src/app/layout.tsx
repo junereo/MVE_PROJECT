@@ -10,12 +10,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="overflow-y-scroll">
+      <body className="overflow-y-scroll flex">
         <Providers>
           <Navigate />
           <Header />
           <SessionChecker />
-          <div className="w-full m-auto pt-[100px]">{children}</div>
+          <div className="w-full min-h-screen h-full  m-auto pt-[63px] pl-5 bg-[#DEDEDE] ">
+            <div className="ml-[72px] lg:ml-[6%] w-[93%]">
+              <div className="w-full min-h-screen h-full p-6 border  shadow rounded-lg bg-[#EBEBEB]">
+                {children}
+              </div>
+            </div>
+          </div>
         </Providers>
       </body>
     </html>

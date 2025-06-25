@@ -3,6 +3,7 @@ export interface LoginFormData {
   email: string;
   password: string;
 }
+
 // 설문 생성 페이로드
 export interface SurveyCreatePayload {
   // 음원 정보

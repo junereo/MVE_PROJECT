@@ -66,11 +66,11 @@ const SignUpForm = () => {
   return (
     <div>
       <div className="pl-10 pb-10 text-xl font-bold ">Admin Signup</div>
-      <div className="min-h-screen flex items-start justify-center bg-[#ffffff]">
-        <div className="w-96 bg-blue-600 bg-opacity-80 p-8 rounded-lg shadow-md text-white">
+      <div className="min-h-screen flex items-start justify-center">
+        <div className="w-120 bg-black bg-opacity-80 p-8 rounded-lg shadow-md text-white">
           <div className="flex flex-col items-center mb-6">
             <h2 className="text-2xl font-semibold text-white pb-2">SignUp</h2>
-            <hr className="w-full border-black pt-6 border-t-2" />
+            <hr className="w-full border-white pt-6 border-t-2" />
           </div>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
@@ -167,18 +167,11 @@ const SignUpForm = () => {
 
             <button
               type="submit"
-              className="w-full bg-[#4a6ea9] py-2 rounded font-semibold hover:bg-[#3d5e93]"
+              className="w-full bg-[#888888] py-2 rounded font-semibold hover:bg-[#726d6d]"
             >
               가입하기
             </button>
           </form>
-
-          <div className="mt-4 text-center text-sm text-white/80">
-            이미 계정이 있으신가요?{" "}
-            <Link href="/login" className="underline text-white">
-              로그인하러 가기!
-            </Link>
-          </div>
         </div>
       </div>
     </div>
