@@ -78,8 +78,10 @@ export default function WalletPage() {
       : responseHistory.filter((res) => res.method === filterMethod);
 
   return (
-    <main className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Admin Wallet Dashboard</h1>
+    <main className="">
+      <div className="w-full font-bold text-black text-2xl py-3 ">
+        Admin Wallet Dashboard
+      </div>
       <Tabs value={activeMainTab} onValueChange={setActiveMainTab}>
         <TabsList>
           <TabsTrigger value="token">Token</TabsTrigger>

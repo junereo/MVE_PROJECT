@@ -36,7 +36,7 @@ export default function SurveyComplete() {
   // 최종 제출 데이터
   const dataToSubmit = {
     // 음원 정보
-    title: step1.youtubeTitle,
+    title: step1.title,
     artist: step1.artist,
     release_date: step1.releaseDate,
     is_released: step1.isReleased,

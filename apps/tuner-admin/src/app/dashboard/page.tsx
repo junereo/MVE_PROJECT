@@ -11,10 +11,10 @@ const Dashboard = () => {
   useSessionCheck(); // 클라이언트 훅 호출
 
   return (
-    <div className="w-full  h-full p-[180px] border border-black border-r-4 bg-[#EBEBEB]">
+    <>
       <div className="w-full  text-black text-2xl py-3 ">dashboard</div>
       <div>
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 w-[100%]">
           {/* 상단 요약 카드들 */}
           <div className="flex  gap-5">
             <SummaryCard
@@ -68,7 +68,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

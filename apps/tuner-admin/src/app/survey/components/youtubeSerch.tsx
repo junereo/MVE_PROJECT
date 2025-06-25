@@ -24,7 +24,6 @@ export default function YoutubeSearch() {
 
   return (
     <div>
-      <div className="pl-10 pb-10 text-xl font-bold ">Admin Signup</div>
       <div>
         <h1 className="text-xl font-bold mb-4">유튜브 영상 검색</h1>
         <div className="flex gap-2 mb-4 max-w-3x">
@@ -59,7 +58,7 @@ export default function YoutubeSearch() {
                   channelTitle: video.channelTitle,
                 }).toString();
 
-                router.push(`/surveyTest/create/step1?${query}`);
+                router.push(`/survey/create/step1?${query}`);
               }}
             >
               <img

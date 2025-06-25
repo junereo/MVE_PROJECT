@@ -54,11 +54,11 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-start flex-col bg-white gap-8">
+    <div className="min-h-screen flex items-center justify-start flex-col gap-8">
       <div className="text-6xl font-medium text-[#0e0e0e]">MVE-Admin-Page</div>
-      <div className="w-96 bg-blue-600 bg-opacity-80 p-8 rounded-lg shadow-md text-white">
+      <div className="w-96 bg-black bg-opacity-80 p-8 rounded-lg shadow-md text-white">
         <div className="flex flex-col items-center mb-6">
-          <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+          <div className="w-20 h-20 bg-[#888888] rounded-full flex items-center justify-center mb-4">
             <span className="text-3xl">LOGO</span>
           </div>
           <h2 className="text-2xl font-semibold">Sign in</h2>
@@ -82,7 +82,7 @@ const LoginForm = () => {
           />
           <button
             type="submit"
-            className="w-full bg-[#4a6ea9] py-2 rounded font-semibold hover:bg-[#3d5e93]"
+            className="w-full bg-[#888888] py-2 rounded font-semibold hover:bg-[#726d6d]"
           >
             Login
           </button>
