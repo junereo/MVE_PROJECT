@@ -1,30 +1,28 @@
 export type SurveyPayload = {
   step1: {
     video: {
-      videoId: string;
+      artist: string;
       title: string;
-      thumbnail: string;
-      channelTitle: string;
+      thumbnail_url: string;
+      sample_url: string;
     };
-    startDate: string;
-    endDate: string;
+    start_at: string;
+    end_at: string;
   };
   step2: {
     title: string;
-    isReleased: boolean;
-    releaseDate: string;
+    is_released: boolean;
+    release_date: string;
     genre: string;
   };
   step3: {
-    surveyType: "common" | "official";
+    surveyType: "general" | "official";
     reward_amount: number;
     reward: number;
-    expertReward: number;
+    expert_reward: number;
   };
   step4: {
-    answers: Record<string, number>;
     tags: Record<string, string>;
-    selectedTags: string[];
   };
   step5: {
     customQuestions: {

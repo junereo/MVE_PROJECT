@@ -2,35 +2,35 @@ import { create } from "zustand";
 
 // YouTube
 export type SelectedVideo = {
-  videoId: string;
+  artist: string;
   title: string;
-  thumbnail: string;
+  thumbnail_url: string;
   channelTitle: string;
 };
 
 // Step1YouTube
 export interface SurveyStep1 {
   video: SelectedVideo | null;
-  startDate: string;
-  endDate: string;
+  start_at: string;
+  end_at: string;
 }
 
 // Step2Meta
 export type SurveyStep2 = {
   title: string;
-  isReleased: boolean;
-  releaseDate: string;
+  is_released: boolean;
+  release_date: string;
   genre: string;
 };
 
 // Step3Type
-type SurveyType = "common" | "official";
+type SurveyType = "general" | "official";
 
 export type SurveyStep3 = {
   surveyType: SurveyType;
   reward_amount: number;
   reward: number;
-  expertReward: number;
+  expert_reward: number;
 };
 
 // Step4Default
@@ -81,8 +81,8 @@ export const useSurveyStore = create<SurveyState>((set) => ({
   setSelectedVideo: (video) => set(() => ({ selectedVideo: video })),
   step1: {
     video: null,
-    startDate: "",
-    endDate: "",
+    start_at: "",
+    end_at: "",
   },
   setStep1: (data) =>
     set((state) => ({
@@ -93,8 +93,8 @@ export const useSurveyStore = create<SurveyState>((set) => ({
     })),
   step2: {
     title: "",
-    isReleased: true,
-    releaseDate: "",
+    is_released: true,
+    release_date: "",
     genre: "",
   },
   setStep2: (data) =>
@@ -105,10 +105,10 @@ export const useSurveyStore = create<SurveyState>((set) => ({
       },
     })),
   step3: {
-    surveyType: "common",
+    surveyType: "general",
     reward_amount: 0,
     reward: 0,
-    expertReward: 0,
+    expert_reward: 0,
   },
   setStep3: (data) =>
     set((state) => ({

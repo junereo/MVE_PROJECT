@@ -20,8 +20,8 @@ export default function Step1YouTube({ onNext }: Step1Props) {
   const handleNext = () => {
     setStep1({
       video: selectedVideo,
-      startDate: startDate?.toISOString(),
-      endDate: endDate?.toISOString(),
+      start_at: startDate?.toISOString(),
+      end_at: endDate?.toISOString(),
     });
 
     onNext();

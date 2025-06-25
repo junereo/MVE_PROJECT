@@ -182,7 +182,7 @@ export default function Step5Custom({ onPrev }: Step5Props) {
         </div>
         <div className="flex-[2]">
           <Button onClick={handleSubmit} color="blue">
-            다음
+            설문 생성
           </Button>
         </div>
       </div>

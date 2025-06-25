@@ -13,19 +13,19 @@ interface Step3Props {
 export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const { step3, setStep3 } = useSurveyStore();
 
-  const [surveyType, setSurveyType] = useState<"official" | "common">(
+  const [surveyType, setSurveyType] = useState<"official" | "general">(
     step3.surveyType
   );
   const [rewardAmount, setRewardAmount] = useState(step3.reward_amount);
   const [reward, setReward] = useState(step3.reward);
-  const [expertReward, setExpertReward] = useState(step3.expertReward);
+  const [expertReward, setExpertReward] = useState(step3.expert_reward);
 
   const handleNext = () => {
     setStep3({
       surveyType,
       reward_amount: rewardAmount,
       reward,
-      expertReward,
+      expert_reward: expertReward,
     });
     onNext();
   };
@@ -47,13 +47,13 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
             공식
           </Button>
           <Button
-            color={surveyType === "common" ? "blue" : "white"}
-            onClick={() => setSurveyType("common")}
+            color={surveyType === "general" ? "blue" : "white"}
+            onClick={() => setSurveyType("general")}
           >
             일반
           </Button>
         </div>
-        {surveyType === "common" && (
+        {surveyType === "general" && (
           <Input
             label="일반 리워드"
             type="number"

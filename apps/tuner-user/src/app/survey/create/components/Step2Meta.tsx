@@ -26,17 +26,17 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
   const [title, setTitle] = useState(step2.title);
   const [releaseType, setReleaseType] = useState<
     "released" | "unreleased" | null
-  >(step2.isReleased ? "released" : "unreleased");
+  >(step2.is_released ? "released" : "unreleased");
   const [releaseDate, setReleaseDate] = useState<Date | null>(
-    step2.releaseDate ? new Date(step2.releaseDate) : null
+    step2.release_date ? new Date(step2.release_date) : null
   );
   const [genre, setGenre] = useState<string | undefined>(step2.genre);
 
   const handleNext = () => {
     setStep2({
       title,
-      isReleased: releaseType === "released",
-      releaseDate: releaseDate?.toISOString() || "",
+      is_released: releaseType === "released",
+      release_date: releaseDate?.toISOString() || "",
       genre,
     });
 

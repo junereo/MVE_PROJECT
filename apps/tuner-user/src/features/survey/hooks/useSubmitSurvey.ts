@@ -13,13 +13,13 @@ export const useSubmitSurvey = () => {
     const payload: SurveyPayload = {
       step1: {
         video: {
-          videoId: step1.video.videoId,
           title: step1.video.title,
-          thumbnail: step1.video.thumbnail,
-          channelTitle: step1.video.channelTitle,
+          artist: step1.video.artist,
+          thumbnail_url: step1.video.thumbnail_url,
+          sample_url: `https://www.youtube.com/watch?v=${step1.video.artist}`,
         },
-        startDate: step1.startDate,
-        endDate: step1.endDate,
+        start_at: step1.start_at,
+        end_at: step1.end_at,
       },
       step2,
       step3,
