@@ -20,6 +20,7 @@ export default function YoutubeSearch() {
   };
 
   return (
+    <div className="pl-10 pb-10 text-xl font-bold ">Admin Signup</div>
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-xl font-bold mb-4">유튜브 영상 검색</h1>
 

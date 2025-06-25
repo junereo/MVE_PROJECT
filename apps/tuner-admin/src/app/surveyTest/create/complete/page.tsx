@@ -1,7 +1,7 @@
 "use client";
 import { useSurveyStore } from "@/store/useSurveyCreateStore";
 import templates from "@/app/template/components/Templates";
-
+import { surveyCreate } from "@/lib/network/api";
 export default function SurveyComplete() {
   const { step1, step2 } = useSurveyStore();
 
@@ -61,13 +61,19 @@ export default function SurveyComplete() {
     allQuestions: combinedQuestions,
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // 서버 전송을 위한 JSON 변환 (allQuestions만 문자열로)
     const serverPayload = {
       ...dataToSubmit,
       allQuestions: JSON.stringify(combinedQuestions),
     };
 
+    try {
+      const res = await surveyCreate(serverPayload);
+      console.log(res);
+    } catch (error) {
+      console.log("서버 전송 중 오류 발생:", error);
+    }
     console.log("🔥 서버 전송용 JSON:", serverPayload);
     alert("데이터가 콘솔에 출력되었습니다. (API 연동 예정)");
   };

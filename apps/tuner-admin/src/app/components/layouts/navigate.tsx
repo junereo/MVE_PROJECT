@@ -17,52 +17,70 @@ export default function Navigate() {
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {/* 네비게이션 바 */}
+      {/* 네비게이션 바  #EBEBEB #888888*/}
       <div
         className={`
-          fixed top-0 left-0 h-screen w-64 bg-blue-600 text-white shadow-lg z-40
+          fixed top-0 left-0 h-screen w-64 bg-[#DEDEDE] text-white shadow-lg z-40
           transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0 lg:w-[8%] lg:min-w-[72px]
         `}
       >
-        <div className="p-4 font-bold text-lg">네비게이션</div>
+        <div className=" text-[#888888] p-4 font-bold text-lg">네비게이션</div>
         <ul className="space-y-2 p-4">
           <li>
-            <Link href="/dashboard" className="block hover:text-blue-300">
+            <Link
+              href="/dashboard"
+              className="block text-[#888888] hover:text-blue-300"
+            >
               - Dashboard
             </Link>
           </li>
           <li>
-            <Link href="/survey" className="block hover:text-blue-300">
+            <Link
+              href="/survey"
+              className="block text-[#888888] hover:text-blue-300"
+            >
               - Surveys
             </Link>
           </li>
           <li>
-            <Link href="/signup" className="block hover:text-blue-300">
+            <Link
+              href="/signup"
+              className="block text-[#888888] hover:text-blue-300"
+            >
               - Sign up
             </Link>
           </li>
           <li>
-            <Link href="/template" className="block hover:text-blue-300">
+            <Link
+              href="/template"
+              className="block text-[#888888] hover:text-blue-300"
+            >
               - Template
             </Link>
           </li>
           <li>
-            <Link href="/mypage" className="block hover:text-blue-300">
+            <Link
+              href="/mypage"
+              className="block text-[#888888] hover:text-blue-300"
+            >
               - My Page
             </Link>
           </li>
           <li>
             <Link
               href="/surveyTest/create/step1"
-              className="block hover:text-blue-300"
+              className="block text-[#888888] hover:text-blue-300"
             >
               - Survey Test
             </Link>
           </li>
           <li>
-            <Link href="/wallet" className="block hover:text-blue-300">
+            <Link
+              href="/wallet"
+              className="block text-[#888888] hover:text-blue-300"
+            >
               - Wallet
             </Link>
           </li>
