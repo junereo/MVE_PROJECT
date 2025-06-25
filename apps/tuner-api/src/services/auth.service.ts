@@ -145,7 +145,7 @@ export const oauthCallbackService = async (
             if (!existingAccount) {
                 await tx.user_OAuth.create({
                     data: {
-                        provider,
+                        provider: OAuthProvider.kakao,
                         provider_id: profile.id,
                         email: safeEmail,
                         profile_image: profile.picture,
@@ -280,7 +280,7 @@ export const googleCallbackService = async (req: Request) => {
                 oauths: {
                     create: [
                         {
-                            provider: 'google',
+                            provider: OAuthProvider.google,
                             provider_id: String(provider_id),
                             nickname: name,
                             email,

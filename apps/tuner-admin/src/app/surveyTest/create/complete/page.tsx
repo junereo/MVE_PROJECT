@@ -13,11 +13,11 @@ export default function SurveyComplete() {
     ([categoryKey, questions]) =>
       Array.isArray(questions)
         ? questions.map((q) => ({
-            category: categoryKey,
-            text: q.question,
-            type: "multiple",
-            options: q.options,
-          }))
+          category: categoryKey,
+          text: q.question,
+          type: "multiple",
+          options: q.options,
+        }))
         : []
   );
 

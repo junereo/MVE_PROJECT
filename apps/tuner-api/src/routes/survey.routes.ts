@@ -1,9 +1,14 @@
-import express from "express";
-import { createSurvey, getSurvey } from "../controllers/survey.controller";
+import express from 'express';
+import { createSurveyHandler } from '../controllers/survey.controller';
+import { verifyToken } from '../middlewares/auth.middleware';
 
 const router = express.Router();
 
-router.post("/", createSurvey);
-router.get("/:id", getSurvey);
+router.get('/list');
+router.get('/:surveyId');
+router.get('/:surveyId/results');
+router.post('/create', verifyToken, createSurveyHandler);
+router.post('/:surveyId/responses');
+router.put('/:surveyId/responses');
 
-export default router; 
+export default router;

@@ -8,7 +8,7 @@ import SurveyCustomForm from "@/app/surveyTest/create/step2/components/SurveyCus
 import SurveyActions from "@/app/surveyTest/create/step2/components/SurveyActions";
 import SurveyNavigation from "@/app/surveyTest/create/step2/components/SurveyNavigation";
 import templates from "@/app/template/components/Templates";
-
+import axios from "axios";
 export default function SurveyStep2() {
   const router = useRouter();
   const { step1, setStep2, setTemplateSetKey } = useSurveyStore();
@@ -108,11 +108,11 @@ export default function SurveyStep2() {
       prev.map((q, i) =>
         i === qIndex
           ? {
-              ...q,
-              options: q.options.map((opt, j) =>
-                j === optIndex ? value : opt
-              ),
-            }
+            ...q,
+            options: q.options.map((opt, j) =>
+              j === optIndex ? value : opt
+            ),
+          }
           : q
       )
     );
@@ -124,15 +124,15 @@ export default function SurveyStep2() {
       prev.map((q, i) =>
         i === index
           ? {
-              ...q,
-              type: newType as QuestionType,
-              options:
-                newType === "subjective"
-                  ? []
-                  : q.options.length
+            ...q,
+            type: newType as QuestionType,
+            options:
+              newType === "subjective"
+                ? []
+                : q.options.length
                   ? q.options
                   : ["", "", "", ""],
-            }
+          }
           : q
       )
     );
@@ -213,7 +213,7 @@ export default function SurveyStep2() {
 
       {/* 완료 버튼 영역 */}
       {(isStardomTab || isCustomTab) && (
-        <SurveyActions onTempSave={() => {}} onComplete={handleComplete} />
+        <SurveyActions onTempSave={() => { }} onComplete={handleComplete} />
       )}
 
       {/* 하단 이동 네비게이션 */}

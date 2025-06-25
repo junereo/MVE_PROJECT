@@ -117,7 +117,7 @@ model User {
   nickname        String
   gender          Gender?
   ageGroup        AgeGroup?
-  genre           Genre
+  genre           Genre?
   wallet_address  String?
   simple_password String?
   level           UserLevel @default(Regular)
@@ -180,7 +180,7 @@ model Survey {
   create_id        Int
   music_id         Int
   type             SurveyType
-  tags             SurveyTags?
+  tags             SurveyTags[]
   music_sample_url String?
   start_at         DateTime
   end_at           DateTime
@@ -198,7 +198,7 @@ model Survey {
   responses       Survey_Responses[]
   result          Survey_Result?
   Survey_Customer Survey_Customer[]
-  Music           Music?             @relation(fields: [musicId], references: [id])
+  Music           Music?             @relation(fields: [music_id], references: [id])
   musicId         Int?
   Rewards         Rewards[]
   Admin           Admin[]

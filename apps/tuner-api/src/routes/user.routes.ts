@@ -3,9 +3,9 @@ import express from 'express';
 
 const router = express.Router();
 
-// router.get('/:id', UserController.getUser);
-// router.patch('/:id/nickname', UserController.updateNickname);
-// router.delete('/:id', UserController.removeUser);
-// router.get('/', UserController.listUsers);
+router.get('/:id',);
+router.patch('/:id/nickname',);
+router.delete('/:id',);
+router.get('/',);
 
 export default router;
