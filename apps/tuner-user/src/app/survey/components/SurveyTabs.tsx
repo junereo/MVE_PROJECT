@@ -1,7 +1,11 @@
 "use client";
 
+interface TabItem {
+  key: string;
+  label: string;
+}
 interface TabProps {
-  tabs: { key: string; label: string }[]; // tap 항목
+  tabs: readonly TabItem[]; // readonly 배열도 허용
   current: number; // 현재 선택된 tap 인덱스
   setTab: (index: number) => void; // 탭 변경 함수
 }
