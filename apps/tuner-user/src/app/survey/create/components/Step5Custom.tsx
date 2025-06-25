@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import type {
   CustomQuestion,
   QuestionType,
 } from "@/features/survey/store/useSurveyStore";
+import { useSubmitSurvey } from "@/features/survey/hooks/useSubmitSurvey";
 import Button from "@/components/ui/Button";
-import CustomForm from "../../components/CustomForm"; // 상대 경로 확인
+import Modal from "@/components/ui/Modal";
+import CustomForm from "../../components/CustomForm";
 
 interface Step5Props {
   onPrev: () => void;
@@ -22,9 +25,28 @@ const typeOptions = [
 
 export default function Step5Custom({ onPrev }: Step5Props) {
   const { setStep5 } = useSurveyStore();
+  const { submit } = useSubmitSurvey();
   const [questions, setQuestions] = useState<CustomQuestion[]>([
     { id: 1, text: "", type: "multiple", options: ["", "", "", "", ""] },
   ]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    image: "",
+    description: "",
+    buttonLabel: "",
+    redirectTo: "",
+  });
+
+  const router = useRouter();
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleNext = () => {
+    setIsModalOpen(false);
+    router.push(modalContent.redirectTo);
+  };
 
   // 질문 추가
   const addCustomQuestion = () => {
@@ -94,10 +116,29 @@ export default function Step5Custom({ onPrev }: Step5Props) {
   };
 
   // !-완료 시 전체 설문 api 요청 필요-!
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setStep5({ customQuestions: questions });
-    console.log("최종 저장된 커스텀 질문:", questions);
-    // 이후 서버로 전송 또는 다음 라우터 이동
+    try {
+      await submit();
+      // 설문 생성
+      setModalContent({
+        image: "check.png",
+        description: "설문 생성을 완료했습니다.",
+        buttonLabel: "확인",
+        redirectTo: "/survey",
+      });
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error("설문 제출 실패", err);
+      // 설문 생성 실패
+      setModalContent({
+        image: "x.png",
+        description: `${err}`,
+        buttonLabel: "다시 시도하기",
+        redirectTo: "/survey/create?step=step5",
+      });
+      setIsModalOpen(true);
+    }
   };
 
   return (
@@ -108,6 +149,16 @@ export default function Step5Custom({ onPrev }: Step5Props) {
       </div>
 
       <div className="space-y-4 min-h-screen">
+        {isModalOpen && (
+          <Modal
+            image={modalContent.image}
+            description={modalContent.description}
+            buttonLabel={modalContent.buttonLabel}
+            onClick={handleNext}
+            onClose={handleClose}
+            color={modalContent.image === "check.png" ? "blue" : "red"}
+          />
+        )}
         <h2 className="text-xl font-bold">Step 5: 커스텀 설문</h2>
 
         <div className="space-y-2">
