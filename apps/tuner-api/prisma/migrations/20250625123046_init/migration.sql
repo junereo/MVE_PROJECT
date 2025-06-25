@@ -194,7 +194,7 @@ CREATE TABLE "Music" (
     "agency" TEXT NOT NULL,
     "release_date" TIMESTAMP(3),
     "is_released" BOOLEAN NOT NULL,
-    "thumbnailUrl" TEXT NOT NULL,
+    "thumbnail_url" TEXT NOT NULL,
     "sample_url" TEXT NOT NULL,
     "nft_token_id" TEXT NOT NULL,
 
