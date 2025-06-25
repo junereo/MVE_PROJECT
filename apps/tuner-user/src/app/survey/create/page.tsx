@@ -1,6 +1,6 @@
 "use client";
 
-import { useFunnel } from "@/features/servey/hooks/useFunnel";
+import { useFunnel } from "@/features/survey/hooks/useFunnel";
 import Step1YouTube from "./components/Step1YouTube";
 import Step2Meta from "./components/Step2Meta";
 import Step3Type from "./components/Step3Type";
@@ -10,7 +10,9 @@ import Step5Custom from "./components/Step5Custom";
 type Step = "step1" | "step2" | "step3" | "step4" | "step5";
 
 export default function SurveyCreatePage() {
-  const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
+  const steps: Step[] = ["step1", "step2", "step3", "step4", "step5"];
+  const { Funnel, setStep, currentStep } = useFunnel<Step>(steps, "step1");
+
   return (
     <div className="mx-auto py-8">
       <Funnel>
