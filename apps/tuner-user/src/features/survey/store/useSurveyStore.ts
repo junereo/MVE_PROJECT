@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { SurveyTypeEnum, QuestionTypeEnum } from "../types/enums";
+import {
+  SurveyTypeEnum,
+  SurveyCategoryEnum,
+  QuestionTypeEnum,
+} from "../types/enums";
 
 // YouTube
 export type SelectedVideo = {
@@ -33,16 +37,14 @@ export type SurveyStep3 = {
 };
 
 // Step4Default
-type BaseAnswerKey =
-  | "originality"
-  | "popularity"
-  | "sustainability"
-  | "expandability"
-  | "stardom";
-
 export type SurveyStep4 = {
-  tags: { [key in BaseAnswerKey]?: string };
-  answers: Partial<Record<BaseAnswerKey, number>>;
+  questions: Record<
+    SurveyCategoryEnum,
+    {
+      question: string;
+      options: string[];
+    }
+  >;
 };
 
 // Step5Custom
@@ -114,11 +116,15 @@ export const useSurveyStore = create<SurveyState>((set) => ({
       },
     })),
   step4: {
-    answers: {},
-    tags: {},
-    selectedTags: [],
+    questions: {
+      [SurveyCategoryEnum.ORIGINALITY]: { question: "", options: [] },
+      [SurveyCategoryEnum.POPULARITY]: { question: "", options: [] },
+      [SurveyCategoryEnum.SUSTAINABILITY]: { question: "", options: [] },
+      [SurveyCategoryEnum.EXPANDABILITY]: { question: "", options: [] },
+      [SurveyCategoryEnum.STARDOM]: { question: "", options: [] },
+    },
   },
-  setStep4: (data) =>
+  setStep4: (data: Partial<SurveyStep4>) =>
     set((state) => ({
       step4: {
         ...state.step4,

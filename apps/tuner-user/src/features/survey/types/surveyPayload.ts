@@ -1,4 +1,4 @@
-import { SurveyTypeEnum, QuestionTypeEnum } from "./enums";
+import { SurveyTypeEnum, SurveyCategoryEnum, QuestionTypeEnum } from "./enums";
 
 export type SurveyPayload = {
   step1: {
@@ -24,8 +24,12 @@ export type SurveyPayload = {
     expert_reward: number;
   };
   step4: {
-    answers: Partial<Record<string, number>>;
-    tags: Record<string, string>;
+    questions: {
+      [key in SurveyCategoryEnum]: {
+        question: string;
+        options: string[];
+      };
+    };
   };
   step5: {
     customQuestions: {

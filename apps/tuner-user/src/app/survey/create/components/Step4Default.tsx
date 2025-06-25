@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Button from "@/components/ui/Button";
 import SurveyTabs from "../../components/SurveyTabs";
 import SurveyTag from "../../components/SurveyTag";
 import QuestionText from "../../components/QuestionText";
 import QuestionOptions from "../../components/QuestionOptions";
 import QuestionScore from "../../components/QuestionScore";
+import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import { defaultQuestions } from "@/features/survey/constants/defaultQuestions";
+import { SurveyCategoryEnum } from "@/features/survey/types/enums";
 
 interface Step4Props {
   onPrev: () => void;
@@ -15,21 +17,23 @@ interface Step4Props {
 }
 
 const baseCategories = [
-  { key: "originality", label: "작품성" },
-  { key: "popularity", label: "대중성" },
-  { key: "sustainability", label: "지속성" },
-  { key: "expandability", label: "확장성" },
-  { key: "stardom", label: "스타성" },
+  { key: SurveyCategoryEnum.ORIGINALITY, label: "작품성" },
+  { key: SurveyCategoryEnum.POPULARITY, label: "대중성" },
+  { key: SurveyCategoryEnum.SUSTAINABILITY, label: "지속성" },
+  { key: SurveyCategoryEnum.EXPANDABILITY, label: "확장성" },
+  { key: SurveyCategoryEnum.STARDOM, label: "스타성" },
 ] as const;
 
 export default function Step4Default({ onPrev, onNext }: Step4Props) {
+  const { step4, setStep4 } = useSurveyStore();
+
   const [tabIndex, setTabIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<
     Record<string, string>
   >({});
   const [scores, setScores] = useState<Record<string, number | null>>({});
 
-  const currentKey = baseCategories[tabIndex].key;
+  const currentKey = baseCategories[tabIndex].key as SurveyCategoryEnum;
   const currentTemplate = defaultQuestions[currentKey];
 
   const handleSelectOption = (value: string) => {
@@ -47,10 +51,22 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
   };
 
   const handleNext = () => {
+    const questionData = currentTemplate[0]; // defaultQuestions는 배열이라서 첫 번째 질문만 추출
+
+    setStep4({
+      questions: {
+        ...step4.questions,
+        [currentKey]: {
+          question: questionData.question,
+          options: questionData.options,
+        },
+      },
+    });
+
     if (tabIndex < baseCategories.length - 1) {
       setTabIndex((prev) => prev + 1);
     } else {
-      onNext(); // 모든 탭 완료 후 Step5로 이동
+      onNext();
     }
   };
 
@@ -85,7 +101,7 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
           </div>
         ))}
 
-        <QuestionText text="점수를 입력해 주세요" />
+        <QuestionText text={`${[currentKey]} 점수를 입력해 주세요`} />
         <QuestionScore
           value={scores[currentKey] ?? null}
           onChange={handleScoreChange}

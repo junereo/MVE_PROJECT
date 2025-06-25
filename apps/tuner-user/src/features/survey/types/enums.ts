@@ -13,6 +13,15 @@ export enum SurveyTypeEnum {
 }
 */
 
+// 설문 카테고리, 작품성/대중성/지속성/확장성/스타성
+export enum SurveyCategoryEnum {
+  ORIGINALITY = "originality",
+  POPULARITY = "popularity",
+  SUSTAINABILITY = "sustainability",
+  EXPANDABILITY = "expandability",
+  STARDOM = "stardom",
+}
+
 // 커스텀 설문 타입, 객관식/체크박스/서술형
 export enum QuestionTypeEnum {
   MULTIPLE = "multiple",
