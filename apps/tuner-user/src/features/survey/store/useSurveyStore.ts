@@ -1,5 +1,13 @@
 import { create } from "zustand";
 
+// YouTube
+export type SelectedVideo = {
+  videoId: string;
+  title: string;
+  thumbnail: string;
+  channelTitle: string;
+};
+
 // Step2Meta
 export type SurveyStep2 = {
   title: string;
@@ -47,6 +55,8 @@ export interface SurveyStep5 {
 }
 
 interface SurveyState {
+  selectedVideo: SelectedVideo | null;
+  setSelectedVideo: (video: SelectedVideo | null) => void;
   step2: SurveyStep2;
   setStep2: (data: Partial<SurveyStep2>) => void;
   step3: SurveyStep3;
@@ -58,6 +68,8 @@ interface SurveyState {
 }
 
 export const useSurveyStore = create<SurveyState>((set) => ({
+  selectedVideo: null,
+  setSelectedVideo: (video) => set(() => ({ selectedVideo: video })),
   step2: {
     title: "",
     isReleased: true,

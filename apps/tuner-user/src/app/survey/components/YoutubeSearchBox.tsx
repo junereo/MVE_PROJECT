@@ -1,0 +1,77 @@
+"use client";
+
+import { useState } from "react";
+import { fetchYoutubeVideos } from "@/lib/youtube";
+import {
+  useSurveyStore,
+  SelectedVideo,
+} from "@/features/survey/store/useSurveyStore";
+
+export default function YoutubeSearchBox() {
+  const [query, setQuery] = useState("");
+  const [videos, setVideos] = useState<SelectedVideo[]>([]);
+  const { selectedVideo, setSelectedVideo } = useSurveyStore();
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    setSelectedVideo(null);
+    const results = await fetchYoutubeVideos(query);
+    setVideos(results);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <input
+          className="border p-2 flex-1 rounded"
+          placeholder="검색어 입력"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+        />
+        <button
+          className="bg-blue-500 text-white px-3 py-1 rounded"
+          onClick={handleSearch}
+        >
+          검색
+        </button>
+      </div>
+
+      {/* 선택된 영상 표시 */}
+      {selectedVideo ? (
+        <div className="space-y-2 mt-4">
+          <iframe
+            src={`https://www.youtube.com/embed/${selectedVideo.videoId}`}
+            className="w-full h-[200px] rounded"
+            allowFullScreen
+          />
+          <h3 className="font-bold">{selectedVideo.title}</h3>
+          <button
+            className="text-blue-500 underline text-sm mt-2"
+            onClick={() => setSelectedVideo(null)}
+          >
+            ← 다시 선택하기
+          </button>
+        </div>
+      ) : (
+        // 검색 결과 목록
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          {videos.map((video) => (
+            <div
+              key={video.videoId}
+              className="cursor-pointer border p-2 rounded"
+              onClick={() => setSelectedVideo(video)}
+            >
+              <img
+                src={video.thumbnail}
+                alt={video.title}
+                className="w-full h-[140px] object-cover rounded"
+              />
+              <p className="mt-2 text-sm line-clamp-2">{video.title}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
