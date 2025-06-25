@@ -66,7 +66,7 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
       </div>
 
-      <div className="p-4 space-y-4 min-h-screen">
+      <div className="space-y-4 min-h-screen">
         <h2 className="text-xl font-bold mb-4">Step 4: 기본 설문</h2>
 
         <SurveyTabs
@@ -87,13 +87,17 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
         <QuestionScore value={score} onChange={setScore} />
       </div>
 
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border px-4 py-2 z-30 flex justify-end pt-4">
-        <Button onClick={onPrev} color="white">
-          이전
-        </Button>
-        <Button onClick={handleNext} color="blue">
-          다음
-        </Button>
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] p-3 flex items-center bg-white text-black border border-green-700 z-30 justify-end gap-3">
+        <div className="flex-[1.5]">
+          <Button onClick={onPrev} color="white">
+            이전
+          </Button>
+        </div>
+        <div className="flex-[2]">
+          <Button onClick={handleNext} color="blue">
+            다음
+          </Button>
+        </div>
       </div>
     </>
   );

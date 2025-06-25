@@ -20,8 +20,8 @@ export default function Step1YouTube({ onNext }: Step1Props) {
   const handleNext = () => {
     setStep1({
       video: selectedVideo,
-      startDate: startDate!.toISOString(),
-      endDate: endDate!.toISOString(),
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString(),
     });
 
     onNext();
@@ -36,7 +36,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
       </div>
 
-      <div className="p-4 space-y-4 min-h-screen">
+      <div className="space-y-4 min-h-screen">
         <h2 className="text-xl font-bold">Step 1: 유튜브</h2>
         <YoutubeSearchBox />
 
@@ -62,7 +62,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
         />
       </div>
 
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] p-3 flex items-center bg-white text-black border border-green-700 z-30 justify-end">
         <Button onClick={handleNext} color="blue">
           다음
         </Button>
