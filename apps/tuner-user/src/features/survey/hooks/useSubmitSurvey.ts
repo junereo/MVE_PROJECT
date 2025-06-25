@@ -1,6 +1,6 @@
 import { useSurveyStore } from "../store/useSurveyStore";
 import { createSurvey } from "../services/createSurvey";
-import { SurveyPayload } from "../types/surveyTypes";
+import { SurveyPayload } from "../types/surveyPayload";
 
 export const useSubmitSurvey = () => {
   const { step1, step2, step3, step4, step5 } = useSurveyStore();

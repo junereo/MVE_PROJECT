@@ -1,4 +1,4 @@
-import { SurveyPayload } from "../types/surveyTypes";
+import { SurveyPayload } from "../types/surveyPayload";
 import axios from "@/lib/network/axios";
 
 export const createSurvey = async (payload: SurveyPayload) => {

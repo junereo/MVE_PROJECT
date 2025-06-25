@@ -51,7 +51,6 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
         ...step4.tags,
         [currentKey]: choice,
       },
-      selectedTags: Array.from(new Set([...step4.selectedTags, currentKey])),
     });
 
     onNext();

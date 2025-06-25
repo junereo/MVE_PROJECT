@@ -23,7 +23,7 @@ const genreOptions = [
 export default function Step2Meta({ onPrev, onNext }: Step2Props) {
   const { step2, setStep2 } = useSurveyStore();
 
-  const [title, setTitle] = useState(step2.title);
+  const [surveyTitle, setSurveyTitle] = useState(step2.survey_title);
   const [releaseType, setReleaseType] = useState<
     "released" | "unreleased" | null
   >(step2.is_released ? "released" : "unreleased");
@@ -34,7 +34,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
 
   const handleNext = () => {
     setStep2({
-      title,
+      survey_title: surveyTitle,
       is_released: releaseType === "released",
       release_date: releaseDate?.toISOString() || "",
       genre,
@@ -55,8 +55,8 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
         <Input
           label="설문 제목"
           placeholder="예) 6월 감성 R&B 설문"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={surveyTitle}
+          onChange={(e) => setSurveyTitle(e.target.value)}
         />
         <div className="space-y-2">
           <div className="text-sm font-medium">음원 상태</div>

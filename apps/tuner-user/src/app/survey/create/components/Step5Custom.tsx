@@ -3,10 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
-import type {
-  CustomQuestion,
-  QuestionType,
-} from "@/features/survey/store/useSurveyStore";
+import type { CustomQuestion } from "@/features/survey/store/useSurveyStore";
+import { QuestionTypeEnum } from "@/features/survey/types/enums";
 import { useSubmitSurvey } from "@/features/survey/hooks/useSubmitSurvey";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -18,16 +16,21 @@ interface Step5Props {
 
 // 질문 타입 옵션 정의
 const typeOptions = [
-  { label: "객관식", value: "multiple" },
-  { label: "체크박스형", value: "checkbox" },
-  { label: "서술형", value: "subjective" },
+  { label: "객관식", value: QuestionTypeEnum.MULTIPLE },
+  { label: "체크박스형", value: QuestionTypeEnum.CHECKBOX },
+  { label: "서술형", value: QuestionTypeEnum.SUBJECTIVE },
 ];
 
 export default function Step5Custom({ onPrev }: Step5Props) {
   const { setStep5 } = useSurveyStore();
   const { submit } = useSubmitSurvey();
   const [questions, setQuestions] = useState<CustomQuestion[]>([
-    { id: 1, text: "", type: "multiple", options: ["", "", "", "", ""] },
+    {
+      id: 1,
+      question_text: "",
+      question_type: QuestionTypeEnum.MULTIPLE,
+      options: ["", "", "", "", ""],
+    },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
@@ -53,14 +56,19 @@ export default function Step5Custom({ onPrev }: Step5Props) {
     const newId = questions.length + 1;
     setQuestions([
       ...questions,
-      { id: newId, text: "", type: "multiple", options: ["", "", "", ""] },
+      {
+        id: newId,
+        question_text: "",
+        question_type: QuestionTypeEnum.MULTIPLE,
+        options: ["", "", "", ""],
+      },
     ]);
   };
 
   // 질문 텍스트 변경
   const handleQuestionChange = (index: number, text: string) => {
     setQuestions((prev) =>
-      prev.map((q, i) => (i === index ? { ...q, text } : q))
+      prev.map((q, i) => (i === index ? { ...q, question_text: text } : q))
     );
   };
 
@@ -71,9 +79,9 @@ export default function Step5Custom({ onPrev }: Step5Props) {
         i === index
           ? {
               ...q,
-              type: newType as QuestionType,
+              question_type: newType as QuestionTypeEnum,
               options:
-                newType === "subjective"
+                newType === QuestionTypeEnum.SUBJECTIVE
                   ? []
                   : q.options.length
                   ? q.options
@@ -115,7 +123,7 @@ export default function Step5Custom({ onPrev }: Step5Props) {
     );
   };
 
-  // !-완료 시 전체 설문 api 요청 필요-!
+  // !-완료 시 상태 저장 및 전체 설문 api 요청-!
   const handleSubmit = async () => {
     setStep5({ customQuestions: questions });
     try {

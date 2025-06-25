@@ -3,15 +3,9 @@
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Dropdown from "@/components/ui/DropDown";
-import Disclosure from "@/components/ui/Disclosure"; // 수정된 Disclosure 컴포넌트 사용
-import { useState } from "react";
-
-interface CustomQuestion {
-  id: number;
-  text: string;
-  type: string;
-  options: string[];
-}
+import Disclosure from "@/components/ui/Disclosure";
+import type { CustomQuestion } from "@/features/survey/store/useSurveyStore";
+import { QuestionTypeEnum } from "@/features/survey/types/enums";
 
 interface CustomFormProps {
   questions: CustomQuestion[];
@@ -44,15 +38,15 @@ export default function CustomForm({
             <div className="flex flex-col gap-4 w-full">
               <Input
                 label="질문 내용"
-                value={q.text}
+                value={q.question_text}
                 onChange={(e) => onChangeText(qIndex, e.target.value)}
               />
               <div className="w-full">
                 <Dropdown
                   options={typeOptions.map((o) => o.label)}
                   selected={
-                    typeOptions.find((o) => o.value === q.type)?.label ??
-                    "유형 선택"
+                    typeOptions.find((o) => o.value === q.question_type)
+                      ?.label ?? "유형 선택"
                   }
                   onSelect={(label: string) => {
                     const found = typeOptions.find((o) => o.label === label);
@@ -62,7 +56,7 @@ export default function CustomForm({
               </div>
             </div>
 
-            {q.type === "multiple" && (
+            {q.question_type === QuestionTypeEnum.MULTIPLE && (
               <div className="space-y-3 w-full">
                 {[...Array(5)].map((_, optIndex) => (
                   <div
@@ -82,7 +76,7 @@ export default function CustomForm({
               </div>
             )}
 
-            {q.type === "checkbox" && (
+            {q.question_type === QuestionTypeEnum.CHECKBOX && (
               <div className="space-y-3 w-full">
                 {q.options.map((opt, optIndex) => (
                   <div
@@ -111,7 +105,7 @@ export default function CustomForm({
               </div>
             )}
 
-            {q.type === "subjective" && (
+            {q.question_type === QuestionTypeEnum.SUBJECTIVE && (
               <textarea
                 className="w-full p-2 border rounded text-sm"
                 placeholder="서술형 답변 예시"

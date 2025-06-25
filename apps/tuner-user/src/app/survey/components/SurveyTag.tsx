@@ -17,7 +17,7 @@ export default function SurveyTag() {
   return (
     <div className="pt-5 mb-6">
       <p className="text-sm font-semibold mb-2 text-gray-700">
-        이 설문에 사용될 해시태그
+        설문에 사용될 해시태그
       </p>
       <div className="flex flex-wrap gap-2">
         {Object.entries(predefinedTags).map(([key, tag]) => (

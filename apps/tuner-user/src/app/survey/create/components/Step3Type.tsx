@@ -4,6 +4,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { useState } from "react";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
+import { SurveyTypeEnum } from "@/features/survey/types/enums";
 
 interface Step3Props {
   onPrev: () => void;
@@ -13,8 +14,8 @@ interface Step3Props {
 export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const { step3, setStep3 } = useSurveyStore();
 
-  const [surveyType, setSurveyType] = useState<"official" | "general">(
-    step3.surveyType
+  const [surveyType, setSurveyType] = useState<SurveyTypeEnum>(
+    step3.surveyType ?? SurveyTypeEnum.OFFICIAL
   );
   const [rewardAmount, setRewardAmount] = useState(step3.reward_amount);
   const [reward, setReward] = useState(step3.reward);
@@ -41,26 +42,20 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
         <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
         <div className="flex gap-2">
           <Button
-            color={surveyType === "official" ? "blue" : "white"}
-            onClick={() => setSurveyType("official")}
+            color={surveyType === SurveyTypeEnum.OFFICIAL ? "blue" : "white"}
+            onClick={() => setSurveyType(SurveyTypeEnum.OFFICIAL)}
           >
             공식
           </Button>
           <Button
-            color={surveyType === "general" ? "blue" : "white"}
-            onClick={() => setSurveyType("general")}
+            color={surveyType === SurveyTypeEnum.GENERAL ? "blue" : "white"}
+            onClick={() => setSurveyType(SurveyTypeEnum.GENERAL)}
           >
             일반
           </Button>
         </div>
-        {surveyType === "general" && (
-          <Input
-            label="일반 리워드"
-            type="number"
-            placeholder="기본으로 지급되는 리워드입니다."
-          />
-        )}
-        {surveyType === "official" && (
+
+        {surveyType === SurveyTypeEnum.OFFICIAL && (
           <>
             <p className="text-sm text-gray-600 bg-gray-50 border rounded-md p-3">
               공식 서베이는 리워드를 가지고 있어야 합니다.
@@ -91,6 +86,13 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
               placeholder="Expert 회원에게 지급할 리워드를 입력해주세요."
             />
           </>
+        )}
+        {surveyType === SurveyTypeEnum.GENERAL && (
+          <Input
+            label="일반 리워드"
+            type="number"
+            placeholder="기본으로 지급되는 리워드입니다."
+          />
         )}
       </div>
 

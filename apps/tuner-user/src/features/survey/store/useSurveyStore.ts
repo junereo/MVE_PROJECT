@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { SurveyTypeEnum, QuestionTypeEnum } from "../types/enums";
 
 // YouTube
 export type SelectedVideo = {
@@ -17,17 +18,15 @@ export interface SurveyStep1 {
 
 // Step2Meta
 export type SurveyStep2 = {
-  title: string;
+  survey_title: string;
   is_released: boolean;
   release_date: string;
   genre: string;
 };
 
 // Step3Type
-type SurveyType = "general" | "official";
-
 export type SurveyStep3 = {
-  surveyType: SurveyType;
+  surveyType: SurveyTypeEnum;
   reward_amount: number;
   reward: number;
   expert_reward: number;
@@ -42,18 +41,15 @@ type BaseAnswerKey =
   | "stardom";
 
 export type SurveyStep4 = {
-  answers: Partial<Record<BaseAnswerKey, number>>;
   tags: { [key in BaseAnswerKey]?: string };
-  selectedTags: BaseAnswerKey[];
+  answers: Partial<Record<BaseAnswerKey, number>>;
 };
 
 // Step5Custom
-export type QuestionType = "multiple" | "checkbox" | "subjective";
-
 export type CustomQuestion = {
   id: number;
-  text: string;
-  type: QuestionType;
+  question_text: string;
+  question_type: QuestionTypeEnum;
   options: string[];
 };
 
@@ -92,7 +88,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
       },
     })),
   step2: {
-    title: "",
+    survey_title: "",
     is_released: true,
     release_date: "",
     genre: "",
@@ -105,7 +101,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
       },
     })),
   step3: {
-    surveyType: "general",
+    surveyType: SurveyTypeEnum.OFFICIAL,
     reward_amount: 0,
     reward: 0,
     expert_reward: 0,
