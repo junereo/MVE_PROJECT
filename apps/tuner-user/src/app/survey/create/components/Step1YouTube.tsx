@@ -15,7 +15,17 @@ interface Step1Props {
 export default function Step1YouTube({ onNext }: Step1Props) {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const { selectedVideo } = useSurveyStore();
+  const { selectedVideo, setStep1 } = useSurveyStore();
+
+  const handleNext = () => {
+    setStep1({
+      video: selectedVideo,
+      startDate: startDate!.toISOString(),
+      endDate: endDate!.toISOString(),
+    });
+
+    onNext();
+  };
 
   return (
     <>
@@ -53,7 +63,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
       </div>
 
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
-        <Button onClick={onNext} color="blue">
+        <Button onClick={handleNext} color="blue">
           다음
         </Button>
       </div>

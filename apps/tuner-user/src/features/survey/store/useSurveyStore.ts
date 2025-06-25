@@ -8,6 +8,13 @@ export type SelectedVideo = {
   channelTitle: string;
 };
 
+// Step1YouTube
+export interface SurveyStep1 {
+  video: SelectedVideo | null;
+  startDate: string;
+  endDate: string;
+}
+
 // Step2Meta
 export type SurveyStep2 = {
   title: string;
@@ -57,6 +64,8 @@ export interface SurveyStep5 {
 interface SurveyState {
   selectedVideo: SelectedVideo | null;
   setSelectedVideo: (video: SelectedVideo | null) => void;
+  step1: SurveyStep1;
+  setStep1: (data: Partial<SurveyStep1>) => void;
   step2: SurveyStep2;
   setStep2: (data: Partial<SurveyStep2>) => void;
   step3: SurveyStep3;
@@ -70,6 +79,18 @@ interface SurveyState {
 export const useSurveyStore = create<SurveyState>((set) => ({
   selectedVideo: null,
   setSelectedVideo: (video) => set(() => ({ selectedVideo: video })),
+  step1: {
+    video: null,
+    startDate: "",
+    endDate: "",
+  },
+  setStep1: (data) =>
+    set((state) => ({
+      step1: {
+        ...state.step1,
+        ...data,
+      },
+    })),
   step2: {
     title: "",
     isReleased: true,
