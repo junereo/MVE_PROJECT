@@ -3,15 +3,15 @@ import { createTemplateHandler } from "../controllers/template.controller"
 const router = express.Router();
 
 // 목록
-router.get('/');
+// router.get('/');
 // 상세
-router.get('/:templateId');
+// router.get('/:templateId');
 // 생성
 router.post('/', createTemplateHandler);
 // 수정
-router.put('/:templateId');
+// router.put('/:templateId');
 // 삭제
-router.delete('/:templateId');
+// router.delete('/:templateId');
 
 
 export default router;
