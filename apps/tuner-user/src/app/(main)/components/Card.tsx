@@ -5,30 +5,30 @@ import Image from "next/image";
 const cardItems = [
   {
     id: 1,
-    image: "/images/slide1.jpeg",
-    artist: "가수1",
-    title: "제목1",
+    thumbnail_url: `https://i.ytimg.com/vi/LBHVOiw274A/sddefault.jpg`,
+    artist: "Beenzino (빈지노)",
+    title: "Fashion Hoarder (Feat. ZENE THE ZILLA)",
     period: "25.06.19 - 25.06.26",
   },
   {
     id: 2,
-    image: "/images/slide2.jpeg",
-    artist: "가수2",
-    title: "제목2",
+    thumbnail_url: `https://i.ytimg.com/vi/08h8u8Z9iJQ/sddefault.jpg`,
+    artist: "Beenzino (빈지노)",
+    title: "Aqua Man",
     period: "25.06.19 - 25.06.26",
   },
   {
     id: 3,
-    image: "/images/slide3.jpeg",
-    artist: "가수3",
-    title: "제목3",
+    thumbnail_url: `https://i.ytimg.com/vi/UDyPp9bkfD0/sddefault.jpg`,
+    artist: "DPR LIVE",
+    title: "Martini Blue",
     period: "25.06.19 - 25.06.26",
   },
   {
     id: 4,
-    image: "/images/slide4.jpeg",
-    artist: "가수4",
-    title: "제목4",
+    thumbnail_url: `https://i.ytimg.com/vi/ppudgIu2TaM/sddefault.jpg`,
+    artist: "Jazzyfact (재지팩트)",
+    title: "아까워",
     period: "25.06.19 - 25.06.26",
   },
 ];
@@ -41,13 +41,15 @@ export default function Card() {
           key={item.id}
           className="rounded-xl bg-white shadow hover:shadow-lg transition overflow-hidden"
         >
-          <Image
-            src={item.image}
-            alt={`card ${item.id}`}
-            width={120}
-            height={160}
-            className="w-full aspect-[3/4] object-cover"
-          />
+          <div className="relative w-full aspect-[16/9]">
+            <Image
+              src={item.thumbnail_url}
+              alt={`card ${item.id}`}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="w-full aspect-[3/4] object-cover"
+            />
+          </div>
           <div className="p-3 space-y-1">
             <p className="text-base font-semibold text-gray-900 truncate">
               {item.title}

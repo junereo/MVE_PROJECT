@@ -1,9 +1,9 @@
-import Wrapper from "@/components/layouts/Wrapper";
+import SurveyWrapper from "./components/layouts/SurveyWrapper";
 
 export default function SurveyCreateLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <Wrapper>{children}</Wrapper>;
+  return <SurveyWrapper>{children}</SurveyWrapper>;
 }

@@ -10,13 +10,16 @@ type Props = {
 export default function ListItem({ image, artist, title, period }: Props) {
   return (
     <div className="flex items-center gap-4 p-2 hover:shadow-md transition">
-      <Image
-        src={image}
-        alt={title}
-        width={60}
-        height={80}
-        className="rounded-md object-cover"
-      />
+      <div className="relative w-[100px] aspect-video rounded overflow-hidden">
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 300px"
+        />
+      </div>
+
       <div className="flex-1">
         <p className="text-sm font-semibold">{artist}</p>
         <p className="text-base font-bold">{title}</p>
