@@ -35,7 +35,7 @@ export default function LogoutButton({ onClose }: LogoutButtonProps) {
   return (
     <>
       <button onClick={handleOpen} className="text-sm hover:underline">
-        Logout
+        LOGOUT
       </button>
       {openModal && (
         <Modal

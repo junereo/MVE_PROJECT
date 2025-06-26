@@ -5,30 +5,30 @@ import ListItem from "../../../components/ui/ListItem";
 const ListItems = [
   {
     id: 1,
-    image: "/images/slide1.jpeg",
-    artist: "가수1",
-    title: "제목1",
+    thumbnail_url: `https://i.ytimg.com/vi/LBHVOiw274A/hqdefault.jpg`,
+    artist: "Beenzino (빈지노)",
+    title: "Fashion Hoarder (Feat. ZENE THE ZILLA)",
     period: "25.06.19 - 25.06.26",
   },
   {
     id: 2,
-    image: "/images/slide2.jpeg",
-    artist: "가수2",
-    title: "제목2",
+    thumbnail_url: `https://i.ytimg.com/vi/08h8u8Z9iJQ/hqdefault.jpg`,
+    artist: "Beenzino (빈지노)",
+    title: "Aqua Man",
     period: "25.06.19 - 25.06.26",
   },
   {
     id: 3,
-    image: "/images/slide3.jpeg",
-    artist: "가수3",
-    title: "제목3",
+    thumbnail_url: `https://i.ytimg.com/vi/UDyPp9bkfD0/hqdefault.jpg`,
+    artist: "DPR LIVE",
+    title: "Martini Blue",
     period: "25.06.19 - 25.06.26",
   },
   {
     id: 4,
-    image: "/images/slide4.jpeg",
-    artist: "가수4",
-    title: "제목4",
+    thumbnail_url: `https://i.ytimg.com/vi/ppudgIu2TaM/hqdefault.jpg`,
+    artist: "Jazzyfact (재지팩트)",
+    title: "아까워",
     period: "25.06.19 - 25.06.26",
   },
 ];
@@ -39,7 +39,7 @@ export default function List() {
       {ListItems.map((item) => (
         <ListItem
           key={item.id}
-          image={item.image}
+          image={item.thumbnail_url}
           artist={item.artist}
           title={item.title}
           period={item.period}
