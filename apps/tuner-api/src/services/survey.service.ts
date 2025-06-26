@@ -3,6 +3,7 @@ import {
     SurveyTags,
     SurveyActive,
     QuestionType,
+    SurveyType,
     Prisma,
 } from '@prisma/client';
 
@@ -17,12 +18,22 @@ const convertType = (t: string): QuestionType => {
     return 'text';
 };
 
-// 상태 계산
-const checkSurveyActive = (start: Date, end: Date): SurveyActive => {
+// 상태 계산 (KST 기준)
+const checkSurveyActive = (_start: Date | string, _end: Date | string): SurveyActive => {
     const now = new Date();
-    if (now < start) return 'upcoming';
-    if (now >= start && now <= end) return 'ongoing';
+    const start = new Date(_start);
+    const end = new Date(_end);
+
+    const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+
+    if (kstNow < start) return 'upcoming';
+    if (kstNow >= start && kstNow <= end) return 'ongoing';
     return 'closed';
+};
+
+// SurveyType 유효성 검사
+const isValidSurveyType = (value: any): value is SurveyType => {
+    return Object.values(SurveyType).includes(value);
 };
 
 // 설문 생성
@@ -39,19 +50,28 @@ export const createSurvey = async ({
         if (!userId && !adminId) {
             throw new Error("User 또는 Admin 중 하나는 반드시 존재해야 합니다.");
         }
+
         if (userId && adminId) {
             throw new Error("User와 Admin은 동시에 생성자로 들어올 수 없습니다.");
         }
 
+        // 타입 유효성 검사
+        if (!isValidSurveyType(body.type)) {
+            throw new Error(`잘못된 SurveyType입니다: ${body.type}`);
+        }
+
+        // 타입 캐스팅
+        const surveyType = body.type as SurveyType;
+
         return await prisma.$transaction(async (tx) => {
-            // 1. Music 저장
+            //  Music 저장
             const music = await tx.music.create({
                 data: {
                     title: body.title,
                     artist: body.artist,
                     release_date: body.release_date ? new Date(body.release_date) : undefined,
                     is_released: body.is_released,
-                    thumbnailUrl: body.thumbnailUrl,
+                    thumbnail_url: body.thumbnail_url,
                     sample_url: body.sample_url,
                     agency: '',
                     description: '',
@@ -59,34 +79,47 @@ export const createSurvey = async ({
                 },
             });
 
-            //  태그 필터링
+            // SurveyTags 추출 및 필터링
             const tagValues: SurveyTags[] = (Object.values(body.tags || {}) as string[])
                 .filter((v): v is SurveyTags =>
                     Object.values(SurveyTags).includes(v as SurveyTags)
                 );
 
-            //  설문 생성
+            //  reward 필수 검증 (공식 설문일 경우)
+            if (surveyType === SurveyType.official) {
+                if (
+                    body.reward == null ||
+                    body.expert_reward == null ||
+                    body.reward_amount == null
+                ) {
+                    throw new Error("공식 설문에는 reward, expert_reward, reward_amount 모두 필요합니다.");
+                }
+            }
+
             const startDate = new Date(body.start_at);
             const endDate = new Date(body.end_at);
 
+            // Survey 생성
             const survey = await tx.survey.create({
                 data: {
                     ...(userId ? { create_userId: userId } : {}),
                     ...(adminId ? { create_adminId: adminId } : {}),
                     music_id: music.id,
-                    type: body.type,
+                    type: surveyType,
                     start_at: startDate,
                     end_at: endDate,
-                    reward_amount: body.reward_amount,
-                    reward: body.reward,
-                    expert_reward: body.expert_reward,
                     is_active: checkSurveyActive(startDate, endDate),
                     tags: { set: tagValues },
                     status: 'draft',
+                    ...(surveyType === SurveyType.official && {
+                        reward: body.reward,
+                        expert_reward: body.expert_reward,
+                        reward_amount: body.reward_amount,
+                    }),
                 },
             });
 
-            // 설문 저장
+            //  Survey_Custom 저장
             const questions = Array.isArray(body.allQuestions)
                 ? body.allQuestions
                 : JSON.parse(body.allQuestions);

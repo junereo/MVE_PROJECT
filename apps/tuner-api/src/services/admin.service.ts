@@ -63,7 +63,7 @@ export const createAdmin = async (data: RegisterList) => {
 }
 
 export const getAdminService = async (req: AdminRequest) => {
-    const adminId = (req as any).user?.adminId;
+    const adminId = (req as any).admin?.adminId;
     if (!adminId) throw new Error('인증되지 않은 사용자입니다.');
 
     const admin = await prisma.admin.findUnique({

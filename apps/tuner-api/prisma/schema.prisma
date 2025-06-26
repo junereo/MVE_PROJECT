@@ -255,16 +255,16 @@ model Survey_Result {
 }
 
 model Music {
-  id           Int       @id @default(autoincrement())
-  title        String
-  artist       String
-  description  String
-  agency       String
-  release_date DateTime?
-  is_released  Boolean
-  thumbnailUrl String
-  sample_url   String
-  nft_token_id String
+  id            Int       @id @default(autoincrement())
+  title         String
+  artist        String
+  description   String
+  agency        String
+  release_date  DateTime?
+  is_released   Boolean
+  thumbnail_url String
+  sample_url    String
+  nft_token_id  String
 
   surveys Survey[]
 }
