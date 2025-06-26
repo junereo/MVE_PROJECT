@@ -9,7 +9,7 @@ const router = express.Router();
 // router.get('/:surveyId');
 // router.get('/:surveyId/results');
 router.post('/create', verifyUserOrAdmin, createSurveyHandler);
-// router.post('/:surveyId/responses');
+router.post('/:surveyId/responses');
 // router.put('/:surveyId/responses');
 
 export default router;
