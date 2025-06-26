@@ -19,10 +19,10 @@ const Dropdown = ({ options, selected, onSelect }: DropdownProps) => {
   };
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="relative inline-block text-left ">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-2 bg-white border rounded-md shadow-sm hover:bg-gray-100"
+        className="px-4 py-2  bg-white border rounded-md shadow-sm hover:bg-gray-100 min-w-[120px]"
       >
         {selected} ▼
       </button>
@@ -33,7 +33,7 @@ const Dropdown = ({ options, selected, onSelect }: DropdownProps) => {
             <li
               key={option}
               onClick={() => handleSelect(option)}
-              className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+              className="px-5 py-2 hover:bg-gray-200 cursor-pointer"
             >
               {option}
             </li>

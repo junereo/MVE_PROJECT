@@ -12,7 +12,9 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="w-full  text-black text-2xl py-3 ">dashboard</div>
+      <div className="w-full  text-black text-2xl py-3  font-bold">
+        Dashboard
+      </div>
       <div>
         <div className="p-6 space-y-6 w-[100%]">
           {/* 상단 요약 카드들 */}
