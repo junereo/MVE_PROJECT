@@ -4,7 +4,6 @@ interface SurveyNavigationProps {
   onPrev: () => void;
   onNext: () => void;
 }
-
 export default function SurveyNavigation({
   tabIndex,
   totalTabs,
@@ -13,6 +12,7 @@ export default function SurveyNavigation({
 }: SurveyNavigationProps) {
   return (
     <div className="flex justify-between mt-12">
+      {/* 이전 버튼은 항상 보여줌, 비활성화만 */}
       <button
         onClick={onPrev}
         disabled={tabIndex === 0}
@@ -20,13 +20,16 @@ export default function SurveyNavigation({
       >
         이전
       </button>
-      <button
-        onClick={onNext}
-        disabled={tabIndex >= totalTabs - 1}
-        className="px-4 py-2 bg-black text-white rounded disabled:opacity-50"
-      >
-        다음
-      </button>
+
+      {/* 다음 버튼은 조건부로 렌더링 */}
+      {tabIndex < totalTabs - 1 && (
+        <button
+          onClick={onNext}
+          className="px-4 py-2 bg-black text-white rounded"
+        >
+          다음
+        </button>
+      )}
     </div>
   );
 }

@@ -45,11 +45,11 @@ export default function YoutubeSearch() {
             검색
           </button>
         </div>
-        <div className="flex gap-7  w-full items-center w-min[1000px]">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {videos.map((video) => (
             <div
               key={video.videoId}
-              className="mb-6 cursor-pointer "
+              className="cursor-pointer bg-white shadow-md hover:shadow-lg rounded-lg overflow-hidden transition-shadow"
               onClick={() => {
                 const query = new URLSearchParams({
                   videoId: video.videoId,
@@ -57,18 +57,24 @@ export default function YoutubeSearch() {
                   thumbnail: video.thumbnail,
                   channelTitle: video.channelTitle,
                 }).toString();
-
                 router.push(`/survey/create/step1?${query}`);
               }}
             >
-              <img
-                src={video.thumbnail}
-                alt={video.title}
-                className="rounded  w-[300px] h-[200px]"
-              />
-              <p className="text-blue-600 underline block mt-2">
-                {video.title}
-              </p>
+              <div className="w-full aspect-video bg-gray-200 overflow-hidden">
+                <img
+                  src={video.thumbnail}
+                  alt={video.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <p className="text-black font-medium line-clamp-2 hover:underline">
+                  {video.title}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {video.channelTitle}
+                </p>
+              </div>
             </div>
           ))}
         </div>

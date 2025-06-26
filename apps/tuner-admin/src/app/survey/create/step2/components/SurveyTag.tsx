@@ -22,7 +22,6 @@ const TagCreate = () => {
   useEffect(() => {
     const tags = Object(predefinedTags);
     setStep2({ tags });
-    console.log(tags);
   }, [setStep2]);
 
   return (

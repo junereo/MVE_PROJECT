@@ -42,7 +42,7 @@ export default function SurveyQuestionBase({
         ))}
       </div>
 
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4">
+      {/* <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4">
         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
           <button
             key={num}
@@ -52,7 +52,7 @@ export default function SurveyQuestionBase({
             {num}
           </button>
         ))}
-      </div>
+      </div> */}
 
       {showCustomButton && (
         <div className="text-right">

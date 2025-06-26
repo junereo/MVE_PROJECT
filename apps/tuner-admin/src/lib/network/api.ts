@@ -1,4 +1,4 @@
-import { SurveyCreatePayload } from "@/types";
+import { SurveyCreatePayload, TemplateType } from "@/types";
 
 import axiosClient from "@/lib/network/axios";
 
@@ -57,8 +57,14 @@ export const serveyTemplate = async () => {
 };
 
 // 설문 템플릿 생성 page
-export const createTemplate = async () => {
-  await axiosClient.post("/template/create");
+export const createTemplate = async (formData: TemplateType) => {
+  await axiosClient.post("/template", formData);
+};
+
+//템플릿 불러오기
+export const fetchTemplates = async () => {
+  const response = await axiosClient.get("/template");
+  return response.data;
 };
 
 // 설문 템플릿 상세 조회
