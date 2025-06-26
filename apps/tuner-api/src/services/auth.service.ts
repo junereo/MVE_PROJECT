@@ -17,7 +17,7 @@ const defaultCookieOptions: CookieOptions = {
 };
 
 type LoginUser = {
-    id: number;
+    id: String;
     nickname: string;
 };
 

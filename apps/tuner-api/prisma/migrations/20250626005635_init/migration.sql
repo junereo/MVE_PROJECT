@@ -23,7 +23,7 @@ CREATE TYPE "SurveyType" AS ENUM ('general', 'official');
 CREATE TYPE "SurveyTags" AS ENUM ('감각적인', '화려한', '감성적인', '몽환적인', '트렌디한', '복고풍', '중독성있는', '잔잔한', '역동적인', '독창적인');
 
 -- CreateEnum
-CREATE TYPE "QuestionType" AS ENUM ('text', 'multiple_choice', 'likert', 'ranking');
+CREATE TYPE "QuestionType" AS ENUM ('text', 'multiple_choice', 'check_box');
 
 -- CreateEnum
 CREATE TYPE "SurveyActive" AS ENUM ('upcoming', 'ongoing', 'closed');
@@ -110,6 +110,7 @@ CREATE TABLE "Admin" (
 -- CreateTable
 CREATE TABLE "Survey" (
     "id" SERIAL NOT NULL,
+    "survey_title" TEXT NOT NULL,
     "create_userId" TEXT,
     "create_adminId" TEXT,
     "music_id" INTEGER NOT NULL,

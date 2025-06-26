@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 회원 등급
 enum UserLevel {
   Regular
   Expert
@@ -46,6 +47,7 @@ enum OAuthProvider {
   // 필요 시 naver, apple 등등 추가
 }
 
+// 설문 타입
 enum SurveyType {
   general
   official
@@ -64,11 +66,11 @@ enum SurveyTags {
   독창적인
 }
 
+// 커스텀 설문 옵
 enum QuestionType {
   text
   multiple_choice
-  likert
-  ranking
+  check_box
 }
 
 enum SurveyActive {
@@ -82,6 +84,7 @@ enum SurveyStatus {
   complete //완료
 }
 
+// 설문 기간
 enum EndedBy {
   expired // 기간 종료
   outOfRewards // 보상 소진
@@ -89,14 +92,14 @@ enum EndedBy {
 }
 
 enum RewardStatus {
-  pending
-  completed
-  failed
+  pending // 대기중
+  completed // 완료
+  failed //실패
 }
 
 enum RewardType {
-  normal
-  expert
+  normal // 일반
+  expert // 익스퍼트
 }
 
 enum SbtType {
@@ -104,9 +107,10 @@ enum SbtType {
   token
 }
 
+// 보상 지급
 enum SbtCondition {
-  auto
-  manual
+  auto // 자동발급
+  manual // 수동발급
 }
 
 model User {
@@ -177,6 +181,8 @@ model Admin {
 
 model Survey {
   id               Int          @id @default(autoincrement())
+  template_id      Int
+  survey_title     String
   create_userId    String?
   create_adminId   String?
   music_id         Int
@@ -199,8 +205,9 @@ model Survey {
   director      Admin?             @relation("SurveyDirector", fields: [create_adminId], references: [id])
   responses     Survey_Responses[]
   result        Survey_Result?
-  Survey_Custom Survey_Custom[]
-  Music         Music              @relation(fields: [music_id], references: [id])
+  survey_custom Survey_Custom[]
+  music         Music              @relation(fields: [music_id], references: [id])
+  template      Survey_Template    @relation(fields: [template_id], references: [id])
 
   Rewards Rewards[]
 }
@@ -225,6 +232,8 @@ model Survey_Template {
   template      Json
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+
+  survey Survey[]
 }
 
 model Survey_Custom {
