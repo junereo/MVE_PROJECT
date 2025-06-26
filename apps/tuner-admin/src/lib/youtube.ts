@@ -10,7 +10,7 @@ export const fetchYoutubeVideos = async (query: string) => {
       part: "snippet",
       q: query,
       type: "video",
-      maxResults: 5,
+      maxResults: 8,
       key: API_KEY,
     },
   });

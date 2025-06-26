@@ -10,5 +10,6 @@ router.post("/signup", adminRegister);
 router.post("/login", adminLogin);
 router.post('/logout', logout);
 router.post('/me', verifyAdmin, getAdminController);
+// router.get('/survey',)
 
 export default router; 
