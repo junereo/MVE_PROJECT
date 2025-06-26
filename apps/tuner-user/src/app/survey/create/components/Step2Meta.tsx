@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import Select from "@/components/ui/Select";
-import DatePicker from "./DatePicker";
+import DatePicker from "../../components/DataPicker";
+import Dropdown from "@/components/ui/DropDown";
 
 interface Step2Props {
   onPrev: () => void;
@@ -12,31 +13,52 @@ interface Step2Props {
 }
 
 const genreOptions = [
-  { value: "rnb", label: "R&B" },
-  { value: "hiphop", label: "Hip-Hop" },
-  { value: "pop", label: "Pop" },
-  { value: "ballad", label: "Ballad" },
-  { value: "indie", label: "Indie" },
+  { value: "Ballad", label: "발라드" },
+  { value: "Dance", label: "댄스" },
+  { value: "Pop", label: "팝" },
+  { value: "Jazz", label: "재즈" },
+  { value: "Korean traditional music", label: "국악" },
+  { value: "CCM", label: "CCM" },
 ];
 
 export default function Step2Meta({ onPrev, onNext }: Step2Props) {
+  const { step2, setStep2 } = useSurveyStore();
+
+  const [surveyTitle, setSurveyTitle] = useState(step2.survey_title);
   const [releaseType, setReleaseType] = useState<
     "released" | "unreleased" | null
-  >(null);
-  const [releaseDate, setReleaseDate] = useState<Date | null>(null);
-  const [genre, setGenre] = useState<string | null>(null);
+  >(step2.is_released ? "released" : "unreleased");
+  const [releaseDate, setReleaseDate] = useState<Date | null>(
+    step2.release_date ? new Date(step2.release_date) : null
+  );
+  const [genre, setGenre] = useState<string | undefined>(step2.genre);
+
+  const handleNext = () => {
+    setStep2({
+      survey_title: surveyTitle,
+      is_released: releaseType === "released",
+      release_date: releaseDate?.toISOString() || "",
+      genre,
+    });
+
+    onNext();
+  };
 
   return (
     <>
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex  bg-white text-black border border-red-500 z-30flex items-center justify-between px-4 py-3">
+      <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
         <button onClick={onPrev}>←</button>
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
-      </div>
-      <div className="p-4 space-y-6">
+      </header>
+
+      <div className="space-y-4 min-h-screen">
         <h2 className="text-xl font-bold">Step 2: 음원 정보</h2>
-
-        <Input label="설문 제목" placeholder="예) 6월 감성 R&B 설문" />
-
+        <Input
+          label="설문 제목"
+          placeholder="예) 6월 감성 R&B 설문"
+          value={surveyTitle}
+          onChange={(e) => setSurveyTitle(e.target.value)}
+        />
         <div className="space-y-2">
           <div className="text-sm font-medium">음원 상태</div>
           <div className="flex gap-2">
@@ -54,7 +76,21 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
             </Button>
           </div>
         </div>
-
+        <div className="space-y-2">
+          <div className="text-sm font-medium">음악 장르</div>
+          <Dropdown
+            options={genreOptions.map((g) => g.label)}
+            selected={
+              genreOptions.find((g) => g.value === genre)?.label || "장르 선택"
+            }
+            onSelect={(label) => {
+              const selectedGenre = genreOptions.find((g) => g.label === label);
+              if (selectedGenre) {
+                setGenre(selectedGenre.value);
+              }
+            }}
+          />
+        </div>
         {releaseType === "released" && (
           <DatePicker
             label="발매일"
@@ -62,20 +98,16 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
             onChange={(date) => setReleaseDate(date)}
           />
         )}
+      </div>
 
-        <Select
-          label="음악 장르"
-          options={genreOptions}
-          value={genre}
-          onChange={(value) => setGenre(value)}
-          placeholder="장르 선택"
-        />
-
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
+        <div className="w-[140px] sm:w-[200px]">
           <Button onClick={onPrev} color="white">
             이전
           </Button>
-          <Button onClick={onNext} color="blue">
+        </div>
+        <div className="w-[180px] sm:w-[400px]">
+          <Button onClick={handleNext} color="blue">
             다음
           </Button>
         </div>

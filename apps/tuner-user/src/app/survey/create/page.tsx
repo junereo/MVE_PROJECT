@@ -1,6 +1,6 @@
 "use client";
 
-import { useFunnel } from "@/features/servey/hooks/useFunnel";
+import { useFunnel } from "@/features/survey/hooks/useFunnel";
 import Step1YouTube from "./components/Step1YouTube";
 import Step2Meta from "./components/Step2Meta";
 import Step3Type from "./components/Step3Type";
@@ -10,9 +10,11 @@ import Step5Custom from "./components/Step5Custom";
 type Step = "step1" | "step2" | "step3" | "step4" | "step5";
 
 export default function SurveyCreatePage() {
-  const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
+  const steps: Step[] = ["step1", "step2", "step3", "step4", "step5"];
+  const { Funnel, setStep, currentStep } = useFunnel<Step>(steps, "step1");
+
   return (
-    <div className="max-w-lg mx-auto py-8">
+    <div className="mx-auto py-8">
       <Funnel>
         <Funnel.Step name="step1">
           <Step1YouTube onNext={() => setStep("step2")} />
@@ -40,7 +42,7 @@ export default function SurveyCreatePage() {
         </Funnel.Step>
       </Funnel>
 
-      <p className="text-center text-sm text-gray-400 mt-4">
+      <p className="text-center text-sm text-gray-400">
         현재 단계: {currentStep}
       </p>
     </div>
