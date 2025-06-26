@@ -25,9 +25,10 @@ export const fetchYoutubeVideos = async (query: string) => {
       id: { videoId: string };
     }) => ({
       title: item.snippet.title,
-      thumbnail: item.snippet.thumbnails.medium.url,
-      videoId: item.id.videoId,
+      artist: item.snippet.channelTitle,
+      thumbnail_url: item.snippet.thumbnails.medium.url,
       channelTitle: item.snippet.channelTitle,
+      sample_url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
     })
   );
 };

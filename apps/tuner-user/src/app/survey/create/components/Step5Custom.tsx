@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import type { CustomQuestion } from "@/features/survey/store/useSurveyStore";
 import { QuestionTypeEnum } from "@/features/survey/types/enums";
-import { useSubmitSurvey } from "@/features/survey/hooks/useSubmitSurvey";
+import { formatSurveyPayload } from "@/features/survey/utils/formatSurveyPayload";
+import { createSurvey } from "@/features/survey/services/createSurvey";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import CustomForm from "../../components/CustomForm";
@@ -23,7 +24,6 @@ const typeOptions = [
 
 export default function Step5Custom({ onPrev }: Step5Props) {
   const { setStep5 } = useSurveyStore();
-  const { submit } = useSubmitSurvey();
   const [questions, setQuestions] = useState<CustomQuestion[]>([
     {
       id: 1,
@@ -123,11 +123,19 @@ export default function Step5Custom({ onPrev }: Step5Props) {
     );
   };
 
+  useEffect(() => {
+    const payload = formatSurveyPayload();
+    console.log("🧪 테스트용 payload:", payload);
+  }, []);
+
   // !-완료 시 상태 저장 및 전체 설문 api 요청-!
   const handleSubmit = async () => {
     setStep5({ customQuestions: questions });
     try {
-      await submit();
+      const payload = formatSurveyPayload();
+      console.log("payload", payload);
+      await createSurvey(payload);
+
       // 설문 생성
       setModalContent({
         image: "check.png",
@@ -137,7 +145,6 @@ export default function Step5Custom({ onPrev }: Step5Props) {
       });
       setIsModalOpen(true);
     } catch (err) {
-      console.error("설문 제출 실패", err);
       // 설문 생성 실패
       setModalContent({
         image: "x.png",

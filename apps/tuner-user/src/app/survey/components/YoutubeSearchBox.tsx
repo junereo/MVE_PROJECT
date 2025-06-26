@@ -41,7 +41,7 @@ export default function YoutubeSearchBox() {
       {selectedVideo ? (
         <div className="space-y-2 mt-4">
           <iframe
-            src={`https://www.youtube.com/embed/${selectedVideo.videoId}`}
+            src={selectedVideo.sample_url}
             className="w-full h-[200px] rounded"
             allowFullScreen
           />
@@ -58,12 +58,12 @@ export default function YoutubeSearchBox() {
         <div className="grid grid-cols-2 gap-4 mt-2">
           {videos.map((video) => (
             <div
-              key={video.videoId}
+              key={video.artist}
               className="cursor-pointer border p-2 rounded"
               onClick={() => setSelectedVideo(video)}
             >
               <img
-                src={video.thumbnail}
+                src={video.thumbnail_url}
                 alt={video.title}
                 className="w-full h-[140px] object-cover rounded"
               />

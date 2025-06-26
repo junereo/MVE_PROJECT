@@ -1,15 +1,12 @@
 import { create } from "zustand";
-import {
-  SurveyTypeEnum,
-  SurveyCategoryEnum,
-  QuestionTypeEnum,
-} from "../types/enums";
+import { SurveyTypeEnum, QuestionTypeEnum } from "../types/enums";
 
 // YouTube
 export type SelectedVideo = {
   artist: string;
   title: string;
   thumbnail_url: string;
+  sample_url: string;
   channelTitle: string;
 };
 
@@ -36,17 +33,6 @@ export type SurveyStep3 = {
   expert_reward: number;
 };
 
-// Step4Default
-export type SurveyStep4 = {
-  questions: Record<
-    SurveyCategoryEnum,
-    {
-      question: string;
-      options: string[];
-    }
-  >;
-};
-
 // Step5Custom
 export type CustomQuestion = {
   id: number;
@@ -68,8 +54,6 @@ interface SurveyState {
   setStep2: (data: Partial<SurveyStep2>) => void;
   step3: SurveyStep3;
   setStep3: (data: Partial<SurveyStep3>) => void;
-  step4: SurveyStep4;
-  setStep4: (data: Partial<SurveyStep4>) => void;
   step5: SurveyStep5;
   setStep5: (data: SurveyStep5) => void;
 }
@@ -112,22 +96,6 @@ export const useSurveyStore = create<SurveyState>((set) => ({
     set((state) => ({
       step3: {
         ...state.step3,
-        ...data,
-      },
-    })),
-  step4: {
-    questions: {
-      [SurveyCategoryEnum.ORIGINALITY]: { question: "", options: [] },
-      [SurveyCategoryEnum.POPULARITY]: { question: "", options: [] },
-      [SurveyCategoryEnum.SUSTAINABILITY]: { question: "", options: [] },
-      [SurveyCategoryEnum.EXPANDABILITY]: { question: "", options: [] },
-      [SurveyCategoryEnum.STARDOM]: { question: "", options: [] },
-    },
-  },
-  setStep4: (data: Partial<SurveyStep4>) =>
-    set((state) => ({
-      step4: {
-        ...state.step4,
         ...data,
       },
     })),
