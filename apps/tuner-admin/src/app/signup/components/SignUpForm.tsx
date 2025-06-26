@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { AdminRole } from "@/types";
 import axiosInstance from "@/lib/network/axios";
 import { useState } from "react";
 import {
@@ -16,15 +17,18 @@ const SignUpForm = () => {
     password: "",
     confirmPassword: "",
     phone_number: "",
-    role: 1,
+    role: AdminRole.admin,
   });
 
   const [errors, setErrors] = useState<SignupFormErrors>({});
 
-  const handleChange = (field: keyof SignupFormData, value: string) => {
+  const handleChange = (
+    field: keyof SignupFormData,
+    value: string | number
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
 
-    const error = validateSignupField(field, value, {
+    const error = validateSignupField(field, value as string, {
       ...formData,
       [field]: value,
     });
@@ -34,6 +38,7 @@ const SignUpForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors = allSignupFields(formData);
+
     setErrors(newErrors);
 
     const hasError = Object.values(newErrors).some((err) => err !== "");
@@ -59,7 +64,10 @@ const SignUpForm = () => {
 
   const pushOauth = async (formData: SignupFormData) => {
     const { confirmPassword, ...payload } = formData;
+    console.log(formData);
+
     const res = await axiosInstance.post("/admin/signup", payload);
+
     return res.data;
   };
 
@@ -141,30 +149,52 @@ const SignUpForm = () => {
               )}
             </div>
 
-            <div className="flex items-center justify-end gap-4">
-              <div className="text-[#ff3131]">관리자 권한 설정</div>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="role"
-                  value="admin"
-                  onChange={() => handleChange("role", "1")}
-                  className="accent-black"
-                />
-                <span>admin</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="role"
-                  value="superadmin"
-                  onChange={() => handleChange("role", "0")}
-                  className="accent-black"
-                />
-                <span>superadmin</span>
-              </label>
-            </div>
+            <div className="flex items-center justify-between gap-4 mt-6">
+              <span className="text-sm text-gray-300 font-medium">
+                🛡 관리자 권한 설정
+              </span>
+              <div className="flex gap-3">
+                <label
+                  className={`cursor-pointer px-4 py-2 rounded border text-sm font-semibold flex items-center gap-1 transition
+                  ${
+                    formData.role === 1
+                      ? "bg-white text-black border-white shadow"
+                      : "bg-transparent text-white border-gray-400 hover:border-white"
+                  }
+                `}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="1"
+                    className="hidden"
+                    onChange={() => handleChange("role", AdminRole.admin)}
+                    checked={formData.role === 1}
+                  />
+                  {formData.role === 1} admin
+                </label>
 
+                <label
+                  className={`cursor-pointer px-4 py-2 rounded border text-sm font-semibold flex items-center gap-1 transition
+                    ${
+                      formData.role === 0
+                        ? "bg-white text-black border-white shadow"
+                        : "bg-transparent text-white border-gray-400 hover:border-white"
+                    }
+                  `}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="0"
+                    className="hidden"
+                    onChange={() => handleChange("role", AdminRole.superadmin)} // ✅ 숫자로
+                    checked={formData.role === 0}
+                  />
+                  {formData.role === 0} Superadmin
+                </label>
+              </div>
+            </div>
             <button
               type="submit"
               className="w-full bg-[#888888] py-2 rounded font-semibold hover:bg-[#726d6d]"
