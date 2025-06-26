@@ -59,7 +59,6 @@ export const createSurvey = async ({
             throw new Error(`잘못된 SurveyType입니다: ${body.type}`);
         }
 
-        // 타입 캐스팅
         const surveyType = body.type as SurveyType;
 
         return await prisma.$transaction(async (tx) => {
@@ -84,7 +83,7 @@ export const createSurvey = async ({
                     Object.values(SurveyTags).includes(v as SurveyTags)
                 );
 
-            //  reward 필수 검증 (공식 설문일 경우)
+            //  reward 필수 검증 (오피셜 설문일 경우)
             if (surveyType === SurveyType.official) {
                 if (
                     body.reward == null ||
