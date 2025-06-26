@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import YoutubeSearchBox from "../../components/YoutubeSearchBox";
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
 import DateRangePicker from "../../components/DateRangePicker";
 import Link from "next/link";
 
@@ -29,12 +28,12 @@ export default function Step1YouTube({ onNext }: Step1Props) {
 
   return (
     <>
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex bg-white text-black border border-red-500 z-30 items-center justify-between px-4 py-3">
+      <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
         <button>
           <Link href="/survey">←</Link>
         </button>
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
-      </div>
+      </header>
 
       <div className="space-y-4 min-h-screen">
         <h2 className="text-xl font-bold">Step 1: 유튜브</h2>
@@ -51,7 +50,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
         />
       </div>
 
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] p-3 flex items-center bg-white text-black border border-green-700 z-30 justify-end">
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
         <Button onClick={handleNext} color="blue">
           다음
         </Button>

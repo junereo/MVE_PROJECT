@@ -39,10 +39,10 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
 
   return (
     <>
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex  bg-white text-black border border-red-500 z-30 items-center justify-between px-4 py-3">
+      <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
         <button onClick={onPrev}>←</button>
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
-      </div>
+      </header>
 
       <div className="space-y-4 min-h-screen">
         <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
@@ -102,13 +102,13 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] p-3 flex items-center bg-white text-black border border-green-700 z-30 justify-end gap-3">
-        <div className="flex-[1.5]">
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
+        <div className="w-[140px] sm:w-[200px]">
           <Button onClick={onPrev} color="white">
             이전
           </Button>
         </div>
-        <div className="flex-[2]">
+        <div className="w-[180px] sm:w-[400px]">
           <Button onClick={handleNext} color="blue">
             다음
           </Button>

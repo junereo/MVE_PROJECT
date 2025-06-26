@@ -123,17 +123,12 @@ export default function Step5Custom({ onPrev }: Step5Props) {
     );
   };
 
-  useEffect(() => {
-    const payload = formatSurveyPayload();
-    console.log("🧪 테스트용 payload:", payload);
-  }, []);
-
   // !-완료 시 상태 저장 및 전체 설문 api 요청-!
   const handleSubmit = async () => {
     setStep5({ customQuestions: questions });
     try {
       const payload = formatSurveyPayload();
-      console.log("payload", payload);
+
       await createSurvey(payload);
 
       // 설문 생성
@@ -158,10 +153,10 @@ export default function Step5Custom({ onPrev }: Step5Props) {
 
   return (
     <>
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex  bg-white text-black border border-red-500 z-30 items-center justify-between px-4 py-3">
+      <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
         <button onClick={onPrev}>←</button>
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
-      </div>
+      </header>
 
       <div className="space-y-4 min-h-screen">
         {isModalOpen && (
@@ -174,7 +169,9 @@ export default function Step5Custom({ onPrev }: Step5Props) {
             color={modalContent.image === "check.png" ? "blue" : "red"}
           />
         )}
-        <h2 className="text-xl font-bold">Step 5: 커스텀 설문</h2>
+        <h2 className="text-xl font-bold">
+          Step 5: 커스텀 설문 <span className="text-red-500">(선택)</span>
+        </h2>
 
         <div className="space-y-2">
           <CustomForm
@@ -189,15 +186,18 @@ export default function Step5Custom({ onPrev }: Step5Props) {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] p-3 flex items-center bg-white text-black border border-green-700 z-30 justify-end gap-3">
-        <div className="flex-[1.5]">
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
+        <div className="w-[100px] sm:w-[200px]">
           <Button onClick={onPrev} color="white">
             이전
           </Button>
         </div>
-        <div className="flex-[2]">
+        <div className="w-[140px] sm:w-[200px]">
+          <Button color="white">임시저장</Button>
+        </div>
+        <div className="w-[180px] sm:w-[400px]">
           <Button onClick={handleSubmit} color="blue">
-            설문 생성
+            생성 완료
           </Button>
         </div>
       </div>
