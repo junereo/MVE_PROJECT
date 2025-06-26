@@ -1,4 +1,9 @@
 export type SurveyType = "general" | "official";
+
+export enum AdminRole {
+  superadmin = 0,
+  admin = 1,
+}
 // 로그인
 export interface LoginFormData {
   email: string;
@@ -44,7 +49,17 @@ export interface SignupFormData {
   confirmPassword: string;
   name: string;
   phone_number: string;
-  role: string | number;
+  role: AdminRole;
 }
 // 회원가입 데이터 에러
 export type SignupFormErrors = Partial<Record<keyof SignupFormData, string>>;
+
+// 템플릿 데이터
+export interface TemplateQuestion {
+  question_text: string;
+  options: string[];
+}
+export interface TemplateType {
+  template_name: string;
+  template: Record<string, TemplateQuestion[]>;
+}

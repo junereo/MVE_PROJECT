@@ -4,7 +4,7 @@ type SurveyType = "general" | "official";
 
 // 설문 생성 1단계 정보 구조 정의
 type SurveyStep1 = {
-  surveyTitle: string; //설문 제목
+  survey_title: string; //설문 제목
   youtubeVideoId: string; // 유튜브 영상 ID
   youtubeTitle: string; // 유튜브 영상 제목
   youtubeThumbnail: string; // 유튜브 영상 썸네일
@@ -38,11 +38,12 @@ type SurveyStep2 = {
   };
   tags: { [key: string]: string };
   selectedTags: string[];
+  template_id?: number;
   customQuestions: {
     id: number;
-    text: string;
+    question_text: string;
     options: string[];
-    type: string;
+    question_type: string;
   }[];
   categoryQuestions: Record<string, any[]>; // 템플릿에서 자동 주입된 기본 설문 문항들
 };
@@ -62,7 +63,7 @@ interface SurveyState {
 // Zustand 스토어 생성
 export const useSurveyStore = create<SurveyState>((set) => ({
   step1: {
-    surveyTitle: "",
+    survey_title: "",
     youtubeVideoId: "",
     youtubeTitle: "",
     youtubeThumbnail: "",

@@ -10,12 +10,16 @@ export default function Navigate() {
   const pathname = usePathname(); // ✅ 현재 경로 가져오기
 
   const navItems = [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Survey", href: "/survey/create/step1" },
-    { label: "Sign up", href: "/signup" },
-    { label: "Template", href: "/template" },
-    { label: "My Page", href: "/mypage" },
-    { label: "Wallet", href: "/wallet" },
+    { label: "Dashboard", href: "/dashboard", activePath: "/dashboard" },
+    {
+      label: "Survey",
+      href: "/survey",
+      activePath: "/survey",
+    },
+    { label: "Sign up", href: "/signup", activePath: "/signup" },
+    { label: "Template", href: "/template", activePath: "/template" },
+    { label: "My Page", href: "/mypage", activePath: "/mypage" },
+    { label: "Wallet", href: "/wallet", activePath: "/wallet" },
   ];
 
   return (
@@ -40,7 +44,7 @@ export default function Navigate() {
         <div className="text-[#888888] font-bold text-lg p-4">네비게이션</div>
         <ul className="space-y-2 px-4">
           {navItems.map((item) => {
-            const isActive = pathname.startsWith(item.href); // ✅ 현재 경로와 비교
+            const isActive = pathname.startsWith(item.activePath);
 
             return (
               <li key={item.href}>

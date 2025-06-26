@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useSurveyStore } from "@/store/useSurveyCreateStore";
 import { useRouter } from "next/navigation";
@@ -7,8 +8,8 @@ import SurveyQuestionBase from "@/app/survey/create/step2/components/SurveyQuest
 import SurveyCustomForm from "@/app/survey/create/step2/components/SurveyCustomForm";
 import SurveyActions from "@/app/survey/create/step2/components/SurveyActions";
 import SurveyNavigation from "@/app/survey/create/step2/components/SurveyNavigation";
-import templates from "@/app/template/components/Templates";
 import TagCreate from "./components/SurveyTag";
+import { fetchTemplates } from "@/lib/network/api";
 
 export default function SurveyStep2() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function SurveyStep2() {
   const [tabIndex, setTabIndex] = useState(0);
   const [customTabCreated, setCustomTabCreated] = useState(false);
 
-  // 기본 탭 + 커스텀 탭 구성
+  // 전체 탭 구성 (기본 + 커스텀)
   const allTabs = [
     ...baseCategories,
     ...(customTabCreated ? [{ key: "custom", label: "커스텀" }] : []),
@@ -36,46 +37,67 @@ export default function SurveyStep2() {
   const isStardomTab = currentTab.key === "stardom";
   const isCustomTab = currentTab.key === "custom";
 
-  // 설문 항목 상태 (기본 질문 및 커스텀 질문)
+  // 질문 타입 정의
   type Question = {
-    id: number; // 질문 ID
-    text: string;
-    type: string;
+    id: number;
+    question_text: string;
+    question_type: string;
     options: string[];
   };
+
+  // 기본 설문 문항 상태
   const [categoryQuestions, setCategoryQuestions] = useState<
     Record<string, Question[]>
   >({});
+
+  // 커스텀 문항 상태
   const [customQuestions, setCustomQuestions] = useState([
-    { id: 1, text: "", type: "multiple", options: ["", "", "", ""] },
+    {
+      id: 1,
+      question_text: "",
+      question_type: "multiple",
+      options: ["", "", "", ""],
+    },
   ]);
 
-  // 질문 타입 옵션 정의
+  // 질문 유형 옵션 정의
   const typeOptions = [
     { label: "객관식", value: "multiple" },
     { label: "체크박스형", value: "checkbox" },
     { label: "서술형", value: "subjective" },
-  ] as const;
+  ];
   type QuestionType = (typeof typeOptions)[number]["value"];
 
-  // 최초 렌더링 시 템플릿 불러와서 상태에 주입
+  // 템플릿 불러오기 (최초 렌더링 시 실행)
   useEffect(() => {
-    const initialQuestions: Record<string, Question[]> = {};
-    for (const cat of baseCategories) {
-      const list = templates[cat.key] || [];
-      initialQuestions[cat.key] = list.map((q, i) => ({
-        id: i, // id가 없으면 랜덤으로 생성
-        text: q.question,
-        type: "multiple",
-        options: q.options,
-      }));
-    }
-    setCategoryQuestions(initialQuestions);
-    // JSON 형태로 템플릿 키 저장
-    setTemplateSetKey(JSON.stringify(initialQuestions));
+    const loadTemplate = async () => {
+      try {
+        const data = await fetchTemplates();
+        const template = data.template;
+
+        // 카테고리별 질문 변환 및 상태 저장
+        const parsed: Record<string, Question[]> = {};
+        baseCategories.forEach((cat) => {
+          const list = template?.[cat.key] || [];
+          parsed[cat.key] = list.map((q: any, i: number) => ({
+            id: i,
+            text: q.text || q.question,
+            type: q.type || "multiple",
+            options: q.options || [],
+          }));
+        });
+
+        setCategoryQuestions(parsed);
+        setTemplateSetKey(JSON.stringify(parsed));
+      } catch (err) {
+        console.error("템플릿 불러오기 실패:", err);
+      }
+    };
+
+    loadTemplate();
   }, []);
 
-  //커스텀 탭 생성 (스타성 탭에서 버튼 누르면 활성화)
+  // 커스텀 탭 생성 (스타성 탭에서 생성 버튼 클릭 시)
   const createCustomTab = () => {
     if (!customTabCreated) {
       setCustomTabCreated(true);
@@ -83,23 +105,28 @@ export default function SurveyStep2() {
     }
   };
 
-  //커스텀 질문 추가
+  // 커스텀 문항 추가
   const addCustomQuestion = () => {
     const newId = customQuestions.length + 1;
     setCustomQuestions([
       ...customQuestions,
-      { id: newId, text: "", type: "multiple", options: ["", "", "", ""] },
+      {
+        id: newId,
+        question_text: "",
+        question_type: "multiple",
+        options: ["", "", "", ""],
+      },
     ]);
   };
 
-  //커스텀 질문 텍스트 수정
-  const handleQuestionChange = (index: number, text: string) => {
+  // 커스텀 질문 텍스트 변경
+  const handleQuestionChange = (index: number, question_text: string) => {
     setCustomQuestions((prev) =>
-      prev.map((q, i) => (i === index ? { ...q, text } : q))
+      prev.map((q, i) => (i === index ? { ...q, question_text } : q))
     );
   };
 
-  //커스텀 질문 옵션 수정
+  // 커스텀 질문 옵션 변경
   const handleOptionChange = (
     qIndex: number,
     optIndex: number,
@@ -119,14 +146,14 @@ export default function SurveyStep2() {
     );
   };
 
-  //커스텀 질문 타입 변경 (객관식/서술형/체크박스)
+  // 커스텀 질문 타입 변경
   const handleTypeChange = (index: number, newType: string) => {
     setCustomQuestions((prev) =>
       prev.map((q, i) =>
         i === index
           ? {
               ...q,
-              type: newType as QuestionType,
+              question_type: newType as QuestionType,
               options:
                 newType === "subjective"
                   ? []
@@ -139,7 +166,7 @@ export default function SurveyStep2() {
     );
   };
 
-  //객관식 옵션 추가 (최대 8개)
+  // 객관식 선택지 추가 (최대 8개)
   const handleAddOption = (qIndex: number) => {
     setCustomQuestions((prev) =>
       prev.map((q, i) => {
@@ -155,12 +182,13 @@ export default function SurveyStep2() {
     );
   };
 
-  //설문 완료 → Zustand 상태 저장 + 완료 페이지로 이동
+  // 설문 완료 → Zustand에 저장 후 다음 페이지로 이동
   const handleComplete = () => {
     setStep2({ customQuestions });
     router.push("/survey/create/complete");
   };
 
+  // 탭 다음/이전 이동
   const goNext = () => {
     if (tabIndex < allTabs.length - 1) setTabIndex(tabIndex + 1);
   };
@@ -170,29 +198,29 @@ export default function SurveyStep2() {
 
   return (
     <div>
-      <div className="w-full  text-black font-bold text-2xl py-3 ">
+      <div className="w-full text-black font-bold text-2xl py-3">
         Survey create Step2
       </div>
-      <div className="p-6 ">
-        <div className=" w-[50%] min-h-[800px] pb-[20px] rounded-xl max-w-[485px] md:max-w-3xl bg-white px-4 sm:px-6 md:px-8">
-          {/* 상단 탭 영역 */}
+      <div className="p-6">
+        <div className="w-[50%] min-h-[800px] pb-[20px] rounded-xl max-w-[485px] md:max-w-3xl bg-white px-4 sm:px-6 md:px-8">
+          {/* 탭 컴포넌트 */}
           <SurveyTabs tabs={allTabs} current={tabIndex} setTab={setTabIndex} />
 
-          {/* 음원 타이틀 */}
+          {/* 음원 제목 */}
           <h1 className="text-lg md:text-2xl font-bold mb-4 pt-[30px]">
-            🎵 {step1.title?.trim() || step1.youtubeTitle || "제목 없음"}에 대한
-            설문
+            🎵 {step1.title || step1.youtubeTitle || "제목 없음"}
           </h1>
 
-          {/* 해시태그 입력 */}
+          {/* 해시태그 선택 */}
           <TagCreate />
-          {/* 기본 카테고리 */}
+
+          {/* 기본 카테고리 탭 또는 커스텀 탭 */}
           {!isCustomTab ? (
             <>
-              {/* 기본 질문 출력 */}
+              {/* 기본 질문 리스트 */}
               {(categoryQuestions[currentTab.key] || []).map((q) => (
                 <div key={q.id} className="mb-6 border p-4 rounded">
-                  <p className="font-medium mb-1">{q.text}</p>
+                  <p className="font-medium mb-1">{q.question_text}</p>
                   {q.options.map((opt: string, i: number) => (
                     <div key={i} className="text-sm text-gray-600">
                       ⦿ {opt}
@@ -200,7 +228,8 @@ export default function SurveyStep2() {
                   ))}
                 </div>
               ))}
-              {/* 점수 영역 + 커스텀 버튼 */}
+
+              {/* 점수입력 + 커스텀 탭 생성 버튼 */}
               <SurveyQuestionBase
                 label={currentTab.label}
                 showCustomButton={isStardomTab && !customTabCreated}
@@ -208,10 +237,10 @@ export default function SurveyStep2() {
               />
             </>
           ) : (
-            // 커스텀 탭 영역
+            // 커스텀 질문 입력 UI
             <SurveyCustomForm
               questions={customQuestions}
-              typeOptions={[...typeOptions]}
+              typeOptions={typeOptions}
               onAdd={addCustomQuestion}
               onChangeText={handleQuestionChange}
               onChangeType={handleTypeChange}
@@ -220,14 +249,15 @@ export default function SurveyStep2() {
             />
           )}
 
-          {/* 하단 이동 네비게이션 */}
+          {/* 네비게이션 (이전/다음 탭 이동) */}
           <SurveyNavigation
             tabIndex={tabIndex}
             totalTabs={allTabs.length}
             onPrev={goBack}
             onNext={goNext}
           />
-          {/* 완료 버튼 영역 */}
+
+          {/* 마지막 탭일 때만 완료/임시저장 버튼 표시 */}
           {(isStardomTab || isCustomTab) && (
             <SurveyActions onTempSave={() => {}} onComplete={handleComplete} />
           )}

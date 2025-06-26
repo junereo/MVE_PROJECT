@@ -4,18 +4,18 @@ import Dropdown from "@/app/components/ui/DropDown";
 
 interface CustomQuestion {
   id: number;
-  text: string;
-  type: string;
+  question_text: string;
+  question_type: string;
   options: string[];
 }
 
 interface SurveyCustomFormProps {
   questions: CustomQuestion[];
-  typeOptions: { label: string; value: string }[];
+  typeOptions: { label: string; value: string }[]; // readonly 제거
   onAdd: () => void;
-  onChangeText: (index: number, value: string) => void;
+  onChangeText: (index: number, text: string) => void;
   onChangeType: (index: number, type: string) => void;
-  onChangeOption: (qIndex: number, oIndex: number, value: string) => void;
+  onChangeOption: (qIndex: number, optIndex: number, value: string) => void;
   onAddOption: (qIndex: number) => void;
 }
 
@@ -55,7 +55,7 @@ export default function SurveyCustomForm({
             <Dropdown
               options={typeOptions.map((o) => o.label)}
               selected={
-                typeOptions.find((o) => o.value === q.type)?.label ??
+                typeOptions.find((o) => o.value === q.question_type)?.label ??
                 "유형 선택"
               }
               onSelect={(label: string) => {
@@ -70,12 +70,12 @@ export default function SurveyCustomForm({
             type="text"
             placeholder="질문을 입력해주세요"
             className="w-full mb-3 p-2 border rounded"
-            value={q.text}
+            value={q.question_text}
             onChange={(e) => onChangeText(qIndex, e.target.value)}
           />
 
           {/* 객관식 or 체크박스형 */}
-          {q.type === "multiple" || q.type === "checkbox" ? (
+          {q.question_type === "multiple" || q.question_type === "checkbox" ? (
             <div className="space-y-2">
               {q.options.map((opt, optIndex) => (
                 <input
@@ -91,7 +91,7 @@ export default function SurveyCustomForm({
               ))}
 
               {/* checkbox 선택지 추가 버튼 (5개 미만일 때만 표시) */}
-              {q.type === "checkbox" && q.options.length < 5 && (
+              {q.question_type === "checkbox" && q.options.length < 5 && (
                 <button
                   type="button"
                   onClick={() => onAddOption(qIndex)}

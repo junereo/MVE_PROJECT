@@ -35,7 +35,6 @@ const SurveyStep1 = () => {
   ) => {
     setStep1({ [field]: value });
   };
-  // 내일 설문제목 추가하기
   return (
     <div>
       <div className="w-full font-bold text-black text-2xl py-3 ">
@@ -57,6 +56,15 @@ const SurveyStep1 = () => {
           <div className="flex flex-col md:flex-row gap-6 mt-4">
             {/* 제목 + 아티스트 입력 */}
             <div className="flex-1">
+              <div className="font-bold text-lg pb-2">설문 제목</div>
+              <input
+                value={step1.survey_title || ""}
+                onChange={(e) =>
+                  handleInputChange("survey_title", e.target.value)
+                }
+                placeholder={"설문 제목 을 입력해주세요"}
+                className="border p-2 w-full"
+              />
               <div className="font-bold text-lg pb-2">곡 제목</div>
               <input
                 value={step1.title || ""}
