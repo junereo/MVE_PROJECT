@@ -12,9 +12,8 @@ const prisma = new PrismaClient();
 // QuestionType 매핑
 const convertType = (t: string): QuestionType => {
     if (t === 'multiple' || t === 'checkbox') return 'multiple_choice';
+    if (t === 'checkbox') return 'check_box';
     if (t === 'subjective') return 'text';
-    if (t === 'likert') return 'likert';
-    if (t === 'ranking') return 'ranking';
     return 'text';
 };
 
@@ -60,7 +59,6 @@ export const createSurvey = async ({
             throw new Error(`잘못된 SurveyType입니다: ${body.type}`);
         }
 
-        // 타입 캐스팅
         const surveyType = body.type as SurveyType;
 
         return await prisma.$transaction(async (tx) => {
@@ -85,7 +83,7 @@ export const createSurvey = async ({
                     Object.values(SurveyTags).includes(v as SurveyTags)
                 );
 
-            //  reward 필수 검증 (공식 설문일 경우)
+            //  reward 필수 검증 (오피셜 설문일 경우)
             if (surveyType === SurveyType.official) {
                 if (
                     body.reward == null ||
@@ -104,6 +102,8 @@ export const createSurvey = async ({
                 data: {
                     ...(userId ? { create_userId: userId } : {}),
                     ...(adminId ? { create_adminId: adminId } : {}),
+                    survey_title: body.survey_title,
+                    template_id: body.template_id ?? 1,
                     music_id: music.id,
                     type: surveyType,
                     start_at: startDate,
