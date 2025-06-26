@@ -17,16 +17,22 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const [surveyType, setSurveyType] = useState<SurveyTypeEnum>(
     step3.surveyType ?? SurveyTypeEnum.OFFICIAL
   );
-  const [rewardAmount, setRewardAmount] = useState(step3.reward_amount);
-  const [reward, setReward] = useState(step3.reward);
-  const [expertReward, setExpertReward] = useState(step3.expert_reward);
+  const [rewardAmount, setRewardAmount] = useState(
+    step3.reward_amount ? String(step3.reward_amount) : ""
+  );
+  const [reward, setReward] = useState(
+    step3.reward ? String(step3.reward) : ""
+  );
+  const [expertReward, setExpertReward] = useState(
+    step3.expert_reward ? String(step3.expert_reward) : ""
+  );
 
   const handleNext = () => {
     setStep3({
       surveyType,
-      reward_amount: rewardAmount,
-      reward,
-      expert_reward: expertReward,
+      reward_amount: Number(rewardAmount),
+      reward: Number(reward),
+      expert_reward: Number(expertReward),
     });
     onNext();
   };
@@ -68,21 +74,21 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
               label="리워드 총량"
               type="number"
               value={rewardAmount}
-              onChange={(e) => setRewardAmount(Number(e.target.value))}
+              onChange={(e) => setRewardAmount(e.target.value)}
               placeholder="리워드 총량을 입력해주세요."
             />
             <Input
               label="일반 회원 리워드"
               type="number"
               value={reward}
-              onChange={(e) => setReward(Number(e.target.value))}
+              onChange={(e) => setReward(e.target.value)}
               placeholder="일반 회원에게 지급할 리워드를 입력해주세요."
             />
             <Input
               label="Expert 회원 리워드"
               type="number"
               value={expertReward}
-              onChange={(e) => setExpertReward(Number(e.target.value))}
+              onChange={(e) => setExpertReward(e.target.value)}
               placeholder="Expert 회원에게 지급할 리워드를 입력해주세요."
             />
           </>

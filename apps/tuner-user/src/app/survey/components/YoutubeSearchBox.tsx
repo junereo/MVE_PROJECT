@@ -6,6 +6,7 @@ import {
   useSurveyStore,
   SelectedVideo,
 } from "@/features/survey/store/useSurveyStore";
+import Input from "@/components/ui/Input";
 
 export default function YoutubeSearchBox() {
   const [query, setQuery] = useState("");
@@ -41,11 +42,32 @@ export default function YoutubeSearchBox() {
       {selectedVideo ? (
         <div className="space-y-2 mt-4">
           <iframe
-            src={selectedVideo.sample_url}
+            src={selectedVideo.select_url}
             className="w-full h-[200px] rounded"
             allowFullScreen
           />
-          <h3 className="font-bold">{selectedVideo.title}</h3>
+          <Input
+            label="곡 제목"
+            value={selectedVideo?.title || ""}
+            onChange={(e) =>
+              setSelectedVideo({
+                ...selectedVideo,
+                title: e.target.value,
+              })
+            }
+            placeholder="곡 제목을 입력해주세요."
+          />
+          <Input
+            label="아티스트"
+            value={selectedVideo?.artist || ""}
+            onChange={(e) =>
+              setSelectedVideo({
+                ...selectedVideo,
+                artist: e.target.value,
+              })
+            }
+            placeholder="아티스트명을 입력해주세요."
+          />
           <button
             className="text-blue-500 underline text-sm mt-2"
             onClick={() => setSelectedVideo(null)}

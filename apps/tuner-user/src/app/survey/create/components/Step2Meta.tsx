@@ -13,11 +13,12 @@ interface Step2Props {
 }
 
 const genreOptions = [
-  { value: "rnb", label: "R&B" },
-  { value: "hiphop", label: "Hip-Hop" },
-  { value: "pop", label: "Pop" },
-  { value: "ballad", label: "Ballad" },
-  { value: "indie", label: "Indie" },
+  { value: "Ballad", label: "발라드" },
+  { value: "Dance", label: "댄스" },
+  { value: "Pop", label: "팝" },
+  { value: "Jazz", label: "재즈" },
+  { value: "Korean traditional music", label: "국악" },
+  { value: "CCM", label: "CCM" },
 ];
 
 export default function Step2Meta({ onPrev, onNext }: Step2Props) {

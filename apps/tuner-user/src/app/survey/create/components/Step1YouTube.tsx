@@ -40,17 +40,6 @@ export default function Step1YouTube({ onNext }: Step1Props) {
         <h2 className="text-xl font-bold">Step 1: 유튜브</h2>
         <YoutubeSearchBox />
 
-        <Input
-          label="곡 제목"
-          value={selectedVideo?.title || ""}
-          placeholder="곡 제목을 입력해주세요."
-        />
-        <Input
-          label="아티스트"
-          value={selectedVideo?.channelTitle || ""}
-          placeholder="아티스트명을 입력해주세요."
-        />
-
         <DateRangePicker
           label="설문 기간"
           startDate={startDate}

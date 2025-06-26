@@ -8,6 +8,7 @@ export type SelectedVideo = {
   thumbnail_url: string;
   sample_url: string;
   channelTitle: string;
+  select_url: string;
 };
 
 // Step1YouTube
