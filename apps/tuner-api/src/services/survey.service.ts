@@ -12,8 +12,9 @@ const prisma = new PrismaClient();
 // QuestionType 매핑
 const convertType = (t: string): QuestionType => {
     if (t === 'multiple' || t === 'checkbox') return 'multiple_choice';
-    if (t === 'checkbox') return 'check_box';
     if (t === 'subjective') return 'text';
+    if (t === 'likert') return 'likert';
+    if (t === 'ranking') return 'ranking';
     return 'text';
 };
 
@@ -31,7 +32,7 @@ const checkSurveyActive = (_start: Date | string, _end: Date | string): SurveyAc
 };
 
 // SurveyType 유효성 검사
-const isValidSurveyType = (value: any): value is SurveyType => {
+const isSurveyType = (value: any): value is SurveyType => {
     return Object.values(SurveyType).includes(value);
 };
 
@@ -55,10 +56,11 @@ export const createSurvey = async ({
         }
 
         // 타입 유효성 검사
-        if (!isValidSurveyType(body.type)) {
-            throw new Error(`잘못된 SurveyType입니다: ${body.type}`);
+        if (!isSurveyType(body.type)) {
+            throw new Error(`잘못된 설문 타입 입니다: ${body.type}`);
         }
 
+        // 타입 캐스팅
         const surveyType = body.type as SurveyType;
 
         return await prisma.$transaction(async (tx) => {
@@ -83,7 +85,7 @@ export const createSurvey = async ({
                     Object.values(SurveyTags).includes(v as SurveyTags)
                 );
 
-            //  reward 필수 검증 (오피셜 설문일 경우)
+            //  reward 필수 검증 (공식 설문일 경우)
             if (surveyType === SurveyType.official) {
                 if (
                     body.reward == null ||
@@ -102,8 +104,6 @@ export const createSurvey = async ({
                 data: {
                     ...(userId ? { create_userId: userId } : {}),
                     ...(adminId ? { create_adminId: adminId } : {}),
-                    survey_title: body.survey_title,
-                    template_id: body.template_id ?? 1,
                     music_id: music.id,
                     type: surveyType,
                     start_at: startDate,
@@ -111,6 +111,8 @@ export const createSurvey = async ({
                     is_active: checkSurveyActive(startDate, endDate),
                     tags: { set: tagValues },
                     status: 'draft',
+                    survey_title: body.survey_title,
+                    template_id: body.template_id,
                     ...(surveyType === SurveyType.official && {
                         reward: body.reward,
                         expert_reward: body.expert_reward,
@@ -143,7 +145,7 @@ export const createSurvey = async ({
             return survey;
         });
     } catch (error) {
-        console.error("survey 생성 에러:", error);
+        console.error("설문 생성 에러:", error);
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             console.error("Prisma Error Code:", error.code);
             console.error("Meta:", error.meta);
@@ -151,3 +153,4 @@ export const createSurvey = async ({
         throw error;
     }
 };
+

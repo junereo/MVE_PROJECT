@@ -110,6 +110,7 @@ CREATE TABLE "Admin" (
 -- CreateTable
 CREATE TABLE "Survey" (
     "id" SERIAL NOT NULL,
+    "template_id" INTEGER NOT NULL,
     "survey_title" TEXT NOT NULL,
     "create_userId" TEXT,
     "create_adminId" TEXT,
@@ -274,6 +275,9 @@ ALTER TABLE "Survey" ADD CONSTRAINT "Survey_create_adminId_fkey" FOREIGN KEY ("c
 
 -- AddForeignKey
 ALTER TABLE "Survey" ADD CONSTRAINT "Survey_music_id_fkey" FOREIGN KEY ("music_id") REFERENCES "Music"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Survey" ADD CONSTRAINT "Survey_template_id_fkey" FOREIGN KEY ("template_id") REFERENCES "Survey_Template"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Survey_Responses" ADD CONSTRAINT "Survey_Responses_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
