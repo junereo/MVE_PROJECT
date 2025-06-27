@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import Sidebar from "./sidebar";
+import Menubar from "./Menubar";
 import Image from "next/image";
 
 export default function Header() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [MenubarOpen, setMenubarOpen] = useState(false);
 
   return (
     <>
@@ -27,7 +27,7 @@ export default function Header() {
             />
           </Link>
           <button
-            onClick={() => setSidebarOpen(true)}
+            onClick={() => setMenubarOpen(true)}
             aria-label="Open menu"
             className="text-xl font-bold text-gray-800 hover:text-black transition"
           >
@@ -35,7 +35,7 @@ export default function Header() {
           </button>
         </nav>
       </header>
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Menubar isOpen={MenubarOpen} onClose={() => setMenubarOpen(false)} />
     </>
   );
 }
