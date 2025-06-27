@@ -4,8 +4,8 @@ const router = express.Router();
 
 // 목록
 // router.get('/');
-// 상세
-// router.get('/:templateId');
+// 상세 조회
+router.get('/:templateId',);
 // 생성
 router.post("/", createTemplateHandler);
 // 수정
