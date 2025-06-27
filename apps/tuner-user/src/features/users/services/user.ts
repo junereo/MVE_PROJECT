@@ -6,11 +6,11 @@ export const getUSerInfo = async () => {
   return response; // nickname, email, simple_password, level, wallet_Address, balance
 };
 
-// 내 정보 수정
-export const updateUSerInfo = async (data: {}) => {
-  const response = await axios.put("/users/me", data);
-  return response; // nickname, phone_number, simple_passwoard
-};
+// // 내 정보 수정
+// export const updateUSerInfo = async (data: {}) => {
+//   const response = await axios.put("/users/me", data);
+//   return response; // nickname, phone_number, simple_passwoard
+// };
 
 // 설문 참여 내역
 export const getUserParticipations = async () => {
@@ -24,7 +24,7 @@ export const getUserSurveys = async () => {
   return response;
 };
 
-// 리워드 내역
-export const getUserReward = async () => {
-  const response = await axios.get("/users/me/rewards");
-};
+// // 리워드 내역
+// export const getUserReward = async () => {
+//   // const response = await axios.get("/users/me/rewards");
+// };
