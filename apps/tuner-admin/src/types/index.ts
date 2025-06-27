@@ -19,7 +19,7 @@ export interface SurveyCreatePayload {
   is_released: boolean;
   thumbnail_url: string;
   sample_url: string;
-  channel_title: string;
+  channelTitle: string;
   genre: string;
 
   // 설문 정보

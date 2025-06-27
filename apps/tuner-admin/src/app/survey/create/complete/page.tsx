@@ -44,7 +44,7 @@ export default function SurveyComplete() {
     is_released: step1.isReleased,
     thumbnail_url: step1.youtubeThumbnail,
     sample_url: step1.url,
-    channel_title: step1.channel_title,
+    channelTitle: step1.channelTitle,
     genre: step1.genre,
     // 설문 정보
     start_at: step1.start_at,
@@ -53,7 +53,7 @@ export default function SurveyComplete() {
     reward_amount: step1.reward_amount ?? 0,
     reward: step1.reward ?? 0,
     expert_reward: step1.expertReward ?? 0,
-    templateSetKey: step1.templateSetKey,
+    templateSetKey: step1.templateSetKey, // 템플릿 내용
     evaluationScores: step2.answers,
     tags: step2.tags,
     //템플릿 정보
@@ -97,7 +97,7 @@ export default function SurveyComplete() {
               className="w-60 mt-2 rounded"
             />
             <p className="text-sm text-gray-600">
-              채널명: {step1.channel_title}
+              채널명: {step1.channelTitle}
             </p>
           </div>
 

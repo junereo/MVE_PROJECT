@@ -1,261 +1,290 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useState } from "react";
-import Link from "next/link";
-import Dropdown from "@/app/components/ui/DropDown";
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 
-// 타입 정의
-interface SurveyItem {
-  id: number;
-  survey_title: string;
-  title: string; // 음원명
-  start_at: string;
-  end_at: string;
-  is_active: "예정" | "진행중" | "종료";
-  surveyType: "general" | "official";
-  participantCount: number;
-  reward_amount?: number;
-}
+// 더미 데이터
+const youtubeId = "dQw4w9WgXcQ";
+const surveyTitle = "미래소년 OST 감성 평가";
+const youtubeTitle = "미래소년 - My Star";
+const channelTitle = "미래소년 공식채널";
+console.log(channelTitle);
 
-const statusOptions = ["전체 상태", "예정", "진행중", "종료"];
-const typeOptions = ["전체 유형", "일반 설문", "리워드 설문"];
+const author = { nickname: "musicfan99", id: "user_33", type: "official" };
+const reward = { total: 500, normal: 10, expert: 20 };
+const status = "종료";
+console.log(status);
 
-// 20개 메타데이터 샘플
-const dummySurveys: SurveyItem[] = Array.from({ length: 20 }, (_, i) => {
-  const id = 20 - i;
-  const statuses = ["예정", "진행중", "종료"] as const;
-  const types = ["general", "official"] as const;
-  return {
-    id,
-    survey_title: `설문 제목 ${id}`,
-    title: `음원 ${id}`,
-    start_at: "2025-06-01",
-    end_at: "2025-06-30",
-    is_active: statuses[id % 3],
-    surveyType: types[id % 2],
-    participantCount: Math.floor(Math.random() * 100),
-    reward_amount: id % 2 === 1 ? undefined : 100 + id * 5,
-  };
-});
+const questions = [
+  "이 곡의 작품성은 뛰어난가요?",
+  "대중성 있는 멜로디라고 생각하십니까?",
+  "지속적으로 듣고 싶은 음악인가요?",
+  "이 곡의 확장 가능성이 높다고 보십니까?",
+  "아티스트의 스타성이 느껴지나요?",
+];
 
-export default function SurveyListPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("전체 상태");
-  const [typeFilter, setTypeFilter] = useState("전체 유형");
-  const [sortNewestFirst, setSortNewestFirst] = useState(true);
+const radarData = [
+  { category: "작품성", 남성: 4.6, 여성: 3.4 },
+  { category: "대중성", 남성: 3.2, 여성: 4.1 },
+  { category: "지속성", 남성: 3.2, 여성: 2.9 },
+  { category: "확장성", 남성: 4.5, 여성: 4.1 },
+  { category: "스타성", 남성: 4.7, 여성: 3.5 },
+];
+
+const ageDistribution = [
+  { age: "10대", count: 9 },
+  { age: "20대", count: 27 },
+  { age: "30대", count: 28 },
+  { age: "40대", count: 10 },
+  { age: "50대+", count: 15 },
+];
+
+const participants = Array.from({ length: 40 }, (_, i) => ({
+  id: i + 1,
+  nickname: `user_${i + 1}`,
+  grade: i % 4 === 0 ? "Expert" : "일반",
+  reward: i % 4 === 0 ? reward.expert : reward.normal,
+}));
+
+export default function SurveyDetailPage() {
+  const { id } = useParams();
+  console.log(id);
+
+  const [gradeFilter, setGradeFilter] = useState("전체");
   const [currentPage, setCurrentPage] = useState(1);
-  const surveysPerPage = 10;
+  const perPage = 20;
 
-  const filteredSurveys = dummySurveys
-    .filter((survey) => {
-      const matchTitle = survey.survey_title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchMusic = survey.title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchStatus =
-        statusFilter === "전체 상태" || survey.is_active === statusFilter;
-      const matchType =
-        typeFilter === "전체 유형" ||
-        (typeFilter === "일반 설문" && survey.surveyType === "general") ||
-        (typeFilter === "리워드 설문" && survey.surveyType === "official");
-      return (matchTitle || matchMusic) && matchStatus && matchType;
-    })
-    .sort((a, b) => (sortNewestFirst ? b.id - a.id : a.id - b.id));
+  const filteredParticipants =
+    gradeFilter === "전체"
+      ? participants
+      : participants.filter((p) => p.grade === gradeFilter);
 
-  const totalPages = Math.ceil(filteredSurveys.length / surveysPerPage);
-  const paginatedSurveys = filteredSurveys.slice(
-    (currentPage - 1) * surveysPerPage,
-    currentPage * surveysPerPage
+  const totalPages = Math.ceil(filteredParticipants.length / perPage);
+  const pageData = filteredParticipants.slice(
+    (currentPage - 1) * perPage,
+    currentPage * perPage
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">설문 리스트</h1>
-        <Link href="/survey/create/step1">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded">
-            + 설문 만들기
-          </button>
-        </Link>
+    <div className="p-6 max-w-[1400px] mx-auto flex flex-col md:flex-row gap-6">
+      {/* 왼쪽 */}
+      <div className="flex-1 flex flex-col space-y-4">
+        {/* 설문 제목 */}
+        <h1 className="text-2xl font-bold">{surveyTitle}</h1>
+
+        {/* 유튜브 영상 + 작성자 정보 레이아웃 */}
+        <div className="flex flex-col md:flex-row md:items-start gap-4 border-t pt-4">
+          {/* 유튜브 영상 */}
+          <div className="rounded overflow-hidden aspect-[3/2] md:w-[480px] w-full border">
+            <iframe
+              src={`https://www.youtube.com/embed/${youtubeId}`}
+              allowFullScreen
+              className="w-full h-full"
+            />
+          </div>
+
+          {/* 작성자 및 설문 정보 */}
+          <div className="text-sm space-y-2 w-full md:w-auto flex-1">
+            <p className="text-gray-800 font-semibold">
+              👤 작성자: <span className="text-black">{author.nickname}</span> (
+              {author.id})
+            </p>
+            <p className="text-gray-800 font-semibold">
+              📘 설문 유형:{" "}
+              <span
+                className={
+                  author.type === "official"
+                    ? "text-green-600 font-bold"
+                    : "text-gray-700"
+                }
+              >
+                {author.type === "official" ? "리워드 설문" : "일반 설문"}
+              </span>
+            </p>
+
+            {author.type === "official" && (
+              <>
+                <p className="text-gray-800 font-semibold">
+                  💰 총 리워드:{" "}
+                  <span className="text-black">{reward.total} STK</span>
+                </p>
+                <p className="text-gray-700">
+                  지급 완료:{" "}
+                  <span className="text-blue-700 font-semibold">
+                    {participants.reduce((acc, cur) => acc + cur.reward, 0)} STK
+                  </span>{" "}
+                  / 잔여:{" "}
+                  <span className="text-red-600 font-semibold">
+                    {reward.total -
+                      participants.reduce(
+                        (acc, cur) => acc + cur.reward,
+                        0
+                      )}{" "}
+                    STK
+                  </span>
+                </p>
+                <p className="text-xs text-gray-600">
+                  일반 유저: {reward.normal} STK / Expert: {reward.expert} STK
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* 유튜브 제목 및 링크 */}
+        <div className="flex items-center justify-between text-sm text-gray-700 mt-2">
+          <p className="font-medium truncate">{youtubeTitle}</p>
+          <a
+            href={`https://www.youtube.com/watch?v=${youtubeId}`}
+            target="_blank"
+            className="text-blue-600 underline"
+          >
+            유튜브에서 보기
+          </a>
+        </div>
+
+        {/* 설문 결과 시각화 */}
+        <div className="border-t pt-4 space-y-3">
+          <h2 className="font-semibold text-lg">설문 결과</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 오각형 그래프 */}
+            <div>
+              <p className="text-sm mb-1 text-center font-medium">
+                성별별 평균 점수
+              </p>
+              <RadarChart
+                outerRadius={90}
+                width={300}
+                height={250}
+                data={radarData}
+                className="mx-auto"
+              >
+                <PolarGrid />
+                <PolarAngleAxis dataKey="category" />
+                <PolarRadiusAxis angle={30} domain={[0, 5]} />
+                {/* 점수 보여주기 */}
+                <Tooltip />
+                <Radar
+                  name="남성"
+                  dataKey="남성"
+                  stroke="#3b82f6"
+                  fill="#3b82f6"
+                  fillOpacity={0.3}
+                />
+                <Radar
+                  name="여성"
+                  dataKey="여성"
+                  stroke="#ec4899"
+                  fill="#ec4899"
+                  fillOpacity={0.3}
+                />
+                <Legend />
+              </RadarChart>
+            </div>
+
+            {/* 막대 그래프 */}
+            <div>
+              <p className="text-sm mb-1 text-center font-medium">
+                연령대별 참여자 수
+              </p>
+              <BarChart width={300} height={250} data={ageDistribution}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="age" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#10b981" />
+              </BarChart>
+            </div>
+          </div>
+        </div>
+
+        {/* 질문 아코디언 */}
+        <div className="mt-2 space-y-2">
+          <h2 className="text-lg font-bold">질문 리스트</h2>
+          {questions.map((q, i) => (
+            <details key={i} className="border rounded px-4 py-2">
+              <summary className="cursor-pointer font-medium">
+                Q{i + 1}. {q}
+              </summary>
+              <div className="text-sm text-gray-600 mt-2">
+                이 문항은 사용자들의 성실도 평가에 활용됩니다.
+              </div>
+            </details>
+          ))}
+        </div>
       </div>
 
-      {/* 검색 및 필터 */}
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="설문 제목 또는 음원명 검색"
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setCurrentPage(1);
-          }}
-          className="border p-2 w-full md:w-1/2"
-        />
-        <Dropdown
-          options={statusOptions}
-          selected={statusFilter}
-          onSelect={(value) => {
-            setStatusFilter(value);
-            setCurrentPage(1);
-          }}
-        />
-        <Dropdown
-          options={typeOptions}
-          selected={typeFilter}
-          onSelect={(value) => {
-            setTypeFilter(value);
-            setCurrentPage(1);
-          }}
-        />
-      </div>
-
-      {/* 정렬 버튼 */}
-      <div className="mb-2 text-right text-sm">
-        <button
-          onClick={() => {
-            setSortNewestFirst((prev) => !prev);
-            setCurrentPage(1);
-          }}
-          className="text-blue-600 hover:underline"
-        >
-          {sortNewestFirst ? "▼ 최신순" : "▲ 오래된순"}
-        </button>
-      </div>
-
-      {/* 테이블 형식 목록 */}
-      <div className="overflow-x-auto">
+      {/* 오른쪽 - 참여자 테이블 */}
+      <div className="w-full md:w-[420px]">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-lg font-bold">참여자 리스트</h2>
+          <select
+            value={gradeFilter}
+            onChange={(e) => {
+              setCurrentPage(1);
+              setGradeFilter(e.target.value);
+            }}
+            className="border p-1 text-sm"
+          >
+            <option value="전체">전체</option>
+            <option value="일반">일반</option>
+            <option value="Expert">Expert</option>
+          </select>
+        </div>
         <table className="w-full border text-sm text-center">
           <thead className="bg-gray-100">
             <tr>
               <th className="border px-2 py-1">ID</th>
-              <th className="border px-2 py-1">설문 제목</th>
-              <th className="border px-2 py-1">음원명</th>
-              <th className="border px-2 py-1">설문 기간</th>
-              <th className="border px-2 py-1">상태</th>
-              <th className="border px-2 py-1">유형</th>
-              <th className="border px-2 py-1">참여 인원</th>
+              <th className="border px-2 py-1">닉네임</th>
+              <th className="border px-2 py-1">등급</th>
+              <th className="border px-2 py-1">리워드</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedSurveys.map((survey) => (
-              <tr key={survey.id} className="hover:bg-gray-50">
-                <td className="border px-2 py-1">{survey.id}</td>
-                <td className="border px-2 py-1 text-left pl-3">
-                  {survey.survey_title}
-                </td>
-                <td className="border px-2 py-1 text-left pl-3">
-                  {survey.title}
-                </td>
-                <td className="border px-2 py-1">
-                  {survey.start_at} ~ {survey.end_at}
-                </td>
-                <td className="border px-2 py-1">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium
-										${
-                      survey.is_active === "예정"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : survey.is_active === "진행중"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-200 text-gray-700"
-                    }`}
-                  >
-                    {survey.is_active}
-                  </span>
-                </td>
-                <td className="border px-2 py-1">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium
-										${
-                      survey.surveyType === "official"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {survey.surveyType === "official"
-                      ? "리워드 설문"
-                      : "일반 설문"}
-                  </span>
-                </td>
-                <td className="border px-2 py-1">
-                  {survey.participantCount}명
-                </td>
+            {pageData.map((user) => (
+              <tr key={user.id} className="hover:bg-gray-50">
+                <td className="border px-2 py-1">{user.id}</td>
+                <td className="border px-2 py-1">{user.nickname}</td>
+                <td className="border px-2 py-1">{user.grade}</td>
+                <td className="border px-2 py-1">{user.reward} STK</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
 
-      {/* 페이지네이션 (그대로 유지) */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex justify-center items-center gap-2 text-sm">
-          <button
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-            className="px-2 py-1 rounded border bg-white hover:bg-gray-100 disabled:text-gray-400"
-          >
-            «
-          </button>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-2 py-1 rounded border bg-white hover:bg-gray-100 disabled:text-gray-400"
-          >
-            ＜
-          </button>
-          {Array.from({ length: totalPages })
-            .map((_, i) => i + 1)
-            .filter((pageNum) => {
-              if (totalPages <= 7) return true;
-              if (
-                pageNum === 1 ||
-                pageNum === totalPages ||
-                Math.abs(currentPage - pageNum) <= 1
-              )
-                return true;
-              if (pageNum === currentPage - 2 || pageNum === currentPage + 2)
-                return false;
-              return false;
-            })
-            .map((pageNum, index, arr) => {
-              const prev = arr[index - 1];
-              const showEllipsis = prev && pageNum - prev > 1;
-              return (
-                <span key={pageNum} className="flex items-center">
-                  {showEllipsis && <span className="px-1">...</span>}
-                  <button
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === pageNum
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                </span>
-              );
-            })}
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-            className="px-2 py-1 rounded border bg-white hover:bg-gray-100 disabled:text-gray-400"
-          >
-            ＞
-          </button>
-          <button
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-            className="px-2 py-1 rounded border bg-white hover:bg-gray-100 disabled:text-gray-400"
-          >
-            »
-          </button>
-        </div>
-      )}
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <div className="mt-4 flex justify-center gap-2">
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`px-3 py-1 text-sm rounded ${
+                  currentPage === i + 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-800"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

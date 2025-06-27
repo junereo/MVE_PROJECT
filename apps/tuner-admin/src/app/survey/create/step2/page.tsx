@@ -21,7 +21,7 @@ interface RawTemplateQuestion {
 }
 export default function SurveyStep2() {
   const router = useRouter();
-  const { step1, setStep2, setTemplateSetKey } = useSurveyStore();
+  const { step2, step1, setStep2, setTemplateSetKey } = useSurveyStore();
 
   // 기본 설문 카테고리 정의
   const baseCategories = [
@@ -81,8 +81,12 @@ export default function SurveyStep2() {
     const loadTemplate = async () => {
       try {
         const templateId = 1;
-        const data = await fetchTemplates(templateId);
+        const { data } = await fetchTemplates(templateId); // ✅ 'data' 전체 응답
+        console.log("전체 응답", data);
+
+        // 응답 안에 template이라는 객체가 들어있음
         const template = data.template;
+        console.log("템플릿 ", template);
 
         // 카테고리별 질문 변환 및 상태 저장
         const parsed: Record<string, Question[]> = {};
@@ -95,7 +99,7 @@ export default function SurveyStep2() {
             options: q.options || [],
           }));
         });
-
+        data.id = step2.template_id;
         setCategoryQuestions(parsed);
         setTemplateSetKey(JSON.stringify(parsed));
       } catch (err) {
