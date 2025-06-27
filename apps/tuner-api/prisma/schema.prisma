@@ -73,6 +73,7 @@ enum QuestionType {
   check_box
 }
 
+// 설문 기간
 enum SurveyActive {
   upcoming // 설문예정
   ongoing // 설문중
@@ -84,7 +85,6 @@ enum SurveyStatus {
   complete //완료
 }
 
-// 설문 기간
 enum EndedBy {
   expired // 기간 종료
   outOfRewards // 보상 소진

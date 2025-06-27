@@ -1,1 +1,11 @@
-{ "extends":["../../.eslintrc.json"],"env":{"node":true},"rules":{"@typescript-eslint/no-var-requires":"off"} }
+{
+    "extends": [
+        "../../.eslintrc.json"
+    ],
+    "env": {
+        "node": true
+    },
+    "rules": {
+        "@typescript-eslint/no-var-requires": "off"
+    }
+}
