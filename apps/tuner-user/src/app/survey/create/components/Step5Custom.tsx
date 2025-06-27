@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import type { CustomQuestion } from "@/features/survey/store/useSurveyStore";
 import { QuestionTypeEnum } from "@/features/survey/types/enums";
 import { formatSurveyPayload } from "@/features/survey/utils/formatSurveyPayload";
-import { createSurvey } from "@/features/survey/services/createSurvey";
+import { createSurvey, saveSurvey } from "@/features/survey/services/survey";
 import Button from "@/components/ui/Button";
-import Modal from "@/components/ui/Modal";
 import CustomForm from "../../components/CustomForm";
 
 interface Step5Props {
   onPrev: () => void;
+  onNext: () => void;
 }
 
 // 질문 타입 옵션 정의
@@ -22,7 +22,7 @@ const typeOptions = [
   { label: "서술형", value: QuestionTypeEnum.SUBJECTIVE },
 ];
 
-export default function Step5Custom({ onPrev }: Step5Props) {
+export default function Step5Custom({ onPrev, onNext }: Step5Props) {
   const { setStep5 } = useSurveyStore();
   const [questions, setQuestions] = useState<CustomQuestion[]>([
     {
@@ -32,24 +32,6 @@ export default function Step5Custom({ onPrev }: Step5Props) {
       options: ["", "", "", "", ""],
     },
   ]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState({
-    image: "",
-    description: "",
-    buttonLabel: "",
-    redirectTo: "",
-  });
-
-  const router = useRouter();
-
-  const handleClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleNext = () => {
-    setIsModalOpen(false);
-    router.push(modalContent.redirectTo);
-  };
 
   // 질문 추가
   const addCustomQuestion = () => {
@@ -123,31 +105,29 @@ export default function Step5Custom({ onPrev }: Step5Props) {
     );
   };
 
-  // !-완료 시 상태 저장 및 전체 설문 api 요청-!
+  // 설문 생성
   const handleSubmit = async () => {
     setStep5({ customQuestions: questions });
     try {
       const payload = formatSurveyPayload();
-
       await createSurvey(payload);
-
-      // 설문 생성
-      setModalContent({
-        image: "check.png",
-        description: "설문 생성을 완료했습니다.",
-        buttonLabel: "확인",
-        redirectTo: "/survey",
-      });
-      setIsModalOpen(true);
+      onNext();
     } catch (err) {
       // 설문 생성 실패
-      setModalContent({
-        image: "x.png",
-        description: `${err}`,
-        buttonLabel: "다시 시도하기",
-        redirectTo: "/survey/create?step=step5",
-      });
-      setIsModalOpen(true);
+      console.log(err);
+      onNext();
+    }
+  };
+
+  // 임시저장
+  const handleSave = async () => {
+    setStep5({ customQuestions: questions });
+    try {
+      const payload = formatSurveyPayload();
+
+      await saveSurvey(payload);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -159,16 +139,6 @@ export default function Step5Custom({ onPrev }: Step5Props) {
       </header>
 
       <div className="space-y-4 min-h-screen">
-        {isModalOpen && (
-          <Modal
-            image={modalContent.image}
-            description={modalContent.description}
-            buttonLabel={modalContent.buttonLabel}
-            onClick={handleNext}
-            onClose={handleClose}
-            color={modalContent.image === "check.png" ? "blue" : "red"}
-          />
-        )}
         <h2 className="text-xl font-bold">
           Step 5: 커스텀 설문 <span className="text-red-500">(선택)</span>
         </h2>
@@ -187,18 +157,22 @@ export default function Step5Custom({ onPrev }: Step5Props) {
       </div>
 
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
-        <div className="w-[100px] sm:w-[200px]">
+        <div className="w-[140px] sm:w-[200px]">
           <Button onClick={onPrev} color="white">
             이전
           </Button>
         </div>
-        <div className="w-[140px] sm:w-[200px]">
-          <Button color="white">임시저장</Button>
-        </div>
-        <div className="w-[180px] sm:w-[400px]">
-          <Button onClick={handleSubmit} color="blue">
-            생성 완료
-          </Button>
+        <div className="flex items-center">
+          <div className="w-[70px] sm:w-[100px]">
+            <Button onClick={handleSave} color="white">
+              임시저장
+            </Button>
+          </div>
+          <div className="w-[110px] sm:w-[300px]">
+            <Button onClick={handleSubmit} color="blue">
+              설문 생성
+            </Button>
+          </div>
         </div>
       </div>
     </>
