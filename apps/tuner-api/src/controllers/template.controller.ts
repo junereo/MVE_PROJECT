@@ -8,6 +8,7 @@ export const createTemplateHandler = async (req: Request, res: Response): Promis
     try {
         const { template_name, template } = req.body;
 
+        console.log(req.body);
         if (!template_name || !template) {
             res.status(400).json({ success: false, message: "템플릿 이름 또는 내용이 없습니다." });
             return
