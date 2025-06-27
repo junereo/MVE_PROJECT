@@ -7,7 +7,8 @@ const router = express.Router();
 // router.get('/list');
 // router.get('/:surveyId');
 // router.get('/:surveyId/results');
-router.post("/create", verifyUserOrAdmin, createSurveyHandler);
+router.post('/create', verifyUserOrAdmin, createSurveyHandler);
+// router.post('/survey/temp');
 // router.post('/:surveyId/responses');
 // router.put('/:surveyId/responses');
 
