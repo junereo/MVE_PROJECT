@@ -9,25 +9,33 @@ import { ChevronUpIcon } from "@heroicons/react/20/solid";
 import { ReactNode } from "react";
 
 interface DisclosureProps {
-  title: string; // 버튼 내용
-  children: ReactNode; // 내용
+  title: string;
+  children: ReactNode;
+  defaultOpen?: boolean;
 }
 
-export default function Disclosure({ title, children }: DisclosureProps) {
+export default function Disclosure({
+  title,
+  children,
+  defaultOpen = false,
+}: DisclosureProps) {
   return (
-    <div className="w-full rounded-lg bg-white p-2 shadow">
-      <HeadlessDisclosure>
+    <div
+      key={defaultOpen ? "open" : "closed"}
+      className="w-full border border-gray-200 rounded-md bg-white shadow-sm"
+    >
+      <HeadlessDisclosure defaultOpen={defaultOpen}>
         {({ open }) => (
           <>
-            <DisclosureButton className="flex w-full justify-between items-center rounded-lg bg-gray-100 px-4 py-2 text-left text-sm font-medium text-gray-900 hover:bg-gray-200">
+            <DisclosureButton className="flex w-full justify-between items-center px-4 py-2 text-sm md:text-base font-semibold text-gray-900 bg-white hover:bg-gray-50 transition">
               <span>{title}</span>
               <ChevronUpIcon
-                className={`h-5 w-5 text-gray-500 transition-transform duration-300 ${
+                className={`h- w-5 text-gray-400 transition-transform duration-300 ${
                   open ? "rotate-180" : "rotate-0"
                 }`}
               />
             </DisclosureButton>
-            <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-700">
+            <DisclosurePanel className="px-2 py-5 text-sm text-gray-800 bg-gray-50">
               {children}
             </DisclosurePanel>
           </>

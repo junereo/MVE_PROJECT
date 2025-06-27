@@ -185,7 +185,7 @@ export default function SurveyParticipatePage() {
 
           {templates[categories[stepIndex]]?.map((template, i) => (
             <div key={i} className="mb-4">
-              <p className="mb-2 font-medium">{template.question}</p>
+              <p className="mb-2 font-medium">{template.question_text}</p>
               {template.options.map((opt) => (
                 <label key={opt} className="block mb-1">
                   <input

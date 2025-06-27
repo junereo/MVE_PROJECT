@@ -3,6 +3,8 @@
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { useState } from "react";
+import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
+import { SurveyTypeEnum } from "@/features/survey/types/enums";
 
 interface Step3Props {
   onPrev: () => void;
@@ -10,43 +12,56 @@ interface Step3Props {
 }
 
 export default function Step3Type({ onPrev, onNext }: Step3Props) {
-  const [surveyType, setSurveyType] = useState<"official" | "common">(
-    "official"
+  const { step3, setStep3 } = useSurveyStore();
+
+  const [surveyType, setSurveyType] = useState<SurveyTypeEnum>(
+    step3.surveyType ?? SurveyTypeEnum.OFFICIAL
   );
+  const [rewardAmount, setRewardAmount] = useState(
+    step3.reward_amount ? String(step3.reward_amount) : ""
+  );
+  const [reward, setReward] = useState(
+    step3.reward ? String(step3.reward) : ""
+  );
+  const [expertReward, setExpertReward] = useState(
+    step3.expert_reward ? String(step3.expert_reward) : ""
+  );
+
+  const handleNext = () => {
+    setStep3({
+      surveyType,
+      reward_amount: Number(rewardAmount),
+      reward: Number(reward),
+      expert_reward: Number(expertReward),
+    });
+    onNext();
+  };
 
   return (
     <>
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex  bg-white text-black border border-red-500 z-30flex items-center justify-between px-4 py-3">
+      <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
         <button onClick={onPrev}>←</button>
         <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
-      </div>
-      <div className="p-4 space-y-6">
-        <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
+      </header>
 
+      <div className="space-y-4 min-h-screen">
+        <h2 className="text-xl font-bold">Step 3: 설문 유형</h2>
         <div className="flex gap-2">
           <Button
-            color={surveyType === "common" ? "blue" : "white"}
-            onClick={() => setSurveyType("common")}
-          >
-            일반
-          </Button>
-          <Button
-            color={surveyType === "official" ? "blue" : "white"}
-            onClick={() => setSurveyType("official")}
+            color={surveyType === SurveyTypeEnum.OFFICIAL ? "blue" : "white"}
+            onClick={() => setSurveyType(SurveyTypeEnum.OFFICIAL)}
           >
             공식
           </Button>
+          <Button
+            color={surveyType === SurveyTypeEnum.GENERAL ? "blue" : "white"}
+            onClick={() => setSurveyType(SurveyTypeEnum.GENERAL)}
+          >
+            일반
+          </Button>
         </div>
 
-        {surveyType === "common" && (
-          <Input
-            label="일반 리워드"
-            type="number"
-            placeholder="기본으로 지급되는 리워드입니다."
-          />
-        )}
-
-        {surveyType === "official" && (
+        {surveyType === SurveyTypeEnum.OFFICIAL && (
           <>
             <p className="text-sm text-gray-600 bg-gray-50 border rounded-md p-3">
               공식 서베이는 리워드를 가지고 있어야 합니다.
@@ -58,26 +73,43 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
             <Input
               label="리워드 총량"
               type="number"
+              value={rewardAmount}
+              onChange={(e) => setRewardAmount(e.target.value)}
               placeholder="리워드 총량을 입력해주세요."
             />
             <Input
               label="일반 회원 리워드"
               type="number"
+              value={reward}
+              onChange={(e) => setReward(e.target.value)}
               placeholder="일반 회원에게 지급할 리워드를 입력해주세요."
             />
             <Input
               label="Expert 회원 리워드"
               type="number"
+              value={expertReward}
+              onChange={(e) => setExpertReward(e.target.value)}
               placeholder="Expert 회원에게 지급할 리워드를 입력해주세요."
             />
           </>
         )}
+        {surveyType === SurveyTypeEnum.GENERAL && (
+          <Input
+            label="일반 리워드"
+            type="number"
+            placeholder="기본으로 지급되는 리워드입니다."
+          />
+        )}
+      </div>
 
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] items-center bg-white text-black border border-green-700 px-4 py-2 z-30 flex justify-end pt-4">
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
+        <div className="w-[140px] sm:w-[200px]">
           <Button onClick={onPrev} color="white">
             이전
           </Button>
-          <Button onClick={onNext} color="blue">
+        </div>
+        <div className="w-[180px] sm:w-[400px]">
+          <Button onClick={handleNext} color="blue">
             다음
           </Button>
         </div>
