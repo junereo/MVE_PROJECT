@@ -26,13 +26,16 @@
 ✅ Node.js, Git, PM2 설치
 
 # 시스템 업데이트
+
 sudo apt update && sudo apt upgrade -y
 
 # Node.js 설치
+
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y nodejs
 
 # Git, PM2 설치
+
 sudo apt install -y git
 npm install -g pm2
 
@@ -50,13 +53,14 @@ npm install -g pm2
     # 빌드
     npm run build
 
-
 ✅ Step 5: next build & pm2로 실행
 
 # 서버 실행 (Next.js는 기본적으로 3000 포트)
+
 pm2 start npm --name "next-app" -- start
 
 # 부팅 시 자동 시작
+
 pm2 startup
 pm2 save
 
@@ -64,6 +68,7 @@ pm2 save
 
     sudo apt install nginx
     sudo nano /etc/nginx/sites-available/default
+
 ```js
 server {
     listen 80;
@@ -79,8 +84,8 @@ server {
     }
 }
 ```
-    sudo systemctl restart nginx
 
+    sudo systemctl restart nginx
 
 ✅ 도메인 연결 + SSL 적용 (옵션)
 
@@ -93,4 +98,3 @@ http://EC2_PUBLIC_IP 또는 도메인 접속
 정상 동작 확인
 
 pm2 logs로 로그 확인 가능
-

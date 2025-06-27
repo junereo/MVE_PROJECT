@@ -1,12 +1,10 @@
 // app/admin/wallet/page.tsx
 "use client";
-
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosResponse, AxiosError } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Accordion,
@@ -16,21 +14,45 @@ import {
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
 
+interface MutationRequest {
+  url: string;
+  method: "GET" | "POST" | "PUT" | "DELETE";
+  data?: Record<string, unknown>;
+}
+
+interface ApiResponse {
+  success?: boolean;
+  error?: string;
+  message?: string;
+  result?: unknown;
+  [key: string]: unknown;
+}
+
+interface TimestampedResponse {
+  timestamp: string;
+  data: ApiResponse;
+  method?: string;
+}
+
 export default function WalletPage() {
-  const [uid, setUid] = useState("");
-  const [to, setTo] = useState("");
-  const [value, setValue] = useState("");
-  const [surveyId, setSurveyId] = useState("");
-  const [answers, setAnswers] = useState("");
-  const [message, setMessage] = useState("");
-  const [lastResponse, setLastResponse] = useState<any>(null);
-  const [responseHistory, setResponseHistory] = useState<any[]>([]);
-  const [activeMainTab, setActiveMainTab] = useState("token");
-  const [activeSubTab, setActiveSubTab] = useState("createWallet");
+  const [uid, setUid] = useState<string>("");
+  const [to, setTo] = useState<string>("");
+  const [value, setValue] = useState<string>("");
+  const [surveyId, setSurveyId] = useState<string>("");
+  const [answers, setAnswers] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [lastResponse, setLastResponse] = useState<TimestampedResponse | null>(
+    null
+  );
+  const [responseHistory, setResponseHistory] = useState<TimestampedResponse[]>(
+    []
+  );
+  const [activeMainTab, setActiveMainTab] = useState<string>("token");
+  const [activeSubTab] = useState<string>("createWallet");
   const [filterMethod, setFilterMethod] = useState<string>("ALL");
   const baseUrl = "http://localhost:4000";
 
-  const resetInputs = () => {
+  const resetInputs = (): void => {
     setUid("");
     setTo("");
     setValue("");
@@ -39,32 +61,44 @@ export default function WalletPage() {
     setMessage("");
   };
 
-  const mutation = useMutation({
+  const mutation = useMutation<ApiResponse, AxiosError, MutationRequest>({
     mutationFn: async ({
       url,
       method,
       data,
-    }: {
-      url: string;
-      method: string;
-      data?: any;
-    }) => {
-      const res = await axios({ url, method, data });
+    }: MutationRequest): Promise<ApiResponse> => {
+      const res: AxiosResponse<ApiResponse> = await axios({
+        url,
+        method,
+        data,
+      });
       return res.data;
     },
-    onSuccess: (data) => {
-      const timestamped = { timestamp: new Date().toISOString(), data };
+    onSuccess: (data, variables) => {
+      const timestamped: TimestampedResponse = {
+        timestamp: new Date().toISOString(),
+        data,
+        method: variables.method,
+      };
       setLastResponse(timestamped);
       setResponseHistory((prev) => [...prev.slice(-4), timestamped]);
       toast.success("Success");
       resetInputs();
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.error || "Request failed");
+    onError: (error: unknown) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.error || "Request failed");
+      } else {
+        toast.error("Unknown error occurred");
+      }
     },
   });
 
-  const handleRequest = (url: string, method: string, data?: any) => {
+  const handleRequest = (
+    url: string,
+    method: MutationRequest["method"],
+    data?: Record<string, unknown>
+  ): void => {
     mutation.mutate({ url, method, data });
   };
 
@@ -72,7 +106,7 @@ export default function WalletPage() {
     resetInputs();
   }, [activeMainTab, activeSubTab]);
 
-  const filteredHistory =
+  const filteredHistory: TimestampedResponse[] =
     filterMethod === "ALL"
       ? responseHistory
       : responseHistory.filter((res) => res.method === filterMethod);

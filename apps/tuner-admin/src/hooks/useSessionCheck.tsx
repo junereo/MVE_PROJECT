@@ -3,8 +3,7 @@
 import { useRouter } from "next/navigation";
 import axiosClient from "@/lib/network/axios";
 import { useSessionStore } from "@/store/useAuthmeStore";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 // const fetchSession = async () => {
 //     const response = await axiosClient.get("https://jsonplaceholder.typicode.com/todos/1");

@@ -44,7 +44,7 @@ export default function SurveyComplete() {
     is_released: step1.isReleased,
     thumbnail_url: step1.youtubeThumbnail,
     sample_url: step1.url,
-    channelTitle: step1.channelTitle,
+    channel_title: step1.channel_title,
     genre: step1.genre,
     // 설문 정보
     start_at: step1.start_at,
@@ -97,7 +97,7 @@ export default function SurveyComplete() {
               className="w-60 mt-2 rounded"
             />
             <p className="text-sm text-gray-600">
-              채널명: {step1.channelTitle}
+              채널명: {step1.channel_title}
             </p>
           </div>
 
