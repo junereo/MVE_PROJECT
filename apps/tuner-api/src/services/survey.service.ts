@@ -32,7 +32,7 @@ const checkSurveyActive = (_start: Date | string, _end: Date | string): SurveyAc
 };
 
 // SurveyType 유효성 검사
-const isValidSurveyType = (value: any): value is SurveyType => {
+const isSurveyType = (value: any): value is SurveyType => {
     return Object.values(SurveyType).includes(value);
 };
 
@@ -56,8 +56,8 @@ export const createSurvey = async ({
         }
 
         // 타입 유효성 검사
-        if (!isValidSurveyType(body.type)) {
-            throw new Error(`잘못된 SurveyType입니다: ${body.type}`);
+        if (!isSurveyType(body.type)) {
+            throw new Error(`잘못된 설문 타입 입니다: ${body.type}`);
         }
 
         // 타입 캐스팅
@@ -145,7 +145,7 @@ export const createSurvey = async ({
             return survey;
         });
     } catch (error) {
-        console.error("survey 생성 에러:", error);
+        console.error("설문 생성 에러:", error);
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             console.error("Prisma Error Code:", error.code);
             console.error("Meta:", error.meta);
@@ -153,3 +153,4 @@ export const createSurvey = async ({
         throw error;
     }
 };
+

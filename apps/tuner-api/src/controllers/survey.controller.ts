@@ -33,7 +33,6 @@ export const createSurveyHandler = async (req: AuthRequest, res: Response): Prom
 
         res.status(201).json({ success: true, data: survey });
     } catch (err: any) {
-        console.error("설문 생성 실패:", err);
         res.status(500).json({ success: false, message: '설문 생성 실패', error: err.message });
     }
 };
