@@ -35,8 +35,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           {/* 네비게이션 */}
-          <nav className="flex flex-col items-center mt-6 space-y-4">
-            <Link href="/" onClick={onClose} className="text-lg font-medium">
+          <nav className="flex flex-col items-start ml-6 mt-6 space-y-4">
+            <Link href="/" onClick={onClose} className="text-lg font-medium ">
               홈
             </Link>
             <Link
@@ -45,6 +45,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               className="text-lg font-medium"
             >
               설문
+            </Link>
+            <Link
+              href="/survey/create"
+              onClick={onClose}
+              className="text-lg font-medium"
+            >
+              설문 생성
             </Link>
             <Link
               href="/mypage"
