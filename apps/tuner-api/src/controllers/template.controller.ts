@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const createTemplateHandler = async (req: Request, res: Response): Promise<void> => {
+export const createTemplateHandler = async (req: Request, res: Response) => {
     try {
         const { template_name, template } = req.body;
 
@@ -23,7 +23,7 @@ export const createTemplateHandler = async (req: Request, res: Response): Promis
 };
 
 
-export const getTemplateHandler = async (req: Request, res: Response): Promise<void> => {
+export const getTemplateHandler = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.templateId);
 
