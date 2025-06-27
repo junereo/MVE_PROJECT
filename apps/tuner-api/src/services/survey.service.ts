@@ -9,7 +9,7 @@ import {
 
 const prisma = new PrismaClient();
 
-// QuestionType 매핑
+// 설문 맵핑 
 const convertType = (t: string): QuestionType => {
     if (t === 'multiple' || t === 'checkbox') return 'multiple_choice';
     if (t === 'checkbox') return 'check_box';
