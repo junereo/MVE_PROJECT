@@ -1,11 +1,11 @@
 import express from "express";
-import { createTemplateHandler } from "../controllers/template.controller";
+import { createTemplateHandler, getTemplateHandler } from "../controllers/template.controller";
 const router = express.Router();
 
 // 목록
 // router.get('/');
 // 상세 조회
-router.get('/:templateId',);
+router.get('/:templateId', getTemplateHandler);
 // 생성
 router.post("/", createTemplateHandler);
 // 수정
