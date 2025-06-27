@@ -2,123 +2,41 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Dropdown from "../components/ui/DropDown"; // 네가 만든 컴포넌트 경로
+import Dropdown from "../components/ui/DropDown";
 
-type SurveyStatus = "예정" | "진행중" | "종료";
-type SurveyType = "general" | "official";
-
+// 타입 정의
 interface SurveyItem {
   id: number;
   survey_title: string;
+  title: string; // 음원명
   start_at: string;
   end_at: string;
-  is_active: SurveyStatus;
-  surveyType: SurveyType;
+  is_active: "예정" | "진행중" | "종료";
+  surveyType: "general" | "official";
   participantCount: number;
   reward_amount?: number;
 }
 
-// 드롭다운 옵션
 const statusOptions = ["전체 상태", "예정", "진행중", "종료"];
 const typeOptions = ["전체 유형", "일반 설문", "리워드 설문"];
 
-// 샘플 10개 더미 데이터
-const dummySurveys: SurveyItem[] = [
-  {
-    id: 10,
-    survey_title: "한숨에대한 설문",
-    start_at: "2025-06-22",
-    end_at: "2025-06-29",
-    is_active: "종료",
-    surveyType: "official",
-    participantCount: 70,
-    reward_amount: 435,
-  },
-  {
-    id: 9,
-    survey_title: "빅뱅에 대한 설문 ",
-    start_at: "2025-06-23",
+// 20개 메타데이터 샘플
+const dummySurveys: SurveyItem[] = Array.from({ length: 20 }, (_, i) => {
+  const id = 20 - i;
+  const statuses = ["예정", "진행중", "종료"] as const;
+  const types = ["general", "official"] as const;
+  return {
+    id,
+    survey_title: `설문 제목 ${id}`,
+    title: `음원 ${id}`,
+    start_at: "2025-06-01",
     end_at: "2025-06-30",
-    is_active: "진행중",
-    surveyType: "general",
-    participantCount: 50,
-  },
-  {
-    id: 8,
-    survey_title: "팝송 대한 설문",
-    start_at: "2025-06-21",
-    end_at: "2025-06-28",
-    is_active: "예정",
-    surveyType: "general",
-    participantCount: 67,
-  },
-  {
-    id: 7,
-    survey_title: "인디 대한 설문",
-    start_at: "2025-06-18",
-    end_at: "2025-06-25",
-    is_active: "진행중",
-    surveyType: "general",
-    participantCount: 8,
-  },
-  {
-    id: 6,
-    survey_title: "락 에 대한 설문",
-    start_at: "2025-06-17",
-    end_at: "2025-06-24",
-    is_active: "종료",
-    surveyType: "official",
-    participantCount: 13,
-    reward_amount: 386,
-  },
-  {
-    id: 5,
-    survey_title: "j-pop 설문 ",
-    start_at: "2025-06-17",
-    end_at: "2025-06-24",
-    is_active: "예정",
-    surveyType: "official",
-    participantCount: 22,
-    reward_amount: 410,
-  },
-  {
-    id: 4,
-    survey_title: "k-pop 설문",
-    start_at: "2025-06-16",
-    end_at: "2025-06-23",
-    is_active: "진행중",
-    surveyType: "general",
-    participantCount: 30,
-  },
-  {
-    id: 3,
-    survey_title: "1",
-    start_at: "2025-06-14",
-    end_at: "2025-06-21",
-    is_active: "종료",
-    surveyType: "general",
-    participantCount: 61,
-  },
-  {
-    id: 2,
-    survey_title: "샘플 설문 제목 2",
-    start_at: "2025-06-13",
-    end_at: "2025-06-20",
-    is_active: "예정",
-    surveyType: "official",
-    participantCount: 15,
-    reward_amount: 250,
-  },
-  {
-    id: 1,
-    survey_title: "제목 1",
-    start_at: "2025-06-12",
-    end_at: "2025-06-19",
-    is_active: "종료",
-    surveyType: "general",
-    participantCount: 44,
-  },
-];
+    is_active: statuses[id % 3],
+    surveyType: types[id % 2],
+    participantCount: Math.floor(Math.random() * 100),
+    reward_amount: id % 2 === 1 ? undefined : 100 + id * 5,
+  };
+});
 
 export default function SurveyListPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -126,12 +44,14 @@ export default function SurveyListPage() {
   const [typeFilter, setTypeFilter] = useState("전체 유형");
   const [sortNewestFirst, setSortNewestFirst] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  // 페이지네이션
-  const surveysPerPage = 5;
+  const surveysPerPage = 10;
 
   const filteredSurveys = dummySurveys
     .filter((survey) => {
       const matchTitle = survey.survey_title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchMusic = survey.title
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
       const matchStatus =
@@ -140,7 +60,7 @@ export default function SurveyListPage() {
         typeFilter === "전체 유형" ||
         (typeFilter === "일반 설문" && survey.surveyType === "general") ||
         (typeFilter === "리워드 설문" && survey.surveyType === "official");
-      return matchTitle && matchStatus && matchType;
+      return (matchTitle || matchMusic) && matchStatus && matchType;
     })
     .sort((a, b) => (sortNewestFirst ? b.id - a.id : a.id - b.id));
 
@@ -151,7 +71,7 @@ export default function SurveyListPage() {
   );
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">설문 리스트</h1>
         <Link href="/survey/create/step1">
@@ -161,11 +81,11 @@ export default function SurveyListPage() {
         </Link>
       </div>
 
-      {/* 검색창 */}
-      <div className="flex flex-col md:flex-row gap-4 mb-2">
+      {/* 검색 및 필터 */}
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
         <input
           type="text"
-          placeholder="제목 또는 음원명 검색"
+          placeholder="설문 제목 또는 음원명 검색"
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
@@ -173,7 +93,6 @@ export default function SurveyListPage() {
           }}
           className="border p-2 w-full md:w-1/2"
         />
-
         <Dropdown
           options={statusOptions}
           selected={statusFilter}
@@ -193,7 +112,7 @@ export default function SurveyListPage() {
       </div>
 
       {/* 정렬 버튼 */}
-      <div className="mb-4 text-right text-sm">
+      <div className="mb-2 text-right text-sm">
         <button
           onClick={() => {
             setSortNewestFirst((prev) => !prev);
@@ -205,54 +124,73 @@ export default function SurveyListPage() {
         </button>
       </div>
 
-      {/* 설문 리스트 카드 */}
-      <div className="space-y-4">
-        {paginatedSurveys.map((survey) => (
-          <div
-            key={survey.id}
-            className="p-4 border bg-white rounded-lg shadow-sm flex flex-col md:flex-row md:justify-between md:items-center"
-          >
-            <div>
-              <p className="text-lg font-semibold">{survey.survey_title}</p>
-              <p className="text-sm text-gray-500">
-                ID: {survey.id} | 기간: {survey.start_at} ~ {survey.end_at}
-              </p>
-              <p className="text-sm text-red-600 ">
-                {survey.surveyType === "official" ? "리워드 설문" : "일반 설문"}
-                {survey.surveyType === "official" && survey.reward_amount && (
-                  <span className="ml-2 text-blue-600 font-medium">
-                    🎁 {survey.reward_amount} STK
+      {/* 테이블 형식 목록 */}
+      <div className="overflow-x-auto">
+        <table className="w-full border text-sm text-center">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border px-2 py-1">ID</th>
+              <th className="border px-2 py-1">설문 제목</th>
+              <th className="border px-2 py-1">음원명</th>
+              <th className="border px-2 py-1">설문 기간</th>
+              <th className="border px-2 py-1">상태</th>
+              <th className="border px-2 py-1">유형</th>
+              <th className="border px-2 py-1">참여 인원</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedSurveys.map((survey) => (
+              <tr key={survey.id} className="hover:bg-gray-50">
+                <td className="border px-2 py-1">{survey.id}</td>
+                <td className="border px-2 py-1 text-left pl-3">
+                  {survey.survey_title}
+                </td>
+                <td className="border px-2 py-1 text-left pl-3">
+                  {survey.title}
+                </td>
+                <td className="border px-2 py-1">
+                  {survey.start_at} ~ {survey.end_at}
+                </td>
+                <td className="border px-2 py-1">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium
+                    ${
+                      survey.is_active === "예정"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : survey.is_active === "진행중"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {survey.is_active}
                   </span>
-                )}
-              </p>
-            </div>
-            <div className="mt-3 md:mt-0 text-right">
-              <span
-                className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                  survey.is_active === "예정"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : survey.is_active === "진행중"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-200 text-gray-700"
-                }`}
-              >
-                {survey.is_active}
-              </span>
-              <p className="text-sm text-gray-600 mt-1">
-                참여 인원: {survey.participantCount}명
-              </p>
-            </div>
-          </div>
-        ))}
-        {paginatedSurveys.length === 0 && (
-          <p className="text-gray-500 text-center mt-10">설문이 없습니다.</p>
-        )}
+                </td>
+                <td className="border px-2 py-1">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium
+                    ${
+                      survey.surveyType === "official"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {survey.surveyType === "official"
+                      ? "리워드 설문"
+                      : "일반 설문"}
+                  </span>
+                </td>
+                <td className="border px-2 py-1">
+                  {survey.participantCount}명
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* 페이지네이션 */}
+      {/* 페이지네이션 (그대로 유지) */}
       {totalPages > 1 && (
         <div className="mt-6 flex justify-center items-center gap-2 text-sm">
-          {/* 첫 페이지로 이동 */}
           <button
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
@@ -260,8 +198,6 @@ export default function SurveyListPage() {
           >
             «
           </button>
-
-          {/* 이전 페이지 */}
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
@@ -269,8 +205,6 @@ export default function SurveyListPage() {
           >
             ＜
           </button>
-
-          {/* 페이지 번호 동적 렌더링 */}
           {Array.from({ length: totalPages })
             .map((_, i) => i + 1)
             .filter((pageNum) => {
@@ -282,13 +216,12 @@ export default function SurveyListPage() {
               )
                 return true;
               if (pageNum === currentPage - 2 || pageNum === currentPage + 2)
-                return false; // 공간 확보를 위해 생략
+                return false;
               return false;
             })
             .map((pageNum, index, arr) => {
               const prev = arr[index - 1];
               const showEllipsis = prev && pageNum - prev > 1;
-
               return (
                 <span key={pageNum} className="flex items-center">
                   {showEllipsis && <span className="px-1">...</span>}
@@ -305,8 +238,6 @@ export default function SurveyListPage() {
                 </span>
               );
             })}
-
-          {/* 다음 페이지 */}
           <button
             onClick={() =>
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
@@ -316,8 +247,6 @@ export default function SurveyListPage() {
           >
             ＞
           </button>
-
-          {/* 마지막 페이지로 이동 */}
           <button
             onClick={() => setCurrentPage(totalPages)}
             disabled={currentPage === totalPages}

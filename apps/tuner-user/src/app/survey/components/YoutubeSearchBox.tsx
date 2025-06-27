@@ -7,6 +7,7 @@ import {
   SelectedVideo,
 } from "@/features/survey/store/useSurveyStore";
 import Input from "@/components/ui/Input";
+import Image from "next/image";
 
 export default function YoutubeSearchBox() {
   const [query, setQuery] = useState("");
@@ -84,10 +85,12 @@ export default function YoutubeSearchBox() {
               className="cursor-pointer border p-2 rounded"
               onClick={() => setSelectedVideo(video)}
             >
-              <img
+              <Image
                 src={video.thumbnail_url}
                 alt={video.title}
                 className="w-full h-[140px] object-cover rounded"
+                width={140}
+                height={140}
               />
               <p className="mt-2 text-sm line-clamp-2">{video.title}</p>
             </div>

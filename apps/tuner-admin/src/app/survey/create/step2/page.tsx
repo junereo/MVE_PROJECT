@@ -11,6 +11,14 @@ import SurveyNavigation from "@/app/survey/create/step2/components/SurveyNavigat
 import TagCreate from "./components/SurveyTag";
 import { fetchTemplates } from "@/lib/network/api";
 
+//템플릿 타입
+interface RawTemplateQuestion {
+  question_text?: string;
+  text?: string;
+  question?: string;
+  type?: string;
+  options?: string[];
+}
 export default function SurveyStep2() {
   const router = useRouter();
   const { step1, setStep2, setTemplateSetKey } = useSurveyStore();
@@ -72,14 +80,15 @@ export default function SurveyStep2() {
   useEffect(() => {
     const loadTemplate = async () => {
       try {
-        const data = await fetchTemplates();
+        const templateId = 1;
+        const data = await fetchTemplates(templateId);
         const template = data.template;
 
         // 카테고리별 질문 변환 및 상태 저장
         const parsed: Record<string, Question[]> = {};
         baseCategories.forEach((cat) => {
           const list = template?.[cat.key] || [];
-          parsed[cat.key] = list.map((q: any, i: number) => ({
+          parsed[cat.key] = list.map((q: RawTemplateQuestion, i: number) => ({
             id: i,
             text: q.text || q.question,
             type: q.type || "multiple",

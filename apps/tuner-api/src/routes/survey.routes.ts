@@ -1,9 +1,8 @@
-import express from 'express';
-import { createSurveyHandler } from '../controllers/survey.controller';
+import express from "express";
+import { createSurveyHandler } from "../controllers/survey.controller";
 import { verifyUserOrAdmin } from "../middlewares/survey.middleware";
 
 const router = express.Router();
-
 
 // router.get('/list');
 // router.get('/:surveyId');
