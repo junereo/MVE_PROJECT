@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "./sidebar";
 import Image from "next/image";
 
 export default function Header() {
@@ -10,27 +10,29 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[485px] min-h-[52px] flex justify-between items-center bg-white text-black border border-red-500 px-4 py-2  z-30">
+      <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
         <div>
-          <Link href="/" className="text-2xl font-bold">
-            LOGO
+          <Link href="/" className="text-lg font-semibold tracking-tight">
+            <span className="text-blue-600">TUNER</span>
           </Link>
         </div>
-        <nav className="flex gap-4 items-center">
-          <Link href="/search">
+        <nav className="flex items-center gap-4">
+          <Link href="/search" aria-label="Search">
             <Image
               src="/images/search.png"
-              alt="search image"
-              width={17}
-              height={17}
+              alt="search icon"
+              width={20}
+              height={20}
+              className="opacity-80 hover:opacity-100 transition"
             />
           </Link>
-          <div
+          <button
             onClick={() => setSidebarOpen(true)}
-            className="text-xl font-bold cursor-pointer"
+            aria-label="Open menu"
+            className="text-xl font-bold text-gray-800 hover:text-black transition"
           >
             ☰
-          </div>
+          </button>
         </nav>
       </header>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
