@@ -4,9 +4,28 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
 
+interface CustomQuestionOption {
+  option: string;
+  count: number;
+}
+
+interface CustomQuestion {
+  id: string | number;
+  text: string;
+  options: CustomQuestionOption[];
+}
+
+interface SurveyResult {
+  youtubeTitle: string;
+  thumbnail: string;
+  averageScores: Record<string, number>;
+  customQuestions: CustomQuestion[];
+  totalParticipants: number;
+}
+
 export default function SurveyResultPage() {
   const { id } = useParams();
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<SurveyResult | null>(null);
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -39,11 +58,11 @@ export default function SurveyResultPage() {
 
       {/* 커스텀 설문 결과 */}
       <h2 className="text-lg font-semibold mb-2">📋 커스텀 설문 결과</h2>
-      {result.customQuestions.map((q: any) => (
+      {result.customQuestions.map((q: CustomQuestion) => (
         <div key={q.id} className="border p-4 rounded mb-4">
           <p className="mb-2 font-medium">{q.text}</p>
           <ul className="pl-4">
-            {q.options.map((opt: any) => (
+            {q.options.map((opt: CustomQuestionOption) => (
               <li key={opt.option}>
                 {opt.option}: {opt.count}명 선택
               </li>

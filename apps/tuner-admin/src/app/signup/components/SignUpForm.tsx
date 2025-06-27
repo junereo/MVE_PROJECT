@@ -2,6 +2,8 @@
 import { AdminRole } from "@/types";
 import axiosInstance from "@/lib/network/axios";
 import { useState } from "react";
+import { AxiosError } from "axios";
+
 import {
   allSignupFields,
   validateSignupField,
@@ -51,18 +53,19 @@ const SignUpForm = () => {
       alert("회원가입이 완료되었습니다.");
       console.log("서버 응답:", result);
       router.push("/dashboard");
-    } catch (error: any) {
-      const status = error.response?.status;
+    } catch (error) {
+      const err = error as AxiosError;
+      const status = err.response?.status as number;
       if (status === 400) {
-        alert("입력한 정보를 다시 확인해주세요.");
+        throw new Error("입력한 정보를 다시 확인해주세요.");
       } else {
-        alert("회원가입 중 오류가 발생했습니다.");
+        throw new Error("회원가입 중 오류가 발생했습니다.");
       }
     }
   };
 
   const pushOauth = async (formData: SignupFormData) => {
-    const { confirmPassword, ...payload } = formData;
+    const { ...payload } = formData;
     console.log(formData);
 
     const res = await axiosInstance.post("/admin/signup", payload);
