@@ -59,14 +59,7 @@ export default function SurveyStep2() {
   >({});
 
   // 커스텀 문항 상태
-  const [customQuestions, setCustomQuestions] = useState([
-    {
-      id: 1,
-      question_text: "",
-      question_type: "multiple",
-      options: ["", "", "", ""],
-    },
-  ]);
+  const [customQuestions, setCustomQuestions] = useState<Question[]>([]);
 
   // 질문 유형 옵션 정의
   const typeOptions = [
@@ -115,6 +108,7 @@ export default function SurveyStep2() {
     if (!customTabCreated) {
       setCustomTabCreated(true);
       setTabIndex(baseCategories.length);
+      addCustomQuestion();
     }
   };
 
@@ -194,13 +188,36 @@ export default function SurveyStep2() {
       })
     );
   };
-
-  // 설문 완료 → Zustand에 저장 후 다음 페이지로 이동
+  // 설문 생성완료
   const handleComplete = () => {
-    setStep2({ customQuestions });
+    if (customTabCreated) {
+      for (const q of customQuestions) {
+        if (q.question_text.trim() === "") {
+          alert("질문 내용을 모두 입력해주세요.");
+          return;
+        }
+
+        if (
+          (q.question_type === "multiple" || q.question_type === "checkbox") &&
+          q.options.some((opt) => opt.trim() === "")
+        ) {
+          alert("모든 선택지를 빠짐없이 입력해주세요.");
+          return;
+        }
+      }
+    }
+
+    // 모든 조건 만족하는 문항만 저장
+    const validCustomQuestions = customQuestions.filter(
+      (q) =>
+        q.question_text.trim() !== "" &&
+        (q.question_type === "subjective" ||
+          q.options.every((opt) => opt.trim() !== ""))
+    );
+
+    setStep2({ customQuestions: validCustomQuestions });
     router.push("/survey/create/complete");
   };
-
   // 탭 다음/이전 이동
   const goNext = () => {
     if (tabIndex < allTabs.length - 1) setTabIndex(tabIndex + 1);
