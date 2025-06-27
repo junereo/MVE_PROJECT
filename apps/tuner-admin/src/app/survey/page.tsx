@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Dropdown from "../components/ui/DropDown";
-
+import Dropdown from "@/app/components/ui/DropDown";
+import { surveyList } from "@/lib/network/api";
 // 타입 정의
 interface SurveyItem {
   id: number;
   survey_title: string;
-  title: string; // 음원명
+  title: string;
   start_at: string;
   end_at: string;
   is_active: "예정" | "진행중" | "종료";
@@ -17,11 +18,12 @@ interface SurveyItem {
   reward_amount?: number;
 }
 
+// 필터 옵션
 const statusOptions = ["전체 상태", "예정", "진행중", "종료"];
 const typeOptions = ["전체 유형", "일반 설문", "리워드 설문"];
 
-// 20개 메타데이터 샘플
-const dummySurveys: SurveyItem[] = Array.from({ length: 20 }, (_, i) => {
+// 고정된 초기 더미 데이터 (절대 랜덤 X)
+const baseSurveys: SurveyItem[] = Array.from({ length: 20 }, (_, i) => {
   const id = 20 - i;
   const statuses = ["예정", "진행중", "종료"] as const;
   const types = ["general", "official"] as const;
@@ -33,20 +35,63 @@ const dummySurveys: SurveyItem[] = Array.from({ length: 20 }, (_, i) => {
     end_at: "2025-06-30",
     is_active: statuses[id % 3],
     surveyType: types[id % 2],
-    participantCount: Math.floor(Math.random() * 100),
+    participantCount: 0, // 여기서는 0으로 고정!
     reward_amount: id % 2 === 1 ? undefined : 100 + id * 5,
   };
 });
+export const surveylist = async (): Promise<SurveyItem[]> => {
+  const { data } = await surveyList();
+
+  // 응답 데이터 구조에 따라 아래를 맞춰줘야 함
+  console.log(data);
+
+  return data.map((item: any) => {
+    // 상태 변환 로직 (예정/진행중/종료 판단)
+    const now = new Date();
+    const start = new Date(item.start_at);
+    const end = new Date(item.end_at);
+    let status: "예정" | "진행중" | "종료" = "예정";
+
+    if (now >= end) status = "종료";
+    else if (now >= start) status = "진행중";
+
+    return {
+      id: item.id,
+      survey_title: item.survey_title,
+      title: item.title || item.music?.title || "제목 없음",
+      start_at: item.start_at,
+      end_at: item.end_at,
+      is_active: status,
+      surveyType: item.type === "official" ? "official" : "general",
+      participantCount: item.participantCount ?? 0,
+      reward_amount: item.reward_amount ?? undefined,
+    };
+  });
+};
 
 export default function SurveyListPage() {
+  const router = useRouter();
+  const [surveys, setSurveys] = useState<SurveyItem[]>(baseSurveys);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("전체 상태");
   const [typeFilter, setTypeFilter] = useState("전체 유형");
   const [sortNewestFirst, setSortNewestFirst] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  // const [surveyList, setSurveyList] = useState<SurveyItem[]>();
   const surveysPerPage = 10;
 
-  const filteredSurveys = dummySurveys
+  // 🔐 클라이언트에서만 랜덤 participantCount 주입
+  useEffect(() => {
+    const randomized = baseSurveys.map((s) => ({
+      ...s,
+      participantCount: Math.floor(Math.random() * 100),
+    }));
+    setSurveys(randomized);
+    surveylist();
+  }, []);
+
+  // 필터링 + 정렬
+  const filteredSurveys = surveys
     .filter((survey) => {
       const matchTitle = survey.survey_title
         .toLowerCase()
@@ -81,7 +126,7 @@ export default function SurveyListPage() {
         </Link>
       </div>
 
-      {/* 검색 및 필터 */}
+      {/* 검색 + 드롭다운 필터 */}
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <input
           type="text"
@@ -111,7 +156,7 @@ export default function SurveyListPage() {
         />
       </div>
 
-      {/* 정렬 버튼 */}
+      {/* 정렬 */}
       <div className="mb-2 text-right text-sm">
         <button
           onClick={() => {
@@ -124,7 +169,7 @@ export default function SurveyListPage() {
         </button>
       </div>
 
-      {/* 테이블 형식 목록 */}
+      {/* 테이블 */}
       <div className="overflow-x-auto">
         <table className="w-full border text-sm text-center">
           <thead className="bg-gray-100">
@@ -140,7 +185,11 @@ export default function SurveyListPage() {
           </thead>
           <tbody>
             {paginatedSurveys.map((survey) => (
-              <tr key={survey.id} className="hover:bg-gray-50">
+              <tr
+                key={survey.id}
+                onClick={() => router.push(`/survey/${survey.id}`)}
+                className="hover:bg-blue-50 cursor-pointer"
+              >
                 <td className="border px-2 py-1">{survey.id}</td>
                 <td className="border px-2 py-1 text-left pl-3">
                   {survey.survey_title}
@@ -153,8 +202,7 @@ export default function SurveyListPage() {
                 </td>
                 <td className="border px-2 py-1">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium
-                    ${
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
                       survey.is_active === "예정"
                         ? "bg-yellow-100 text-yellow-800"
                         : survey.is_active === "진행중"
@@ -167,8 +215,7 @@ export default function SurveyListPage() {
                 </td>
                 <td className="border px-2 py-1">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium
-                    ${
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
                       survey.surveyType === "official"
                         ? "bg-blue-100 text-blue-700"
                         : "bg-gray-100 text-gray-800"
@@ -188,72 +235,25 @@ export default function SurveyListPage() {
         </table>
       </div>
 
-      {/* 페이지네이션 (그대로 유지) */}
+      {/* 페이지네이션 */}
       {totalPages > 1 && (
         <div className="mt-6 flex justify-center items-center gap-2 text-sm">
-          <button
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-            className="px-2 py-1 rounded border bg-white hover:bg-gray-100 disabled:text-gray-400"
-          >
-            «
-          </button>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-2 py-1 rounded border bg-white hover:bg-gray-100 disabled:text-gray-400"
-          >
-            ＜
-          </button>
-          {Array.from({ length: totalPages })
-            .map((_, i) => i + 1)
-            .filter((pageNum) => {
-              if (totalPages <= 7) return true;
-              if (
-                pageNum === 1 ||
-                pageNum === totalPages ||
-                Math.abs(currentPage - pageNum) <= 1
-              )
-                return true;
-              if (pageNum === currentPage - 2 || pageNum === currentPage + 2)
-                return false;
-              return false;
-            })
-            .map((pageNum, index, arr) => {
-              const prev = arr[index - 1];
-              const showEllipsis = prev && pageNum - prev > 1;
-              return (
-                <span key={pageNum} className="flex items-center">
-                  {showEllipsis && <span className="px-1">...</span>}
-                  <button
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === pageNum
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                </span>
-              );
-            })}
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-            className="px-2 py-1 rounded border bg-white hover:bg-gray-100 disabled:text-gray-400"
-          >
-            ＞
-          </button>
-          <button
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-            className="px-2 py-1 rounded border bg-white hover:bg-gray-100 disabled:text-gray-400"
-          >
-            »
-          </button>
+          {Array.from({ length: totalPages }).map((_, i) => {
+            const pageNum = i + 1;
+            return (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === pageNum
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-800"
+                }`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

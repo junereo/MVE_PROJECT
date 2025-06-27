@@ -10,7 +10,7 @@ type SurveyStep1 = {
   youtubeThumbnail: string; // 유튜브 영상 썸네일
   artist: string; // 아티스트명
   title: string; // 곡 제목
-  channel_title: string; // 채널명
+  channelTitle: string; // 채널명
   url: string; // 유튜브 URL
   updated_at?: string; // 마지막 수정일
   isReleased: boolean; // 발매 여부
@@ -76,7 +76,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
     start_at: "",
     end_at: "",
     surveyType: "general",
-    channel_title: "",
+    channelTitle: "",
     reward_amount: 0,
     reward: 0,
     expertReward: 0,
