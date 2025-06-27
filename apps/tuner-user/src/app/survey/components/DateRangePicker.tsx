@@ -6,7 +6,7 @@ interface DateRangePickerProps {
   label?: string;
   startDate: Date | null;
   endDate: Date | null;
-  onChange: (start: Date, end: Date) => void;
+  onChange: (start: Date | null, end: Date | null) => void;
 }
 
 export default function DateRangePicker({
@@ -23,15 +23,17 @@ export default function DateRangePicker({
   );
 
   const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newStart = new Date(e.target.value);
-    setStart(e.target.value);
-    onChange(newStart, endDate ?? newStart); // endDate가 없으면 start랑 동일
+    const value = e.target.value;
+    const newStart = value ? new Date(value) : null;
+    setStart(value);
+    onChange(newStart, endDate);
   };
 
   const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newEnd = new Date(e.target.value);
-    setEnd(e.target.value);
-    onChange(startDate ?? newEnd, newEnd);
+    const value = e.target.value;
+    const newEnd = value ? new Date(value) : null;
+    setEnd(value);
+    onChange(startDate, newEnd);
   };
 
   return (
