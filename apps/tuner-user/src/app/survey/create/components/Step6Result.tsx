@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 interface Step6Props {
   onPrev: () => void;
@@ -16,13 +17,13 @@ export default function Step6Result({ onPrev }: Step6Props) {
 
       <div className="min-h-screen flex justify-center px-4">
         <div className="bg-white w-full max-w-[485px] py-10 text-center flex flex-col justify-center items-center gap-10">
-          <div>
-            <img
-              src="/images/check.png"
-              alt="성공"
-              className="w-[64px] h-[64px] object-contain"
-            />
-          </div>
+          <Image
+            src="/images/check.png"
+            alt="성공"
+            width={64}
+            height={64}
+            className="object-contain"
+          />
 
           <div className="text-xl font-bold text-gray-800">
             <p>설문 생성 완료</p>

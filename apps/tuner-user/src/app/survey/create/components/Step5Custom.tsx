@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import type { CustomQuestion } from "@/features/survey/store/useSurveyStore";
 import { QuestionTypeEnum } from "@/features/survey/types/enums";
