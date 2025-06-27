@@ -63,7 +63,7 @@ export const createTemplate = async (formData: TemplateType) => {
 
 //템플릿 불러오기
 export const fetchTemplates = async () => {
-  const response = await axiosClient.get("/template");
+  const response = await axiosClient.get("/template/:id");
   return response.data;
 };
 
