@@ -1,11 +1,11 @@
 "use client";
 
 import { useFunnel } from "@/features/survey/hooks/useFunnel";
-import Step1YouTube from "./components/Step1YouTube";
-import Step2Meta from "./components/Step2Meta";
-import Step3Type from "./components/Step3Type";
-import Step4Default from "./components/Step4Default";
-import Step5Custom from "./components/Step5Custom";
+import Step1YouTube from "./Step1YouTube";
+import Step2Meta from "./Step2Meta";
+import Step3Type from "./Step3Type";
+import Step4Default from "./Step4Default";
+import Step5Custom from "./Step5Custom";
 
 type Step = "step1" | "step2" | "step3" | "step4" | "step5";
 
