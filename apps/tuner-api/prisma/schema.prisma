@@ -71,6 +71,8 @@ enum QuestionType {
   text
   multiple_choice
   check_box
+  ranking
+  likert
 }
 
 // 설문 기간
