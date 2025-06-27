@@ -71,6 +71,8 @@ enum QuestionType {
   text
   multiple_choice
   check_box
+  ranking
+  likert
 }
 
 enum SurveyActive {
