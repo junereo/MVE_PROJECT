@@ -1,8 +1,24 @@
+"use client";
+
 import UserProfile from "./components/UserProfile";
 import WalletInfo from "./components/WalletInfo";
 import SurveyStats from "./components/SurveyStatus";
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function MyPage() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.replace("/auth"); // 비로그인 시 로그인 페이지로
+    }
+  }, [user, router]);
+
+  if (!user) return null;
+
   return (
     <div className="bg-gray-100 min-h-screen space-y-2">
       <UserProfile />
