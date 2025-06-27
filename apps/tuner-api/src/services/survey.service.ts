@@ -11,10 +11,9 @@ const prisma = new PrismaClient();
 
 // 설문 맵핑 
 const convertType = (t: string): QuestionType => {
-    if (t === 'multiple' || t === 'checkbox') return 'multiple_choice';
+    if (t === 'multiple') return 'multiple_choice';
+    if (t === 'checkbox') return 'check_box';
     if (t === 'subjective') return 'text';
-    if (t === 'likert') return 'likert';
-    if (t === 'ranking') return 'ranking';
     return 'text';
 };
 
