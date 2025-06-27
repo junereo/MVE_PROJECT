@@ -4,10 +4,11 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const createTemplateHandler = async (req: Request, res: Response): Promise<void> => {
+export const createTemplateHandler = async (req: Request, res: Response) => {
     try {
         const { template_name, template } = req.body;
 
+        console.log(req.body);
         if (!template_name || !template) {
             res.status(400).json({ success: false, message: "템플릿 이름 또는 내용이 없습니다." });
             return
@@ -22,7 +23,7 @@ export const createTemplateHandler = async (req: Request, res: Response): Promis
 };
 
 
-export const getTemplateHandler = async (req: Request, res: Response): Promise<void> => {
+export const getTemplateHandler = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.templateId);
 
