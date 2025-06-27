@@ -8,11 +8,11 @@ import { QuestionTypeEnum } from "@/features/survey/types/enums";
 import { formatSurveyPayload } from "@/features/survey/utils/formatSurveyPayload";
 import { createSurvey, saveSurvey } from "@/features/survey/services/survey";
 import Button from "@/components/ui/Button";
-import Modal from "@/components/ui/Modal";
 import CustomForm from "../../components/CustomForm";
 
 interface Step5Props {
   onPrev: () => void;
+  onNext: () => void;
 }
 
 // 질문 타입 옵션 정의
@@ -22,7 +22,7 @@ const typeOptions = [
   { label: "서술형", value: QuestionTypeEnum.SUBJECTIVE },
 ];
 
-export default function Step5Custom({ onPrev }: Step5Props) {
+export default function Step5Custom({ onPrev, onNext }: Step5Props) {
   const { setStep5 } = useSurveyStore();
   const [questions, setQuestions] = useState<CustomQuestion[]>([
     {
@@ -32,24 +32,6 @@ export default function Step5Custom({ onPrev }: Step5Props) {
       options: ["", "", "", "", ""],
     },
   ]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState({
-    image: "",
-    description: "",
-    buttonLabel: "",
-    redirectTo: "",
-  });
-
-  const router = useRouter();
-
-  const handleClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleNext = () => {
-    setIsModalOpen(false);
-    router.push(modalContent.redirectTo);
-  };
 
   // 질문 추가
   const addCustomQuestion = () => {
@@ -129,9 +111,11 @@ export default function Step5Custom({ onPrev }: Step5Props) {
     try {
       const payload = formatSurveyPayload();
       await createSurvey(payload);
+      onNext();
     } catch (err) {
       // 설문 생성 실패
       console.log(err);
+      onNext();
     }
   };
 
