@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import tp from "@/app/template/components/Templates";
+// import tp from "@/app/template/components/Templates";
 import templates from "@/app/template/components/Templates";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { createTemplate } from "@/lib/network/api";
 import { TemplateType } from "@/types";
 
 export default function TemplateSelectPage() {
-  const router = useRouter();
-  const templateKeys = Object.keys(tp); // ["originality", "popularity", ...]
-  const [openKey, setOpenKey] = useState<string | null>(null); // 펼친 상태
+  // const router = useRouter();
+  // const templateKeys = Object.keys(tp); // ["originality", "popularity", ...]
+  // const [openKey, setOpenKey] = useState<string | null>(null); // 펼친 상태
   const [loading, setLoading] = useState(false); // 버튼 중복 방지
 
   const handleTemplateSave = async () => {
@@ -42,7 +42,7 @@ export default function TemplateSelectPage() {
         >
           📝 템플릿 저장하기
         </button>
-        {templateKeys.map((key) => (
+        {/* {templateKeys.map((key) => (
           <div key={key} className="border rounded-lg p-4 shadow">
             <div
               className="cursor-pointer font-semibold text-lg text-indigo-600 flex justify-between items-center"
@@ -84,7 +84,7 @@ export default function TemplateSelectPage() {
               </div>
             )}
           </div>
-        ))}
+        ))} */}
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
-import { SurveyCreatePayload, TemplateType } from "@/types";
+import { SurveyCreatePayload, TemplateType, LoginFormData } from "@/types";
 
 import axiosClient from "@/lib/network/axios";
 
 // 로그인 요청
-export const pushLogin = async (formData: any) => {
+export const pushLogin = async (formData: LoginFormData) => {
   const res = await axiosClient.post("/admin/login", formData);
   return res.data;
 };
@@ -62,8 +62,8 @@ export const createTemplate = async (formData: TemplateType) => {
 };
 
 //템플릿 불러오기
-export const fetchTemplates = async () => {
-  const response = await axiosClient.get("/template");
+export const fetchTemplates = async (id: number | string) => {
+  const response = await axiosClient.get(`/template/${id}`);
   return response.data;
 };
 

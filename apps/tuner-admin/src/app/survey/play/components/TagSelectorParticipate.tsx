@@ -17,6 +17,7 @@ export const predefinedTags: { [key: string]: string } = {
 
 interface TagSelectorParticipateProps {
   tags: string[]; // 영어 key 배열로 수정
+  onChange: (selected: string[]) => void;
 }
 
 const TagSelectorParticipate = ({ tags }: TagSelectorParticipateProps) => {
