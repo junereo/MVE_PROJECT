@@ -13,10 +13,12 @@ export type SurveyPayload = {
   is_released: boolean;
   genre: string;
 
-  survey_type: SurveyTypeEnum;
+  type: SurveyTypeEnum;
   reward_amount: number;
   reward: number;
   expert_reward: number;
 
-  customQuestions: string; //JSON.stringify 문자열
+  template_id: number;
+
+  allQuestions: string; //JSON.stringify 문자열
 };

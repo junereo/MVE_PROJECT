@@ -107,12 +107,15 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
   // 설문 생성
   const handleSubmit = async () => {
     setStep5({ customQuestions: questions });
+
     try {
       const payload = formatSurveyPayload();
+      console.log("🚀 생성 요청 payload", payload); // 여기에 찍어서 확인
       await createSurvey(payload);
       onNext();
     } catch (err) {
       // 설문 생성 실패
+      console.error("🔥 설문 생성 에러", err); // 여기도 콘솔로 확인
       console.log(err);
       onNext();
     }
