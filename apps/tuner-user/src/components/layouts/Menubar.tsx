@@ -9,7 +9,7 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Menubar({ isOpen, onClose }: SidebarProps) {
   const { user } = useAuthStore();
 
   if (!isOpen) return null;
