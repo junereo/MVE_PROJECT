@@ -2,7 +2,7 @@ import { UserIcon } from "lucide-react";
 import { useUser } from "@/features/auth/hooks/useUser";
 
 export default function UserProfile() {
-  const { data, error } = useUser();
+  const { data } = useUser();
 
   if (!data) return <p>로딩 중...</p>;
   const user = data.data.user;
