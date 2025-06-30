@@ -110,12 +110,10 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
 
     try {
       const payload = formatSurveyPayload();
-      console.log("생성 요청 payload", payload); // 여기에 찍어서 확인
       await createSurvey(payload);
       setSurveySubmitStatus("success");
       onNext();
     } catch (err) {
-      // 설문 생성 실패
       console.error("설문 생성 에러", err);
       setSurveySubmitStatus("error");
       onNext();
@@ -125,12 +123,16 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
   // 임시저장
   const handleSave = async () => {
     setStep5({ customQuestions: questions });
+
     try {
       const payload = formatSurveyPayload();
-      console.log("임시저장 payload", payload);
       await saveSurvey(payload);
+      setSurveySubmitStatus("saved"); // 임시저장 성공 상태로 업데이트
+      onNext();
     } catch (err) {
       console.error("임시저장 에러", err);
+      setSurveySubmitStatus("save-error"); // 실패 상태로 업데이트
+      onNext();
     }
   };
 
