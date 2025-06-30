@@ -4,7 +4,7 @@ import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
 import Wrapper from "@/components/layouts/Wrapper";
-import List from "../(main)/components/MainSurveyList";
+import SurveyList from "./components/ui/SurveyList";
 import SurveyBreadcrumb from "@/features/survey/components/SurveyBreadcrumb";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -25,10 +25,9 @@ export default function Survey() {
           </p>
         </section>
 
-        <List />
+        <SurveyList />
       </Wrapper>
 
-      {/* 플로팅 버튼만 별도 배치 */}
       <Link
         href="/survey/create"
         className="    fixed bottom-[80px] z-20 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm"
