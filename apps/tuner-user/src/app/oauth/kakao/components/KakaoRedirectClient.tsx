@@ -8,7 +8,7 @@ import { socialLogin } from "@/features/auth/services/login";
 export default function KakaoRedirectClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { setUser } = useAuthStore();
+  const { setUser, setInitialized } = useAuthStore();
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -17,13 +17,14 @@ export default function KakaoRedirectClient() {
       socialLogin("kakao", code)
         .then((res) => {
           setUser(res.data.user);
+          setInitialized(true);
           router.push("/"); // 로그인 후 홈으로
         })
         .catch(() => {
           router.push("/auth");
         });
     }
-  }, [searchParams, setUser, router]);
+  }, [searchParams, setUser, router, setInitialized]);
 
   return (
     <div className="flex justify-center items-center h-screen">
