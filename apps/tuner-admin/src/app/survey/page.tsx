@@ -23,22 +23,22 @@ const statusOptions = ["전체 상태", "예정", "진행중", "종료"];
 const typeOptions = ["전체 유형", "일반 설문", "리워드 설문"];
 
 // 고정된 초기 더미 데이터 (절대 랜덤 X)
-const baseSurveys: SurveyItem[] = Array.from({ length: 20 }, (_, i) => {
-  const id = 20 - i;
-  const statuses = ["예정", "진행중", "종료"] as const;
-  const types = ["general", "official"] as const;
-  return {
-    id,
-    survey_title: `설문 제목 ${id}`,
-    title: `음원 ${id}`,
-    start_at: "2025-06-01",
-    end_at: "2025-06-30",
-    is_active: statuses[id % 3],
-    surveyType: types[id % 2],
-    participantCount: 0, // 여기서는 0으로 고정!
-    reward_amount: id % 2 === 1 ? undefined : 100 + id * 5,
-  };
-});
+// const baseSurveys: SurveyItem[] = Array.from({ length: 20 }, (_, i) => {
+//   const id = 20 - i;
+//   const statuses = ["예정", "진행중", "종료"] as const;
+//   const types = ["general", "official"] as const;
+//   return {
+//     id,
+//     survey_title: `설문 제목 ${id}`,
+//     title: `음원 ${id}`,
+//     start_at: "2025-06-01",
+//     end_at: "2025-06-30",
+//     is_active: statuses[id % 3],
+//     surveyType: types[id % 2],
+//     participantCount: 0, // 여기서는 0으로 고정!
+//     reward_amount: id % 2 === 1 ? undefined : 100 + id * 5,
+//   };
+// });
 export const surveylist = async (): Promise<SurveyItem[]> => {
   const { data } = await surveyList();
 
@@ -71,7 +71,8 @@ export const surveylist = async (): Promise<SurveyItem[]> => {
 
 export default function SurveyListPage() {
   const router = useRouter();
-  const [surveys, setSurveys] = useState<SurveyItem[]>(baseSurveys);
+  // const [surveys, setSurveys] = useState<SurveyItem[]>(baseSurveys);
+  const [surveys, setSurveys] = useState<SurveyItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("전체 상태");
   const [typeFilter, setTypeFilter] = useState("전체 유형");
@@ -80,14 +81,17 @@ export default function SurveyListPage() {
   // const [surveyList, setSurveyList] = useState<SurveyItem[]>();
   const surveysPerPage = 10;
 
-  // 🔐 클라이언트에서만 랜덤 participantCount 주입
   useEffect(() => {
-    const randomized = baseSurveys.map((s) => ({
-      ...s,
-      participantCount: Math.floor(Math.random() * 100),
-    }));
-    setSurveys(randomized);
-    surveylist();
+    const fetchSurveys = async () => {
+      try {
+        const list = await surveylist(); // 실제 API 응답
+        setSurveys(list); // 상태에 설정
+      } catch (err) {
+        console.error("설문 리스트 불러오기 실패:", err);
+      }
+    };
+
+    fetchSurveys();
   }, []);
 
   // 필터링 + 정렬

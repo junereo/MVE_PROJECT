@@ -63,3 +63,4 @@ export interface TemplateType {
   template_name: string;
   template: Record<string, TemplateQuestion[]>;
 }
+// types/survey.ts
