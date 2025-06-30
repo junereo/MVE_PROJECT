@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import ListItem from "../../../components/ui/ListItem";
+import { surveyList } from "@/features/survey/services/survey";
 
 const ListItems = [
   {
@@ -50,6 +52,10 @@ const ListItems = [
 ] as const;
 
 export default function List() {
+  useEffect(() => {
+    surveyList().then((res) => console.log(res));
+  }, []);
+
   return (
     <div className="flex flex-col gap-3">
       {ListItems.map((item) => (
