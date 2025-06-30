@@ -4,7 +4,7 @@ import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
 import Wrapper from "@/components/layouts/Wrapper";
-import List from "../(main)/components/List";
+import List from "../(main)/components/MainSurveyList";
 import SurveyBreadcrumb from "@/features/survey/components/SurveyBreadcrumb";
 import Link from "next/link";
 import { Plus } from "lucide-react";
