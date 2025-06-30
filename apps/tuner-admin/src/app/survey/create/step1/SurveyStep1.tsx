@@ -23,7 +23,7 @@ const SurveyStep1 = () => {
         youtubeVideoId: videoId,
         youtubeTitle: title,
         youtubeThumbnail: thumbnail,
-        channel_title: channelTitle ?? undefined,
+        channelTitle: channelTitle ?? undefined,
         url: `https://www.youtube.com/watch?v=${videoId}`,
       });
     }
@@ -78,7 +78,7 @@ const SurveyStep1 = () => {
               <input
                 value={step1.artist || ""}
                 onChange={(e) => handleInputChange("artist", e.target.value)}
-                placeholder={step1.channel_title || "아티스트명을 입력해주세요"}
+                placeholder={step1.channelTitle || "아티스트명을 입력해주세요"}
                 className="border p-2 w-full"
                 disabled={!step1.youtubeVideoId}
               />
