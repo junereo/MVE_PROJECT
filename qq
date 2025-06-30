@@ -1,0 +1,19 @@
+              List of relations
+ Schema |        Name         | Type  | Owner 
+--------+---------------------+-------+-------
+ public | Admin               | table | tuner
+ public | Music               | table | tuner
+ public | Rewards             | table | tuner
+ public | SBT_Issuance        | table | tuner
+ public | Survey              | table | tuner
+ public | Survey_Custom       | table | tuner
+ public | Survey_Responses    | table | tuner
+ public | Survey_Result       | table | tuner
+ public | Survey_Template     | table | tuner
+ public | User                | table | tuner
+ public | User_Balance        | table | tuner
+ public | User_OAuth          | table | tuner
+ public | Withdrawal_Requests | table | tuner
+ public | _prisma_migrations  | table | tuner
+(14 rows)
+

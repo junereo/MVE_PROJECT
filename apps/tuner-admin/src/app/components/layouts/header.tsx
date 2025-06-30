@@ -35,7 +35,7 @@ export default function Header() {
           관리자 대시보드
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-green-600">ID: {admin?.id}</span>
+          <span className="text-green-600">ID: {admin?.role}</span>
           <span className="text-green-600">닉네임: {admin?.name}</span>
           <Button color="blue" onClick={() => setShowModal(true)}>
             LogOut

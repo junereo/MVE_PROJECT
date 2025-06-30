@@ -33,7 +33,8 @@ export const nftList = async () => {
 
 // 발급된 설문 리스트
 export const surveyList = async () => {
-  await axiosClient.get("/survey");
+  const res = await axiosClient.get("/survey/list");
+  return res;
 };
 
 // 새로운 설문 만들기
