@@ -57,6 +57,9 @@ interface SurveyState {
   setStep3: (data: Partial<SurveyStep3>) => void;
   step5: SurveyStep5;
   setStep5: (data: SurveyStep5) => void;
+
+  surveySubmitStatus: "success" | "error" | null;
+  setSurveySubmitStatus: (status: "success" | "error" | null) => void;
 }
 
 export const useSurveyStore = create<SurveyState>((set) => ({
@@ -107,4 +110,8 @@ export const useSurveyStore = create<SurveyState>((set) => ({
     set(() => ({
       step5: data,
     })),
+
+  surveySubmitStatus: null,
+  setSurveySubmitStatus: (status) =>
+    set(() => ({ surveySubmitStatus: status })),
 }));

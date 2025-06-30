@@ -1,32 +1,22 @@
 "use client";
 
 import { useFunnel } from "@/features/survey/hooks/useFunnel";
+import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
 import Step1YouTube from "./Step1YouTube";
 import Step2Meta from "./Step2Meta";
 import Step3Type from "./Step3Type";
 import Step4Default from "./Step4Default";
 import Step5Custom from "./Step5Custom";
 import Step6Result from "./Step6Result";
-import { useEffect } from "react";
-import { useAuthStore } from "@/features/auth/store/authStore";
-import { useRouter } from "next/navigation";
 
 type Step = "step1" | "step2" | "step3" | "step4" | "step5" | "step6";
 
 export default function SurveyCreateClient() {
-  const { user } = useAuthStore();
-  const router = useRouter();
+  const { isInitialized } = useAuthGuard();
 
-  useEffect(() => {
-    if (!user) {
-      router.replace("/auth"); // 로그인 페이지 경로에 맞게 수정
-    }
-  }, [user, router]);
+  if (!isInitialized) return null; // 아직 로그인 여부 확인 중이면 렌더링 X
 
-  if (!user) return null;
-
-  const steps: Step[] = ["step1", "step2", "step3", "step4", "step5", "step6"];
-  const { Funnel, setStep, currentStep } = useFunnel<Step>(steps, "step1");
+  const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
 
   return (
     <div className="mx-auto py-8">

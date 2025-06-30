@@ -22,7 +22,7 @@ const typeOptions = [
 ];
 
 export default function Step5Custom({ onPrev, onNext }: Step5Props) {
-  const { setStep5 } = useSurveyStore();
+  const { setStep5, setSurveySubmitStatus } = useSurveyStore();
   const [questions, setQuestions] = useState<CustomQuestion[]>([
     {
       id: 1,
@@ -110,13 +110,14 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
 
     try {
       const payload = formatSurveyPayload();
-      console.log("🚀 생성 요청 payload", payload); // 여기에 찍어서 확인
+      console.log("생성 요청 payload", payload); // 여기에 찍어서 확인
       await createSurvey(payload);
+      setSurveySubmitStatus("success");
       onNext();
     } catch (err) {
       // 설문 생성 실패
-      console.error("🔥 설문 생성 에러", err); // 여기도 콘솔로 확인
-      console.log(err);
+      console.error("설문 생성 에러", err);
+      setSurveySubmitStatus("error");
       onNext();
     }
   };
@@ -126,10 +127,10 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
     setStep5({ customQuestions: questions });
     try {
       const payload = formatSurveyPayload();
-
+      console.log("임시저장 payload", payload);
       await saveSurvey(payload);
     } catch (err) {
-      console.log(err);
+      console.error("임시저장 에러", err);
     }
   };
 
