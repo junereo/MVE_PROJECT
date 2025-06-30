@@ -27,6 +27,23 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
     step3.expert_reward ? String(step3.expert_reward) : ""
   );
 
+  const total = Number(rewardAmount);
+  const general = Number(reward);
+  const expert = Number(expertReward);
+
+  const isValid =
+    surveyType === SurveyTypeEnum.GENERAL ||
+    (rewardAmount.trim() !== "" &&
+      reward.trim() !== "" &&
+      expertReward.trim() !== "" &&
+      !isNaN(total) &&
+      !isNaN(general) &&
+      !isNaN(expert) &&
+      total > 0 &&
+      general > 0 &&
+      expert > 0 &&
+      total === general + expert);
+
   const handleNext = () => {
     setStep3({
       surveyType,
@@ -91,6 +108,17 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
               onChange={(e) => setExpertReward(e.target.value)}
               placeholder="Expert 회원에게 지급할 리워드를 입력해주세요."
             />
+
+            {surveyType === SurveyTypeEnum.OFFICIAL &&
+              rewardAmount &&
+              reward &&
+              expertReward &&
+              total !== general + expert && (
+                <p className="text-sm text-red-500">
+                  리워드 총량 = 일반 회원 리워드 + Expert 회원 리워드여야
+                  합니다.
+                </p>
+              )}
           </>
         )}
         {surveyType === SurveyTypeEnum.GENERAL && (
@@ -109,7 +137,7 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
           </Button>
         </div>
         <div className="w-[180px] sm:w-[400px]">
-          <Button onClick={handleNext} color="blue">
+          <Button onClick={handleNext} disabled={!isValid} color="blue">
             다음
           </Button>
         </div>

@@ -1,10 +1,27 @@
 "use client";
 
-import { useUser } from "../hooks/useUser";
+import { useEffect } from "react";
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { getMe } from "@/features/auth/services/login";
 
-// 최초 실행 시 Zustand에 로그인 사용자 저장
+// 사용자 로그인 상태 동기화
 export default function AuthInitializer() {
-  useUser(); // 로그인 상태 확인 자동으로 실행, 페이지 진입 => `/auth/me` => zustand user 저장
+  const { setUser, setInitialized } = useAuthStore();
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const res = await getMe(); // 사용자 {id, nickname} 요청
+        setUser(res.data); // 성공 시 setUser에 상태 저장
+      } catch {
+        setUser(null); // 실패 시 null
+      } finally {
+        setInitialized(true); // 완료 후 로그인 체크 true
+      }
+    };
+
+    init();
+  }, [setUser, setInitialized]);
 
   return null;
 }

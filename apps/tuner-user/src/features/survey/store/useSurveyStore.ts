@@ -46,6 +46,9 @@ export interface SurveyStep5 {
   customQuestions: CustomQuestion[];
 }
 
+// 설문 생성 성공 / 에러 / 임시저장 성공 / 에러
+type SurveySubmitStatus = "success" | "error" | "saved" | "save-error" | null;
+
 interface SurveyState {
   selectedVideo: SelectedVideo | null;
   setSelectedVideo: (video: SelectedVideo | null) => void;
@@ -57,6 +60,9 @@ interface SurveyState {
   setStep3: (data: Partial<SurveyStep3>) => void;
   step5: SurveyStep5;
   setStep5: (data: SurveyStep5) => void;
+
+  surveySubmitStatus: SurveySubmitStatus;
+  setSurveySubmitStatus: (status: SurveySubmitStatus) => void;
 }
 
 export const useSurveyStore = create<SurveyState>((set) => ({
@@ -107,4 +113,8 @@ export const useSurveyStore = create<SurveyState>((set) => ({
     set(() => ({
       step5: data,
     })),
+
+  surveySubmitStatus: null,
+  setSurveySubmitStatus: (status) =>
+    set(() => ({ surveySubmitStatus: status })),
 }));
