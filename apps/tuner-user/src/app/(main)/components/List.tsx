@@ -1,74 +1,49 @@
 "use client";
 
-import { useEffect } from "react";
-import ListItem from "../../../components/ui/ListItem";
+import { useState, useEffect } from "react";
 import { surveyList } from "@/features/survey/services/survey";
-
-const ListItems = [
-  {
-    id: 1,
-    thumbnail_url: `https://i.ytimg.com/vi/LBHVOiw274A/hqdefault.jpg`,
-    artist: "Beenzino (빈지노)",
-    title: "Fashion Hoarder (Feat. ZENE THE ZILLA)",
-    surveyTitle: "Fashion Hoarder 설문",
-    period: "25.06.19 - 25.06.26",
-    status: "종료",
-    participants: 48,
-    reward: 435,
-  },
-  {
-    id: 2,
-    thumbnail_url: `https://i.ytimg.com/vi/08h8u8Z9iJQ/hqdefault.jpg`,
-    artist: "Beenzino (빈지노)",
-    title: "Aqua Man",
-    surveyTitle: "Aqua Man 설문",
-    period: "25.06.19 - 25.06.26",
-    status: "종료",
-    participants: 70,
-    reward: 435,
-  },
-  {
-    id: 3,
-    thumbnail_url: `https://i.ytimg.com/vi/UDyPp9bkfD0/hqdefault.jpg`,
-    artist: "DPR LIVE",
-    title: "Martini Blue",
-    surveyTitle: "Martini Blue 설문",
-    period: "25.06.19 - 25.06.26",
-    status: "종료",
-    participants: 26,
-    reward: 435,
-  },
-  {
-    id: 4,
-    thumbnail_url: `https://i.ytimg.com/vi/ppudgIu2TaM/hqdefault.jpg`,
-    artist: "Jazzyfact (재지팩트)",
-    title: "아까워",
-    surveyTitle: "아까워 설문",
-    period: "25.06.19 - 25.06.26",
-    status: "종료",
-    participants: 39,
-    reward: 125,
-  },
-] as const;
+import ListItem from "../../../components/ui/ListItem";
+import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
 
 export default function List() {
+  const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
+
   useEffect(() => {
-    surveyList().then((res) => console.log(res));
+    const fetchSurveys = async () => {
+      try {
+        const res = await surveyList();
+
+        const sorted = res.data.sort(
+          (a: SurveyResponse, b: SurveyResponse) =>
+            new Date(b.create_at).getTime() - new Date(a.create_at).getTime()
+        );
+
+        setSurveys(sorted);
+      } catch (err) {
+        console.error("설문 목록 가져오기 실패:", err);
+      }
+    };
+
+    fetchSurveys();
   }, []);
 
   return (
     <div className="flex flex-col gap-3">
-      {ListItems.map((item) => (
+      {surveys.map((item) => (
         <ListItem
           key={item.id}
-          image={item.thumbnail_url}
-          artist={item.artist}
-          title={item.title}
-          surveyTitle={item.surveyTitle}
-          period={item.period}
-          status={item.status}
-          participants={item.participants}
-          reward={item.reward}
+          image={item.music.thumbnail_url}
+          artist={item.music.artist}
+          title={item.music.title}
+          surveyTitle={item.survey_title}
+          period={`${item.start_at
+            .slice(2, 10)
+            .replace(/-/g, ".")} - ${item.end_at
+            .slice(2, 10)
+            .replace(/-/g, ".")}`}
+          status={item.is_active === "ongoing" ? "진행중" : "종료"}
+          participants={item.survey_custom?.length || 0}
+          reward={item.reward_amount}
         />
       ))}
     </div>
