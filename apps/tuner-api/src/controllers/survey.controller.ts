@@ -16,7 +16,7 @@ interface AuthRequest extends Request {
     };
 }
 
-export const createSurveyHandler = async (req: AuthRequest, res: Response): Promise<void> => {
+export const createSurveyHandler = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user?.userId;
         const adminId = req.admin?.adminId;
@@ -27,6 +27,8 @@ export const createSurveyHandler = async (req: AuthRequest, res: Response): Prom
             return;
         }
 
+        console.log('설문 생성 요청 데이터:', data);
+
         const survey = await createSurvey({
             userId,
             adminId,
@@ -35,9 +37,15 @@ export const createSurveyHandler = async (req: AuthRequest, res: Response): Prom
 
         res.status(201).json({ success: true, data: survey });
     } catch (err: any) {
-        res.status(500).json({ success: false, message: '설문 생성 실패', error: err.message });
+        console.error('설문 생성 실패:', err);
+        res.status(500).json({
+            success: false,
+            message: '설문 생성 실패',
+            error: err.message || err,
+        });
     }
 };
+
 
 export const getSurveyList = async (req: Request, res: Response) => {
     try {
@@ -85,4 +93,12 @@ export const updateSurvey = async (req: Request, res: Response): Promise<void> =
         return;
     }
 
-};
+    try {
+        const updatedSurvey = await updateSurveyService(surveyId, body);
+        res.status(200).json({ success: true, data: updatedSurvey });
+    } catch (err: any) {
+        console.error('설문 수정 실패:', err);
+        res.status(500).json({ success: false, message: '설문 수정 실패', error: err.message });
+    };
+}
+

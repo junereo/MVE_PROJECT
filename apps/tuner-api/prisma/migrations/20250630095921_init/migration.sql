@@ -23,7 +23,7 @@ CREATE TYPE "SurveyType" AS ENUM ('general', 'official');
 CREATE TYPE "SurveyTags" AS ENUM ('감각적인', '화려한', '감성적인', '몽환적인', '트렌디한', '복고풍', '중독성있는', '잔잔한', '역동적인', '독창적인');
 
 -- CreateEnum
-CREATE TYPE "QuestionType" AS ENUM ('text', 'multiple_choice', 'check_box');
+CREATE TYPE "QuestionType" AS ENUM ('text', 'multiple_choice', 'check_box', 'ranking', 'likert');
 
 -- CreateEnum
 CREATE TYPE "SurveyActive" AS ENUM ('upcoming', 'ongoing', 'closed');
@@ -83,17 +83,6 @@ CREATE TABLE "User_OAuth" (
 );
 
 -- CreateTable
-CREATE TABLE "User_Balance" (
-    "id" SERIAL NOT NULL,
-    "user_id" TEXT NOT NULL,
-    "current_reward" INTEGER NOT NULL,
-    "total_withdrawn" INTEGER NOT NULL,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "User_Balance_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Admin" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
@@ -110,7 +99,6 @@ CREATE TABLE "Admin" (
 -- CreateTable
 CREATE TABLE "Survey" (
     "id" SERIAL NOT NULL,
-    "template_id" INTEGER NOT NULL,
     "survey_title" TEXT NOT NULL,
     "create_userId" TEXT,
     "create_adminId" TEXT,
@@ -145,17 +133,6 @@ CREATE TABLE "Survey_Responses" (
     "rewarded" BOOLEAN NOT NULL,
 
     CONSTRAINT "Survey_Responses_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Survey_Template" (
-    "id" SERIAL NOT NULL,
-    "template_name" TEXT NOT NULL,
-    "template" JSONB NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Survey_Template_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -265,9 +242,6 @@ CREATE UNIQUE INDEX "Survey_Result_survey_id_key" ON "Survey_Result"("survey_id"
 ALTER TABLE "User_OAuth" ADD CONSTRAINT "User_OAuth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User_Balance" ADD CONSTRAINT "User_Balance_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Survey" ADD CONSTRAINT "Survey_create_userId_fkey" FOREIGN KEY ("create_userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -275,9 +249,6 @@ ALTER TABLE "Survey" ADD CONSTRAINT "Survey_create_adminId_fkey" FOREIGN KEY ("c
 
 -- AddForeignKey
 ALTER TABLE "Survey" ADD CONSTRAINT "Survey_music_id_fkey" FOREIGN KEY ("music_id") REFERENCES "Music"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Survey" ADD CONSTRAINT "Survey_template_id_fkey" FOREIGN KEY ("template_id") REFERENCES "Survey_Template"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Survey_Responses" ADD CONSTRAINT "Survey_Responses_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

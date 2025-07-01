@@ -66,7 +66,7 @@ enum SurveyTags {
   독창적인
 }
 
-// 커스텀 설문 옵
+// 커스텀 설문 옵션
 enum QuestionType {
   text
   multiple_choice
@@ -133,7 +133,6 @@ model User {
   updated_at      DateTime  @updatedAt
 
   oauths              User_OAuth[] // Relation (1:N)
-  balances            User_Balance[]
   surveys             Survey[]              @relation("SurveyCreator") // 내가 만든설문 연결
   responses           Survey_Responses[]
   Rewards             Rewards[]
@@ -155,16 +154,6 @@ model User_OAuth {
   user   User   @relation(fields: [userId], references: [id])
 }
 
-model User_Balance {
-  id              Int      @id @default(autoincrement())
-  user_id         String
-  current_reward  Int
-  total_withdrawn Int
-  updated_at      DateTime
-
-  user User @relation(fields: [user_id], references: [id])
-}
-
 model Admin {
   id           String    @id @default(uuid())
   email        String    @unique
@@ -183,7 +172,6 @@ model Admin {
 
 model Survey {
   id               Int          @id @default(autoincrement())
-  template_id      Int
   survey_title     String
   create_userId    String?
   create_adminId   String?
@@ -209,7 +197,6 @@ model Survey {
   result        Survey_Result?
   survey_custom Survey_Custom[]
   music         Music              @relation(fields: [music_id], references: [id])
-  template      Survey_Template    @relation(fields: [template_id], references: [id])
 
   Rewards Rewards[]
 }
@@ -226,16 +213,6 @@ model Survey_Responses {
 
   user   User   @relation(fields: [user_id], references: [id])
   survey Survey @relation(fields: [survey_id], references: [id])
-}
-
-model Survey_Template {
-  id            Int      @id @default(autoincrement())
-  template_name String
-  template      Json
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
-  survey Survey[]
 }
 
 model Survey_Custom {
