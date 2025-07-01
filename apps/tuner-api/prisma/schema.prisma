@@ -68,7 +68,7 @@ enum SurveyTags {
 
 // 커스텀 설문 옵션
 enum QuestionType {
-  text
+  subjective
   multiple_choice
   check_box
   ranking

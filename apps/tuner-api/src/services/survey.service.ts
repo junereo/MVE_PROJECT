@@ -4,16 +4,19 @@ import {
   SurveyActive,
   QuestionType,
   SurveyType,
-  Prisma,
+  SurveyStatus,
 } from '@prisma/client';
+// import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
 
 const prisma = new PrismaClient();
 
-// 설문 맵핑 
+// 설문 맵핑
 const convertType = (t: string): QuestionType => {
   if (t === 'multiple_choice') return 'multiple_choice';
   if (t === 'check_box') return 'check_box';
   if (t === 'text') return 'text';
+  if (t === 'ranking') return 'ranking';
+  if (t === 'likert') return 'likert';
   return 'text';
 };
 
@@ -22,7 +25,6 @@ const checkSurveyActive = (_start: Date | string, _end: Date | string): SurveyAc
   const now = new Date();
   const start = new Date(_start);
   const end = new Date(_end);
-
   const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 
   if (kstNow < start) return 'upcoming';
@@ -35,7 +37,7 @@ const isSurveyType = (value: any): value is SurveyType => {
   return Object.values(SurveyType).includes(value);
 };
 
-// 설문 생성
+// ✅ 설문 생성 (템플릿 제거 버전)
 export const createSurvey = async ({
   userId,
   adminId,
@@ -68,7 +70,7 @@ export const createSurvey = async ({
         },
       });
 
-      //  태그 파싱
+      // 태그 파싱
       const tagValues: SurveyTags[] = (Object.values(body.tags || {}) as string[])
         .filter((v): v is SurveyTags =>
           Object.values(SurveyTags).includes(v as SurveyTags)
@@ -90,7 +92,6 @@ export const createSurvey = async ({
           tags: { set: tagValues },
           status: body.status ?? 'draft',
           survey_title: body.survey_title,
-          template_id: body.template_id,
 
           ...(surveyType === SurveyType.official && {
             reward: body.reward,
@@ -100,56 +101,35 @@ export const createSurvey = async ({
         },
       });
 
-      // 템플릿 가져오기
-      const template = await tx.survey_Template.findUnique({
-        where: { id: body.template_id },
-      });
-      if (!template) throw new Error(`템플릿 ID ${body.template_id} 없음`);
+      // // ✅ 고정 질문 삽입
+      // const fixedQuestions = FIXED_SURVEY_QUESTIONS.map((q, idx) => ({
+      //   survey_id: survey.id,
+      //   question_text: q.question_text,
+      //   question_type: q.question_type,
+      //   options: JSON.stringify(q.options ?? []),
+      //   is_required: true,
+      //   question_order: idx + 1,
+      // }));
 
-      // 타입 선언 
-      const templateJson = template.template as { questions: any[] };
-      const templateQuestions = Array.isArray(templateJson.questions)
-        ? templateJson.questions
-        : [];
+      // // ✅ 커스텀 질문 삽입
+      // const additionalQuestions = Array.isArray(body.additionalQuestions)
+      //   ? body.additionalQuestions
+      //   : JSON.parse(body.additionalQuestions || '[]');
 
-      const surveyCustoms: Prisma.Survey_QuestionsCreateManyInput[] = [];
+      // const customQuestions = additionalQuestions.map((q: any, idx: number) => ({
+      //   survey_id: survey.id,
+      //   question_text: q.text?.trim() || '(비어 있는 질문)',
+      //   question_type: convertType(q.type),
+      //   options: JSON.stringify(q.options ?? []),
+      //   is_required: q.is_required ?? true,
+      //   question_order: FIXED_SURVEY_QUESTIONS.length + idx + 1,
+      // }));
 
-      // 템플릿 복제
-      templateQuestions.forEach((q: any, idx: number) => {
-        surveyCustoms.push({
-          survey_id: survey.id,
-          question_text: q.question,
-          question_type: convertType(q.type),
-          options: JSON.stringify(q.options ?? []),
-          is_required: true,
-          question_order: idx + 1,
-          template_based: true,
-          template_id: template.id,
-        });
-      });
-
-      // 커스텀 질문 처리
-      const additionalQuestions = Array.isArray(body.additionalQuestions)
-        ? body.additionalQuestions
-        : JSON.parse(body.additionalQuestions || '[]');
-
-      additionalQuestions.forEach((q: any, idx: number) => {
-        surveyCustoms.push({
-          survey_id: survey.id,
-          question_text: q.text?.trim() || '(비어 있는 질문)',
-          question_type: convertType(q.type),
-          options: JSON.stringify(q.options ?? []),
-          is_required: q.is_required ?? true,
-          question_order: templateQuestions.length + idx + 1,
-          template_based: false,
-          template_id: null,
-        });
-      });
-
-      //  일괄 저장
-      if (surveyCustoms.length > 0) {
-        await tx.survey_Questions.createMany({ data: surveyCustoms });
-      }
+      // ✅ 전체 질문 저장
+      // const surveyCustoms = [...fixedQuestions, ...customQuestions];
+      // if (surveyCustoms.length > 0) {
+      //   await tx.survey_Custom.createMany({ data: surveyCustoms });
+      // }
 
       console.log('설문 생성 완료:', survey.id);
       return survey;
@@ -160,18 +140,14 @@ export const createSurvey = async ({
   }
 };
 
-// 설문 불러오기
+// ✅ 설문 불러오기
 export const getSurveyListService = async () => {
   return await prisma.survey.findMany({
     include: {
       music: true,
-      creator: {
-        select: { id: true },
-      },
-      director: {
-        select: { id: true },
-      },
-      survey_questions: true,
+      creator: { select: { id: true } },
+      director: { select: { id: true } },
+      survey_custom: true,
     },
     orderBy: { start_at: 'desc' },
   });
@@ -180,7 +156,6 @@ export const getSurveyListService = async () => {
 // 설문 정보 수정
 export const updateSurveyService = async (surveyId: number, body: any) => {
   return await prisma.$transaction(async (tx) => {
-
     const updatedSurvey = await tx.survey.update({
       where: { id: surveyId },
       data: {
@@ -201,7 +176,7 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
     });
 
     // 기존 커스텀 문항 가져오기
-    const existingQuestions = await tx.survey_Questions.findMany({
+    const existingQuestions = await tx.survey_Custom.findMany({
       where: { survey_id: surveyId },
     });
     const existingIds = new Set(existingQuestions.map((q) => q.id));
@@ -220,18 +195,16 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
           options: JSON.stringify(q.options ?? []),
           is_required: q.is_required ?? true,
           question_order: q.question_order ?? idx + 1,
-          template_based: q.template_based ?? false,
-          template_id: q.template_id ?? null,
         };
 
         if (q.id && existingIds.has(q.id)) {
           incomingIds.add(q.id);
-          await tx.survey_Questions.update({
+          await tx.survey_Custom.update({
             where: { id: q.id },
             data: questionData,
           });
         } else {
-          const created = await tx.survey_Questions.create({
+          const created = await tx.survey_Custom.create({
             data: {
               survey_id: surveyId,
               ...questionData,
@@ -244,11 +217,11 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
 
     const idsToDelete = [...existingIds].filter((id) => !incomingIds.has(id));
     if (idsToDelete.length > 0) {
-      await tx.survey_Questions.deleteMany({
+      await tx.survey_Custom.deleteMany({
         where: { id: { in: idsToDelete } },
       });
     }
 
     return updatedSurvey;
   });
-}
+};
