@@ -23,8 +23,9 @@ export function formatSurveyPayload(): SurveyPayload {
     reward: step3.reward,
     expert_reward: step3.expert_reward,
 
-    template_id: 2, // 수정해야함, 기본 템플릿도 JSON.stringify 해서 보낼 것
+    template_id: 1, // 수정해야함, 기본 템플릿도 JSON.stringify 해서 보낼 것
 
+    // 커스텀 설문
     allQuestions: JSON.stringify(
       step5.customQuestions.map((q) => ({
         question_type: q.question_type,
