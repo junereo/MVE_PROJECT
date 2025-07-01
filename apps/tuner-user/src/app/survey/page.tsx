@@ -13,32 +13,28 @@ export default function Survey() {
   return (
     <>
       <Header />
-
       <Wrapper>
         <SurveyBreadcrumb />
-        <section className="mb-6">
-          <h1 className="pt-[20px] text-xl font-bold text-gray-900 mb-2">
-            설문 목록
-          </h1>
-          <p className="pb-[10px] text-sm text-gray-500">
-            현재 진행 중인 설문들을 확인해보세요.
-          </p>
+        <section className="flex items-end justify-between mb-6">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold text-gray-900">설문 목록</h1>
+            <p className="text-sm text-gray-500">
+              참여할 수 있는 설문들을 확인해보세요.
+            </p>
+          </div>
+
+          <Link
+            href="/survey/create"
+            className="inline-flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">설문 생성</span>
+            <span className="sm:hidden">생성</span>
+          </Link>
         </section>
 
         <SurveyList />
       </Wrapper>
-
-      <Link
-        href="/survey/create"
-        className="    fixed bottom-[80px] z-20 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm"
-        style={{
-          right: "max(calc(50% - 320px), 1rem)",
-        }}
-      >
-        <Plus className="w-4 h-4" />
-        설문 생성
-      </Link>
-
       <BottomNavbar />
       <Footer />
     </>
