@@ -23,7 +23,7 @@ CREATE TYPE "SurveyType" AS ENUM ('general', 'official');
 CREATE TYPE "SurveyTags" AS ENUM ('감각적인', '화려한', '감성적인', '몽환적인', '트렌디한', '복고풍', '중독성있는', '잔잔한', '역동적인', '독창적인');
 
 -- CreateEnum
-CREATE TYPE "QuestionType" AS ENUM ('text', 'multiple_choice', 'check_box');
+CREATE TYPE "QuestionType" AS ENUM ('subjective', 'multiple_choice', 'check_box', 'ranking', 'likert');
 
 -- CreateEnum
 CREATE TYPE "SurveyActive" AS ENUM ('upcoming', 'ongoing', 'closed');
