@@ -5,7 +5,26 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Dropdown from "@/app/components/ui/DropDown";
 import { surveyList } from "@/lib/network/api";
-// 타입 정의
+
+// 🔷 enum 및 인터페이스 임포트
+import {
+  SurveyTypeEnum,
+  QuestionTypeEnum,
+  SurveyResponse,
+} from "@/app/survey/create/complete/type";
+const mapToQuestionTypeEnum = (type: string): QuestionTypeEnum => {
+  switch (type) {
+    case "multiple":
+      return QuestionTypeEnum.MULTIPLE;
+    case "checkbox":
+      return QuestionTypeEnum.CHECKBOX;
+    case "subjective":
+      return QuestionTypeEnum.SUBJECTIVE;
+    default:
+      return QuestionTypeEnum.MULTIPLE;
+  }
+};
+// 리스트에서 사용할 내부 타입
 interface SurveyItem {
   id: number;
   survey_title: string;
@@ -13,40 +32,22 @@ interface SurveyItem {
   start_at: string;
   end_at: string;
   is_active: "예정" | "진행중" | "종료";
-  surveyType: "general" | "official";
+  surveyType: SurveyTypeEnum;
   participantCount: number;
   reward_amount?: number;
+  question_type: QuestionTypeEnum;
 }
 
 // 필터 옵션
 const statusOptions = ["전체 상태", "예정", "진행중", "종료"];
 const typeOptions = ["전체 유형", "일반 설문", "리워드 설문"];
 
-// 고정된 초기 더미 데이터 (절대 랜덤 X)
-// const baseSurveys: SurveyItem[] = Array.from({ length: 20 }, (_, i) => {
-//   const id = 20 - i;
-//   const statuses = ["예정", "진행중", "종료"] as const;
-//   const types = ["general", "official"] as const;
-//   return {
-//     id,
-//     survey_title: `설문 제목 ${id}`,
-//     title: `음원 ${id}`,
-//     start_at: "2025-06-01",
-//     end_at: "2025-06-30",
-//     is_active: statuses[id % 3],
-//     surveyType: types[id % 2],
-//     participantCount: 0, // 여기서는 0으로 고정!
-//     reward_amount: id % 2 === 1 ? undefined : 100 + id * 5,
-//   };
-// });
-export const surveylist = async (): Promise<SurveyItem[]> => {
+//  API 호출 및 변환
+const surveylist = async (): Promise<SurveyItem[]> => {
   const { data } = await surveyList();
+  console.log("설문 리스트 데이터:", data);
 
-  // 응답 데이터 구조에 따라 아래를 맞춰줘야 함
-  console.log(data);
-
-  return data.map((item: any) => {
-    // 상태 변환 로직 (예정/진행중/종료 판단)
+  return data.map((item: SurveyResponse) => {
     const now = new Date();
     const start = new Date(item.start_at);
     const end = new Date(item.end_at);
@@ -58,43 +59,44 @@ export const surveylist = async (): Promise<SurveyItem[]> => {
     return {
       id: item.id,
       survey_title: item.survey_title,
-      title: item.title || item.music?.title || "제목 없음",
-      start_at: item.start_at,
-      end_at: item.end_at,
+      title: item.music?.title || "제목 없음",
+      start_at: item.start_at.slice(0, 10),
+      end_at: item.end_at.slice(0, 10),
       is_active: status,
-      surveyType: item.type === "official" ? "official" : "general",
-      participantCount: item.participantCount ?? 0,
+      surveyType: item.type,
+      participantCount: 0,
       reward_amount: item.reward_amount ?? undefined,
+      question_type: mapToQuestionTypeEnum(
+        item.survey_custom?.[0]?.question_type
+      ),
     };
   });
 };
 
 export default function SurveyListPage() {
   const router = useRouter();
-  // const [surveys, setSurveys] = useState<SurveyItem[]>(baseSurveys);
   const [surveys, setSurveys] = useState<SurveyItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("전체 상태");
   const [typeFilter, setTypeFilter] = useState("전체 유형");
   const [sortNewestFirst, setSortNewestFirst] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  // const [surveyList, setSurveyList] = useState<SurveyItem[]>();
   const surveysPerPage = 10;
 
   useEffect(() => {
     const fetchSurveys = async () => {
       try {
-        const list = await surveylist(); // 실제 API 응답
-        setSurveys(list); // 상태에 설정
+        const list = await surveylist();
+        console.log("설문 목록", list);
+        setSurveys(list);
       } catch (err) {
         console.error("설문 리스트 불러오기 실패:", err);
       }
     };
-
     fetchSurveys();
   }, []);
 
-  // 필터링 + 정렬
+  // 🔍 필터링 + 정렬
   const filteredSurveys = surveys
     .filter((survey) => {
       const matchTitle = survey.survey_title
@@ -107,8 +109,10 @@ export default function SurveyListPage() {
         statusFilter === "전체 상태" || survey.is_active === statusFilter;
       const matchType =
         typeFilter === "전체 유형" ||
-        (typeFilter === "일반 설문" && survey.surveyType === "general") ||
-        (typeFilter === "리워드 설문" && survey.surveyType === "official");
+        (typeFilter === "일반 설문" &&
+          survey.surveyType === SurveyTypeEnum.GENERAL) ||
+        (typeFilter === "리워드 설문" &&
+          survey.surveyType === SurveyTypeEnum.OFFICIAL);
       return (matchTitle || matchMusic) && matchStatus && matchType;
     })
     .sort((a, b) => (sortNewestFirst ? b.id - a.id : a.id - b.id));
@@ -130,7 +134,7 @@ export default function SurveyListPage() {
         </Link>
       </div>
 
-      {/* 검색 + 드롭다운 필터 */}
+      {/* 검색 + 필터 */}
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <input
           type="text"
@@ -220,12 +224,12 @@ export default function SurveyListPage() {
                 <td className="border px-2 py-1">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      survey.surveyType === "official"
+                      survey.surveyType === SurveyTypeEnum.OFFICIAL
                         ? "bg-blue-100 text-blue-700"
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {survey.surveyType === "official"
+                    {survey.surveyType === SurveyTypeEnum.OFFICIAL
                       ? "리워드 설문"
                       : "일반 설문"}
                   </span>

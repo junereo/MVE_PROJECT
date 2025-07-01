@@ -18,10 +18,10 @@ import {
 } from "recharts";
 
 // 더미 데이터
-const youtubeId = "dQw4w9WgXcQ";
-const surveyTitle = "미래소년 OST 감성 평가";
-const youtubeTitle = "미래소년 - My Star";
-const channelTitle = "미래소년 공식채널";
+const youtubeId = "0LwcvjNJTuM";
+const surveyTitle = " 레전드 일렉기타 감성 평가";
+const youtubeTitle = "Lynyrd Skynyrd - Free Bird ";
+const channelTitle = " Lynyrd Skynyrd";
 console.log(channelTitle);
 
 const author = { nickname: "musicfan99", id: "user_33", type: "official" };
@@ -80,210 +80,217 @@ export default function SurveyDetailPage() {
   );
 
   return (
-    <div className="p-6 max-w-[1400px] mx-auto flex flex-col md:flex-row gap-6">
-      {/* 왼쪽 */}
-      <div className="flex-1 flex flex-col space-y-4">
-        {/* 설문 제목 */}
-        <h1 className="text-2xl font-bold">{surveyTitle}</h1>
+    <div>
+      <div className=" w-full  text-black text-2xl py-3  font-bold">
+        Survey Detail - {surveyTitle}
+      </div>
+      <div className="p-6 ">
+        <div className=" flex flex-col md:flex-row gap-6">
+          {/* 왼쪽 */}
+          <div className="flex-1 flex flex-col space-y-4  ">
+            {/* 설문 제목 */}
 
-        {/* 유튜브 영상 + 작성자 정보 레이아웃 */}
-        <div className="flex flex-col md:flex-row md:items-start gap-4 border-t pt-4">
-          {/* 유튜브 영상 */}
-          <div className="rounded overflow-hidden aspect-[3/2] md:w-[480px] w-full border">
-            <iframe
-              src={`https://www.youtube.com/embed/${youtubeId}`}
-              allowFullScreen
-              className="w-full h-full"
-            />
-          </div>
+            {/* 유튜브 영상 + 작성자 정보 레이아웃 */}
+            <div className="flex flex-col md:flex-row md:items-start gap-10 border-t pt-4">
+              {/* 유튜브 영상 */}
+              <div className="rounded overflow-hidden aspect-[3/2] md:w-[480px] w-full border">
+                <iframe
+                  src={`https://www.youtube.com/embed/${youtubeId}`}
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
 
-          {/* 작성자 및 설문 정보 */}
-          <div className="text-sm space-y-2 w-full md:w-auto flex-1">
-            <p className="text-gray-800 font-semibold">
-              👤 작성자: <span className="text-black">{author.nickname}</span> (
-              {author.id})
-            </p>
-            <p className="text-gray-800 font-semibold">
-              📘 설문 유형:{" "}
-              <span
-                className={
-                  author.type === "official"
-                    ? "text-green-600 font-bold"
-                    : "text-gray-700"
-                }
-              >
-                {author.type === "official" ? "리워드 설문" : "일반 설문"}
-              </span>
-            </p>
-
-            {author.type === "official" && (
-              <>
+              {/* 작성자 및 설문 정보 */}
+              <div className="space-y-5 w-full flex-1 flex flex-col items-start justify-end gap-1">
                 <p className="text-gray-800 font-semibold">
-                  💰 총 리워드:{" "}
-                  <span className="text-black">{reward.total} STK</span>
+                  👤 작성자:{" "}
+                  <span className="text-black">{author.nickname}</span> (
+                  {author.id})
                 </p>
-                <p className="text-gray-700">
-                  지급 완료:{" "}
-                  <span className="text-blue-700 font-semibold">
-                    {participants.reduce((acc, cur) => acc + cur.reward, 0)} STK
-                  </span>{" "}
-                  / 잔여:{" "}
-                  <span className="text-red-600 font-semibold">
-                    {reward.total -
-                      participants.reduce(
-                        (acc, cur) => acc + cur.reward,
-                        0
-                      )}{" "}
-                    STK
+                <p className="text-gray-800 font-semibold">
+                  📘 설문 유형:{" "}
+                  <span
+                    className={
+                      author.type === "official"
+                        ? "text-green-600 font-bold"
+                        : "text-gray-700"
+                    }
+                  >
+                    {author.type === "official" ? "리워드 설문" : "일반 설문"}
                   </span>
                 </p>
-                <p className="text-xs text-gray-600">
-                  일반 유저: {reward.normal} STK / Expert: {reward.expert} STK
-                </p>
-              </>
+
+                {author.type === "official" && (
+                  <>
+                    <p className="text-gray-800 font-semibold">
+                      💰 총 리워드:{" "}
+                      <span className="text-black">{reward.total} STK</span>
+                    </p>
+                    <p className="text-gray-700">
+                      지급 완료:{" "}
+                      <span className="text-blue-700 font-semibold">
+                        {participants.reduce((acc, cur) => acc + cur.reward, 0)}{" "}
+                        STK
+                      </span>{" "}
+                      / 잔여:{" "}
+                      <span className="text-red-600 font-semibold">
+                        {reward.total -
+                          participants.reduce(
+                            (acc, cur) => acc + cur.reward,
+                            0
+                          )}{" "}
+                        STK
+                      </span>
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      일반 유저: {reward.normal} STK / Expert: {reward.expert}{" "}
+                      STK
+                    </p>
+                    <div>{youtubeTitle}</div>
+                  </>
+                )}
+
+                {/* 유튜브에서 보기 버튼 - 하단에 배치 */}
+                <a
+                  href={`https://www.youtube.com/watch?v=${youtubeId}`}
+                  target="_blank"
+                  className="bg-red-500 text-white text-sm text-center px-3 py-2 rounded w-full max-w-xs"
+                >
+                  유튜브에서 보기
+                </a>
+              </div>
+            </div>
+
+            {/* 설문 결과 시각화 */}
+            <div className="border-t pt-4 space-y-3">
+              <h2 className="font-semibold text-lg">설문 결과</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 오각형 그래프 */}
+                <div>
+                  <p className="text-sm mb-1 text-center font-medium">
+                    성별별 평균 점수
+                  </p>
+                  <RadarChart
+                    outerRadius={90}
+                    width={300}
+                    height={250}
+                    data={radarData}
+                    className="mx-auto"
+                  >
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="category" />
+                    <PolarRadiusAxis angle={30} domain={[0, 5]} />
+                    {/* 점수 보여주기 */}
+                    <Tooltip />
+                    <Radar
+                      name="남성"
+                      dataKey="남성"
+                      stroke="#3b82f6"
+                      fill="#3b82f6"
+                      fillOpacity={0.3}
+                    />
+                    <Radar
+                      name="여성"
+                      dataKey="여성"
+                      stroke="#ec4899"
+                      fill="#ec4899"
+                      fillOpacity={0.3}
+                    />
+                    <Legend />
+                  </RadarChart>
+                </div>
+
+                {/* 막대 그래프 */}
+                <div>
+                  <p className="text-sm mb-1 text-center font-medium">
+                    연령대별 참여자 수
+                  </p>
+                  <BarChart width={300} height={250} data={ageDistribution}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="age" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#10b981" />
+                  </BarChart>
+                </div>
+              </div>
+            </div>
+
+            {/* 질문 아코디언 */}
+            <div className="mt-2 space-y-2">
+              <h2 className="text-lg font-bold">질문 리스트</h2>
+              {questions.map((q, i) => (
+                <details key={i} className="border rounded px-4 py-2">
+                  <summary className="cursor-pointer font-medium">
+                    Q{i + 1}. {q}
+                  </summary>
+                  <div className="text-sm text-gray-600 mt-2">
+                    이 문항은 사용자들의 성실도 평가에 활용됩니다.
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+
+          {/* 오른쪽 - 참여자 테이블 */}
+          <div className="w-full md:w-[520px]">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-lg font-bold">참여자 리스트</h2>
+              <select
+                value={gradeFilter}
+                onChange={(e) => {
+                  setCurrentPage(1);
+                  setGradeFilter(e.target.value);
+                }}
+                className="border p-1 text-sm"
+              >
+                <option value="전체">전체</option>
+                <option value="일반">일반</option>
+                <option value="Expert">Expert</option>
+              </select>
+            </div>
+            <table className="w-full border text-sm text-center">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border px-2 py-1">ID</th>
+                  <th className="border px-2 py-1">닉네임</th>
+                  <th className="border px-2 py-1">등급</th>
+                  <th className="border px-2 py-1">리워드</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pageData.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="border px-2 py-1">{user.id}</td>
+                    <td className="border px-2 py-1">{user.nickname}</td>
+                    <td className="border px-2 py-1">{user.grade}</td>
+                    <td className="border px-2 py-1">{user.reward} STK</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* 페이지네이션 */}
+            {totalPages > 1 && (
+              <div className="mt-4 flex justify-center gap-2">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`px-3 py-1 text-sm rounded ${
+                      currentPage === i + 1
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-800"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
-
-        {/* 유튜브 제목 및 링크 */}
-        <div className="flex items-center justify-between text-sm text-gray-700 mt-2">
-          <p className="font-medium truncate">{youtubeTitle}</p>
-          <a
-            href={`https://www.youtube.com/watch?v=${youtubeId}`}
-            target="_blank"
-            className="text-blue-600 underline"
-          >
-            유튜브에서 보기
-          </a>
-        </div>
-
-        {/* 설문 결과 시각화 */}
-        <div className="border-t pt-4 space-y-3">
-          <h2 className="font-semibold text-lg">설문 결과</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* 오각형 그래프 */}
-            <div>
-              <p className="text-sm mb-1 text-center font-medium">
-                성별별 평균 점수
-              </p>
-              <RadarChart
-                outerRadius={90}
-                width={300}
-                height={250}
-                data={radarData}
-                className="mx-auto"
-              >
-                <PolarGrid />
-                <PolarAngleAxis dataKey="category" />
-                <PolarRadiusAxis angle={30} domain={[0, 5]} />
-                {/* 점수 보여주기 */}
-                <Tooltip />
-                <Radar
-                  name="남성"
-                  dataKey="남성"
-                  stroke="#3b82f6"
-                  fill="#3b82f6"
-                  fillOpacity={0.3}
-                />
-                <Radar
-                  name="여성"
-                  dataKey="여성"
-                  stroke="#ec4899"
-                  fill="#ec4899"
-                  fillOpacity={0.3}
-                />
-                <Legend />
-              </RadarChart>
-            </div>
-
-            {/* 막대 그래프 */}
-            <div>
-              <p className="text-sm mb-1 text-center font-medium">
-                연령대별 참여자 수
-              </p>
-              <BarChart width={300} height={250} data={ageDistribution}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="age" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#10b981" />
-              </BarChart>
-            </div>
-          </div>
-        </div>
-
-        {/* 질문 아코디언 */}
-        <div className="mt-2 space-y-2">
-          <h2 className="text-lg font-bold">질문 리스트</h2>
-          {questions.map((q, i) => (
-            <details key={i} className="border rounded px-4 py-2">
-              <summary className="cursor-pointer font-medium">
-                Q{i + 1}. {q}
-              </summary>
-              <div className="text-sm text-gray-600 mt-2">
-                이 문항은 사용자들의 성실도 평가에 활용됩니다.
-              </div>
-            </details>
-          ))}
-        </div>
-      </div>
-
-      {/* 오른쪽 - 참여자 테이블 */}
-      <div className="w-full md:w-[420px]">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-bold">참여자 리스트</h2>
-          <select
-            value={gradeFilter}
-            onChange={(e) => {
-              setCurrentPage(1);
-              setGradeFilter(e.target.value);
-            }}
-            className="border p-1 text-sm"
-          >
-            <option value="전체">전체</option>
-            <option value="일반">일반</option>
-            <option value="Expert">Expert</option>
-          </select>
-        </div>
-        <table className="w-full border text-sm text-center">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border px-2 py-1">ID</th>
-              <th className="border px-2 py-1">닉네임</th>
-              <th className="border px-2 py-1">등급</th>
-              <th className="border px-2 py-1">리워드</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pageData.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50">
-                <td className="border px-2 py-1">{user.id}</td>
-                <td className="border px-2 py-1">{user.nickname}</td>
-                <td className="border px-2 py-1">{user.grade}</td>
-                <td className="border px-2 py-1">{user.reward} STK</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* 페이지네이션 */}
-        {totalPages > 1 && (
-          <div className="mt-4 flex justify-center gap-2">
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`px-3 py-1 text-sm rounded ${
-                  currentPage === i + 1
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-800"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
