@@ -5,6 +5,7 @@ import Header from "@/components/layouts/Header";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
 import Wrapper from "@/components/layouts/Wrapper";
 import Button from "@/components/ui/Button";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 const dummySurvey = {
   id: 1,
@@ -48,6 +49,12 @@ export default function SurveyDetail() {
     <>
       <Header />
       <Wrapper>
+        <Breadcrumb
+          crumbs={[
+            { label: "설문", href: "/survey" },
+            { label: `${survey_title}` },
+          ]}
+        />
         <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-5 shadow-md">
           <Image
             src={thumbnail_url}

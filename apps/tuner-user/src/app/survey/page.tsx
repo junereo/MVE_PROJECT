@@ -5,7 +5,7 @@ import Footer from "@/components/layouts/Footer";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
 import Wrapper from "@/components/layouts/Wrapper";
 import SurveyList from "./components/ui/SurveyList";
-import SurveyBreadcrumb from "@/features/survey/components/SurveyBreadcrumb";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -14,7 +14,7 @@ export default function Survey() {
     <>
       <Header />
       <Wrapper>
-        <SurveyBreadcrumb />
+        <Breadcrumb crumbs={[{ label: "설문 목록" }]} />
         <section className="flex items-end justify-between mb-6">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold text-gray-900">설문 목록</h1>
