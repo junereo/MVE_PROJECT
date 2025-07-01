@@ -18,12 +18,15 @@ export function formatSurveyPayload(): SurveyPayload {
     is_released: step2.is_released,
     genre: step2.genre,
 
-    survey_type: step3.surveyType,
+    type: step3.surveyType,
     reward_amount: step3.reward_amount,
     reward: step3.reward,
     expert_reward: step3.expert_reward,
 
-    customQuestions: JSON.stringify(
+    template_id: 1, // 수정해야함, 기본 템플릿도 JSON.stringify 해서 보낼 것
+
+    // 커스텀 설문
+    allQuestions: JSON.stringify(
       step5.customQuestions.map((q) => ({
         question_type: q.question_type,
         question_text: q.question_text,
