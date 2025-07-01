@@ -18,7 +18,7 @@ const statusColorMap = {
   종료: "bg-gray-100 text-gray-500",
 };
 
-export default function ListItem({
+export default function List({
   image,
   artist,
   title,
