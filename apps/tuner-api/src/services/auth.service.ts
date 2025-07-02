@@ -1,10 +1,10 @@
-import { PrismaClient, User, OAuthProvider } from '@prisma/client';
+import { PrismaClient, OAuthProvider } from '@prisma/client';
 import type { Request, CookieOptions } from 'express';
-import { RegisterList } from "../types/auth.types";
-import { AdminRequest } from '../types/admin.types';
+import { mapRoleEnum } from '../utils/auth.utils';
 import { signToken } from '../utils/jwt';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import qs from 'qs';
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -13,30 +13,14 @@ const defaultCookieOptions: CookieOptions = {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    maxAge: 24 * 60 * 60 * 1000,// 7일
+    maxAge: 24 * 60 * 60 * 1000
 };
+// 이메일 회원가입
+export const emailRegister = async (data: any) => {
+    const exist = await prisma.user.findUnique({ where: { email: data.email } });
+    if (exist) throw new Error("이미 가입된 이메일입니다.");
 
-type LoginUser = {
-    id: String;
-    nickname: string;
-};
-
-type OAuthCallbackResult =
-    | {
-        token: string;
-        redirectUrl: string;
-        user: LoginUser;
-        cookieOptions: CookieOptions;
-    }
-    | {
-        error: string;
-        detail?: string;
-    };
-
-// 이메일 
-export const emailRegister = async (data: RegisterList) => {
-    const isUser = await prisma.user.findUnique({ where: { email: data.email } });
-    if (isUser) throw new Error("이미 가입된 이메일입니다.");
+    const roleEnum = mapRoleEnum(Number(data.role) || 3);
 
     const newUser = await prisma.user.create({
         data: {
@@ -44,136 +28,130 @@ export const emailRegister = async (data: RegisterList) => {
             password: data.password,
             nickname: data.nickname,
             phone_number: data.phone_number,
-
-        }
+            role: roleEnum,
+        },
     });
-    return {
-        id: newUser.id,
-        email: newUser.email,
-        phone_number: newUser.phone_number,
-        nickname: newUser.nickname,
-        level: newUser.level,
-        wallet_address: newUser.wallet_address,
-        balance: newUser.balance,
-        badge_issued_at: newUser.badge_issued_at,
-        created_at: newUser.created_at,
-        updated_at: newUser.updated_at
-    };
-};
 
-export const emaillogin = async (email: string, password: string): Promise<OAuthCallbackResult> => {
-
-
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-        throw new Error("가입되지 않은 이메일입니다. -서버");
-    }
-    const isValid = (password === user.password);
-    // const isValid = await verifyPassword(password, user.password);
-    if (!isValid) {
-        throw new Error("비밀번호가 일치하지 않습니다.-서버");
-    }
-
-    // STEP 2: JWT 발급
-    const token = signToken({ userId: user.id });
-
-    const loginUser: LoginUser = {
-        id: user.id,
-        nickname: user.nickname
-    };
+    const token = signToken({ userId: newUser.id, role: newUser.role });
 
     return {
         token,
-        user: loginUser,
-        redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
+        user: { id: newUser.id, nickname: newUser.nickname, role: newUser.role },
+        cookieOptions: defaultCookieOptions,
+    };
+};
+
+// 이메일 로그인 
+export const emaillogin = async (email: string, password: string) => {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) throw new Error("가입되지 않은 이메일입니다.");
+
+    const isValid = password === user.password;
+    if (!isValid) throw new Error("비밀번호가 일치하지 않습니다.");
+
+    const token = signToken({ userId: user.id, role: user.role });
+
+    return {
+        token,
+        user: { id: user.id, nickname: user.nickname, role: user.role },
+        cookieOptions: defaultCookieOptions,
+    };
+};
+
+// 관리자 회원가입 
+export const adminRegister = async (data: any) => {
+    const isAdmin = await prisma.user.findUnique({ where: { email: data.email } });
+    if (isAdmin) throw new Error("이미 등록된 관리자입니다.");
+
+    const role = data.role === 0 ? 'superadmin' : 'admin';
+
+    const newAdmin = await prisma.user.create({
+        data: {
+            email: data.email,
+            password: data.password,
+            nickname: data.name,
+            phone_number: data.phone_number,
+            role: role,
+        },
+    });
+
+    const token = signToken({ userId: newAdmin.id, role: newAdmin.role });
+
+    return {
+        token,
+        user: { id: newAdmin.id, nickname: newAdmin.nickname, role: newAdmin.role },
+        cookieOptions: defaultCookieOptions,
+    };
+};
+// 관리자 로그인
+export const adminLogin = async (email: string, password: string) => {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) throw new Error("존재하지 않는 관리자입니다.");
+
+    const isValid = password === user.password;
+    if (!isValid) throw new Error("비밀번호가 일치하지 않습니다.");
+
+    if (user.role !== 'admin' && user.role !== 'superadmin') {
+        throw new Error("권한이 없습니다. 관리자만 로그인할 수 있습니다.");
+    }
+
+    const token = signToken({ userId: user.id, role: user.role });
+
+    return {
+        token,
+        user: { id: user.id, nickname: user.nickname, role: user.role },
         cookieOptions: defaultCookieOptions,
     };
 };
 
 // 카카오
-export const oauthCallbackService = async (
-    req: Request,
-): Promise<OAuthCallbackResult> => {
+export const oauthCallbackService = async (req: Request) => {
     const { provider } = req.params;
-    const rawCode = req.query.code as string | string[] | undefined;
-    const code =
-        typeof rawCode === 'string'
-            ? rawCode
-            : Array.isArray(rawCode)
-                ? rawCode[0]
-                : '';
-
-    if (!code || typeof provider !== 'string') {
-        throw new Error('Missing or invalid code or provider');
-    }
+    const code = req.query.code as string;
+    const roleEnum = mapRoleEnum(Number(req.query.role) || 3);
 
     const profile = await fetchKakaoProfile(code);
-
-    if (!profile) {
-        throw new Error(`${provider} 계정 프로필 가져오기 실패`);
-    }
-
     const safeEmail = profile.email ?? `noemail_${profile.id}@${provider}.com`;
 
-    let user: User;
-
-    // STEP 1: 사용자 및 계정 등록 (DB 트랜잭션)
-    try {
-        user = await prisma.$transaction(async (tx) => {
-            const existingAccount = await tx.user_OAuth.findUnique({
-                where: {
-                    provider: OAuthProvider.kakao,
-                    provider_id: profile.id,
-
-                },
-                include: { user: true },
-            });
-
-            const resolvedUser = existingAccount?.user ?? await tx.user.upsert({
-                where: {
-                    email: safeEmail
-                },
-                update: {},
-                create: {
-                    nickname: profile.nickname,
-                    email: safeEmail,
-                    password: '',
-                    phone_number: '',
-                },
-            });
-
-            if (!existingAccount) {
-                await tx.user_OAuth.create({
-                    data: {
-                        provider: OAuthProvider.kakao,
-                        provider_id: profile.id,
-                        email: safeEmail,
-                        profile_image: profile.picture,
-                        nickname: profile.nickname,
-                        user: {
-                            connect: { id: resolvedUser.id },
-                        },
-                    },
-                });
-            }
-
-            return resolvedUser;
+    const user = await prisma.$transaction(async (tx) => {
+        const existingOauth = await tx.user_Oauth.findUnique({
+            where: { provider_id: profile.id },
+            include: { user: true },
         });
-    } catch (err) {
-        console.error('DB 트랜잭션 오류 발생:', err);
-        return {
-            error: 'OAuth 처리 중 오류 발생',
-            detail: err instanceof Error ? err.message : String(err),
-        };
-    }
+        if (existingOauth) return existingOauth.user;
 
-    // STEP 2: JWT 발급
-    const token = signToken({ userId: user.id });
+        const existingUser = await tx.user.findUnique({ where: { email: safeEmail } });
+
+        const resolvedUser = existingUser ?? await tx.user.create({
+            data: {
+                email: safeEmail,
+                password: '',
+                nickname: profile.nickname,
+                phone_number: '',
+                role: roleEnum,
+            },
+        });
+
+        await tx.user_Oauth.create({
+            data: {
+                provider: OAuthProvider.kakao,
+                provider_id: profile.id,
+                nickname: profile.nickname,
+                email: safeEmail,
+                profile_image: profile.picture,
+                userId: resolvedUser.id,
+            },
+        });
+
+        return resolvedUser;
+    });
+
+    const token = signToken({ userId: user.id, role: user.role });
 
     return {
         token,
-        user,
-        redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
+        user: { id: user.id, nickname: user.nickname, role: user.role },
+        redirectUrl: process.env.CLIENT_USER_IP || "http://localhost:3000",
         cookieOptions: defaultCookieOptions,
     };
 };
@@ -186,22 +164,16 @@ export const fetchKakaoProfile = async (code: string) => {
             params: {
                 grant_type: 'authorization_code',
                 client_id: process.env.KAKAO_API_KEY!,
-                redirectUrl: process.env.KAKAO_REDIRECT_URI!,
+                redirect_uri: process.env.KAKAO_REDIRECT_URI!,
                 code,
             },
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
         },
     );
 
     const { data: profileRes } = await axios.get(
         'https://kapi.kakao.com/v2/user/me',
-        {
-            headers: {
-                Authorization: `Bearer ${tokenRes.access_token}`,
-            },
-        },
+        { headers: { Authorization: `Bearer ${tokenRes.access_token}` } },
     );
 
     return {
@@ -212,98 +184,83 @@ export const fetchKakaoProfile = async (code: string) => {
     };
 };
 
-export const getUserService = async (req: AdminRequest) => {
-    const decodedUser = (req as any).user;
-    const user = await prisma.user.findUnique({
-        where: { id: decodedUser.userId },
-        select: {
-            id: true,
-            nickname: true,
-        },
+// 구글 
+export const googleCallbackService = async ({
+    code,
+    role,
+}: { code: string; role?: string }) => {
+    const roleEnum = mapRoleEnum(Number(role) || 3);
+
+    console.log("=== GOOGLE CALLBACK SERVICE ===");
+    console.log("code:", code);
+
+    const payload = qs.stringify({
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+        grant_type: "authorization_code",
     });
 
-    if (!user) throw new Error('사용자를 찾을 수 없습니다.');
-    return user;
-};
+    console.log("TOKEN PAYLOAD:", payload);
 
-// 구글
-export const googleCallbackService = async (req: Request) => {
-    const { code } = req.body;
-    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
-    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-    const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-
-    // token 요청
-    const tokenRe = await axios.post(
-        'https://oauth2.googleapis.com/token',
+    const tokenRes = await axios.post(
+        "https://oauth2.googleapis.com/token",
+        payload,
         {
-            code,
-            client_id: GOOGLE_CLIENT_ID,
-            client_secret: GOOGLE_CLIENT_SECRET,
-            redirect_uri: REDIRECT_URI,
-            grant_type: 'authorization_code',
-        },
-        {
-            headers: {
-                'Content-Type': 'application/json',
-            }
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
     );
-    const { access_token } = tokenRe.data;
 
-    // 유저 정보 가져오기 
-    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-            Authorization: `Bearer ${access_token}`,
-        },
-    });
+    const { access_token } = tokenRes.data;
 
-    const { id: provider_id, email, name } = userInfo.data;
+    const { data: userInfo } = await axios.get(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        {
+            headers: { Authorization: `Bearer ${access_token}` },
+        }
+    );
 
-    // 기존 유저 확인
-    let oauth = await prisma.user_OAuth.findUnique({
-        where: { provider_id },
-        include: { user: true },
-    });
+    const { id: provider_id, email, name } = userInfo;
 
-    // 없으면 새 유저 생성
-    if (!oauth) {
-        const newUser = await prisma.user.create({
-            data: {
-                email,
-                nickname: name,
-                password: '',
-                phone_number: '',
-                wallet_address: '',
-                simple_password: '',
-                level: 'Regular',
-                oauths: {
-                    create: [
-                        {
-                            provider: OAuthProvider.google,
-                            provider_id: String(provider_id),
-                            nickname: name,
-                            email,
-                        },
-                    ],
-                }
-            }
-        });
-        // 만들어진 유저 다시 조회
-        oauth = await prisma.user_OAuth.findUnique({
+    const user = await prisma.$transaction(async (tx) => {
+        const existingOauth = await tx.user_Oauth.findUnique({
             where: { provider_id },
             include: { user: true },
         });
-    }
+        if (existingOauth) return existingOauth.user;
 
-    const token = signToken({ userId: oauth!.user.id });
+        const existingUser = await tx.user.findUnique({ where: { email } });
+
+        const resolvedUser = existingUser ?? await tx.user.create({
+            data: {
+                email,
+                password: "",
+                nickname: name,
+                phone_number: "",
+                role: roleEnum,
+            },
+        });
+
+        await tx.user_Oauth.create({
+            data: {
+                provider: OAuthProvider.google,
+                provider_id: String(provider_id),
+                nickname: name,
+                email,
+                userId: resolvedUser.id,
+            },
+        });
+
+        return resolvedUser;
+    });
+
+    const token = signToken({ userId: user.id, role: user.role });
 
     return {
         token,
-        redirectUrl: process.env.CLIENT_IP || 'http://localhost:3000',
+        user: { id: user.id, nickname: user.nickname, role: user.role },
+        redirectUrl: process.env.CLIENT_USER_IP || "http://localhost:3000",
         cookieOptions: defaultCookieOptions,
-
-    }
-
-}
-
+    };
+};
