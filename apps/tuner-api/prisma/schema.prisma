@@ -159,21 +159,18 @@ model Survey {
   updated_at    DateTime     @updatedAt
 
   creator      User                  @relation(fields: [user_id], references: [id])
-  questions    Survey_Question[]
+  questions    Int
   participants Survey_Participants[]
   result       Survey_Result?
 }
 
 model Survey_Question {
   id             Int          @id @default(autoincrement())
-  survey_id      Int
   question_type  QuestionType
   question       Json
   question_order Int
   created_at     DateTime     @default(now())
   updated_at     DateTime     @updatedAt
-
-  survey Survey @relation(fields: [survey_id], references: [id])
 }
 
 model Survey_Participants {

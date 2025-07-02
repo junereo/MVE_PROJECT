@@ -2,7 +2,7 @@ import express from "express";
 import {
   adminRoutes,
   authRoutes,
-  // surveyRoutes,
+  surveyRoutes,
 } from "./routes/index";
 import routerWallet from "./wallet/routers/index";
 import cookieParser from "cookie-parser";
@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // 라우트 설정
 app.use("/auth", authRoutes);
-// app.use("/survey", surveyRoutes);
+app.use("/survey", surveyRoutes);
 app.use("/admin", adminRoutes);
 app.use("/contract", routerWallet);
 
