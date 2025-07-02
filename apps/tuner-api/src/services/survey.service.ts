@@ -43,7 +43,7 @@ export const createSurvey = async ({
   userId,
   body,
 }: {
-  userId?: string;
+  userId?: number;
   body: any;
 }) => {
   try {
@@ -61,13 +61,14 @@ export const createSurvey = async ({
         const survey : Survey = await tx.survey.create({
             data: {
                 // ✅ 필수 외래키: 사용자 ID
-                user_id: userId ?? '', // 적절한 fallback 설정
+                user_id: userId ?? 0, // 적절한 fallback 설정
 
                 // ✅ 음악 정보
                 music_title: body.music_title ?? null,
                 artist: body.artist ??  null,
                 music_uri: body.music_uri, // music 객체의 sample_url 사용
-
+                thumbnail_uri: body.thumbnail_uri,
+                genre: body.genre, //장르
                 // ✅ 기본 필드
                 type: surveyType,
                 start_at: startDate,
@@ -188,7 +189,7 @@ export const createSurveyParticipant = async ({
   status = 'complete',
   rewarded = true
 }: {
-  user_id: string;
+  user_id: number;
   survey_id: number;
   answers: any;
   status?: SurveyStatus;
@@ -314,7 +315,6 @@ export const createSurveyResult = async ({
       survey_id,
       survey_statistics,
       is_public,
-      version,
       metadata_ipfs,
       respondents,
       reward_claimed_amount,
