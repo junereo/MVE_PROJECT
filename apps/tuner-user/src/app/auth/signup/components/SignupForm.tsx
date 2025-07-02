@@ -123,10 +123,10 @@ export default function SignupForm() {
       )}
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-4 max-w-[400px] mx-auto mt-10 p-6"
+        className="flex flex-col gap-4 max-w-[400px] mx-auto p-6"
       >
-        <div className="flex flex-col gap-2 mb-6">
-          <div className="flex flex-col gap-2 mb-4">
+        <div className="flex flex-col gap-2 mb-4">
+          <div className="flex flex-col gap-2">
             <div>
               <Input
                 label="이메일"

@@ -46,10 +46,10 @@ export default function SurveyList() {
         {["all", "upcoming", "ongoing", "closed"].map((s) => (
           <button
             key={s}
-            className={`text-sm font-medium px-4 py-1 rounded ${
+            className={`flex-1 min-w-0 py-1 text-sm sm:text-base transition ${
               status === s
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-600"
+                ? "bg-blue-500 text-white font-semibold shadow-sm"
+                : "bg-gray-100 text-gray-800 hover:bg-blue-100"
             }`}
             onClick={() => setStatus(s as any)}
           >
