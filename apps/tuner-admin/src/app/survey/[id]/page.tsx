@@ -91,7 +91,7 @@ export default function SurveyDetailPage() {
             {/* 설문 제목 */}
 
             {/* 유튜브 영상 + 작성자 정보 레이아웃 */}
-            <div className="flex flex-col md:flex-row md:items-start gap-10 border-t pt-4">
+            <div className="flex flex-col md:flex-row md:items-start gap-10">
               {/* 유튜브 영상 */}
               <div className="rounded overflow-hidden aspect-[3/2] md:w-[480px] w-full border">
                 <iframe

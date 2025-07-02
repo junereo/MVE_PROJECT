@@ -8,7 +8,7 @@ import SurveyQuestionBase from "@/app/survey/create/step2/components/SurveyQuest
 import SurveyCustomForm from "@/app/survey/create/step2/components/SurveyCustomForm";
 import SurveyActions from "@/app/survey/create/step2/components/SurveyActions";
 import SurveyNavigation from "@/app/survey/create/step2/components/SurveyNavigation";
-import TagCreate from "./components/SurveyTag";
+// import TagCreate from "./components/SurveyTag";
 import { fetchTemplates } from "@/lib/network/api";
 import { QuestionTypeEnum } from "@/app/survey/create/complete/type";
 
@@ -255,7 +255,7 @@ export default function SurveyStep2() {
             🎵 {step1.title || step1.youtubeTitle || "제목 없음"}
           </h1>
 
-          <TagCreate />
+          {/* <TagCreate /> */}
 
           {/* 기본 설문 탭 */}
           {!isCustomTab ? (

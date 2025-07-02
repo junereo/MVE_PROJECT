@@ -2,23 +2,20 @@
 
 import { useState } from "react";
 // import tp from "@/app/template/components/Templates";
-import templates from "@/app/template/components/Templates";
+import fixedQuestions from "@/app/fixedQuestion/components/Templates";
 // import { useRouter } from "next/navigation";
 import { createTemplate } from "@/lib/network/api";
-import { TemplateType } from "@/types";
+import { SurveyQuestion } from "@/types";
 
 export default function TemplateSelectPage() {
-  // const router = useRouter();
-  // const templateKeys = Object.keys(tp); // ["originality", "popularity", ...]
-  // const [openKey, setOpenKey] = useState<string | null>(null); // 펼친 상태
   const [loading, setLoading] = useState(false); // 버튼 중복 방지
 
   const handleTemplateSave = async () => {
     try {
       setLoading(true);
-      const formData: TemplateType = {
-        template_name: "템플릿 초안1",
-        template: templates, //
+      const formData: SurveyQuestion = {
+        Survey_question: "고정 질문1",
+        question: fixedQuestions, //
       };
       console.log(formData);
 
@@ -31,16 +28,17 @@ export default function TemplateSelectPage() {
     }
   };
   return (
-    <div className="max-w-xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">사용할 템플릿을 선택해주세요</h1>
-
-      <div className="space-y-6">
+    <div className="">
+      <div className="w-full  text-black text-2xl py-3  font-bold">
+        FixedQuestion
+      </div>
+      <div className="space-y-6 p-6">
         <button
           onClick={handleTemplateSave}
           className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
           disabled={loading}
         >
-          📝 템플릿 저장하기
+          템플릿 저장하기
         </button>
         {/* {templateKeys.map((key) => (
           <div key={key} className="border rounded-lg p-4 shadow">

@@ -6,15 +6,14 @@ import {
   QuestionTypeEnum,
   SurveyTypeEnum,
 } from "@/app/survey/create/complete/type";
+import { Question_type } from "@/types";
 
-// 문자열을 enum으로 변환하는 함수
 const mapToQuestionTypeEnum = (type: string): QuestionTypeEnum => {
   switch (type?.toLowerCase()) {
     case "multiple":
       return QuestionTypeEnum.MULTIPLE;
     case "checkbox":
       return QuestionTypeEnum.CHECKBOX;
-    case "text":
     case "subjective":
       return QuestionTypeEnum.SUBJECTIVE;
     default:
@@ -68,14 +67,14 @@ export default function SurveyComplete() {
 
   // 최종 전송 payload
   const serverPayload = {
-    survey_title: step1.survey_title,
+    survey_title: step1.survey_title, // 설문 제목
     title: step1.title,
+    music_uri: step1.url, // 유튜브 URL
+    thumbnail_uri: step1.youtubeThumbnail,
     artist: step1.artist,
     release_date: step1.releaseDate,
-    is_released: step1.isReleased,
     thumbnail_url: step1.youtubeThumbnail,
-    sample_url: step1.url,
-    channelTitle: step1.channelTitle,
+    music_title: step1.channelTitle, //음악 제목
     genre: step1.genre,
     start_at: step1.start_at,
     end_at: step1.end_at,
@@ -84,15 +83,20 @@ export default function SurveyComplete() {
     reward: step1.reward ?? 0,
     expert_reward: step1.expertReward ?? 0,
     templateSetKey: templateSetKeyString,
-    evaluationScores: step2.answers,
-    tags: step2.tags,
-    template_id: step2.template_id,
-    allQuestions: JSON.stringify(
-      allQuestionsRaw.map((q) => ({
-        ...q,
-        question_type: mapToQuestionTypeEnum(q.question_type),
-      }))
-    ),
+    questions: step2.template_id!,
+    question_type: 0 as Question_type, // 기본값 설정
+
+    // is_released: step1.isReleased, //발매여부
+    // evaluationScores: step2.answers, // 평가 점수
+    // tags: step2.tags, // 해시태그
+
+    // 커스텀 질문
+    // allQuestions: JSON.stringify(
+    //   allQuestionsRaw.map((q) => ({
+    //     ...q,
+    //     question_type: mapToQuestionTypeEnum(q.question_type),
+    //   }))
+    // ),
   };
   //서버로 전송할 데이터 구조
   const handleSubmit = async () => {

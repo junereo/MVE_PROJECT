@@ -124,9 +124,11 @@ export default function SurveyListPage() {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">설문 리스트</h1>
+    <div>
+      <div className="w-full  text-black text-2xl py-3  font-bold">
+        Survey List
+      </div>
+      <div className="flex justify-end items-center mb-6">
         <Link href="/survey/create/step1">
           <button className="bg-blue-600 text-white px-4 py-2 rounded">
             + 설문 만들기
@@ -198,17 +200,30 @@ export default function SurveyListPage() {
                 onClick={() => router.push(`/survey/${survey.id}`)}
                 className="hover:bg-blue-50 cursor-pointer"
               >
-                <td className="border px-2 py-1">{survey.id}</td>
-                <td className="border px-2 py-1 text-left pl-3">
-                  {survey.survey_title}
+                <td className="border px-2 py-1 h-[40px] align-middle">
+                  {survey.id}
                 </td>
-                <td className="border px-2 py-1 text-left pl-3">
-                  {survey.title}
+
+                <td className="border px-2 py-1 text-left pl-3 h-[40px] align-middle">
+                  <div
+                    className="truncate max-w-[180px]"
+                    title={survey.survey_title}
+                  >
+                    {survey.survey_title}
+                  </div>
                 </td>
-                <td className="border px-2 py-1">
+
+                <td className="border px-2 py-1 text-left pl-3 h-[40px] align-middle">
+                  <div className="truncate max-w-[180px]" title={survey.title}>
+                    {survey.title}
+                  </div>
+                </td>
+
+                <td className="border px-2 py-1 h-[40px] align-middle">
                   {survey.start_at} ~ {survey.end_at}
                 </td>
-                <td className="border px-2 py-1">
+
+                <td className="border px-2 py-1 h-[40px] align-middle">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       survey.is_active === "예정"
@@ -221,7 +236,8 @@ export default function SurveyListPage() {
                     {survey.is_active}
                   </span>
                 </td>
-                <td className="border px-2 py-1">
+
+                <td className="border px-2 py-1 h-[40px] align-middle">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       survey.surveyType === SurveyTypeEnum.OFFICIAL
@@ -234,7 +250,8 @@ export default function SurveyListPage() {
                       : "일반 설문"}
                   </span>
                 </td>
-                <td className="border px-2 py-1">
+
+                <td className="border px-2 py-1 h-[40px] align-middle">
                   {survey.participantCount}명
                 </td>
               </tr>

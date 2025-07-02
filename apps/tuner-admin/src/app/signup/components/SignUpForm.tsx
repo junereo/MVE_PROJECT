@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 const SignUpForm = () => {
   const router = useRouter();
   const [formData, setFormData] = useState<SignupFormData>({
-    name: "",
+    nickname: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -68,14 +68,16 @@ const SignUpForm = () => {
     const { ...payload } = formData;
     console.log(formData);
 
-    const res = await axiosInstance.post("/admin/signup", payload);
+    const res = await axiosInstance.post("/auth/register", payload);
 
     return res.data;
   };
 
   return (
     <div>
-      <div className="pl-10 pb-10 text-xl font-bold ">Admin Signup</div>
+      <div className="w-full  text-black text-2xl py-3  font-bold">
+        Admin Signup
+      </div>
       <div className="min-h-screen flex items-start justify-center">
         <div className="w-120 bg-black bg-opacity-80 p-8 rounded-lg shadow-md text-white">
           <div className="flex flex-col items-center mb-6">
@@ -87,8 +89,8 @@ const SignUpForm = () => {
               <input
                 type="text"
                 placeholder="이름을 입력해주세요"
-                value={formData.name}
-                onChange={(e) => handleChange("name", e.target.value)}
+                value={formData.nickname}
+                onChange={(e) => handleChange("nickname", e.target.value)}
                 className="w-full px-4 py-2 rounded bg-white text-black placeholder-gray-400 border-b border-gray-300 focus:outline-none"
               />
             </div>

@@ -3,7 +3,7 @@ import LoginFrom from "./components/LoginFrom";
 const Login = () => {
   return (
     <>
-      <LoginFrom />;
+      <LoginFrom />
     </>
   );
 };

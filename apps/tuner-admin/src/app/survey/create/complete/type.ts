@@ -15,18 +15,16 @@ export enum QuestionTypeEnum {
 export interface SurveyResponse {
   id: number;
   create_at: string;
-
   survey_title: string;
   type: SurveyTypeEnum;
   start_at: string;
   end_at: string;
   is_active: "upcoming" | "ongoing" | "closed";
-  template_id: number;
-
+  questions: number;
   reward_amount: number;
   reward: number;
   expert_reward: number;
-
+  thumbnail_uri: string;
   music: {
     title: string;
     artist: string;

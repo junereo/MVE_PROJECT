@@ -19,8 +19,8 @@ export const useSessionCheck = () => {
   useEffect(() => {
     const check = async () => {
       try {
-        const { data } = await axiosClient.post("/admin/me"); // ✅ 서버는 쿠키 보고 사용자 확인
-        if (!data) {
+        const { data } = await axiosClient.post("/auth/me"); //  서버는 쿠키 보고 사용자 확인
+        if (!data || data.admin.role !== "admin") {
           router.push("/login");
         }
         setAdmin(data.admin);
