@@ -1,7 +1,7 @@
 "use client";
 
 import Slider from "./components/Slider";
-import List from "./components/List";
+import MainSurveyList from "./components/MainSurveyList";
 import Card from "./components/Card";
 import Link from "next/link";
 
@@ -28,7 +28,7 @@ export default function Home() {
             <Link href="/survey">전체보기</Link>
           </button>
         </div>
-        <List />
+        <MainSurveyList status="closed" />
       </section>
     </div>
   );

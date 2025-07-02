@@ -16,7 +16,7 @@ interface FunnelComponent extends FC<FunnelProps> {
   Step: FC<StepProps>;
 }
 
-export function useFunnel<T extends string>(steps: T[], initialStep: T) {
+export function useFunnel<T extends string>(initialStep: T) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

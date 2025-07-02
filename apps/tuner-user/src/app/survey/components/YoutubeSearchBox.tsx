@@ -39,7 +39,6 @@ export default function YoutubeSearchBox() {
         </button>
       </div>
 
-      {/* 선택된 영상 표시 */}
       {selectedVideo ? (
         <div className="space-y-2 mt-4">
           <iframe
@@ -76,14 +75,16 @@ export default function YoutubeSearchBox() {
             ← 다시 선택하기
           </button>
         </div>
-      ) : (
-        // 검색 결과 목록
+      ) : videos.length > 0 ? (
         <div className="grid grid-cols-2 gap-4 mt-2">
           {videos.map((video) => (
             <div
-              key={video.artist}
+              key={video.artist + video.title}
               className="cursor-pointer border p-2 rounded"
-              onClick={() => setSelectedVideo(video)}
+              onClick={() => {
+                setSelectedVideo(video);
+                setVideos([]);
+              }}
             >
               <Image
                 src={video.thumbnail_url}
@@ -96,7 +97,7 @@ export default function YoutubeSearchBox() {
             </div>
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

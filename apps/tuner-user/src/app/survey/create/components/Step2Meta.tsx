@@ -33,6 +33,13 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
   );
   const [genre, setGenre] = useState<string | undefined>(step2.genre);
 
+  const isValid =
+    surveyTitle.trim() !== "" &&
+    releaseType !== null &&
+    genreOptions.some((g) => g.value === genre) &&
+    (releaseType === "unreleased" ||
+      (releaseType === "released" && releaseDate));
+
   const handleNext = () => {
     setStep2({
       survey_title: surveyTitle,
@@ -107,7 +114,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
           </Button>
         </div>
         <div className="w-[180px] sm:w-[400px]">
-          <Button onClick={handleNext} color="blue">
+          <Button onClick={handleNext} disabled={!isValid} color="blue">
             다음
           </Button>
         </div>
