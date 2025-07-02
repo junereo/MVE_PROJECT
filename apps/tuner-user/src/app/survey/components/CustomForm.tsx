@@ -35,25 +35,25 @@ export default function CustomForm({
           defaultOpen={qIndex === questions.length - 1}
         >
           <div className="rounded-lg bg-white border p-4 space-y-4">
+            <div className="w-full">
+              <Dropdown
+                options={typeOptions.map((o) => o.label)}
+                selected={
+                  typeOptions.find((o) => o.value === q.question_type)?.label ??
+                  "유형 선택"
+                }
+                onSelect={(label: string) => {
+                  const found = typeOptions.find((o) => o.label === label);
+                  if (found) onChangeType(qIndex, found.value);
+                }}
+              />
+            </div>
             <div className="flex flex-col gap-4 w-full">
               <Input
                 label="질문 내용"
                 value={q.question_text}
                 onChange={(e) => onChangeText(qIndex, e.target.value)}
               />
-              <div className="w-full">
-                <Dropdown
-                  options={typeOptions.map((o) => o.label)}
-                  selected={
-                    typeOptions.find((o) => o.value === q.question_type)
-                      ?.label ?? "유형 선택"
-                  }
-                  onSelect={(label: string) => {
-                    const found = typeOptions.find((o) => o.label === label);
-                    if (found) onChangeType(qIndex, found.value);
-                  }}
-                />
-              </div>
             </div>
 
             {q.question_type === QuestionTypeEnum.MULTIPLE && (
@@ -64,12 +64,14 @@ export default function CustomForm({
                     className="flex items-center gap-2 w-full"
                   >
                     <span className="w-5 h-5 rounded-full border border-gray-400 flex-shrink-0" />
-                    <Input
+                    <input
+                      type="text"
                       value={q.options[optIndex] ?? ""}
                       onChange={(e) =>
                         onChangeOption(qIndex, optIndex, e.target.value)
                       }
                       placeholder={`선택지 ${optIndex + 1}`}
+                      className="flex-1 px-4 py-2 rounded-md border border-gray-300 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 ))}
@@ -84,12 +86,14 @@ export default function CustomForm({
                     className="flex items-center gap-2 w-full"
                   >
                     <span className="w-5 h-5 border border-gray-400 rounded-sm flex-shrink-0" />
-                    <Input
+                    <input
+                      type="text"
                       value={opt}
                       onChange={(e) =>
                         onChangeOption(qIndex, optIndex, e.target.value)
                       }
                       placeholder={`선택지 ${optIndex + 1}`}
+                      className="flex-1 px-4 py-2 rounded-md border border-gray-300 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 ))}
@@ -108,7 +112,7 @@ export default function CustomForm({
             {q.question_type === QuestionTypeEnum.SUBJECTIVE && (
               <textarea
                 className="w-full p-2 border rounded text-sm"
-                placeholder="서술형 답변 예시"
+                placeholder="서술형 답변을 입력해주세요"
                 rows={3}
                 disabled
               />

@@ -4,6 +4,7 @@ import UserProfile from "./components/UserProfile";
 import WalletInfo from "./components/WalletInfo";
 import SurveyStats from "./components/SurveyStatus";
 import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 export default function MyPage() {
   const { isInitialized } = useAuthGuard();
@@ -12,6 +13,7 @@ export default function MyPage() {
 
   return (
     <div className="bg-gray-100 min-h-screen space-y-2">
+      <Breadcrumb crumbs={[{ label: "마이페이지" }]} />
       <UserProfile />
       <WalletInfo />
 

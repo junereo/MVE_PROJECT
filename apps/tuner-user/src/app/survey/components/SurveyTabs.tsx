@@ -12,22 +12,26 @@ interface TabProps {
 
 export default function SurveyTabs({ tabs, current, setTab }: TabProps) {
   return (
-    <div className="sticky top-0 z-10 bg-white">
-      <div className="flex whitespace-nowrap scrollbar-hide justify-between items-center">
-        {tabs.map((cat, i) => (
+    <div className="sticky top-0 z-10 w-full bg-white overflow-hidden flex justify-between">
+      {tabs.map((cat, i) => {
+        const isActive = current === i;
+        return (
           <button
             key={cat.key}
             onClick={() => setTab(i)}
-            className={`px-3 py-1.5 text-sm md:text-base rounded-md text-center flex ${
-              current === i ? "bg-blue-500 text-white" : "border-transparent"
-            }`}
+            className={`
+                flex-1 min-w-0 py-2 text-sm sm:text-base transition
+                ${
+                  isActive
+                    ? "bg-blue-500 text-white font-semibold shadow-sm"
+                    : "bg-gray-100 text-gray-800 hover:bg-blue-100"
+                }
+              `}
           >
-            <span className="inline-block max-w-[90px] sm:max-w-[100px] truncate">
-              {cat.label}
-            </span>
+            <span className="block text-center">{cat.label}</span>
           </button>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }
