@@ -145,7 +145,7 @@ model Survey {
   music_title   String
   artist        String
   music_uri     String
-  user_id       String
+  user_id       Int
   type          SurveyType
   genre         Genre
   start_at      DateTime
@@ -155,26 +155,22 @@ model Survey {
   expert_reward Int?
   is_active     SurveyActive
   ended_by      EndedBy?
-  status        SurveyStatus          @default(draft)
-  created_at    DateTime              @default(now())
-  updated_at    DateTime              @updatedAt
-  userId        Int
-  creator       User                  @relation(fields: [userId], references: [id])
-  questions     Survey_Question[]
-  participants  Survey_Participants[]
-  result        Survey_Result?
+  status        SurveyStatus @default(draft)
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  creator       User         @relation(fields: [user_id], references: [id])
+  questions    Int
+  participants Survey_Participants[]
+  result       Survey_Result?
 }
 
 model Survey_Question {
   id             Int          @id @default(autoincrement())
-  survey_id      Int
   question_type  QuestionType
   question       Json
   question_order Int
   created_at     DateTime     @default(now())
   updated_at     DateTime     @updatedAt
-
-  survey Survey @relation(fields: [survey_id], references: [id])
 }
 
 model Survey_Participants {
