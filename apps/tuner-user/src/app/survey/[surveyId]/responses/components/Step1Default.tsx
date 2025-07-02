@@ -10,6 +10,7 @@ import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 import { defaultQuestions } from "@/features/survey/constants/defaultQuestions";
+import { QuestionTypeEnum } from "@/features/survey/types/enums";
 
 interface Step1props {
   onNext: () => void;
@@ -98,9 +99,9 @@ export default function Step1Default({ onNext }: Step1props) {
               key={idx}
               className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4"
             >
-              <QuestionText text={q.question_text} />
+              <QuestionText text={`Q${idx + 1}. ${q.question_text}`} />
 
-              {q.type === "subjective" ? (
+              {q.type === QuestionTypeEnum.SUBJECTIVE ? (
                 <QuestionSubjective
                   value={typeof saved === "string" ? saved : ""}
                   onChange={(val) => setAnswer(currentKey, idx, val)}
