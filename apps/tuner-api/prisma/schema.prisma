@@ -8,14 +8,16 @@ datasource db {
 }
 
 // 회원 등급
-enum UserLevel {
-  Regular
-  Expert
+enum UserRole {
+  superadmin
+  admin
+  ordinary
+  expert
 }
 
 enum Gender {
-  male
-  female
+  male //true
+  female // false
 }
 
 enum AgeGroup {
@@ -28,17 +30,18 @@ enum AgeGroup {
 }
 
 enum Genre {
-  dance
+  hiphop
   ballad
+  dance
+  rnb
+  rock
   trot
   pop
   gukak
   ccm
-}
-
-enum AdminRole {
-  admin
-  superadmin
+  edm
+  classical
+  jazz
 }
 
 enum OAuthProvider {
@@ -53,26 +56,10 @@ enum SurveyType {
   official
 }
 
-enum SurveyTags {
-  감각적인
-  화려한
-  감성적인
-  몽환적인
-  트렌디한
-  복고풍
-  중독성있는
-  잔잔한
-  역동적인
-  독창적인
-}
-
-// 커스텀 설문 옵
+// 커스텀 설문 옵션
 enum QuestionType {
-  subjective
-  multiple_choice
-  check_box
-  ranking
-  likert
+  fixed
+  custom
 }
 
 // 설문 기간
@@ -93,160 +80,110 @@ enum EndedBy {
   closedByCreator // 생성자 종료
 }
 
-enum RewardStatus {
-  pending // 대기중
-  completed // 완료
-  failed //실패
-}
+// enum RewardStatus {
+//   pending // 대기중
+//   completed // 완료
+//   failed //실패
+// }
 
-enum RewardType {
-  normal // 일반
-  expert // 익스퍼트
-}
+// enum RewardType {
+//   normal // 일반
+//   expert // 익스퍼트
+// }
 
-enum SbtType {
-  badge
-  token
-}
+// enum SbtType {
+//   badge
+//   token
+// }
 
-// 보상 지급
-enum SbtCondition {
-  auto // 자동발급
-  manual // 수동발급
-}
+// // 보상 지급
+// enum SbtCondition {
+//   auto // 자동발급
+//   manual // 수동발급
+// }
 
 model User {
-  id              String    @id @default(uuid())
+  id              Int       @id @default(autoincrement())
   email           String    @unique
   phone_number    String
   password        String
-  nickname        String
-  gender          Gender?
-  ageGroup        AgeGroup?
+  nickname        String // 유저는 닉네임 / 관리자는 실명 
+  gender          Boolean? // true=남자, false=여자
+  age             AgeGroup? // enum
   genre           Genre?
+  job_domain      Boolean? // 음악전공/종사자 여부
+  balance         Int       @default(0)
   wallet_address  String?
   simple_password String?
-  level           UserLevel @default(Regular)
+  role            UserRole  @default(ordinary)
   badge_issued_at DateTime?
-  balance         Int       @default(0)
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
 
-  oauths              User_OAuth[] // Relation (1:N)
-  balances            User_Balance[]
-  surveys             Survey[]              @relation("SurveyCreator") // 내가 만든설문 연결
-  responses           Survey_Responses[]
-  Rewards             Rewards[]
-  Withdrawal_Requests Withdrawal_Requests[]
+  oauths          User_Oauth[]
+  surveys         Survey[]
+  surveyResponses Survey_Participants[]
 }
 
-model User_OAuth {
-  id            Int           @id @default(autoincrement())
-  provider      OAuthProvider
-  provider_id   String        @unique
+model User_Oauth {
+  id            Int      @id @default(autoincrement())
+  provider_id   String   @unique
+  provider      String
   nickname      String
   email         String
   profile_image String?
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
-
-  // Relation to User
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-}
-
-model User_Balance {
-  id              Int      @id @default(autoincrement())
-  user_id         String
-  current_reward  Int
-  total_withdrawn Int
-  updated_at      DateTime
-
-  user User @relation(fields: [user_id], references: [id])
-}
-
-model Admin {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  password     String
-  name         String
-  phone_number String
-  role         AdminRole
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
-
-  surveys      Survey[]              @relation("SurveyDirector")
-  rewards      Rewards[]
-  withdrawal   Withdrawal_Requests[]
-  SBT_Issuance SBT_Issuance[]
-}
-
-model Survey {
-  id               Int          @id @default(autoincrement())
-  template_id      Int
-  survey_title     String
-  create_userId    String?
-  create_adminId   String?
-  music_id         Int
-  type             SurveyType
-  tags             SurveyTags[]
-  music_sample_url String?
-  start_at         DateTime
-  end_at           DateTime
-  reward_amount    Int?
-  reward           Int?
-  expert_reward    Int?
-  is_active        SurveyActive
-  ended_by         EndedBy?
-  metadata_cid     String?
-  status           SurveyStatus @default(draft)
-  create_at        DateTime     @default(now())
-  updated_at       DateTime     @updatedAt
-
-  creator       User?              @relation("SurveyCreator", fields: [create_userId], references: [id])
-  director      Admin?             @relation("SurveyDirector", fields: [create_adminId], references: [id])
-  responses     Survey_Responses[]
-  result        Survey_Result?
-  survey_custom Survey_Custom[]
-  music         Music              @relation(fields: [music_id], references: [id])
-  template      Survey_Template    @relation(fields: [template_id], references: [id])
-
-  Rewards Rewards[]
-}
-
-model Survey_Responses {
-  id         Int          @id @default(autoincrement())
-  user_id    String
-  survey_id  Int
-  answers    Json
-  status     SurveyStatus @default(draft)
-  created_at DateTime     @default(now())
-  updated_at DateTime     @updatedAt
-  rewarded   Boolean
-
-  user   User   @relation(fields: [user_id], references: [id])
-  survey Survey @relation(fields: [survey_id], references: [id])
-}
-
-model Survey_Template {
-  id            Int      @id @default(autoincrement())
-  template_name String
-  template      Json
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
 
-  survey Survey[]
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 }
 
-model Survey_Custom {
-  id             Int          @id @default(autoincrement())
-  survey_id      Int
-  question_text  String
-  question_type  QuestionType
-  options        Json?
-  is_required    Boolean      @default(true)
-  question_order Int
+model Survey {
+  id            Int                   @id @default(autoincrement())
+  survey_title  String
+  music_title   String
+  artist        String
+  music_uri     String
+  thumbnail_uri String
+  user_id       Int
+  type          SurveyType
+  genre         Genre
+  start_at      DateTime
+  end_at        DateTime
+  reward_amount Int?
+  reward        Int?
+  expert_reward Int?
+  is_active     SurveyActive
+  ended_by      EndedBy?
+  status        SurveyStatus @default(draft)
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  creator       User         @relation(fields: [user_id], references: [id])
+  questions    Int
+  participants Survey_Participants[]
+  result       Survey_Result?
+}
 
+model Survey_Question {
+  id             Int          @id @default(autoincrement())
+  question_type  QuestionType
+  question       Json
+  question_order Int
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+}
+
+model Survey_Participants {
+  id         Int          @id @default(autoincrement())
+  user_id    Int
+  survey_id  Int
+  answers    Json
+  status     SurveyStatus @default(draft)
+  rewarded   Boolean      @default(false)
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  user   User   @relation(fields: [user_id], references: [id])
   survey Survey @relation(fields: [survey_id], references: [id])
 }
 
@@ -254,75 +191,12 @@ model Survey_Result {
   id                    Int      @id @default(autoincrement())
   survey_id             Int      @unique
   survey_statistics     Json
-  is_public             Boolean
-  generated_at          DateTime
-  version               Int?
-  metadata              Json?
+  is_public             Boolean  @default(false)
+  metadata_ipfs         String?
   respondents           Int
   reward_claimed_amount Int
   reward_claimed        Int
+  created_at            DateTime
 
   survey Survey @relation(fields: [survey_id], references: [id])
-}
-
-model Music {
-  id            Int       @id @default(autoincrement())
-  title         String
-  artist        String
-  description   String
-  agency        String
-  release_date  DateTime?
-  is_released   Boolean
-  thumbnail_url String
-  sample_url    String
-  nft_token_id  String
-
-  surveys Survey[]
-}
-
-model Rewards {
-  id            Int          @id @default(autoincrement())
-  user_id       String
-  survey_id     Int
-  token_amount  Int
-  status        RewardStatus
-  reward_reason String
-  source_ref    String
-  reward_type   RewardType
-  rewarded_at   DateTime
-
-  user    User    @relation(fields: [user_id], references: [id])
-  survey  Survey  @relation(fields: [survey_id], references: [id])
-  adminId String?
-  admin   Admin?  @relation(fields: [adminId], references: [id])
-}
-
-model Withdrawal_Requests {
-  id                 Int          @id @default(autoincrement())
-  user_id            String
-  total_token_amount Int
-  requested_at       DateTime
-  processed_at       DateTime?
-  tx_hash            String
-  status             RewardStatus
-
-  user User @relation(fields: [user_id], references: [id])
-
-  admin_id String?
-  Admin    Admin?  @relation(fields: [admin_id], references: [id])
-}
-
-model SBT_Issuance {
-  id             Int          @id @default(autoincrement())
-  admin_id       String
-  sbt_type       SbtType
-  name           String
-  amount         Int?
-  issued_at      DateTime
-  condition_note SbtCondition
-  metadata_cid   String?
-  token_id       String?
-  chain_tx_hash  String?
-
-  admin Admin @relation(fields: [admin_id], references: [id])
 }

@@ -2,6 +2,15 @@ import { Request, Response, NextFunction } from "express";
 import { RegisterList } from "../types/auth.types";
 import jwt from "jsonwebtoken";
 
+export interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+    role: string;
+    nickname?: string;
+  };
+}
+
+
 export const validateRegister = (
   req: Request,
   res: Response,
@@ -36,12 +45,6 @@ export const validateLogin = (
   next();
 };
 
-export interface AuthRequest extends Request {
-  user?: {
-    userId: number;
-    nickname?: string;
-  };
-}
 
 export const verifyToken = (
   req: Request,
