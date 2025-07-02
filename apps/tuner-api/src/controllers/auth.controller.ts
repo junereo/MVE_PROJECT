@@ -80,11 +80,21 @@ export const oauthCallbackController = async (req: Request, res: Response) => {
 // 구글 
 export const googleCallbackController = async (req: Request, res: Response) => {
   try {
-    const result = await googleCallbackService(req);
+    const { code, role } = req.query;
+    if (!code) {
+      throw new Error("No code provided in query");
+    }
 
-    res.cookie('token', result.token, result.cookieOptions);
-    res.redirect(process.env.CLIENT_USER_IP || "http://localhost:3000");
+    const result = await googleCallbackService({
+      code: code.toString(),
+      role: role?.toString(),
+    });
+
+    res.cookie("token", result.token, result.cookieOptions);
+
+    res.redirect(result.redirectUrl);
   } catch (error: any) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
