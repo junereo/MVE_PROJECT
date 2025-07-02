@@ -1,13 +1,30 @@
 import express from "express";
-import { createSurveyHandler, getSurveyList, getSurvey, updateSurvey } from "../controllers/survey.controller";
+import {
+        createSurveyHandler,
+        createSurveyQuestionHandler,
+        getSurveyList,
+        getSurvey,
+        updateSurvey,
+        getSurveyQuestionList,
+        getAllSurveyParticipantsHandler,
+        createSurveyParticipantHandler,
+        getSurveyResultHandler,
+        createSurveyResultHandler
+} from "../controllers/survey.controller";
 import { verifyUserOrAdmin } from "../middlewares/survey.middleware";
 
 const router = express.Router();
 
 router.get('/list', getSurveyList);
-router.get('/:surveyId', getSurvey);
-// router.get('/:surveyId/results');
-router.post('/create', verifyUserOrAdmin, createSurveyHandler);
+router.get('/s/:surveyId', getSurvey);
+router.get('/q/:questionnaireId', getSurveyQuestionList);
+router.get('/p', getAllSurveyParticipantsHandler);
+router.get('/r/:surveyId', getSurveyResultHandler);
+
+router.post('/r', createSurveyResultHandler);
+router.post('/p', createSurveyParticipantHandler);
+router.post('/', createSurveyHandler);
+router.post('/q', createSurveyQuestionHandler);
 // router.post('/survey/temp');
 // router.post('/:surveyId/responses');
 // router.put('/:surveyId/responses');
