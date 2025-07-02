@@ -1,49 +1,62 @@
 "use client";
 
 import Image from "next/image";
+import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
+import { useEffect, useState } from "react";
+import { surveyList } from "@/features/survey/services/survey";
 
-const cardItems = [
-  {
-    id: 1,
-    thumbnail_url: `https://i.ytimg.com/vi/LBHVOiw274A/sddefault.jpg`,
-    artist: "Beenzino (빈지노)",
-    title: "Fashion Hoarder (Feat. ZENE THE ZILLA)",
-    period: "25.06.19 - 25.06.26",
-  },
-  {
-    id: 2,
-    thumbnail_url: `https://i.ytimg.com/vi/08h8u8Z9iJQ/sddefault.jpg`,
-    artist: "Beenzino (빈지노)",
-    title: "Aqua Man",
-    period: "25.06.19 - 25.06.26",
-  },
-  {
-    id: 3,
-    thumbnail_url: `https://i.ytimg.com/vi/UDyPp9bkfD0/sddefault.jpg`,
-    artist: "DPR LIVE",
-    title: "Martini Blue",
-    period: "25.06.19 - 25.06.26",
-  },
-  {
-    id: 4,
-    thumbnail_url: `https://i.ytimg.com/vi/ppudgIu2TaM/sddefault.jpg`,
-    artist: "Jazzyfact (재지팩트)",
-    title: "아까워",
-    period: "25.06.19 - 25.06.26",
-  },
-];
+const statusTextMap: Record<
+  SurveyResponse["is_active"],
+  "예정" | "진행중" | "종료"
+> = {
+  upcoming: "예정",
+  ongoing: "진행중",
+  closed: "종료",
+};
 
-export default function Card() {
+export default function Card({
+  status,
+}: {
+  status: "all" | "ongoing" | "closed";
+}) {
+  const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
+
+  useEffect(() => {
+    const fetchSurveys = async () => {
+      try {
+        const res = await surveyList();
+        const sorted = res.data.sort((a: SurveyResponse, b: SurveyResponse) => {
+          return (
+            new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
+          );
+        });
+
+        const filtered: SurveyResponse[] =
+          status === "all"
+            ? sorted
+            : sorted.filter(
+                (item: SurveyResponse) => item.is_active === status
+              );
+
+        setSurveys(filtered);
+      } catch (err) {
+        console.error("설문 목록 가져오기 실패:", err);
+      }
+    };
+
+    fetchSurveys();
+  }, [status]);
+
   return (
     <div className="grid grid-cols-2 gap-4">
-      {cardItems.map((item) => (
+      {surveys.map((item) => (
         <div
           key={item.id}
           className="rounded-xl bg-white shadow hover:shadow-lg transition overflow-hidden"
         >
-          <div className="relative w-full aspect-[16/9]">
+          <div className="relative w-full">
             <Image
-              src={item.thumbnail_url}
+              src={item.music.thumbnail_url}
               alt={`card ${item.id}`}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -51,11 +64,22 @@ export default function Card() {
             />
           </div>
           <div className="p-3 space-y-1">
-            <p className="text-base font-semibold text-gray-900 truncate">
-              {item.title}
+            <div className="flex justify-between">
+              <p className="text-base font-semibold text-gray-900 truncate">
+                {item.survey_title}
+              </p>
+              <p className="text-xs sm:text-sm text-orange-500 font-medium">
+                🎁 {item.reward_amount} STK
+              </p>
+            </div>
+            <p className="text-sm text-gray-500 truncate">
+              {item.music.artist} - {item.music.title}
             </p>
-            <p className="text-sm text-gray-500 truncate">{item.artist}</p>
-            <p className="text-xs text-gray-400">{item.period}</p>
+            <p className="text-xs text-gray-400">{`${item.start_at
+              .slice(2, 10)
+              .replace(/-/g, ".")} - ${item.end_at
+              .slice(2, 10)
+              .replace(/-/g, ".")}`}</p>
           </div>
         </div>
       ))}
