@@ -1,42 +1,97 @@
+import { QuestionTypeEnum } from "../types/enums";
+
 export interface DefaultQuestion {
-  question: string;
+  question_text: string;
+  question_type: number;
+  type: QuestionTypeEnum;
   options: string[];
 }
 
 export const defaultQuestions: Record<string, DefaultQuestion[]> = {
   originality: [
     {
-      question: "이 음원의 구성이 참신했나요?",
-      options: ["매우 참신했다", "참신했다", "보통이다", "진부했다"],
+      question_text: "이 음원에 대한 첫인상은 어땠나요?",
+      question_type: 0,
+      type: QuestionTypeEnum.MULTIPLE,
+      options: ["매우 좋다", "보통이다", "아니다", "잘 모르겠다"],
+    },
+    {
+      question_text: "이 음원의 기억에 남는 포인트가 있다면 무엇인가요?",
+      question_type: 0,
+      type: QuestionTypeEnum.MULTIPLE,
+      options: ["보컬", "편곡/사운드", "리듬/비트", "잘 모르겠다"],
     },
   ],
   popularity: [
     {
-      question: "대중적으로 인기를 끌 수 있을까요?",
-      options: ["대중적으로 끌 것이다.", "그렇다", "보통이다", "아니다"],
+      question_text: "이 음원을 노래방에서 부르고 싶으신가요?",
+      question_type: 0,
+      type: QuestionTypeEnum.MULTIPLE,
+      options: ["매우 그렇다", "그렇다", "보통이다", "그렇지 않다"],
+    },
+    {
+      question_text: "이 음원의 장르를 선택해주세요.",
+      question_type: 0,
+      type: QuestionTypeEnum.CHECKBOX,
+      options: [
+        "발라드",
+        "힙합",
+        "R&B",
+        "댄스",
+        "재즈",
+        "클래식",
+        "EDM",
+        "국악",
+      ],
     },
   ],
   sustainability: [
     {
-      question: "오래 들어도 질리지 않을 것 같나요?",
-      options: ["내 인생의 18 번 곡이다", "그렇다", "보통이다", "그렇지 않다"],
+      question_text: "이 음원을 자주 들을 것 같으신가요?",
+      question_type: 0,
+      type: QuestionTypeEnum.MULTIPLE,
+      options: [
+        "매우 그렇다",
+        "가끔 들을 것 같다",
+        "잘 모르겠다",
+        "전혀 아니다",
+      ],
+    },
+    {
+      question_text: "이 음원이 오랫동안 인기를 유지할 수 있을까요?",
+      question_type: 0,
+      type: QuestionTypeEnum.MULTIPLE,
+      options: ["매우 그렇다", "그렇다", "보통이다", "그렇지 않다"],
     },
   ],
   expandability: [
     {
-      question: "다른 장르로 확장 가능성이 있나요?",
-      options: ["어떤 장르로도 확장가능하다", "있다", "잘 모르겠다", "없다"],
+      question_text:
+        "이 음원의 활용 가능성은 어디에 있다고 생각하시나요? (복수선택 가능)",
+      question_type: 0,
+      type: QuestionTypeEnum.CHECKBOX,
+      options: ["광고", "영화/드라마", "무대 공연", "SNS 배경음", "없음"],
+    },
+    {
+      question_text:
+        "이 음원을 리메이크하면 어울릴 것 같은 아티스트는 누구인가요?",
+      question_type: 0,
+      type: QuestionTypeEnum.SUBJECTIVE,
+      options: [],
     },
   ],
   stardom: [
     {
-      question: "이 음원으로 스타성이 돋보이나요?",
-      options: [
-        "진짜 스타성이 보인다",
-        "매우 그렇다",
-        "보통이다",
-        "그렇지 않다",
-      ],
+      question_text: "이 음원을 장기자랑 무대에서 사용할 의향이 있으신가요?",
+      question_type: 0,
+      type: QuestionTypeEnum.MULTIPLE,
+      options: ["예", "아니오"],
+    },
+    {
+      question_text: "이 음원의 라이브 공연에 참여하고 싶으신가요?",
+      question_type: 0,
+      type: QuestionTypeEnum.MULTIPLE,
+      options: ["예", "아니오"],
     },
   ],
 };
