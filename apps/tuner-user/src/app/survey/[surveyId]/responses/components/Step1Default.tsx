@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useState, useMemo } from "react";
+import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
 import Button from "@/components/ui/Button";
-import SurveyTabs from "../../components/SurveyTabs";
-import QuestionText from "../../components/QuestionText";
-import QuestionOptions from "../../components/QuestionOptions";
-import QuestionSubjective from "../../components/QuestionSubjective";
+import Breadcrumb from "@/components/ui/Breadcrumb";
+import SurveyTabs from "@/app/survey/components/SurveyTabs";
+import QuestionText from "@/app/survey/components/QuestionText";
+import QuestionOptions from "@/app/survey/components/QuestionOptions";
+import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 import { defaultQuestions } from "@/features/survey/constants/defaultQuestions";
 
-interface Step4Props {
-  onPrev: () => void;
+interface Step1props {
   onNext: () => void;
 }
 
@@ -21,16 +23,37 @@ const baseCategories = [
   { key: "stardom", label: "스타성" },
 ];
 
-export default function Step4Default({ onPrev, onNext }: Step4Props) {
+const dummySurvey = {
+  id: 1,
+  survey_title: "빈지노 Fashion Hoarder 설문",
+};
+
+export default function Step1Default({ onNext }: Step1props) {
+  const { answers, setAnswer } = useAnswerStore();
+
   const [tabIndex, setTabIndex] = useState(0);
   const currentKey = baseCategories[tabIndex]?.key ?? "";
-  const currentTemplate = defaultQuestions[currentKey];
+  const currentTemplate = useMemo(
+    () => defaultQuestions[currentKey] ?? [],
+    [currentKey]
+  );
+
+  const { id, survey_title } = dummySurvey;
+
+  const isValid = useMemo(() => {
+    const currentAnswers = answers[currentKey] || {};
+    return currentTemplate.every((_, idx) => {
+      const val = currentAnswers[idx];
+      if (Array.isArray(val)) return val.length > 0;
+      return val !== undefined && val !== "";
+    });
+  }, [answers, currentKey, currentTemplate]);
 
   const handlePrev = () => {
     if (tabIndex > 0) {
       setTabIndex((prev) => prev - 1);
     } else {
-      onPrev();
+      return;
     }
   };
 
@@ -45,12 +68,18 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
   return (
     <>
       <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
-        <button onClick={onPrev}>←</button>
-        <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
+        <Link href={`/survey/${id}`}>←</Link>
+        <h1 className="font-bold text-lg text-center flex-1">설문 참여</h1>
       </header>
 
       <div className="space-y-4 min-h-screen">
-        <h2 className="text-xl font-bold text-gray-800">Step 4: 기본 설문</h2>
+        <Breadcrumb
+          crumbs={[
+            { label: "설문", href: "/survey" },
+            { label: `${survey_title}`, href: `/survey/${id}` },
+            { label: "기본 설문" },
+          ]}
+        />
 
         <SurveyTabs
           tabs={baseCategories}
@@ -59,6 +88,11 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
         />
 
         {currentTemplate.map((q, idx) => {
+          const saved = answers[currentKey]?.[idx] as
+            | string
+            | string[]
+            | undefined;
+
           return (
             <div
               key={idx}
@@ -67,12 +101,17 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
               <QuestionText text={q.question_text} />
 
               {q.type === "subjective" ? (
-                <QuestionSubjective disabled={true} />
+                <QuestionSubjective
+                  value={typeof saved === "string" ? saved : ""}
+                  onChange={(val) => setAnswer(currentKey, idx, val)}
+                />
               ) : (
                 <QuestionOptions
                   options={q.options}
+                  value={saved}
+                  type={q.type}
+                  onChange={(val) => setAnswer(currentKey, idx, val)}
                   layout="horizontal"
-                  disabled={true}
                 />
               )}
             </div>
@@ -87,7 +126,7 @@ export default function Step4Default({ onPrev, onNext }: Step4Props) {
           </Button>
         </div>
         <div className="w-[180px] sm:w-[400px]">
-          <Button onClick={handleNext} color="blue">
+          <Button onClick={handleNext} disabled={!isValid} color="blue">
             다음
           </Button>
         </div>

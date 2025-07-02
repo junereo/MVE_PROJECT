@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Header from "@/components/layouts/Header";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
 import Wrapper from "@/components/layouts/Wrapper";
@@ -31,7 +32,10 @@ const statusTextMap: Record<SurveyStatus, string> = {
 };
 
 export default function SurveyDetail() {
+  const router = useRouter();
+
   const {
+    id,
     thumbnail_url,
     survey_title,
     title,
@@ -109,7 +113,12 @@ export default function SurveyDetail() {
         </section>
 
         <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
-          <Button color="blue">설문 참여하기</Button>
+          <Button
+            color="blue"
+            onClick={() => router.push(`/survey/${id}/responses`)}
+          >
+            설문 참여하기
+          </Button>
         </div>
       </Wrapper>
       <BottomNavbar />
@@ -117,7 +126,7 @@ export default function SurveyDetail() {
   );
 }
 
-// 🔹 정보 표시용 컴포넌트
+// 정보 표시용 컴포넌트
 function InfoRow({
   label,
   value,

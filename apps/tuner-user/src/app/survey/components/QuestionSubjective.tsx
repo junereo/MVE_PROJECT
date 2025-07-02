@@ -20,6 +20,7 @@ export default function QuestionSubjective({
         }
       }}
       disabled={disabled}
+      maxLength={300}
     />
   );
 }
