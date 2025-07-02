@@ -270,15 +270,17 @@ const SurveyStep1 = () => {
           <div className="pt-4">
             <button
               onClick={() => {
+                if (!step1.survey_title?.trim())
+                  return alert("설문 제목을 입력해주세요.");
                 if (!step1.youtubeVideoId)
                   return alert("유튜브 영상을 등록해주세요.");
-
                 if (!step1.title?.trim())
                   return alert("곡 제목을 입력해주세요.");
-
                 if (!step1.start_at || !step1.end_at)
                   return alert("설문 기간을 입력해주세요.");
-
+                if (step1.start_at > step1.end_at)
+                  return alert("시작일은 종료일보다 이전이어야 합니다.");
+                if (!step1.genre) return alert("장르를 선택해주세요.");
                 if (
                   step1.surveyType === "official" &&
                   [step1.reward_amount, step1.reward, step1.expertReward].some(

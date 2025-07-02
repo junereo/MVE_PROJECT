@@ -8,7 +8,7 @@ import { LogOut } from "@/lib/network/api";
 import ReusableModal from "../ui/modal";
 
 export default function Header() {
-  const { logout, admin } = useSessionStore();
+  const { logout, user } = useSessionStore();
   const [showModal, setShowModal] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -35,8 +35,8 @@ export default function Header() {
           관리자 대시보드
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-green-600">ID: {admin?.role}</span>
-          <span className="text-green-600">닉네임: {admin?.name}</span>
+          <span className="text-green-600">ID: {user?.role}</span>
+          <span className="text-green-600">닉네임: {user?.nickname}</span>
           <Button color="blue" onClick={() => setShowModal(true)}>
             LogOut
           </Button>

@@ -76,7 +76,7 @@ const LoginForm = () => {
               placeholder="이메일을 입력하세요"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
-              className="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none placeholder-gray-400"
+              className="w-full px-4 py-3 rounded-md border text-black border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none placeholder-gray-400"
             />
             {errors.email && (
               <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -92,7 +92,7 @@ const LoginForm = () => {
               placeholder="비밀번호를 입력하세요"
               value={formData.password}
               onChange={(e) => handleChange("password", e.target.value)}
-              className="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none placeholder-gray-400"
+              className="w-full px-4 py-3 rounded-md border text-black border-gray-300 focus:ring-2 focus:ring-gray-600 focus:outline-none placeholder-gray-400"
             />
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password}</p>

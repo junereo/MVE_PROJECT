@@ -65,11 +65,9 @@ const SignUpForm = () => {
   };
 
   const pushOauth = async (formData: SignupFormData) => {
-    const { ...payload } = formData;
-    console.log(formData);
-
-    const res = await axiosInstance.post("/auth/register", payload);
-
+    const res = await axiosInstance.post("/auth/signup", formData, {
+      withCredentials: false,
+    });
     return res.data;
   };
 

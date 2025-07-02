@@ -72,9 +72,9 @@ export default function SurveyComplete() {
     music_uri: step1.url, // 유튜브 URL
     thumbnail_uri: step1.youtubeThumbnail,
     artist: step1.artist,
-    release_date: step1.releaseDate,
+    // release_date: step1.releaseDate, // 발매일 (YYYY-MM-DD 형식)
     thumbnail_url: step1.youtubeThumbnail,
-    music_title: step1.channelTitle, //음악 제목
+    music_title: step1.title, //음악 제목
     genre: step1.genre,
     start_at: step1.start_at,
     end_at: step1.end_at,
@@ -82,9 +82,9 @@ export default function SurveyComplete() {
     reward_amount: step1.reward_amount ?? 0,
     reward: step1.reward ?? 0,
     expert_reward: step1.expertReward ?? 0,
-    templateSetKey: templateSetKeyString,
+    // templateSetKey: templateSetKeyString, //템플릿 문항
     questions: step2.template_id!,
-    question_type: 0 as Question_type, // 기본값 설정
+    question_type: "fixed" as Question_type, // 기본값 설정
 
     // is_released: step1.isReleased, //발매여부
     // evaluationScores: step2.answers, // 평가 점수

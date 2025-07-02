@@ -4,32 +4,32 @@ import { create } from "zustand";
 type AdminType = {
   id: number;
   email: string;
-  name: string;
+  nickname: string;
   role: "admin" | "superadmin";
 };
 
 type SessionState = {
-  admin: AdminType | null;
+  user: AdminType | null;
   isLoading: boolean;
   isLoggedIn: boolean;
-  setAdmin: (admin: AdminType) => void;
+  setAdmin: (user: AdminType) => void;
   logout: () => void;
 };
 
 export const useSessionStore = create<SessionState>((set) => ({
-  admin: null,
+  user: null,
   isLoading: true,
   isLoggedIn: false,
 
-  setAdmin: (admin) =>
+  setAdmin: (user) =>
     set({
-      admin,
+      user,
       isLoading: false,
       isLoggedIn: true,
     }),
   logout: () =>
     set({
-      admin: null,
+      user: null,
       isLoading: false,
       isLoggedIn: false,
     }),

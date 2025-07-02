@@ -1,88 +1,74 @@
 "use client";
 
 import { useState } from "react";
-// import tp from "@/app/template/components/Templates";
-import fixedQuestions from "@/app/fixedQuestion/components/Templates";
-// import { useRouter } from "next/navigation";
+import fixedQuestions from "./components/Templates";
 import { createTemplate } from "@/lib/network/api";
-import { SurveyQuestion } from "@/types";
+import { QuestionTypeEnum } from "@/app/survey/create/complete/type";
+import { Question_type } from "@/types";
 
-export default function TemplateSelectPage() {
-  const [loading, setLoading] = useState(false); // 버튼 중복 방지
+export interface FixedQuestion {
+  category: string;
+  question_text: string;
+  question_type: Question_type;
+  type: QuestionTypeEnum;
+  options: string[];
+}
 
-  const handleTemplateSave = async () => {
+const groupByCategory = (
+  questions: FixedQuestion[]
+): Record<string, FixedQuestion[]> => {
+  return questions.reduce((acc, q) => {
+    if (!acc[q.category]) acc[q.category] = [];
+    acc[q.category].push(q);
+    return acc;
+  }, {} as Record<string, FixedQuestion[]>);
+};
+
+export default function FixedQuestionTemplatePage() {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
     try {
       setLoading(true);
-      const formData: SurveyQuestion = {
-        Survey_question: "고정 질문1",
-        question: fixedQuestions, //
-      };
-      console.log(formData);
 
-      await createTemplate(formData); //
-      alert("저장 완료!");
-    } catch (err) {
-      console.error("템플릿 저장 실패:", err);
+      const groupedQuestions = groupByCategory(fixedQuestions); // category별로 묶기
+
+      const formData = {
+        Survey_question: "고정 질문1",
+        question: groupedQuestions,
+        question_type: Question_type.fixed, // 고정 질문 타입
+        question_order: 1,
+      };
+
+      console.log("전송 데이터 ", formData);
+      await createTemplate(formData);
+      alert("고정 질문 템플릿 저장 완료!");
+    } catch (error) {
+      console.error("템플릿 저장 실패 ❌", error);
+      alert("저장 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
+
   return (
-    <div className="">
-      <div className="w-full  text-black text-2xl py-3  font-bold">
-        FixedQuestion
-      </div>
-      <div className="space-y-6 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#F5F5F5] px-4">
+      <div className="bg-white p-8 rounded-xl shadow-md max-w-xl w-full">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+          🎵 고정 질문 템플릿 업로드
+        </h1>
+
+        <p className="text-sm text-gray-500 mb-4">
+          아래 버튼을 클릭하면 고정 질문 세트를 서버로 전송합니다.
+        </p>
+
         <button
-          onClick={handleTemplateSave}
-          className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
+          onClick={handleSubmit}
           disabled={loading}
+          className="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition disabled:opacity-50"
         >
-          템플릿 저장하기
+          {loading ? "저장 중..." : "📤 템플릿 저장하기"}
         </button>
-        {/* {templateKeys.map((key) => (
-          <div key={key} className="border rounded-lg p-4 shadow">
-            <div
-              className="cursor-pointer font-semibold text-lg text-indigo-600 flex justify-between items-center"
-              onClick={() => setOpenKey(openKey === key ? null : key)}
-            >
-              📦 {key} 템플릿
-              <span>{openKey === key ? "▲" : "▼"}</span>
-            </div>
-
-            {openKey === key && (
-              <div className="mt-4 space-y-4">
-                {(tp as any)[key] &&
-                  Object.entries((tp as any)[key]).map(
-                    ([category, questions]) => (
-                      <div key={category}>
-                        <p className="font-bold mb-1">📁 {category}</p>
-                        {(questions as any[]).map((q, idx) => (
-                          <div key={idx} className="ml-4 mb-3">
-                            <p className="font-medium">📝 {q.question}</p>
-                            <ul className="list-disc list-inside text-sm text-gray-700">
-                              {q.options.map((opt: string, i: number) => (
-                                <li key={i}>⦿ {opt}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    )
-                  )}
-
-                <div className="flex gap-4 mt-6">
-                  <button
-                    onClick={() => router.push("/surveyTest/create/step2")}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded"
-                  >
-                    ✔ 이 템플릿 사용하기
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))} */}
       </div>
     </div>
   );
