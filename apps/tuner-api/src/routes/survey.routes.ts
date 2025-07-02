@@ -1,22 +1,23 @@
 import express from "express";
-import { createSurveyHandler,
-        createSurveyQuestionHandler, 
-        getSurveyList, 
-        getSurvey, 
+import {
+        createSurveyHandler,
+        createSurveyQuestionHandler,
+        getSurveyList,
+        getSurvey,
         updateSurvey,
         getSurveyQuestionList,
         getAllSurveyParticipantsHandler,
         createSurveyParticipantHandler,
         getSurveyResultHandler,
         createSurveyResultHandler
-     } from "../controllers/survey.controller";
+} from "../controllers/survey.controller";
 import { verifyUserOrAdmin } from "../middlewares/survey.middleware";
 
 const router = express.Router();
 
 router.get('/list', getSurveyList);
 router.get('/s/:surveyId', getSurvey);
-router.get('/q/:questionnaireId', getSurveyQuestionList );
+router.get('/q/:questionnaireId', getSurveyQuestionList);
 router.get('/p', getAllSurveyParticipantsHandler);
 router.get('/r/:surveyId', getSurveyResultHandler);
 

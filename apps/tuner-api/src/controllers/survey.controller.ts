@@ -1,60 +1,61 @@
 import { Request, Response } from 'express';
-import { createSurvey, 
-        getSurveyListService, 
-        updateSurveyService,
-        setSurveyQuestion,
-        getSurveyQuestions,
-        createSurveyParticipant,
-        getAllSurveyParticipants,
-        getSurveyResult,
-        createSurveyResult
-    } from '../services/survey.service';
+import {
+  createSurvey,
+  getSurveyListService,
+  updateSurveyService,
+  setSurveyQuestion,
+  getSurveyQuestions,
+  createSurveyParticipant,
+  getAllSurveyParticipants,
+  getSurveyResult,
+  createSurveyResult
+} from '../services/survey.service';
 import { PrismaClient, QuestionType } from '@prisma/client';
 const prisma = new PrismaClient();
 
 interface AuthRequest extends Request {
-    user?: {
-        user_id: string;
-        email?: string;
-        nickname?: string;
-    };
-    admin?: {
-        adminId: string;
-        email?: string;
-        name?: string;
-    };
+  user?: {
+    user_id: string;
+    email?: string;
+    nickname?: string;
+  };
+  admin?: {
+    adminId: string;
+    email?: string;
+    name?: string;
+  };
 }
 
 export const createSurveyHandler = async (req: AuthRequest, res: Response) => {
-    try {
-        //const userId = req.user?.user_id || req.body.user_id ;
-        const userId = parseInt(req.body.user_id);
+  try {
+    //const userId = req.user?.user_id || req.body.user_id ;
+    const userId = parseInt(req.body.user_id);
 
-        const data = req.body;
+    const data = req.body;
 
-        console.log(userId, data);
+    console.log(userId, data);
 
-        if (!userId) {
-            res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
-            return;
-        }
-
-        console.log('설문 생성 요청 데이터:', data);
-
-        const survey = await createSurvey({
-            userId,
-            body: data,
-        });
-
-        res.status(201).json({ success: true, data: survey });
-    } catch (err: any) {
-        console.error('설문 생성 실패:', err);
-        res.status(500).json({
-            success: false,
-            message: '설문 생성 실패',
-            error: err.message || err,
-        });
+    if (!userId) {
+      res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+      return;
     }
+
+    console.log('설문 생성 요청 데이터:', data);
+
+    const survey = await createSurvey({
+      userId,
+      body: data,
+    });
+
+    res.status(201).json({ success: true, data: survey });
+  } catch (err: any) {
+    console.error('설문 생성 실패:', err);
+    res.status(500).json({
+      success: false,
+      message: '설문 생성 실패',
+      error: err.message || err,
+    });
+  }
 };
 
 
@@ -87,16 +88,16 @@ export const createSurveyQuestionHandler = async (req: Request, res: Response) =
 };
 
 
-export const getSurveyList = async (req: Request, res: Response):Promise<void> => {
-    try {
-        const surveys = await getSurveyListService();
-        res.json(surveys);
-    } catch (err) {
-        res.status(500).json({ message: '설문 목록 조회 실패', error: err });
-    }
+export const getSurveyList = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const surveys = await getSurveyListService();
+    res.json(surveys);
+  } catch (err) {
+    res.status(500).json({ message: '설문 목록 조회 실패', error: err });
+  }
 };
 
-export const getSurvey = async (req: Request, res: Response):Promise<void> => {
+export const getSurvey = async (req: Request, res: Response): Promise<void> => {
   const surveyId = Number(req.params.surveyId);
 
   if (isNaN(surveyId)) {
@@ -110,8 +111,8 @@ export const getSurvey = async (req: Request, res: Response):Promise<void> => {
       const allSurveys = await prisma.survey.findMany({
         orderBy: { created_at: 'desc' },
         include: {
-            participants: true,
-            result: true,
+          participants: true,
+          result: true,
           creator: { select: { id: true, nickname: true, role: true } }
         }
       });
@@ -142,7 +143,7 @@ export const getSurvey = async (req: Request, res: Response):Promise<void> => {
 };
 
 
-export const getSurveyQuestionList = async (req: Request, res: Response):Promise<void> => {
+export const getSurveyQuestionList = async (req: Request, res: Response): Promise<void> => {
   const questionnaireId = Number(req.params.questionnaireId);
 
   if (isNaN(questionnaireId)) {
@@ -160,7 +161,7 @@ export const getSurveyQuestionList = async (req: Request, res: Response):Promise
 };
 
 // POST /survey-participants
-export const createSurveyParticipantHandler = async (req: Request, res: Response):Promise<void> => {
+export const createSurveyParticipantHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const { user_id, survey_id, answers, status, rewarded } = req.body;
 
@@ -171,7 +172,7 @@ export const createSurveyParticipantHandler = async (req: Request, res: Response
 
     const userid = parseInt(user_id);
     const newParticipant = await createSurveyParticipant({
-      user_id : userid,
+      user_id: userid,
       survey_id,
       answers,
       status,
@@ -198,24 +199,24 @@ export const getAllSurveyParticipantsHandler = async (req: Request, res: Respons
 
 
 export const updateSurvey = async (req: Request, res: Response): Promise<void> => {
-    const surveyId = Number(req.params.surveyId);
-    console.log('surveyId:', surveyId);
-    console.log('req.body:', req.body);
+  const surveyId = Number(req.params.surveyId);
+  console.log('surveyId:', surveyId);
+  console.log('req.body:', req.body);
 
-    const body = req.body;
-    if (!body || Object.keys(body).length === 0) {
-        console.error('요청 본문이 비어 있습니다');
-        res.status(400).json({ message: '요청 데이터가 없습니다.' });
-        return;
-    }
+  const body = req.body;
+  if (!body || Object.keys(body).length === 0) {
+    console.error('요청 본문이 비어 있습니다');
+    res.status(400).json({ message: '요청 데이터가 없습니다.' });
+    return;
+  }
 
-    try {
-        const updatedSurvey = await updateSurveyService(surveyId, body);
-        res.status(200).json({ success: true, data: updatedSurvey });
-    } catch (err: any) {
-        console.error('설문 수정 실패:', err);
-        res.status(500).json({ success: false, message: '설문 수정 실패', error: err.message });
-    };
+  try {
+    const updatedSurvey = await updateSurveyService(surveyId, body);
+    res.status(200).json({ success: true, data: updatedSurvey });
+  } catch (err: any) {
+    console.error('설문 수정 실패:', err);
+    res.status(500).json({ success: false, message: '설문 수정 실패', error: err.message });
+  };
 }
 
 export const createSurveyResultHandler = async (req: Request, res: Response) => {
@@ -249,7 +250,7 @@ export const createSurveyResultHandler = async (req: Request, res: Response) => 
   }
 };
 
-export const getSurveyResultHandler = async (req: Request, res: Response):Promise<void> => {
+export const getSurveyResultHandler = async (req: Request, res: Response): Promise<void> => {
   const surveyId = Number(req.params.surveyId);
   if (isNaN(surveyId)) {
     res.status(400).json({ message: '잘못된 surveyId' });

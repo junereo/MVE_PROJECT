@@ -30,7 +30,7 @@ CREATE TYPE "EndedBy" AS ENUM ('expired', 'outOfRewards', 'closedByCreator');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
     "phone_number" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE "User_Oauth" (
     "profile_image" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "userId" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL,
 
     CONSTRAINT "User_Oauth_pkey" PRIMARY KEY ("id")
 );
@@ -69,21 +69,24 @@ CREATE TABLE "User_Oauth" (
 CREATE TABLE "Survey" (
     "id" SERIAL NOT NULL,
     "survey_title" TEXT NOT NULL,
-    "music_title" TEXT,
-    "artist" TEXT,
+    "music_title" TEXT NOT NULL,
+    "artist" TEXT NOT NULL,
     "music_uri" TEXT NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "thumbnail_uri" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "type" "SurveyType" NOT NULL,
+    "genre" "Genre" NOT NULL,
     "start_at" TIMESTAMP(3) NOT NULL,
     "end_at" TIMESTAMP(3) NOT NULL,
-    "reward_amount" INTEGER NOT NULL,
-    "reward" INTEGER NOT NULL,
-    "expert_reward" INTEGER NOT NULL,
+    "reward_amount" INTEGER,
+    "reward" INTEGER,
+    "expert_reward" INTEGER,
     "is_active" "SurveyActive" NOT NULL,
     "ended_by" "EndedBy",
     "status" "SurveyStatus" NOT NULL DEFAULT 'draft',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "questions" INTEGER NOT NULL,
 
     CONSTRAINT "Survey_pkey" PRIMARY KEY ("id")
 );
@@ -91,7 +94,6 @@ CREATE TABLE "Survey" (
 -- CreateTable
 CREATE TABLE "Survey_Question" (
     "id" SERIAL NOT NULL,
-    "survey_id" INTEGER NOT NULL,
     "question_type" "QuestionType" NOT NULL,
     "question" JSONB NOT NULL,
     "question_order" INTEGER NOT NULL,
@@ -104,7 +106,7 @@ CREATE TABLE "Survey_Question" (
 -- CreateTable
 CREATE TABLE "Survey_Participants" (
     "id" SERIAL NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "survey_id" INTEGER NOT NULL,
     "answers" JSONB NOT NULL,
     "status" "SurveyStatus" NOT NULL DEFAULT 'draft',
@@ -121,7 +123,6 @@ CREATE TABLE "Survey_Result" (
     "survey_id" INTEGER NOT NULL,
     "survey_statistics" JSONB NOT NULL,
     "is_public" BOOLEAN NOT NULL DEFAULT false,
-    "version" INTEGER,
     "metadata_ipfs" TEXT,
     "respondents" INTEGER NOT NULL,
     "reward_claimed_amount" INTEGER NOT NULL,
@@ -145,9 +146,6 @@ ALTER TABLE "User_Oauth" ADD CONSTRAINT "User_Oauth_userId_fkey" FOREIGN KEY ("u
 
 -- AddForeignKey
 ALTER TABLE "Survey" ADD CONSTRAINT "Survey_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Survey_Question" ADD CONSTRAINT "Survey_Question_survey_id_fkey" FOREIGN KEY ("survey_id") REFERENCES "Survey"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Survey_Participants" ADD CONSTRAINT "Survey_Participants_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

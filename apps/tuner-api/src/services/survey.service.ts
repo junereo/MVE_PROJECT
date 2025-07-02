@@ -11,16 +11,6 @@ import {
 
 const prisma = new PrismaClient();
 
-// 설문 맵핑
-const convertType = (t: string): QuestionType => {
-  if (t === 'multiple_choice') return 'multiple_choice';
-  if (t === 'check_box') return 'check_box';
-  if (t === 'text') return 'text';
-  if (t === 'ranking') return 'ranking';
-  if (t === 'likert') return 'likert';
-  return 'text';
-};
-
 // 상태 계산 (한국시간 기준)
 const checkSurveyActive = (_start: Date | string, _end: Date | string): SurveyActive => {
   const now = new Date();
@@ -38,7 +28,7 @@ const isSurveyType = (value: any): value is SurveyType => {
   return Object.values(SurveyType).includes(value);
 };
 
-// ✅ 설문 생성 (템플릿 제거 버전)
+//  설문 생성 
 export const createSurvey = async ({
   userId,
   body,
@@ -47,7 +37,7 @@ export const createSurvey = async ({
   body: any;
 }) => {
   try {
-    if (!userId ) throw new Error('유저 필요');
+    if (!userId) throw new Error('유저 필요');
     if (!isSurveyType(body.type)) throw new Error(`잘못된 설문 타입: ${body.type}`);
 
     const surveyType = body.type as SurveyType;
@@ -55,44 +45,44 @@ export const createSurvey = async ({
     return await prisma.$transaction(async (tx) => {
       // 설문 생성
 
-        const startDate = new Date(body.start_at);
-        const endDate = new Date(body.end_at);
+      const startDate = new Date(body.start_at);
+      const endDate = new Date(body.end_at);
 
-        const survey : Survey = await tx.survey.create({
-            data: {
-                // ✅ 필수 외래키: 사용자 ID
-                user_id: userId ?? 0, // 적절한 fallback 설정
+      const survey: Survey = await tx.survey.create({
+        data: {
+          //  필수 외래키: 사용자 ID
+          user_id: userId ?? 0, // 적절한 fallback 설정
 
-                // ✅ 음악 정보
-                music_title: body.music_title ?? null,
-                artist: body.artist ??  null,
-                music_uri: body.music_uri, // music 객체의 sample_url 사용
-                thumbnail_uri: body.thumbnail_uri,
-                genre: body.genre, //장르
-                // ✅ 기본 필드
-                type: surveyType,
-                start_at: startDate,
-                end_at: endDate,
-                is_active: checkSurveyActive(startDate, endDate),
-                survey_title: body.survey_title,
-                status: body.status ?? 'draft',
-                reward: body.reward ?? 0,
-                expert_reward: body.expert_reward ?? 0,
-                reward_amount: body.reward_amount ?? 0,
-                questions: body.questions ?? 0,
+          //  음악 정보
+          music_title: body.music_title ?? null,
+          artist: body.artist ?? null,
+          music_uri: body.music_uri, // music 객체의 sample_url 사용
+          thumbnail_uri: body.thumbnail_uri,
+          genre: body.genre, //장르
+          // 기본 필드
+          type: surveyType,
+          start_at: startDate,
+          end_at: endDate,
+          is_active: checkSurveyActive(startDate, endDate),
+          survey_title: body.survey_title,
+          status: body.status ?? 'draft',
+          reward: body.reward ?? 0,
+          expert_reward: body.expert_reward ?? 0,
+          reward_amount: body.reward_amount ?? 0,
+          questions: body.questions ?? 0,
 
-                // ✅ 보상 정보 (official 설문에만)
-                ...(surveyType === SurveyType.official && {
-                reward: body.reward,
-                expert_reward: body.expert_reward,
-                reward_amount: body.reward_amount,
-                }),
-            },
-        });
+          // 보상 정보 (official 설문에만)
+          ...(surveyType === SurveyType.official && {
+            reward: body.reward,
+            expert_reward: body.expert_reward,
+            reward_amount: body.reward_amount,
+          }),
+        },
+      });
 
-        console.log(survey);
+      console.log(survey);
 
-      // // ✅ 고정 질문 삽입
+      // //  고정 질문 삽입
       // const fixedQuestions = FIXED_SURVEY_QUESTIONS.map((q, idx) => ({
       //   survey_id: survey.id,
       //   question_text: q.question_text,
@@ -102,7 +92,7 @@ export const createSurvey = async ({
       //   question_order: idx + 1,
       // }));
 
-      // // ✅ 커스텀 질문 삽입
+      // // 커스텀 질문 삽입
       // const additionalQuestions = Array.isArray(body.additionalQuestions)
       //   ? body.additionalQuestions
       //   : JSON.parse(body.additionalQuestions || '[]');
@@ -116,7 +106,7 @@ export const createSurvey = async ({
       //   question_order: FIXED_SURVEY_QUESTIONS.length + idx + 1,
       // }));
 
-      // ✅ 전체 질문 저장
+      // 전체 질문 저장
       // const surveyCustoms = [...fixedQuestions, ...customQuestions];
       // if (surveyCustoms.length > 0) {
       //   await tx.survey_Custom.createMany({ data: surveyCustoms });
@@ -131,14 +121,11 @@ export const createSurvey = async ({
   }
 };
 
-// ✅ 설문 불러오기
+//  설문 불러오기
 export const getSurveyListService = async () => {
   return await prisma.survey.findMany({
     include: {
-      music: true,
       creator: { select: { id: true } },
-      director: { select: { id: true } },
-      survey_custom: true,
     },
     orderBy: { start_at: 'desc' },
   });
@@ -228,11 +215,6 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
         end_at: new Date(body.end_at),
         status: body.status,
         is_active: checkSurveyActive(body.start_at, body.end_at),
-        tags: {
-          set: (Object.values(body.tags || {}) as string[]).filter(
-            (v): v is SurveyTags => Object.values(SurveyTags).includes(v as SurveyTags)
-          ),
-        },
         reward: body.reward,
         reward_amount: body.reward_amount,
         expert_reward: body.expert_reward,
@@ -240,8 +222,8 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
     });
 
     // 기존 커스텀 문항 가져오기
-    const existingQuestions = await tx.survey_Custom.findMany({
-      where: { survey_id: surveyId },
+    const existingQuestions = await tx.survey_Question.findMany({
+      orderBy: { question_order: 'asc' },
     });
     const existingIds = new Set(existingQuestions.map((q) => q.id));
 
@@ -254,23 +236,23 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
     await Promise.all(
       incomingQuestions.map(async (q: any, idx: number) => {
         const questionData = {
-          question_text: q.text?.trim() || '(비어 있는 질문)',
-          question_type: convertType(q.type),
-          options: JSON.stringify(q.options ?? []),
-          is_required: q.is_required ?? true,
+          question: {
+            text: q.text?.trim() || '(비어 있는 질문)',
+            options: q.options ?? [],
+          },
+          question_type: q.type,
           question_order: q.question_order ?? idx + 1,
         };
 
         if (q.id && existingIds.has(q.id)) {
           incomingIds.add(q.id);
-          await tx.survey_Custom.update({
+          await tx.survey_Question.update({
             where: { id: q.id },
             data: questionData,
           });
         } else {
-          const created = await tx.survey_Custom.create({
+          const created = await tx.survey_Question.create({
             data: {
-              survey_id: surveyId,
               ...questionData,
             },
           });
@@ -281,7 +263,7 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
 
     const idsToDelete = [...existingIds].filter((id) => !incomingIds.has(id));
     if (idsToDelete.length > 0) {
-      await tx.survey_Custom.deleteMany({
+      await tx.survey_Question.deleteMany({
         where: { id: { in: idsToDelete } },
       });
     }
@@ -295,7 +277,6 @@ export const createSurveyResult = async ({
   survey_id,
   survey_statistics,
   is_public = false,
-  version,
   metadata_ipfs,
   respondents,
   reward_claimed_amount,
