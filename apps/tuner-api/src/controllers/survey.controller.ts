@@ -27,7 +27,9 @@ interface AuthRequest extends Request {
 
 export const createSurveyHandler = async (req: AuthRequest, res: Response) => {
     try {
-        const userId = req.user?.user_id || req.body.user_id ;
+        //const userId = req.user?.user_id || req.body.user_id ;
+        const userId = parseInt(req.body.user_id);
+
         const data = req.body;
 
         console.log(userId, data);
@@ -108,6 +110,8 @@ export const getSurvey = async (req: Request, res: Response):Promise<void> => {
       const allSurveys = await prisma.survey.findMany({
         orderBy: { created_at: 'desc' },
         include: {
+            participants: true,
+            result: true,
           creator: { select: { id: true, nickname: true, role: true } }
         }
       });
@@ -165,8 +169,9 @@ export const createSurveyParticipantHandler = async (req: Request, res: Response
       return;
     }
 
+    const userid = parseInt(user_id);
     const newParticipant = await createSurveyParticipant({
-      user_id,
+      user_id : userid,
       survey_id,
       answers,
       status,

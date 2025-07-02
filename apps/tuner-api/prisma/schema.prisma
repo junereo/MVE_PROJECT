@@ -145,6 +145,7 @@ model Survey {
   music_title   String
   artist        String
   music_uri     String
+  thumbnail_uri String
   user_id       Int
   type          SurveyType
   genre         Genre
@@ -175,16 +176,14 @@ model Survey_Question {
 
 model Survey_Participants {
   id         Int          @id @default(autoincrement())
-  user_id    String
+  user_id    Int
   survey_id  Int
   answers    Json
   status     SurveyStatus @default(draft)
   rewarded   Boolean      @default(false)
   created_at DateTime     @default(now())
   updated_at DateTime     @updatedAt
-
-  userId Int
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [user_id], references: [id])
   survey Survey @relation(fields: [survey_id], references: [id])
 }
 
