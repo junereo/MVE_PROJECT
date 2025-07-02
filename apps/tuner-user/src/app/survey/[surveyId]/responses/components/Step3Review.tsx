@@ -1,6 +1,6 @@
 "use client";
 
-import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
+import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
@@ -46,7 +46,7 @@ const statusMap: Record<StatusKey, StatusUI> = {
 };
 
 export default function Step3Review({ onPrev }: Step3Props) {
-  const { surveySubmitStatus } = useSurveyStore();
+  const { surveySubmitStatus } = useAnswerStore();
 
   const status: StatusKey = surveySubmitStatus || "error";
   const ui = statusMap[status];
