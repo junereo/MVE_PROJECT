@@ -4,6 +4,7 @@ import { mapRoleEnum } from '../utils/auth.utils';
 import { signToken } from '../utils/jwt';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import qs from 'qs';
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -184,25 +185,40 @@ export const fetchKakaoProfile = async (code: string) => {
 };
 
 // 구글 
-export const googleCallbackService = async (req: Request) => {
-    const { code, role } = req.body;
+export const googleCallbackService = async ({
+    code,
+    role,
+}: { code: string; role?: string }) => {
     const roleEnum = mapRoleEnum(Number(role) || 3);
 
-    const tokenRe = await axios.post(
-        'https://oauth2.googleapis.com/token',
+    console.log("=== GOOGLE CALLBACK SERVICE ===");
+    console.log("code:", code);
+
+    const payload = qs.stringify({
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+        grant_type: "authorization_code",
+    });
+
+    console.log("TOKEN PAYLOAD:", payload);
+
+    const tokenRes = await axios.post(
+        "https://oauth2.googleapis.com/token",
+        payload,
         {
-            code,
-            client_id: process.env.GOOGLE_CLIENT_ID!,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-            redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
-            grant_type: 'authorization_code',
-        },
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        }
     );
-    const { access_token } = tokenRe.data;
+
+    const { access_token } = tokenRes.data;
 
     const { data: userInfo } = await axios.get(
-        'https://www.googleapis.com/oauth2/v2/userinfo',
-        { headers: { Authorization: `Bearer ${access_token}` } },
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        {
+            headers: { Authorization: `Bearer ${access_token}` },
+        }
     );
 
     const { id: provider_id, email, name } = userInfo;
@@ -219,9 +235,9 @@ export const googleCallbackService = async (req: Request) => {
         const resolvedUser = existingUser ?? await tx.user.create({
             data: {
                 email,
-                password: '',
+                password: "",
                 nickname: name,
-                phone_number: '',
+                phone_number: "",
                 role: roleEnum,
             },
         });
