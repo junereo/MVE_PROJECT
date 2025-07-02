@@ -1,11 +1,12 @@
 import SignupForm from "./components/SignupForm";
+import Breadcrumb from "@/components/ui/Breadcrumb";
 
 export default function Signup() {
   return (
     <div>
-      <h1 className="title">SIGNUP</h1>
-      <div className="flex justify-center font-bold text-2xl pt-1 pb-1">
-        LOGO
+      <Breadcrumb crumbs={[{ label: "회원가입" }]} />
+      <div className="flex items-center justify-center font-bold text-2xl pt-1 pb-1 text-blue-600">
+        TUNER
       </div>
       <SignupForm />
     </div>

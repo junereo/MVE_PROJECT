@@ -16,7 +16,7 @@ export default function Home() {
             <Link href="/survey">전체보기</Link>
           </button>
         </div>
-        <Card />
+        <Card status="ongoing" />
         <button className="flex mx-auto px-4 py-1 border border-blue-300 bg-white hover:bg-blue-50 transition">
           <Link href="/survey">진행중 설문 더보기</Link>
         </button>
