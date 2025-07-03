@@ -24,7 +24,7 @@ export const submitSurvey = async (req: Request, res: Response) => {
 
   if (!uid || !surveyId || !answers) {
     res.status(400).json({ error: 'uid, surveyId, answers are required' });
-    return ;
+    return;
   }
 
   try {
