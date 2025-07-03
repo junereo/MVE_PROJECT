@@ -16,7 +16,8 @@ import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 
-interface Step1Props {
+interface Step2Props {
+  onPrev: () => void;
   onNext: () => void;
 }
 
@@ -28,7 +29,7 @@ const baseCategories = [
   { key: "stardom", label: "스타성" },
 ];
 
-export default function Step1Default({ onNext }: Step1Props) {
+export default function Step2Default({ onPrev, onNext }: Step2Props) {
   const params = useParams();
   const surveyId = Number(params.id);
 
@@ -59,7 +60,7 @@ export default function Step1Default({ onNext }: Step1Props) {
       // 기본 설문 불러옴
       fetchSurveyQuestions(1).then((res) => {
         const data = res.data[0];
-
+        console.log(data);
         setSurveyTitle(data.title);
 
         type RawQuestion = {
@@ -77,8 +78,8 @@ export default function Step1Default({ onNext }: Step1Props) {
         const defaultQuestions: QuestionItem[] = Object.entries(rawMap).flatMap(
           ([category, items]) =>
             items.map(
-              (q): QuestionItem => ({
-                id: q.id,
+              (q, index): QuestionItem => ({
+                id: index + 1,
                 category,
                 question_text: q.question_text,
                 type: q.type,
@@ -96,6 +97,8 @@ export default function Step1Default({ onNext }: Step1Props) {
   const handlePrev = () => {
     if (tabIndex > 0) {
       setTabIndex((prev) => prev - 1);
+    } else {
+      onPrev();
     }
   };
 
@@ -106,10 +109,6 @@ export default function Step1Default({ onNext }: Step1Props) {
       onNext();
     }
   };
-
-  useEffect(() => {
-    console.log("📦 현재 저장된 답변 상태:", answers);
-  }, [answers]);
 
   return (
     <>

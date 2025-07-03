@@ -1,20 +1,13 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { Suspense } from "react";
+import SurveyResponsesClient from "./components/SurveyResponsesClient";
 
-// 동적으로 CSR 전용 컴포넌트 로딩
-const SurveyResponsesClient = dynamic(
-  () => import("./components/SurveyResponsesClient"),
-  {
-    ssr: false,
-  }
-);
+interface Props {
+  params: { surveyId: string };
+}
 
-export default function SurveyCreatePage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SurveyResponsesClient />
-    </Suspense>
-  );
+export default function SurveyCreatePage({ params }: Props) {
+  const surveyId = Number(params.surveyId);
+
+  return <SurveyResponsesClient surveyId={surveyId} />;
 }
