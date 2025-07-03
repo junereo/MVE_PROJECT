@@ -6,7 +6,7 @@ import {
   QuestionTypeEnum,
   SurveyTypeEnum,
 } from "@/app/survey/create/complete/type";
-import { Question_type } from "@/types";
+import { Question_type, SurveyStatus } from "@/types";
 
 const mapToQuestionTypeEnum = (type: string): QuestionTypeEnum => {
   switch (type?.toLowerCase()) {
@@ -72,7 +72,7 @@ export default function SurveyComplete() {
     music_uri: step1.url, // 유튜브 URL
     thumbnail_uri: step1.youtubeThumbnail,
     artist: step1.artist,
-    // release_date: step1.releaseDate, // 발매일 (YYYY-MM-DD 형식)
+    release_date: step1.releaseDate, // 발매일 (YYYY-MM-DD 형식)
     thumbnail_url: step1.youtubeThumbnail,
     music_title: step1.title, //음악 제목
     genre: step1.genre,
@@ -85,8 +85,8 @@ export default function SurveyComplete() {
     // templateSetKey: templateSetKeyString, //템플릿 문항
     questions: step2.template_id!,
     question_type: "fixed" as Question_type, // 기본값 설정
-
-    // is_released: step1.isReleased, //발매여부
+    status: SurveyStatus.complete, // 설문 상태 (임시저장 | 생성 완료)
+    is_released: step1.isReleased, //발매여부
     // evaluationScores: step2.answers, // 평가 점수
     // tags: step2.tags, // 해시태그
 

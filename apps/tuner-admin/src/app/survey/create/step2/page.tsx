@@ -8,8 +8,9 @@ import SurveyQuestionBase from "@/app/survey/create/step2/components/SurveyQuest
 import SurveyCustomForm from "@/app/survey/create/step2/components/SurveyCustomForm";
 import SurveyActions from "@/app/survey/create/step2/components/SurveyActions";
 import SurveyNavigation from "@/app/survey/create/step2/components/SurveyNavigation";
-import { fetchTemplates } from "@/lib/network/api";
+import { fetchTemplates, surveyCreate } from "@/lib/network/api";
 import { QuestionTypeEnum } from "@/app/survey/create/complete/type";
+import { Question_type, SurveyStatus } from "@/types";
 
 // 🔷 백엔드에서 받아오는 질문 타입 정의
 interface RawTemplateQuestion {
@@ -31,7 +32,7 @@ interface Question {
 
 export default function SurveyStep2() {
   const router = useRouter();
-  const { step1, setStep2, setTemplateSetKey } = useSurveyStore();
+  const { step1, step2, setStep2, setTemplateSetKey } = useSurveyStore();
 
   // 🔹 탭 카테고리 정의
   const baseCategories = [
@@ -114,6 +115,43 @@ export default function SurveyStep2() {
 
     loadTemplate();
   }, [setStep2, setTemplateSetKey]);
+
+  const basePayload = {
+    survey_title: step1.survey_title,
+    title: step1.title,
+    music_uri: step1.url,
+    thumbnail_uri: step1.youtubeThumbnail,
+    artist: step1.artist,
+    release_date: step1.releaseDate,
+    thumbnail_url: step1.youtubeThumbnail,
+    music_title: step1.title,
+    genre: step1.genre,
+    start_at: step1.start_at,
+    end_at: step1.end_at,
+    type: step1.surveyType,
+    reward_amount: step1.reward_amount ?? 0,
+    reward: step1.reward ?? 0,
+    expert_reward: step1.expertReward ?? 0,
+    questions: step2.template_id!,
+    question_type: "fixed" as Question_type,
+    is_released: step1.isReleased,
+  };
+  const handleTempSave = async () => {
+    const draftPayload = {
+      ...basePayload,
+      status: SurveyStatus.draft,
+    };
+
+    try {
+      console.log("임시 저장 데이터:", draftPayload);
+      const res = await surveyCreate(draftPayload);
+      console.log("서버 응답:", res);
+      alert("임시 저장 완료!");
+    } catch (error) {
+      console.error("임시 저장 오류:", error);
+      alert("임시 저장 실패");
+    }
+  };
 
   // 🔹 커스텀 탭 생성
   const createCustomTab = () => {
@@ -268,7 +306,10 @@ export default function SurveyStep2() {
 
           {/* 🔹 완료 버튼 */}
           {(isStardomTab || isCustomTab) && (
-            <SurveyActions onTempSave={() => {}} onComplete={handleComplete} />
+            <SurveyActions
+              onTempSave={handleTempSave}
+              onComplete={handleComplete}
+            />
           )}
         </div>
       </div>
