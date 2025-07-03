@@ -17,7 +17,11 @@ export default function Navigate() {
       activePath: "/survey",
     },
     { label: "Sign up", href: "/signup", activePath: "/signup" },
-    { label: "Template", href: "/template", activePath: "/template" },
+    {
+      label: "Fixed Question",
+      href: "/fixedQuestion",
+      activePath: "/ fixedQuestion",
+    },
     { label: "My Page", href: "/mypage", activePath: "/mypage" },
     { label: "Wallet", href: "/wallet", activePath: "/wallet" },
   ];
@@ -35,11 +39,11 @@ export default function Navigate() {
       {/* 사이드바 */}
       <div
         className={`
-          fixed top-0 left-0 h-screen z-40 bg-[#DEDEDE] shadow-lg
-          transition-transform duration-300 ease-in-out
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0 lg:min-w-[40px]
-        `}
+        fixed top-0 left-0 h-screen z-40 bg-[#DEDEDE] shadow-lg
+        transition-transform duration-300 ease-in-out
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        lg:translate-x-0 lg:w-[125px] 
+      `}
       >
         <div className="text-[#888888] font-bold text-lg p-4">네비게이션</div>
         <ul className="space-y-2 px-4">

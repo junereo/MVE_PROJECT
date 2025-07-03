@@ -1,15 +1,15 @@
-import { SurveyCreatePayload, TemplateType, LoginFormData } from "@/types";
+import { SurveyCreatePayload, SurveyQuestion, LoginFormData } from "@/types";
 
 import axiosClient from "@/lib/network/axios";
 
 // 로그인 요청
 export const pushLogin = async (formData: LoginFormData) => {
-  const res = await axiosClient.post("/admin/login", formData);
+  const res = await axiosClient.post("/auth/login", formData);
   return res.data;
 };
 // 로그아웃 요청
 export const LogOut = async () => {
-  const res = await axiosClient.post("/admin/logout");
+  const res = await axiosClient.post("/auth/logout");
   return res.data;
 };
 // dashbord
@@ -33,13 +33,15 @@ export const nftList = async () => {
 
 // 발급된 설문 리스트
 export const surveyList = async () => {
-  const res = await axiosClient.get("/survey/list");
-  return res;
+  const res = await axiosClient.get("/survey/s/0");
+  console.log("설문 리스트:", res.data);
+
+  return res.data;
 };
 
 // 새로운 설문 만들기
 export const surveyCreate = async (serverPayload: SurveyCreatePayload) => {
-  await axiosClient.post("/survey/create", serverPayload);
+  await axiosClient.post("/survey", serverPayload);
 };
 
 // 모든 유저 조회 list
@@ -58,22 +60,22 @@ export const serveyTemplate = async () => {
 };
 
 // 설문 템플릿 생성 page
-export const createTemplate = async (formData: TemplateType) => {
-  await axiosClient.post("/template", formData);
+export const createTemplate = async (formData: SurveyQuestion) => {
+  await axiosClient.post("/survey/q", formData);
 };
 
 //템플릿 불러오기
 export const fetchTemplates = async (id: number | string) => {
-  const response = await axiosClient.get(`/template/${id}`);
+  const response = await axiosClient.get(`/survey/q/${id}`);
   return response.data;
 };
 
 // 설문 템플릿 상세 조회
 export const templateView = async () => {
-  await axiosClient.post("/template/id");
+  await axiosClient.post("/survey/q/id");
 };
 
 // 설문 템플릿 수정
 export const templatePut = async () => {
-  await axiosClient.put("/template/id");
+  await axiosClient.put("/survey/q/id");
 };
