@@ -10,20 +10,20 @@ export default function Navigate() {
   const pathname = usePathname(); // ✅ 현재 경로 가져오기
 
   const navItems = [
-    { label: "Dashboard", href: "/dashboard", activePath: "/dashboard" },
+    { label: "대시보드", href: "/dashboard", activePath: "/dashboard" },
     {
-      label: "Survey",
+      label: "설문조사",
       href: "/survey",
       activePath: "/survey",
     },
-    { label: "Sign up", href: "/signup", activePath: "/signup" },
+    { label: "회원가입", href: "/signup", activePath: "/signup" },
     {
-      label: "Fixed Question",
+      label: "고정질문",
       href: "/fixedQuestion",
-      activePath: "/ fixedQuestion",
+      activePath: "/fixedQuestion",
     },
-    { label: "My Page", href: "/mypage", activePath: "/mypage" },
-    { label: "Wallet", href: "/wallet", activePath: "/wallet" },
+    { label: "유저관리", href: "/userService", activePath: "/userService" },
+    { label: "지갑관리", href: "/wallet", activePath: "/wallet" },
   ];
 
   return (
@@ -60,7 +60,7 @@ export default function Navigate() {
                       : "text-[#888888]"
                   }`}
                 >
-                  - {item.label}
+                  {item.label}
                 </Link>
               </li>
             );
