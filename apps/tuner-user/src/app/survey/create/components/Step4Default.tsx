@@ -8,7 +8,7 @@ import QuestionOptions from "../../components/QuestionOptions";
 import QuestionSubjective from "../../components/QuestionSubjective";
 import { fetchSurveyQuestions } from "@/features/survey/services/survey";
 import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
-import { QuestionTypeEnum } from "@/features/survey/types/enums";
+import { InputTypeEnum } from "@/features/survey/types/enums";
 // import { defaultQuestions } from "@/features/survey/constants/defaultQuestions";
 
 interface Step4Props {
@@ -100,7 +100,7 @@ export default function Step4Default({
             className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4"
           >
             <QuestionText text={q.question_text} />
-            {q.type === QuestionTypeEnum.SUBJECTIVE ? (
+            {q.type === InputTypeEnum.SUBJECTIVE ? (
               <QuestionSubjective disabled={true} />
             ) : (
               <QuestionOptions

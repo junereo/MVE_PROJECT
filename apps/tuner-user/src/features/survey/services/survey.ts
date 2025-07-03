@@ -3,7 +3,7 @@ import { SurveyPayload } from "../types/surveyPayload";
 
 // 설문 생성
 export const createSurvey = async (payload: SurveyPayload) => {
-  const response = await axios.post("/survey/create", payload);
+  const response = await axios.post("/survey", payload);
   return response;
 };
 
