@@ -24,11 +24,11 @@ export const fetchYoutubeVideos = async (query: string) => {
       };
       id: { videoId: string };
     }) => ({
-      title: item.snippet.title,
+      music_title: item.snippet.title,
       artist: item.snippet.channelTitle,
-      thumbnail_url: item.snippet.thumbnails.medium.url,
+      thumbnail_uri: item.snippet.thumbnails.medium.url,
       channelTitle: item.snippet.channelTitle,
-      sample_url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+      music_uri: `https://www.youtube.com/watch?v=${item.id.videoId}`,
       select_url: `https://www.youtube.com/embed/${item.id.videoId}`,
     })
   );

@@ -10,9 +10,8 @@ type Step = "step1" | "step2" | "step3";
 
 export default function SurveyResponsesClient() {
   const { isInitialized } = useAuthGuard();
-  if (!isInitialized) return null;
-
   const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
+  if (!isInitialized) return null;
 
   return (
     <div className="mx-auto py-8">

@@ -10,6 +10,7 @@ type Props = {
   status: "예정" | "진행중" | "종료";
   participants: number;
   reward?: number;
+  onClick?: () => void;
 };
 
 const statusColorMap = {
@@ -27,9 +28,13 @@ export default function List({
   status,
   participants,
   reward,
+  onClick,
 }: Props) {
   return (
-    <div className="flex gap-3 items-center p-3 sm:p-4 md:p-5 rounded-md border hover:shadow-sm transition bg-white w-full max-w-[485px] sm:max-w-[600px] md:max-w-[700px] mx-auto">
+    <div
+      onClick={onClick}
+      className="flex gap-3 items-center p-3 sm:p-4 md:p-5 rounded-md border hover:shadow-sm transition bg-white w-full max-w-[485px] sm:max-w-[600px] md:max-w-[700px] mx-auto"
+    >
       <div className="relative w-[100px] h-[60px] sm:w-[140px] sm:h-[80px] rounded overflow-hidden border shrink-0">
         <Image
           src={image}

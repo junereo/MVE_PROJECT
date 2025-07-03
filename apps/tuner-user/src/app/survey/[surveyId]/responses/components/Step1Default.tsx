@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
@@ -9,8 +9,11 @@ import SurveyTabs from "@/app/survey/components/SurveyTabs";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
-import { defaultQuestions } from "@/features/survey/constants/defaultQuestions";
+import { InputTypeEnum } from "@/features/survey/types/enums";
+import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
+import { fetchSurveyQuestions } from "@/features/survey/services/survey";
 import { QuestionTypeEnum } from "@/features/survey/types/enums";
+import type { QuestionItem } from "@/features/survey/store/useDefaultQuestionStore";
 
 interface Step1props {
   onNext: () => void;
@@ -34,21 +37,57 @@ export default function Step1Default({ onNext }: Step1props) {
 
   const [tabIndex, setTabIndex] = useState(0);
   const currentKey = baseCategories[tabIndex]?.key ?? "";
-  const currentTemplate = useMemo(
-    () => defaultQuestions[currentKey] ?? [],
-    [currentKey]
+  const { questions, setQuestions } = useDefaultQuestionStore();
+  const currentQuestion = useMemo(
+    () => questions.filter((q) => q.category === currentKey),
+    [questions, currentKey]
   );
 
   const { id, survey_title } = dummySurvey;
 
   const isValid = useMemo(() => {
     const currentAnswers = answers[currentKey] || {};
-    return currentTemplate.every((_, idx) => {
+    return currentQuestion.every((_, idx) => {
       const val = currentAnswers[idx];
       if (Array.isArray(val)) return val.length > 0;
       return val !== undefined && val !== "";
     });
-  }, [answers, currentKey, currentTemplate]);
+  }, [answers, currentKey, currentQuestion]);
+
+  useEffect(() => {
+    if (questions.length === 0) {
+      fetchSurveyQuestions(id).then((res) => {
+        const template = res.data[0];
+
+        type RawQuestion = {
+          id: number;
+          question_text: string;
+          type: InputTypeEnum;
+          options?: string[];
+          question_type?: string;
+        };
+
+        type QuestionMap = Record<string, RawQuestion[]>;
+
+        const rawMap = template.question as QuestionMap;
+
+        const defaultQuestions: QuestionItem[] = Object.entries(rawMap).flatMap(
+          ([category, items]) =>
+            items.map(
+              (q): QuestionItem => ({
+                id: q.id,
+                category,
+                question_text: q.question_text,
+                type: q.type,
+                options: q.options,
+                question_type: QuestionTypeEnum.FIXED,
+              })
+            )
+        );
+        setQuestions(defaultQuestions);
+      });
+    }
+  }, [id, questions.length, setQuestions]);
 
   const handlePrev = () => {
     if (tabIndex > 0) {
@@ -88,7 +127,7 @@ export default function Step1Default({ onNext }: Step1props) {
           setTab={setTabIndex}
         />
 
-        {currentTemplate.map((q, idx) => {
+        {currentQuestion.map((q, idx) => {
           const saved = answers[currentKey]?.[idx] as
             | string
             | string[]
@@ -101,14 +140,14 @@ export default function Step1Default({ onNext }: Step1props) {
             >
               <QuestionText text={`Q${idx + 1}. ${q.question_text}`} />
 
-              {q.type === QuestionTypeEnum.SUBJECTIVE ? (
+              {q.type === InputTypeEnum.SUBJECTIVE ? (
                 <QuestionSubjective
                   value={typeof saved === "string" ? saved : ""}
                   onChange={(val) => setAnswer(currentKey, idx, val)}
                 />
               ) : (
                 <QuestionOptions
-                  options={q.options}
+                  options={q.options ?? []}
                   value={saved}
                   type={q.type}
                   onChange={(val) => setAnswer(currentKey, idx, val)}
