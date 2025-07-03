@@ -28,6 +28,12 @@ CREATE TYPE "SurveyStatus" AS ENUM ('draft', 'complete');
 -- CreateEnum
 CREATE TYPE "EndedBy" AS ENUM ('expired', 'outOfRewards', 'closedByCreator');
 
+-- CreateEnum
+CREATE TYPE "TransactionType" AS ENUM ('DEPOSIT', 'WITHDRAW');
+
+-- CreateEnum
+CREATE TYPE "WithdrawalStatus" AS ENUM ('pending', 'completed', 'failed');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -73,6 +79,8 @@ CREATE TABLE "Survey" (
     "artist" TEXT NOT NULL,
     "music_uri" TEXT NOT NULL,
     "thumbnail_uri" TEXT NOT NULL,
+    "is_released" BOOLEAN NOT NULL,
+    "released_date" TIMESTAMP(3) NOT NULL,
     "user_id" INTEGER NOT NULL,
     "type" "SurveyType" NOT NULL,
     "genre" "Genre" NOT NULL,
@@ -132,6 +140,30 @@ CREATE TABLE "Survey_Result" (
     CONSTRAINT "Survey_Result_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Transaction" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "type" "TransactionType" NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "memo" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "WithdrawalRequest" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "txhash" TEXT NOT NULL,
+    "status" "WithdrawalStatus" NOT NULL,
+    "requested_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "WithdrawalRequest_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -155,3 +187,9 @@ ALTER TABLE "Survey_Participants" ADD CONSTRAINT "Survey_Participants_survey_id_
 
 -- AddForeignKey
 ALTER TABLE "Survey_Result" ADD CONSTRAINT "Survey_Result_survey_id_fkey" FOREIGN KEY ("survey_id") REFERENCES "Survey"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WithdrawalRequest" ADD CONSTRAINT "WithdrawalRequest_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
