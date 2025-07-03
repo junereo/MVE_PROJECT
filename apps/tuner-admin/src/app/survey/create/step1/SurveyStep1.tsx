@@ -1,4 +1,3 @@
-// ✅ SurveyStep1.tsx - Flex 기반 리워드 정렬
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -25,10 +24,23 @@ const SurveyStep1 = () => {
         youtubeThumbnail: thumbnail,
         channelTitle: channelTitle ?? undefined,
         url: `https://www.youtube.com/watch?v=${videoId}`,
+        title: step1.title || title,
+        artist: step1.artist || channelTitle || "",
       });
     }
-  }, [videoId, title, thumbnail, channelTitle, setStep1]);
+  }, [videoId, title, thumbnail, channelTitle]);
 
+  // useEffect(() => {
+  //   if (videoId && title && thumbnail) {
+  //     setStep1({
+  //       youtubeVideoId: videoId,
+  //       youtubeTitle: title,
+  //       youtubeThumbnail: thumbnail,
+  //       channelTitle: channelTitle ?? undefined,
+  //       url: `https://www.youtube.com/watch?v=${videoId}`,
+  //     });
+  //   }
+  // }, [videoId, title, thumbnail, channelTitle, setStep1]);
   const handleInputChange = (
     field: keyof typeof step1,
     value: string | boolean | number
@@ -69,7 +81,6 @@ const SurveyStep1 = () => {
               <input
                 value={step1.title || ""}
                 onChange={(e) => handleInputChange("title", e.target.value)}
-                placeholder={step1.youtubeTitle || "곡 제목을 입력해주세요"}
                 className="border p-2 w-full"
                 disabled={!step1.youtubeVideoId}
               />
@@ -78,7 +89,6 @@ const SurveyStep1 = () => {
               <input
                 value={step1.artist || ""}
                 onChange={(e) => handleInputChange("artist", e.target.value)}
-                placeholder={step1.channelTitle || "아티스트명을 입력해주세요"}
                 className="border p-2 w-full"
                 disabled={!step1.youtubeVideoId}
               />
@@ -260,10 +270,17 @@ const SurveyStep1 = () => {
           <div className="pt-4">
             <button
               onClick={() => {
+                if (!step1.survey_title?.trim())
+                  return alert("설문 제목을 입력해주세요.");
                 if (!step1.youtubeVideoId)
                   return alert("유튜브 영상을 등록해주세요.");
+                if (!step1.title?.trim())
+                  return alert("곡 제목을 입력해주세요.");
                 if (!step1.start_at || !step1.end_at)
                   return alert("설문 기간을 입력해주세요.");
+                if (step1.start_at > step1.end_at)
+                  return alert("시작일은 종료일보다 이전이어야 합니다.");
+                if (!step1.genre) return alert("장르를 선택해주세요.");
                 if (
                   step1.surveyType === "official" &&
                   [step1.reward_amount, step1.reward, step1.expertReward].some(
@@ -271,6 +288,7 @@ const SurveyStep1 = () => {
                   )
                 )
                   return alert("리워드 항목을 모두 입력해주세요.");
+
                 router.push("/survey/create/step2");
               }}
               className="mt-6 bg-black text-white px-6 py-2 rounded w-full"
