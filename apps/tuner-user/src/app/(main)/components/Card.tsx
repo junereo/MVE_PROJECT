@@ -1,30 +1,23 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import { useEffect, useState } from "react";
-import { surveyList } from "@/features/survey/services/survey";
-
-const statusTextMap: Record<
-  SurveyResponse["is_active"],
-  "예정" | "진행중" | "종료"
-> = {
-  upcoming: "예정",
-  ongoing: "진행중",
-  closed: "종료",
-};
+import { getSurveyList } from "@/features/survey/services/survey";
 
 export default function Card({
   status,
 }: {
   status: "all" | "ongoing" | "closed";
 }) {
+  const router = useRouter();
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
 
   useEffect(() => {
     const fetchSurveys = async () => {
       try {
-        const res = await surveyList();
+        const res = await getSurveyList();
         const sorted = res.data.sort((a: SurveyResponse, b: SurveyResponse) => {
           return (
             new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
@@ -52,15 +45,16 @@ export default function Card({
       {surveys.map((item) => (
         <div
           key={item.id}
+          onClick={() => router.push(`/survey/${item.id}`)}
           className="rounded-xl bg-white shadow hover:shadow-lg transition overflow-hidden"
         >
-          <div className="relative w-full">
+          <div className="relative w-full aspect-[4/3]">
             <Image
-              src={item.music.thumbnail_url}
+              src={item.thumbnail_uri}
               alt={`card ${item.id}`}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="w-full aspect-[3/4] object-cover"
+              className="object-cover"
             />
           </div>
           <div className="p-3 space-y-1">
@@ -73,7 +67,7 @@ export default function Card({
               </p>
             </div>
             <p className="text-sm text-gray-500 truncate">
-              {item.music.artist} - {item.music.title}
+              {item.artist} - {item.music_title}
             </p>
             <p className="text-xs text-gray-400">{`${item.start_at
               .slice(2, 10)

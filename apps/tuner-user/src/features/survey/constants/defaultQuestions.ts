@@ -1,9 +1,9 @@
-import { QuestionTypeEnum } from "../types/enums";
+import { InputTypeEnum } from "../types/enums";
 
 export interface DefaultQuestion {
   question_text: string;
   question_type: number;
-  type: QuestionTypeEnum;
+  type: InputTypeEnum;
   options: string[];
 }
 
@@ -12,13 +12,13 @@ export const defaultQuestions: Record<string, DefaultQuestion[]> = {
     {
       question_text: "이 음원에 대한 첫인상은 어땠나요?",
       question_type: 0,
-      type: QuestionTypeEnum.MULTIPLE,
+      type: InputTypeEnum.MULTIPLE,
       options: ["매우 좋다", "보통이다", "아니다", "잘 모르겠다"],
     },
     {
       question_text: "이 음원의 기억에 남는 포인트가 있다면 무엇인가요?",
       question_type: 0,
-      type: QuestionTypeEnum.MULTIPLE,
+      type: InputTypeEnum.MULTIPLE,
       options: ["보컬", "편곡/사운드", "리듬/비트", "잘 모르겠다"],
     },
   ],
@@ -26,13 +26,13 @@ export const defaultQuestions: Record<string, DefaultQuestion[]> = {
     {
       question_text: "이 음원을 노래방에서 부르고 싶으신가요?",
       question_type: 0,
-      type: QuestionTypeEnum.MULTIPLE,
+      type: InputTypeEnum.MULTIPLE,
       options: ["매우 그렇다", "그렇다", "보통이다", "그렇지 않다"],
     },
     {
       question_text: "이 음원의 장르를 선택해주세요.",
       question_type: 0,
-      type: QuestionTypeEnum.CHECKBOX,
+      type: InputTypeEnum.CHECKBOX,
       options: [
         "발라드",
         "힙합",
@@ -49,7 +49,7 @@ export const defaultQuestions: Record<string, DefaultQuestion[]> = {
     {
       question_text: "이 음원을 자주 들을 것 같으신가요?",
       question_type: 0,
-      type: QuestionTypeEnum.MULTIPLE,
+      type: InputTypeEnum.MULTIPLE,
       options: [
         "매우 그렇다",
         "가끔 들을 것 같다",
@@ -60,7 +60,7 @@ export const defaultQuestions: Record<string, DefaultQuestion[]> = {
     {
       question_text: "이 음원이 오랫동안 인기를 유지할 수 있을까요?",
       question_type: 0,
-      type: QuestionTypeEnum.MULTIPLE,
+      type: InputTypeEnum.MULTIPLE,
       options: ["매우 그렇다", "그렇다", "보통이다", "그렇지 않다"],
     },
   ],
@@ -69,14 +69,14 @@ export const defaultQuestions: Record<string, DefaultQuestion[]> = {
       question_text:
         "이 음원의 활용 가능성은 어디에 있다고 생각하시나요? (복수선택 가능)",
       question_type: 0,
-      type: QuestionTypeEnum.CHECKBOX,
+      type: InputTypeEnum.CHECKBOX,
       options: ["광고", "영화/드라마", "무대 공연", "SNS 배경음", "없음"],
     },
     {
       question_text:
         "이 음원을 리메이크하면 어울릴 것 같은 아티스트는 누구인가요?",
       question_type: 0,
-      type: QuestionTypeEnum.SUBJECTIVE,
+      type: InputTypeEnum.SUBJECTIVE,
       options: [],
     },
   ],
@@ -84,13 +84,13 @@ export const defaultQuestions: Record<string, DefaultQuestion[]> = {
     {
       question_text: "이 음원을 장기자랑 무대에서 사용할 의향이 있으신가요?",
       question_type: 0,
-      type: QuestionTypeEnum.MULTIPLE,
+      type: InputTypeEnum.MULTIPLE,
       options: ["예", "아니오"],
     },
     {
       question_text: "이 음원의 라이브 공연에 참여하고 싶으신가요?",
       question_type: 0,
-      type: QuestionTypeEnum.MULTIPLE,
+      type: InputTypeEnum.MULTIPLE,
       options: ["예", "아니오"],
     },
   ],
