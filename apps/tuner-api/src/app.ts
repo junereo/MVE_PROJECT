@@ -1,14 +1,18 @@
 import express from "express";
 import {
+  userRoutes,
   adminRoutes,
   authRoutes,
   surveyRoutes,
+  transaction,
+  withdrawal
 } from "./routes/index";
 import routerWallet from "./wallet/routers/index";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import "./schedulers/surveyStatusCron"; //스케쥴링
+
 dotenv.config();
 
 const app = express();
@@ -24,14 +28,18 @@ app.use(
   })
 );
 
+
 // 미들웨어 설정
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 라우트 설정
+app.use('/user', userRoutes);
 app.use("/auth", authRoutes);
 app.use("/survey", surveyRoutes);
+app.use("/withdraw", withdrawal);
+app.use("/transac", transaction);
 app.use("/admin", adminRoutes);
 app.use("/contract", routerWallet);
 

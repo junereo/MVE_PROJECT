@@ -80,6 +80,17 @@ enum EndedBy {
   closedByCreator // 생성자 종료
 }
 
+enum TransactionType {
+  DEPOSIT // 입금 (리워드 지급 등)
+  WITHDRAW // 출금 (출금 요청 처리 등)
+}
+
+enum WithdrawalStatus {
+  pending // 대기중
+  completed // 완료
+  failed //실패
+}
+
 // enum RewardStatus {
 //   pending // 대기중
 //   completed // 완료
@@ -120,9 +131,11 @@ model User {
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
 
-  oauths          User_Oauth[]
-  surveys         Survey[]
-  surveyResponses Survey_Participants[]
+  oauths            User_Oauth[]
+  surveys           Survey[]
+  surveyResponses   Survey_Participants[]
+  transaction       Transaction[]
+  withdrawalRequest WithdrawalRequest[]
 }
 
 model User_Oauth {
@@ -146,6 +159,8 @@ model Survey {
   artist        String
   music_uri     String
   thumbnail_uri String
+  is_released   Boolean
+  released_date DateTime
   user_id       Int
   type          SurveyType
   genre         Genre
@@ -156,13 +171,13 @@ model Survey {
   expert_reward Int?
   is_active     SurveyActive
   ended_by      EndedBy?
-  status        SurveyStatus @default(draft)
-  created_at    DateTime     @default(now())
-  updated_at    DateTime     @updatedAt
-  creator       User         @relation(fields: [user_id], references: [id])
-  questions    Int
-  participants Survey_Participants[]
-  result       Survey_Result?
+  status        SurveyStatus          @default(draft)
+  created_at    DateTime              @default(now())
+  updated_at    DateTime              @updatedAt
+  creator       User                  @relation(fields: [user_id], references: [id])
+  questions     Int
+  participants  Survey_Participants[]
+  result        Survey_Result?
 }
 
 model Survey_Question {
@@ -183,8 +198,8 @@ model Survey_Participants {
   rewarded   Boolean      @default(false)
   created_at DateTime     @default(now())
   updated_at DateTime     @updatedAt
-  user   User   @relation(fields: [user_id], references: [id])
-  survey Survey @relation(fields: [survey_id], references: [id])
+  user       User         @relation(fields: [user_id], references: [id])
+  survey     Survey       @relation(fields: [survey_id], references: [id])
 }
 
 model Survey_Result {
@@ -199,4 +214,24 @@ model Survey_Result {
   created_at            DateTime
 
   survey Survey @relation(fields: [survey_id], references: [id])
+}
+
+model Transaction {
+  id         Int             @id @default(autoincrement())
+  user_id    Int
+  type       TransactionType
+  amount     Int // 양수 값만 저장
+  memo       String? // 출금요청/리워드 지급 등
+  created_at DateTime        @default(now())
+  user       User            @relation(fields: [user_id], references: [id])
+}
+
+model WithdrawalRequest {
+  id           Int              @id @default(autoincrement())
+  user_id      Int
+  amount       Int
+  txhash       String
+  status       WithdrawalStatus // PENDING | COMPLETED | REJECTED
+  requested_at DateTime         @default(now())
+  user         User             @relation(fields: [user_id], references: [id])
 }
