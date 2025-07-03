@@ -23,6 +23,80 @@ const checkSurveyActive = (_start: Date | string, _end: Date | string): SurveyAc
   return 'closed';
 };
 
+// 설문 수정
+export const editSurvey = ({
+  status,
+  is_active,
+}: {
+  status: SurveyStatus;
+  is_active: SurveyActive;
+}): boolean => {
+  if (status === 'draft') return true;
+  if (status === 'complete' && is_active === 'ongoing') return true;
+  return false;
+};
+
+// 설문참여 가능 여부
+export const canParticipateSurvey = ({
+  status,
+  is_active,
+}: {
+  status: SurveyStatus;
+  is_active: SurveyActive;
+}): boolean => {
+  return status === 'complete' && is_active === 'ongoing';
+};
+
+// 참여 저장 (임시저장/제출)
+export const createSurveyParticipant = async ({
+  user_id,
+  survey_id,
+  answers,
+  isSubmit = false, // false: 임시저장, true: 제출
+}: {
+  user_id: number;
+  survey_id: number;
+  answers: any;
+  isSubmit?: boolean;
+}) => {
+  // 참여 가능 상태 확인
+  const survey = await prisma.survey.findUnique({
+    where: { id: survey_id },
+    select: { status: true, is_active: true },
+  });
+
+  if (!survey) throw new Error('설문 없음');
+  if (!canParticipateSurvey(survey)) {
+    throw new Error('참여할 수 없는 상태입니다.');
+  }
+
+  // 기존 참여 내역 확인 (있으면 수정, 없으면 새로 생성)
+  const existing = await prisma.survey_Participants.findFirst({
+    where: { user_id, survey_id },
+  });
+
+  if (existing) {
+    return await prisma.survey_Participants.update({
+      where: { id: existing.id },
+      data: {
+        answers,
+        status: isSubmit ? 'complete' : 'draft',
+        rewarded: false,
+      },
+    });
+  }
+
+  return await prisma.survey_Participants.create({
+    data: {
+      user_id,
+      survey_id,
+      answers,
+      status: isSubmit ? 'complete' : 'draft',
+      rewarded: false,
+    },
+  });
+};
+
 // 설문 타입 유효성 검사
 const isSurveyType = (value: any): value is SurveyType => {
   return Object.values(SurveyType).includes(value);
@@ -44,21 +118,26 @@ export const createSurvey = async ({
 
     return await prisma.$transaction(async (tx) => {
       // 설문 생성
-
       const startDate = new Date(body.start_at);
       const endDate = new Date(body.end_at);
 
       const survey: Survey = await tx.survey.create({
         data: {
-          //  필수 외래키: 사용자 ID
-          user_id: userId ?? 0, // 적절한 fallback 설정
+          user_id: userId ?? 0,
 
-          //  음악 정보
+          // 음악 정보
           music_title: body.music_title ?? null,
           artist: body.artist ?? null,
           music_uri: body.music_uri, // music 객체의 sample_url 사용
           thumbnail_uri: body.thumbnail_uri,
           genre: body.genre, //장르
+
+          // 발매 여부 추가
+          is_released: !!body.is_released,
+          released_date: body.released_date
+            ? new Date(body.released_date)
+            : new Date(),
+
           // 기본 필드
           type: surveyType,
           start_at: startDate,
@@ -131,7 +210,7 @@ export const getSurveyListService = async () => {
   });
 };
 
-//질문지 생성
+// 질문지 생성
 export const setSurveyQuestion = async ({
   surveyId,
   questionType,
@@ -168,31 +247,6 @@ export const getSurveyQuestions = async (surveyId: number) => {
   });
 };
 
-// 생성 (POST)
-export const createSurveyParticipant = async ({
-  user_id,
-  survey_id,
-  answers,
-  status = 'complete',
-  rewarded = true
-}: {
-  user_id: number;
-  survey_id: number;
-  answers: any;
-  status?: SurveyStatus;
-  rewarded?: boolean;
-}) => {
-  return await prisma.survey_Participants.create({
-    data: {
-      user_id,
-      survey_id,
-      answers,
-      status,
-      rewarded
-    }
-  });
-};
-
 // 전체 조회 (GET)
 export const getAllSurveyParticipants = async () => {
   return await prisma.survey_Participants.findMany({
@@ -206,72 +260,29 @@ export const getAllSurveyParticipants = async () => {
 
 // 설문 정보 수정
 export const updateSurveyService = async (surveyId: number, body: any) => {
-  return await prisma.$transaction(async (tx) => {
-    const updatedSurvey = await tx.survey.update({
-      where: { id: surveyId },
-      data: {
-        survey_title: body.survey_title,
-        start_at: new Date(body.start_at),
-        end_at: new Date(body.end_at),
-        status: body.status,
-        is_active: checkSurveyActive(body.start_at, body.end_at),
-        reward: body.reward,
-        reward_amount: body.reward_amount,
-        expert_reward: body.expert_reward,
-      },
-    });
-
-    // 기존 커스텀 문항 가져오기
-    const existingQuestions = await tx.survey_Question.findMany({
-      orderBy: { question_order: 'asc' },
-    });
-    const existingIds = new Set(existingQuestions.map((q) => q.id));
-
-    const incomingQuestions = Array.isArray(body.allQuestions)
-      ? body.allQuestions
-      : JSON.parse(body.allQuestions);
-
-    const incomingIds = new Set<number>();
-
-    await Promise.all(
-      incomingQuestions.map(async (q: any, idx: number) => {
-        const questionData = {
-          question: {
-            text: q.text?.trim() || '(비어 있는 질문)',
-            options: q.options ?? [],
-          },
-          question_type: q.type,
-          question_order: q.question_order ?? idx + 1,
-        };
-
-        if (q.id && existingIds.has(q.id)) {
-          incomingIds.add(q.id);
-          await tx.survey_Question.update({
-            where: { id: q.id },
-            data: questionData,
-          });
-        } else {
-          const created = await tx.survey_Question.create({
-            data: {
-              ...questionData,
-            },
-          });
-          incomingIds.add(created.id);
-        }
-      })
-    );
-
-    const idsToDelete = [...existingIds].filter((id) => !incomingIds.has(id));
-    if (idsToDelete.length > 0) {
-      await tx.survey_Question.deleteMany({
-        where: { id: { in: idsToDelete } },
-      });
-    }
-
-    return updatedSurvey;
+  const survey = await prisma.survey.findUnique({
+    where: { id: surveyId },
+    select: { status: true, is_active: true },
   });
-};
 
+  if (!survey) throw new Error('설문 없음');
+  if (!editSurvey(survey)) {
+    throw new Error('설문이 종료되어 수정할 수 없습니다.');
+  }
+
+  const updatedSurvey = await prisma.survey.update({
+    where: { id: surveyId },
+    data: {
+      survey_title: body.survey_title,
+      start_at: new Date(body.start_at),
+      end_at: new Date(body.end_at),
+      status: body.status,
+      is_active: checkSurveyActive(body.start_at, body.end_at),
+    },
+  });
+
+  return updatedSurvey;
+};
 
 export const createSurveyResult = async ({
   survey_id,
