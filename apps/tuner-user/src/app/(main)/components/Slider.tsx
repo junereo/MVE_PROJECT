@@ -7,10 +7,10 @@ import "swiper/css/autoplay";
 import { Autoplay } from "swiper/modules";
 
 const slideItems = [
-  { id: 1, thumbnail_url: `https://i.ytimg.com/vi/LBHVOiw274A/hqdefault.jpg` },
-  { id: 2, thumbnail_url: `https://i.ytimg.com/vi/08h8u8Z9iJQ/hqdefault.jpg` },
-  { id: 3, thumbnail_url: `https://i.ytimg.com/vi/UDyPp9bkfD0/hqdefault.jpg` },
-  { id: 4, thumbnail_url: `https://i.ytimg.com/vi/ppudgIu2TaM/hqdefault.jpg` },
+  { id: 1, thumbnail_uri: `https://i.ytimg.com/vi/LBHVOiw274A/hqdefault.jpg` },
+  { id: 2, thumbnail_uri: `https://i.ytimg.com/vi/08h8u8Z9iJQ/hqdefault.jpg` },
+  { id: 3, thumbnail_uri: `https://i.ytimg.com/vi/UDyPp9bkfD0/hqdefault.jpg` },
+  { id: 4, thumbnail_uri: `https://i.ytimg.com/vi/ppudgIu2TaM/hqdefault.jpg` },
 ];
 
 export default function Slider() {
@@ -31,7 +31,7 @@ export default function Slider() {
           <SwiperSlide key={item.id}>
             <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden shadow-md">
               <Image
-                src={item.thumbnail_url}
+                src={item.thumbnail_uri}
                 alt={`slide YouTube Thumbnail ${item.id}`}
                 fill
                 className="object-cover"

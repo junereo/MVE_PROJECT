@@ -52,9 +52,9 @@ export default function MainSurveyList({
       {surveys.map((item) => (
         <List
           key={item.id}
-          image={item.music.thumbnail_url}
+          image={item.music.thumbnail_uri}
           artist={item.music.artist}
-          title={item.music.title}
+          title={item.music.music_title}
           surveyTitle={item.survey_title}
           period={`${item.start_at
             .slice(2, 10)

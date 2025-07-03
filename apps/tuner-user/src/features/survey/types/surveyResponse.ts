@@ -16,10 +16,10 @@ export interface SurveyResponse {
   expert_reward: number;
 
   music: {
-    title: string;
+    music_title: string;
     artist: string;
-    sample_url: string;
-    thumbnail_url: string;
+    music_uri: string;
+    thumbnail_uri: string;
   };
 
   survey_custom: {

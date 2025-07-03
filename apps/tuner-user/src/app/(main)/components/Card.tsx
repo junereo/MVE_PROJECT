@@ -55,13 +55,19 @@ export default function Card({
           className="rounded-xl bg-white shadow hover:shadow-lg transition overflow-hidden"
         >
           <div className="relative w-full">
-            <Image
-              src={item.music.thumbnail_url}
-              alt={`card ${item.id}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="w-full aspect-[3/4] object-cover"
-            />
+            {item.music?.thumbnail_uri ? (
+              <Image
+                src={item.music.thumbnail_uri}
+                alt={`card ${item.id}`}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="w-full aspect-[3/4] object-cover"
+              />
+            ) : (
+              <div className="w-full aspect-[3/4] bg-gray-100 flex items-center justify-center text-sm text-gray-400">
+                썸네일 없음
+              </div>
+            )}
           </div>
           <div className="p-3 space-y-1">
             <div className="flex justify-between">
@@ -73,7 +79,7 @@ export default function Card({
               </p>
             </div>
             <p className="text-sm text-gray-500 truncate">
-              {item.music.artist} - {item.music.title}
+              {item.music.artist} - {item.music.music_title}
             </p>
             <p className="text-xs text-gray-400">{`${item.start_at
               .slice(2, 10)

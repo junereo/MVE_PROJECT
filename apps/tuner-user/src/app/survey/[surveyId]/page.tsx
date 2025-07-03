@@ -10,9 +10,9 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 
 const dummySurvey = {
   id: 1,
-  thumbnail_url: `https://i.ytimg.com/vi/LBHVOiw274A/hqdefault.jpg`,
+  thumbnail_uri: `https://i.ytimg.com/vi/LBHVOiw274A/hqdefault.jpg`,
   survey_title: "빈지노 Fashion Hoarder 설문",
-  title: "Fashion Hoarder (Feat. ZENE THE ZILLA)",
+  music_title: "Fashion Hoarder (Feat. ZENE THE ZILLA)",
   artist: "Beenzino",
   type: "official",
   startAt: "2025-07-01",
@@ -36,9 +36,9 @@ export default function SurveyDetail() {
 
   const {
     id,
-    thumbnail_url,
+    thumbnail_uri,
     survey_title,
-    title,
+    music_title,
     artist,
     type,
     startAt,
@@ -62,8 +62,8 @@ export default function SurveyDetail() {
         />
         <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-5 shadow-md">
           <Image
-            src={thumbnail_url}
-            alt={title}
+            src={thumbnail_uri}
+            alt={music_title}
             layout="fill"
             objectFit="cover"
             className="rounded-xl"
@@ -86,7 +86,7 @@ export default function SurveyDetail() {
           </div>
 
           <p className="text-lg font-medium text-gray-800">{artist}</p>
-          <p className="text-base text-gray-600 mt-1">{title}</p>
+          <p className="text-base text-gray-600 mt-1">{music_title}</p>
         </div>
 
         <section className="rounded-2xl mb-10 border border-gray-100 bg-gray-50 px-4 py-5 shadow-sm space-y-4">
