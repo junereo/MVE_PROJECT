@@ -3,9 +3,13 @@
 import { useState } from "react";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import type { CustomQuestion } from "@/features/survey/store/useSurveyStore";
-import { QuestionTypeEnum } from "@/features/survey/types/enums";
+import {
+  InputTypeEnum,
+  QuestionTypeEnum,
+  SurveyStatusEnum,
+} from "@/features/survey/types/enums";
 import { formatSurveyPayload } from "@/features/survey/utils/formatSurveyPayload";
-import { createSurvey, saveSurvey } from "@/features/survey/services/survey";
+import { createSurvey } from "@/features/survey/services/survey";
 import Button from "@/components/ui/Button";
 import CustomForm from "../../components/CustomForm";
 
@@ -16,9 +20,9 @@ interface Step5Props {
 
 // 질문 타입 옵션 정의
 const typeOptions = [
-  { label: "객관식", value: QuestionTypeEnum.MULTIPLE },
-  { label: "체크박스형", value: QuestionTypeEnum.CHECKBOX },
-  { label: "서술형", value: QuestionTypeEnum.SUBJECTIVE },
+  { label: "객관식", value: InputTypeEnum.MULTIPLE },
+  { label: "체크박스형", value: InputTypeEnum.CHECKBOX },
+  { label: "서술형", value: InputTypeEnum.SUBJECTIVE },
 ];
 
 export default function Step5Custom({ onPrev, onNext }: Step5Props) {
@@ -26,8 +30,9 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
   const [questions, setQuestions] = useState<CustomQuestion[]>([
     {
       id: 1,
+      question_type: QuestionTypeEnum.CUSTOM,
       question_text: "",
-      question_type: QuestionTypeEnum.MULTIPLE,
+      type: InputTypeEnum.MULTIPLE,
       options: ["", "", "", "", ""],
     },
   ]);
@@ -39,8 +44,9 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
       ...questions,
       {
         id: newId,
+        question_type: QuestionTypeEnum.CUSTOM,
         question_text: "",
-        question_type: QuestionTypeEnum.MULTIPLE,
+        type: InputTypeEnum.MULTIPLE,
         options: ["", "", "", ""],
       },
     ]);
@@ -60,9 +66,9 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
         i === index
           ? {
               ...q,
-              question_type: newType as QuestionTypeEnum,
+              type: newType as InputTypeEnum,
               options:
-                newType === QuestionTypeEnum.SUBJECTIVE
+                newType === InputTypeEnum.SUBJECTIVE
                   ? []
                   : q.options.length
                   ? q.options
@@ -109,7 +115,7 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
     setStep5({ customQuestions: questions });
 
     try {
-      const payload = formatSurveyPayload();
+      const payload = formatSurveyPayload(SurveyStatusEnum.COMPLETE);
       await createSurvey(payload);
       setSurveySubmitStatus("success");
       onNext();
@@ -125,8 +131,8 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
     setStep5({ customQuestions: questions });
 
     try {
-      const payload = formatSurveyPayload();
-      await saveSurvey(payload);
+      const payload = formatSurveyPayload(SurveyStatusEnum.DRAFT);
+      await createSurvey(payload);
       setSurveySubmitStatus("saved"); // 임시저장 성공 상태로 업데이트
       onNext();
     } catch (err) {
