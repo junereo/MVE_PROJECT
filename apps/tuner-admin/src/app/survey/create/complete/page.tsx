@@ -31,6 +31,7 @@ export default function SurveyComplete() {
     parsedTemplateSet = JSON.parse(templateSetKeyString);
   } catch (e) {
     console.error("templateSetKey 파싱 오류:", e);
+    parsedTemplateSet = {};
   }
 
   // 템플릿 질문 변환
