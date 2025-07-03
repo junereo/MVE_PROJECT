@@ -80,6 +80,17 @@ enum EndedBy {
   closedByCreator // 생성자 종료
 }
 
+enum TransactionType {
+  DEPOSIT   // 입금 (리워드 지급 등)
+  WITHDRAW  // 출금 (출금 요청 처리 등)
+}
+
+enum WithdrawalStatus {
+  pending    // 대기중
+  completed  // 완료
+  failed     //실패
+}
+
 // enum RewardStatus {
 //   pending // 대기중
 //   completed // 완료
@@ -123,6 +134,8 @@ model User {
   oauths          User_Oauth[]
   surveys         Survey[]
   surveyResponses Survey_Participants[]
+  transaction     Transaction[]
+  withdrawalRequest WithdrawalRequest[]
 }
 
 model User_Oauth {
@@ -199,4 +212,25 @@ model Survey_Result {
   created_at            DateTime
 
   survey Survey @relation(fields: [survey_id], references: [id])
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  type        TransactionType
+  amount      Int                         // 양수 값만 저장
+  memo        String?                     // 출금요청/리워드 지급 등
+  created_at  DateTime  @default(now())
+  user        User     @relation(fields: [user_id], references: [id])
+
+}
+
+model WithdrawalRequest {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  amount      Int
+  txhash      String
+  status      WithdrawalStatus          // PENDING | COMPLETED | REJECTED
+  requested_at DateTime  @default(now())
+  user        User       @relation(fields: [user_id], references: [id])
 }
