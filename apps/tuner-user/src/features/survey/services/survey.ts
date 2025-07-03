@@ -18,3 +18,9 @@ export const surveyList = async () => {
   const response = await axios.get("/survey/list");
   return response;
 };
+
+// 설문 질문 불러오기 / id=1 고정질문
+export const fetchSurveyQuestions = async (questionsId: number) => {
+  const response = await axios.get(`/survey/q/${questionsId}`);
+  return response.data;
+};

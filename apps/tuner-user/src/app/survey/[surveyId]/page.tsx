@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layouts/Header";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
-import Wrapper from "@/components/layouts/Wrapper";
+import SurveyWrapper from "../create/components/layouts/SurveyWrapper";
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 
@@ -52,7 +52,8 @@ export default function SurveyDetail() {
   return (
     <>
       <Header />
-      <Wrapper>
+
+      <SurveyWrapper>
         <Breadcrumb
           crumbs={[
             { label: "설문", href: "/survey" },
@@ -120,7 +121,7 @@ export default function SurveyDetail() {
             설문 참여하기
           </Button>
         </div>
-      </Wrapper>
+      </SurveyWrapper>
       <BottomNavbar />
     </>
   );
