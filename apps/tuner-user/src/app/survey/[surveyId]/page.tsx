@@ -4,24 +4,13 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layouts/Header";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
-import Wrapper from "@/components/layouts/Wrapper";
+import SurveyWrapper from "../create/components/layouts/SurveyWrapper";
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
-
-const dummySurvey = {
-  id: 1,
-  thumbnail_url: `https://i.ytimg.com/vi/LBHVOiw274A/hqdefault.jpg`,
-  survey_title: "빈지노 Fashion Hoarder 설문",
-  title: "Fashion Hoarder (Feat. ZENE THE ZILLA)",
-  artist: "Beenzino",
-  type: "official",
-  startAt: "2025-07-01",
-  endAt: "2025-07-07",
-  totalParticipants: 1234,
-  rewardAmount: 100,
-  releaseDate: "2025-06-30",
-  status: "ongoing" as SurveyStatus,
-};
+import { useParams } from "next/navigation";
+import { getSurveyById } from "@/features/survey/services/survey";
+import { useEffect, useState } from "react";
+import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 
 type SurveyStatus = "upcoming" | "ongoing" | "closed";
 
@@ -33,26 +22,44 @@ const statusTextMap: Record<SurveyStatus, string> = {
 
 export default function SurveyDetail() {
   const router = useRouter();
+  const params = useParams();
+  const [survey, setSurvey] = useState<SurveyResponse | null>(null);
+
+  useEffect(() => {
+    if (!params?.surveyId) return;
+    const fetch = async () => {
+      try {
+        const response = await getSurveyById(Number(params.surveyId));
+        setSurvey(response);
+      } catch (err) {
+        console.error("설문 상세 불러오기 실패", err);
+      }
+    };
+    fetch();
+  }, [params.surveyId]);
+
+  if (!survey) return null;
 
   const {
     id,
-    thumbnail_url,
+    thumbnail_uri,
     survey_title,
-    title,
+    music_title,
     artist,
     type,
-    startAt,
-    endAt,
-    totalParticipants,
-    rewardAmount,
-    releaseDate,
-    status,
-  } = dummySurvey;
+    start_at,
+    end_at,
+    participantCount,
+    reward_amount,
+    is_active,
+    release_date,
+  } = survey;
 
   return (
     <>
       <Header />
-      <Wrapper>
+
+      <SurveyWrapper>
         <Breadcrumb
           crumbs={[
             { label: "설문", href: "/survey" },
@@ -61,8 +68,8 @@ export default function SurveyDetail() {
         />
         <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-5 shadow-md">
           <Image
-            src={thumbnail_url}
-            alt={title}
+            src={thumbnail_uri}
+            alt={music_title}
             layout="fill"
             objectFit="cover"
             className="rounded-xl"
@@ -81,31 +88,31 @@ export default function SurveyDetail() {
         <div className="mb-6 border-t border-gray-100 pt-4 px-1">
           <div className="flex justify-between">
             <p className="text-sm text-gray-400 mb-1">ARTIST</p>
-            <p className="text-sm text-gray-500 mt-1">{releaseDate} 발매</p>
+            <p className="text-sm text-gray-500 mt-1">{release_date} 발매</p>
           </div>
 
           <p className="text-lg font-medium text-gray-800">{artist}</p>
-          <p className="text-base text-gray-600 mt-1">{title}</p>
+          <p className="text-base text-gray-600 mt-1">{music_title}</p>
         </div>
 
         <section className="rounded-2xl mb-10 border border-gray-100 bg-gray-50 px-4 py-5 shadow-sm space-y-4">
-          <InfoRow label="설문 기간" value={`${startAt} ~ ${endAt}`} />
+          <InfoRow label="설문 기간" value={`${start_at} ~ ${end_at}`} />
           <InfoRow
             label="참여자 수"
-            value={`${totalParticipants.toLocaleString()}명`}
+            value={`${(participantCount ?? 0).toLocaleString()}명`}
           />
           <InfoRow
             label="리워드"
-            value={`🎁 ${rewardAmount} STK`}
+            value={`🎁 ${reward_amount} STK`}
             valueClass="text-orange-500"
           />
           <InfoRow
             label="상태"
-            value={statusTextMap[status]}
+            value={statusTextMap[is_active]}
             valueClass={
-              status === "ongoing"
+              is_active === "ongoing"
                 ? "text-green-600"
-                : status === "upcoming"
+                : is_active === "upcoming"
                 ? "text-blue-500"
                 : "text-gray-400"
             }
@@ -120,7 +127,7 @@ export default function SurveyDetail() {
             설문 참여하기
           </Button>
         </div>
-      </Wrapper>
+      </SurveyWrapper>
       <BottomNavbar />
     </>
   );

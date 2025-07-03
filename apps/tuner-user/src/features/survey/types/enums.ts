@@ -4,9 +4,21 @@ export enum SurveyTypeEnum {
   OFFICIAL = "official",
 }
 
+// 설문 상태
+export enum SurveyStatusEnum {
+  DRAFT = "eraft",
+  COMPLETE = "complete",
+}
+
 // 커스텀 설문 타입, 객관식/체크박스/서술형
-export enum QuestionTypeEnum {
+export enum InputTypeEnum {
   MULTIPLE = "multiple",
   CHECKBOX = "checkbox",
   SUBJECTIVE = "subjective",
+}
+
+// 질문 타입
+export enum QuestionTypeEnum {
+  FIXED = "fixed",
+  CUSTOM = "custom",
 }

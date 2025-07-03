@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { surveyList } from "@/features/survey/services/survey";
+import { useRouter } from "next/navigation";
+import { getSurveyList } from "@/features/survey/services/survey";
 import List from "@/components/ui/List";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
 
@@ -19,12 +20,13 @@ export default function MainSurveyList({
 }: {
   status: "all" | "ongoing" | "closed";
 }) {
+  const router = useRouter();
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
 
   useEffect(() => {
     const fetchSurveys = async () => {
       try {
-        const res = await surveyList();
+        const res = await getSurveyList();
         const sorted = res.data.sort((a: SurveyResponse, b: SurveyResponse) => {
           return (
             new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
@@ -52,9 +54,10 @@ export default function MainSurveyList({
       {surveys.map((item) => (
         <List
           key={item.id}
-          image={item.music.thumbnail_url}
-          artist={item.music.artist}
-          title={item.music.title}
+          onClick={() => router.push(`/survey/${item.id}`)}
+          image={item.thumbnail_uri}
+          artist={item.artist}
+          title={item.music_title}
           surveyTitle={item.survey_title}
           period={`${item.start_at
             .slice(2, 10)

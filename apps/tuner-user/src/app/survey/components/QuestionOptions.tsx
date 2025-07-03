@@ -1,10 +1,10 @@
-import { QuestionTypeEnum } from "@/features/survey/types/enums";
+import { InputTypeEnum } from "@/features/survey/types/enums";
 
 interface Props {
   options: string[];
   value?: string | string[];
   onChange?: (value: string | string[]) => void;
-  type?: QuestionTypeEnum;
+  type?: InputTypeEnum;
   optionClassName?: string;
   layout?: "vertical" | "horizontal";
   disabled?: boolean;
@@ -19,7 +19,7 @@ export default function QuestionOptions({
   layout = "vertical",
   disabled = false,
 }: Props) {
-  const isMulti = type === QuestionTypeEnum.CHECKBOX;
+  const isMulti = type === InputTypeEnum.CHECKBOX;
 
   const handleClick = (opt: string) => {
     if (disabled || !onChange) return;

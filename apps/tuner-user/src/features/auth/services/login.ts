@@ -23,11 +23,10 @@ export const googleLogin = async (provider: "google", code: string) => {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_API_URL}/auth/${provider}`,
     { code },
-    { headers: { 'Content-Type': 'application/json' } }
+    { headers: { "Content-Type": "application/json" } }
   );
   return response;
 };
-
 
 // 카카오 로그인
 export const socialLogin = async (provider: "kakao", code: string) => {

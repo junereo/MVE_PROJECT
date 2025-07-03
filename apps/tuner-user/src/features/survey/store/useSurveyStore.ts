@@ -1,12 +1,16 @@
 import { create } from "zustand";
-import { SurveyTypeEnum, QuestionTypeEnum } from "../types/enums";
+import {
+  SurveyTypeEnum,
+  QuestionTypeEnum,
+  InputTypeEnum,
+} from "../types/enums";
 
 // YouTube
 export type SelectedVideo = {
   artist: string;
-  title: string;
-  thumbnail_url: string;
-  sample_url: string;
+  music_title: string;
+  thumbnail_uri: string;
+  music_uri: string;
   channelTitle: string;
   select_url: string;
 };
@@ -37,8 +41,9 @@ export type SurveyStep3 = {
 // Step5Custom
 export type CustomQuestion = {
   id: number;
+  question_type: QuestionTypeEnum.CUSTOM;
   question_text: string;
-  question_type: QuestionTypeEnum;
+  type: InputTypeEnum;
   options: string[];
 };
 

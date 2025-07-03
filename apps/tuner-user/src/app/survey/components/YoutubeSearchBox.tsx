@@ -48,11 +48,11 @@ export default function YoutubeSearchBox() {
           />
           <Input
             label="곡 제목"
-            value={selectedVideo?.title || ""}
+            value={selectedVideo?.music_title || ""}
             onChange={(e) =>
               setSelectedVideo({
                 ...selectedVideo,
-                title: e.target.value,
+                music_title: e.target.value,
               })
             }
             placeholder="곡 제목을 입력해주세요."
@@ -79,7 +79,7 @@ export default function YoutubeSearchBox() {
         <div className="grid grid-cols-2 gap-4 mt-2">
           {videos.map((video) => (
             <div
-              key={video.artist + video.title}
+              key={video.artist + video.music_title}
               className="cursor-pointer border p-2 rounded"
               onClick={() => {
                 setSelectedVideo(video);
@@ -87,13 +87,13 @@ export default function YoutubeSearchBox() {
               }}
             >
               <Image
-                src={video.thumbnail_url}
-                alt={video.title}
+                src={video.thumbnail_uri}
+                alt={video.music_title}
                 className="w-full h-[140px] object-cover rounded"
                 width={140}
                 height={140}
               />
-              <p className="mt-2 text-sm line-clamp-2">{video.title}</p>
+              <p className="mt-2 text-sm line-clamp-2">{video.music_title}</p>
             </div>
           ))}
         </div>
