@@ -13,7 +13,7 @@ import { AuthRequest } from "../middlewares/auth.middleware"
 const prisma = new PrismaClient();
 
 
-// 이메일  회원가입
+// 이메일 회원가입
 export const emailRegister = async (req: Request, res: Response): Promise<void> => {
   try {
     const result = await registerServices(req.body);
@@ -140,7 +140,7 @@ export const deleteAccount = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     await prisma.user.delete({
-      where: { id: Number(req.user.userId) }, // 너 아이디 Int면 Number로 캐스팅
+      where: { id: Number(req.user.userId) },
     });
 
     res.clearCookie('token', {
@@ -167,9 +167,9 @@ export const deleteAdminAccount = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    // ✅ 관리자 권한인지 확인
+    // 관리자 권한 확인
     if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
-      res.status(403).json({ error: "권한이 없습니다. 관리자만 탈퇴할 수 있습니다." });
+      res.status(403).json({ error: "관리자만 탈퇴할 수 있습니다." });
       return;
     }
 
@@ -184,7 +184,7 @@ export const deleteAdminAccount = async (req: AuthRequest, res: Response) => {
     });
 
     res.status(200).json({
-      message: "관리자 탈퇴 완료!",
+      message: "관리자 탈퇴 완료",
       redirect: process.env.CLIENT_ADMIN_IP || "/admin",
     });
 

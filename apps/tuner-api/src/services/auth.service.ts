@@ -118,7 +118,7 @@ export const adminRegister = async (data: any) => {
     const newAdmin = await prisma.user.create({
         data: {
             email: data.email,
-            password: hashedPassword, // ✅ 해시 저장
+            password: hashedPassword,
             nickname: data.name,
             phone_number: data.phone_number,
             role: role,
@@ -138,7 +138,6 @@ export const adminLogin = async (email: string, password: string) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error("존재하지 않는 관리자입니다.");
 
-    // ✅ bcrypt 비교
     const isValid = await verifyPassword(password, user.password);
     if (!isValid) throw new Error("비밀번호가 일치하지 않습니다.");
 
