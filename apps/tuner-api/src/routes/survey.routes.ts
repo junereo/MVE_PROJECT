@@ -1,15 +1,15 @@
 import express from "express";
 import {
-        createSurveyHandler,
-        createSurveyQuestionHandler,
-        getSurveyList,
-        getSurvey,
-        updateSurvey,
-        getSurveyQuestionList,
-        getAllSurveyParticipantsHandler,
-        createSurveyParticipantHandler,
-        getSurveyResultHandler,
-        createSurveyResultHandler,
+  createSurveyHandler,
+  createSurveyQuestionHandler,
+  getSurveyList,
+  getSurvey,
+  updateSurvey,
+  getSurveyQuestionList,
+  getAllSurveyParticipantsHandler,
+  createSurveyParticipantHandler,
+  getSurveyResultHandler,
+  createSurveyResultHandler,
 } from "../controllers/survey.controller";
 import { verifyUserOrAdmin } from "../middlewares/survey.middleware";
 

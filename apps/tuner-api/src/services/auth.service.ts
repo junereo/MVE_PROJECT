@@ -60,6 +60,7 @@ const defaultCookieOptions: CookieOptions = {
 //     };
 // };
 
+// 이메일 회원가입
 export const emailRegister = async (data: any) => {
     const exist = await prisma.user.findUnique({ where: { email: data.email } });
     if (exist) throw new Error("이미 가입된 이메일입니다.");
@@ -121,7 +122,7 @@ export const adminRegister = async (data: any) => {
     const newAdmin = await prisma.user.create({
         data: {
             email: data.email,
-            password: hashedPassword, // ✅ 해시 저장
+            password: hashedPassword,
             nickname: data.name,
             phone_number: data.phone_number,
             role: role,
@@ -137,11 +138,11 @@ export const adminRegister = async (data: any) => {
     };
 };
 
+// 관리자 로그인
 export const adminLogin = async (email: string, password: string) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error("존재하지 않는 관리자입니다.");
 
-    // ✅ bcrypt 비교
     const isValid = await verifyPassword(password, user.password);
     if (!isValid) throw new Error("비밀번호가 일치하지 않습니다.");
 
@@ -157,7 +158,6 @@ export const adminLogin = async (email: string, password: string) => {
         cookieOptions: defaultCookieOptions,
     };
 };
-
 
 // 관리자 회원가입 
 // export const adminRegister = async (data: any) => {
