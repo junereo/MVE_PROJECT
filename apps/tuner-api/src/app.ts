@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  userRoutes,
   adminRoutes,
   authRoutes,
   surveyRoutes,
@@ -9,8 +10,9 @@ import {
 import routerWallet from "./wallet/routers/index";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import dotenv from 'dotenv';
-import './schedulers/surveyStatusCron' //스케쥴링
+import dotenv from "dotenv";
+import "./schedulers/surveyStatusCron"; //스케쥴링
+
 dotenv.config();
 
 const app = express();
@@ -33,6 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 라우트 설정
+app.use('/user', userRoutes);
 app.use("/auth", authRoutes);
 app.use("/survey", surveyRoutes);
 app.use("/withdraw", withdrawal);
