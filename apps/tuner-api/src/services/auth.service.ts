@@ -1,5 +1,7 @@
 import { PrismaClient, OAuthProvider } from '@prisma/client';
+import { hashPassword, verifyPassword } from '../utils/auth.utils';
 import type { Request, CookieOptions } from 'express';
+import jwt from 'jsonwebtoken';
 import { mapRoleEnum } from '../utils/auth.utils';
 import { signToken } from '../utils/jwt';
 import axios from 'axios';
@@ -16,16 +18,60 @@ const defaultCookieOptions: CookieOptions = {
     maxAge: 24 * 60 * 60 * 1000
 };
 // 이메일 회원가입
+// export const emailRegister = async (data: any) => {
+//     const exist = await prisma.user.findUnique({ where: { email: data.email } });
+//     if (exist) throw new Error("이미 가입된 이메일입니다.");
+
+//     const roleEnum = mapRoleEnum(Number(data.role) || 3);
+
+//     const newUser = await prisma.user.create({
+//         data: {
+//             email: data.email,
+//             password: data.password,
+//             nickname: data.nickname,
+//             phone_number: data.phone_number,
+//             role: roleEnum,
+//         },
+//     });
+
+//     const token = signToken({ userId: newUser.id, role: newUser.role });
+
+//     return {
+//         token,
+//         user: { id: newUser.id, nickname: newUser.nickname, role: newUser.role },
+//         cookieOptions: defaultCookieOptions,
+//     };
+// };
+
+// // 이메일 로그인 
+// export const emaillogin = async (email: string, password: string) => {
+//     const user = await prisma.user.findUnique({ where: { email } });
+//     if (!user) throw new Error("가입되지 않은 이메일입니다.");
+
+//     const isValid = password === user.password;
+//     if (!isValid) throw new Error("비밀번호가 일치하지 않습니다.");
+
+//     const token = signToken({ userId: user.id, role: user.role });
+
+//     return {
+//         token,
+//         user: { id: user.id, nickname: user.nickname, role: user.role },
+//         cookieOptions: defaultCookieOptions,
+//     };
+// };
+
 export const emailRegister = async (data: any) => {
     const exist = await prisma.user.findUnique({ where: { email: data.email } });
     if (exist) throw new Error("이미 가입된 이메일입니다.");
+
+    const hashedPassword = await hashPassword(data.password);
 
     const roleEnum = mapRoleEnum(Number(data.role) || 3);
 
     const newUser = await prisma.user.create({
         data: {
             email: data.email,
-            password: data.password,
+            password: hashedPassword,
             nickname: data.nickname,
             phone_number: data.phone_number,
             role: roleEnum,
@@ -46,10 +92,13 @@ export const emaillogin = async (email: string, password: string) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error("가입되지 않은 이메일입니다.");
 
-    const isValid = password === user.password;
+    const isValid = await verifyPassword(password, user.password);
     if (!isValid) throw new Error("비밀번호가 일치하지 않습니다.");
 
     const token = signToken({ userId: user.id, role: user.role });
+    console.log('발급한 토큰:', token);
+    console.log("디코딩 결과:", jwt.decode(token, { complete: true }));
+
 
     return {
         token,
@@ -58,17 +107,18 @@ export const emaillogin = async (email: string, password: string) => {
     };
 };
 
-// 관리자 회원가입 
 export const adminRegister = async (data: any) => {
     const isAdmin = await prisma.user.findUnique({ where: { email: data.email } });
     if (isAdmin) throw new Error("이미 등록된 관리자입니다.");
+
+    const hashedPassword = await hashPassword(data.password);
 
     const role = data.role === 0 ? 'superadmin' : 'admin';
 
     const newAdmin = await prisma.user.create({
         data: {
             email: data.email,
-            password: data.password,
+            password: hashedPassword, // ✅ 해시 저장
             nickname: data.name,
             phone_number: data.phone_number,
             role: role,
@@ -83,12 +133,13 @@ export const adminRegister = async (data: any) => {
         cookieOptions: defaultCookieOptions,
     };
 };
-// 관리자 로그인
+
 export const adminLogin = async (email: string, password: string) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error("존재하지 않는 관리자입니다.");
 
-    const isValid = password === user.password;
+    // ✅ bcrypt 비교
+    const isValid = await verifyPassword(password, user.password);
     if (!isValid) throw new Error("비밀번호가 일치하지 않습니다.");
 
     if (user.role !== 'admin' && user.role !== 'superadmin') {
@@ -103,6 +154,53 @@ export const adminLogin = async (email: string, password: string) => {
         cookieOptions: defaultCookieOptions,
     };
 };
+
+
+// 관리자 회원가입 
+// export const adminRegister = async (data: any) => {
+//     const isAdmin = await prisma.user.findUnique({ where: { email: data.email } });
+//     if (isAdmin) throw new Error("이미 등록된 관리자입니다.");
+
+//     const role = data.role === 0 ? 'superadmin' : 'admin';
+
+//     const newAdmin = await prisma.user.create({
+//         data: {
+//             email: data.email,
+//             password: data.password,
+//             nickname: data.name,
+//             phone_number: data.phone_number,
+//             role: role,
+//         },
+//     });
+
+//     const token = signToken({ userId: newAdmin.id, role: newAdmin.role });
+
+//     return {
+//         token,
+//         user: { id: newAdmin.id, nickname: newAdmin.nickname, role: newAdmin.role },
+//         cookieOptions: defaultCookieOptions,
+//     };
+// };
+// // 관리자 로그인
+// export const adminLogin = async (email: string, password: string) => {
+//     const user = await prisma.user.findUnique({ where: { email } });
+//     if (!user) throw new Error("존재하지 않는 관리자입니다.");
+
+//     const isValid = password === user.password;
+//     if (!isValid) throw new Error("비밀번호가 일치하지 않습니다.");
+
+//     if (user.role !== 'admin' && user.role !== 'superadmin') {
+//         throw new Error("권한이 없습니다. 관리자만 로그인할 수 있습니다.");
+//     }
+
+//     const token = signToken({ userId: user.id, role: user.role });
+
+//     return {
+//         token,
+//         user: { id: user.id, nickname: user.nickname, role: user.role },
+//         cookieOptions: defaultCookieOptions,
+//     };
+// };
 
 // 카카오
 export const oauthCallbackService = async (req: Request) => {
