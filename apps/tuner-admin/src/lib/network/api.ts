@@ -48,6 +48,9 @@ export const surveyCreate = async (serverPayload: SurveyCreatePayload) => {
 export const userList = async () => {
   await axiosClient.get("/users");
 };
+export const userme = async () => {
+  await axiosClient.get("/users/me");
+};
 
 // 유저 상세 내용 확인 page
 // export const userView = async () => {
