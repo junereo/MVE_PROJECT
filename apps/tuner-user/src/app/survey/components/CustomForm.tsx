@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import Dropdown from "@/components/ui/DropDown";
 import Disclosure from "@/components/ui/Disclosure";
 import type { CustomQuestion } from "@/features/survey/store/useSurveyStore";
-import { QuestionTypeEnum } from "@/features/survey/types/enums";
+import { InputTypeEnum } from "@/features/survey/types/enums";
 
 interface CustomFormProps {
   questions: CustomQuestion[];
@@ -39,7 +39,7 @@ export default function CustomForm({
               <Dropdown
                 options={typeOptions.map((o) => o.label)}
                 selected={
-                  typeOptions.find((o) => o.value === q.question_type)?.label ??
+                  typeOptions.find((o) => o.value === q.type)?.label ??
                   "유형 선택"
                 }
                 onSelect={(label: string) => {
@@ -56,7 +56,7 @@ export default function CustomForm({
               />
             </div>
 
-            {q.question_type === QuestionTypeEnum.MULTIPLE && (
+            {q.type === InputTypeEnum.MULTIPLE && (
               <div className="space-y-3 w-full">
                 {[...Array(5)].map((_, optIndex) => (
                   <div
@@ -78,7 +78,7 @@ export default function CustomForm({
               </div>
             )}
 
-            {q.question_type === QuestionTypeEnum.CHECKBOX && (
+            {q.type === InputTypeEnum.CHECKBOX && (
               <div className="space-y-3 w-full">
                 {q.options.map((opt, optIndex) => (
                   <div
@@ -109,7 +109,7 @@ export default function CustomForm({
               </div>
             )}
 
-            {q.question_type === QuestionTypeEnum.SUBJECTIVE && (
+            {q.type === InputTypeEnum.SUBJECTIVE && (
               <textarea
                 className="w-full p-2 border rounded text-sm"
                 placeholder="서술형 답변을 입력해주세요"

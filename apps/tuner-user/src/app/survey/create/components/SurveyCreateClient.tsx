@@ -13,10 +13,9 @@ type Step = "step1" | "step2" | "step3" | "step4" | "step5" | "step6";
 
 export default function SurveyCreateClient() {
   const { isInitialized } = useAuthGuard();
+  const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
 
   if (!isInitialized) return null; // 아직 로그인 여부 확인 중이면 렌더링 X
-
-  const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
 
   return (
     <div className="mx-auto py-8">

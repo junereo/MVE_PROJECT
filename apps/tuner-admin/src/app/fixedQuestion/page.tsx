@@ -44,7 +44,7 @@ export default function FixedQuestionTemplatePage() {
       await createTemplate(formData);
       alert("고정 질문 템플릿 저장 완료!");
     } catch (error) {
-      console.error("템플릿 저장 실패 ❌", error);
+      console.error("템플릿 저장 실패 ", error);
       alert("저장 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -52,23 +52,28 @@ export default function FixedQuestionTemplatePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5F5F5] px-4">
-      <div className="bg-white p-8 rounded-xl shadow-md max-w-xl w-full">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">
-          🎵 고정 질문 템플릿 업로드
-        </h1>
+    <div>
+      <div className="w-full  text-black text-2xl py-3  font-bold">
+        Fixed Question
+      </div>
+      <div className="p-6 space-y-6 w-[100%]">
+        <div className="bg-white p-8 rounded-xl shadow-md max-w-xl w-full">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">
+            고정 질문 템플릿 업로드
+          </h1>
 
-        <p className="text-sm text-gray-500 mb-4">
-          아래 버튼을 클릭하면 고정 질문 세트를 서버로 전송합니다.
-        </p>
+          <p className="text-sm text-gray-500 mb-4">
+            아래 버튼을 클릭하면 고정 질문 세트를 서버로 전송합니다.
+          </p>
 
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition disabled:opacity-50"
-        >
-          {loading ? "저장 중..." : "📤 템플릿 저장하기"}
-        </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {loading ? "저장 중..." : "템플릿 저장하기"}
+          </button>
+        </div>
       </div>
     </div>
   );
