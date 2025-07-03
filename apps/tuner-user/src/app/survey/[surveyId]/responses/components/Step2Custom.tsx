@@ -7,7 +7,7 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
-import { QuestionTypeEnum } from "@/features/survey/types/enums";
+import { InputTypeEnum } from "@/features/survey/types/enums";
 
 interface Step2Props {
   onPrev: () => void;
@@ -21,24 +21,24 @@ const dummySurvey = {
 
 type CustomQuestion = {
   question_text: string;
-  type: QuestionTypeEnum;
+  type: InputTypeEnum;
   options?: string[];
 };
 
 const dummyCustomQuestions: CustomQuestion[] = [
   {
     question_text: "이 음원을 추천하고 싶은 대상은 누구인가요?",
-    type: QuestionTypeEnum.MULTIPLE,
+    type: InputTypeEnum.MULTIPLE,
     options: ["친구", "가족", "연인", "직장 동료"],
   },
   {
     question_text: "어떤 상황에서 이 음원을 듣고 싶나요?",
-    type: QuestionTypeEnum.CHECKBOX,
+    type: InputTypeEnum.CHECKBOX,
     options: ["운전 중", "공부할 때", "샤워할 때", "운동할 때"],
   },
   {
     question_text: "이 음원에 대해 자유롭게 의견을 남겨주세요.",
-    type: QuestionTypeEnum.SUBJECTIVE,
+    type: InputTypeEnum.SUBJECTIVE,
   },
 ];
 
@@ -78,9 +78,7 @@ export default function Step2Custom({ onPrev, onNext }: Step2Props) {
 
         {dummyCustomQuestions.map((q, idx) => {
           const saved = (currentAnswers[idx] ??
-            (q.type === QuestionTypeEnum.CHECKBOX ? [] : "")) as
-            | string
-            | string[];
+            (q.type === InputTypeEnum.CHECKBOX ? [] : "")) as string | string[];
 
           return (
             <div
@@ -89,7 +87,7 @@ export default function Step2Custom({ onPrev, onNext }: Step2Props) {
             >
               <QuestionText text={`Q${idx + 1}. ${q.question_text}`} />
 
-              {q.type === QuestionTypeEnum.SUBJECTIVE ? (
+              {q.type === InputTypeEnum.SUBJECTIVE ? (
                 <QuestionSubjective
                   value={typeof saved === "string" ? saved : ""}
                   onChange={(val) => setAnswer("custom", idx, val)}

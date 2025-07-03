@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import { useEffect, useState } from "react";
 import { getSurveyList } from "@/features/survey/services/survey";
@@ -10,6 +11,7 @@ export default function Card({
 }: {
   status: "all" | "ongoing" | "closed";
 }) {
+  const router = useRouter();
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
 
   useEffect(() => {
@@ -43,6 +45,7 @@ export default function Card({
       {surveys.map((item) => (
         <div
           key={item.id}
+          onClick={() => router.push(`/survey/${item.id}`)}
           className="rounded-xl bg-white shadow hover:shadow-lg transition overflow-hidden"
         >
           <div className="relative w-full aspect-[4/3]">

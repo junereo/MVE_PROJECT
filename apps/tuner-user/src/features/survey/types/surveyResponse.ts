@@ -10,6 +10,9 @@ export interface SurveyResponse {
   end_at: string;
   is_active: "upcoming" | "ongoing" | "closed";
 
+  is_released: boolean;
+  release_date: string;
+
   reward_amount: number;
   reward: number;
   expert_reward: number;

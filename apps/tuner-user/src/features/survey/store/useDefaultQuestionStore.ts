@@ -1,9 +1,10 @@
 import { create } from "zustand";
+import { InputTypeEnum } from "../types/enums";
 
 export type QuestionItem = {
   category: string;
   question_text: string;
-  type: "multiple" | "checkbox" | "subjective";
+  type: InputTypeEnum;
   question_type: "fixed";
   options?: string[];
 };

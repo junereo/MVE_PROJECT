@@ -1,6 +1,7 @@
 import axios from "@/lib/network/axios";
 import { SurveyPayload } from "../types/surveyPayload";
 import { SurveyResponse } from "../types/surveyResponse";
+import { SurveySubmitPayload } from "../types/answer";
 
 // 설문 생성
 export const createSurvey = async (payload: SurveyPayload) => {
@@ -22,11 +23,23 @@ export const getSurveyById = async (
   surveyId: number
 ): Promise<SurveyResponse> => {
   const response = await axios.get(`/survey/s/${surveyId}`);
-  return response.data;
+  const data = response.data.data;
+
+  return {
+    ...data,
+    participantCount: data.participants?.length ?? 0,
+    release_date: data.release_date ?? "미정",
+  };
 };
 
 // 설문 질문 불러오기 / id=1 고정질문
 export const fetchSurveyQuestions = async (questionsId: number) => {
   const response = await axios.get(`/survey/q/${questionsId}`);
   return response.data;
+};
+
+// 설믄 응답 제출
+export const postSurveyAnswer = async (payload: SurveySubmitPayload) => {
+  const res = await axios.post("/survey/p", payload);
+  return res.data;
 };
