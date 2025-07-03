@@ -5,6 +5,8 @@ import {
   oauthCallbackController,
   googleCallbackController,
   getUserController,
+  deleteAccount,
+  deleteAdminAccount,
   logout,
 } from "../controllers/auth.controller";
 import {
@@ -22,5 +24,8 @@ router.post("/login", validateLogin, emaillogin);
 router.get("/oauth/:provider", oauthCallbackController, validateOAuthRequest);
 router.get('/google/callback', googleCallbackController);
 router.post("/logout", logout);
+router.delete("/delete", verifyToken, deleteAccount);
+router.delete("/delete", verifyToken, deleteAdminAccount);
+
 
 export default router;
