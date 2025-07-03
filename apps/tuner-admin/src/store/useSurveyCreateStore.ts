@@ -81,7 +81,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
     reward: 0,
     expertReward: 0,
     respondent: [""],
-    templateSetKey: "templates",
+    templateSetKey: "",
   },
   setStep1: (data) =>
     set((state) => ({
