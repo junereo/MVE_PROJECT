@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
@@ -8,6 +8,7 @@ import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 import { InputTypeEnum } from "@/features/survey/types/enums";
+import { postSurveyAnswer } from "@/features/survey/services/survey";
 
 interface Step2Props {
   onPrev: () => void;

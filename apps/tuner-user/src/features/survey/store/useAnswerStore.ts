@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-type Answer = string | string[]; // 단일 선택 or 복수 선택
+export type Answer = string | string[]; // 단일 선택 or 복수 선택
 
-interface SurveyAnswers {
+export interface SurveyAnswers {
   [categoryKey: string]: {
     [questionIndex: number]: Answer;
   };

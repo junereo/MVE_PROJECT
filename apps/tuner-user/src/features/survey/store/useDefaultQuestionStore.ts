@@ -1,11 +1,12 @@
 import { create } from "zustand";
-import { InputTypeEnum } from "../types/enums";
+import { InputTypeEnum, QuestionTypeEnum } from "../types/enums";
 
 export type QuestionItem = {
+  id: string;
   category: string;
   question_text: string;
   type: InputTypeEnum;
-  question_type: "fixed";
+  question_type: QuestionTypeEnum.FIXED;
   options?: string[];
 };
 

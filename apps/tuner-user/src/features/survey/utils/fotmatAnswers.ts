@@ -1,27 +1,39 @@
-import { SurveyAnswers, FormattedAnswer } from "@/features/survey/types/answer";
-import { Question } from "@/features/survey/types/question";
+import { SurveyAnswers } from "@/features/survey/store/useAnswerStore";
+import { QuestionItem } from "@/features/survey/store/useDefaultQuestionStore";
 
-export const formatAnswers = (
+type FormattedAnswer = {
+  question_id: number;
+  answer: string | string[];
+};
+
+export const formatDefaultAnswers = (
   answers: SurveyAnswers,
-  questionsByCategory: Record<string, Question[]>
+  defaultQuestions: QuestionItem[]
 ): FormattedAnswer[] => {
   const result: FormattedAnswer[] = [];
 
-  Object.entries(answers).forEach(([categoryKey, categoryAnswers]) => {
-    const questions = questionsByCategory[categoryKey];
+  const filteredCategories = Object.keys(answers).filter(
+    (categoryKey) => categoryKey !== "custom"
+  );
 
-    Object.entries(categoryAnswers).forEach(([indexStr, answer]) => {
+  for (const categoryKey of filteredCategories) {
+    const categoryAnswers = answers[categoryKey];
+    const categoryQuestions = defaultQuestions.filter(
+      (q) => q.category === categoryKey
+    );
+
+    Object.entries(categoryAnswers).forEach(([indexStr, value]) => {
       const index = Number(indexStr);
-      const question = questions?.[index];
+      const question = categoryQuestions[index];
 
       if (question?.id !== undefined) {
         result.push({
           question_id: question.id,
-          answer,
+          answer: value,
         });
       }
     });
-  });
+  }
 
   return result;
 };
