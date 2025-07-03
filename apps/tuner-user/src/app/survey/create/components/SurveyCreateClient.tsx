@@ -1,6 +1,7 @@
 "use client";
 
 import { useFunnel } from "@/features/survey/hooks/useFunnel";
+import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
 import Step1YouTube from "./Step1YouTube";
 import Step2Meta from "./Step2Meta";
 import Step3Type from "./Step3Type";
@@ -11,8 +12,11 @@ import Step6Result from "./Step6Result";
 type Step = "step1" | "step2" | "step3" | "step4" | "step5" | "step6";
 
 export default function SurveyCreateClient() {
-  const steps: Step[] = ["step1", "step2", "step3", "step4", "step5", "step6"];
-  const { Funnel, setStep, currentStep } = useFunnel<Step>(steps, "step1");
+  const { isInitialized } = useAuthGuard();
+
+  if (!isInitialized) return null; // 아직 로그인 여부 확인 중이면 렌더링 X
+
+  const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
 
   return (
     <div className="mx-auto py-8">

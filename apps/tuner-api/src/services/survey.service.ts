@@ -1,245 +1,323 @@
 import {
-    PrismaClient,
-    SurveyTags,
-    SurveyActive,
-    QuestionType,
-    SurveyType,
-    Prisma,
+  PrismaClient,
+  SurveyActive,
+  QuestionType,
+  SurveyType,
+  SurveyStatus,
+  Survey,
+  Survey_Question,
 } from '@prisma/client';
+// import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
 
 const prisma = new PrismaClient();
 
-// 설문 맵핑 
-const convertType = (t: string): QuestionType => {
-    if (t === 'multiple') return 'multiple_choice';
-    if (t === 'checkbox') return 'check_box';
-    if (t === 'subjective') return 'text';
-    return 'text';
-};
-
 // 상태 계산 (한국시간 기준)
 const checkSurveyActive = (_start: Date | string, _end: Date | string): SurveyActive => {
-    const now = new Date();
-    const start = new Date(_start);
-    const end = new Date(_end);
+  const now = new Date();
+  const start = new Date(_start);
+  const end = new Date(_end);
+  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 
-    const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  if (kstNow < start) return 'upcoming';
+  if (kstNow >= start && kstNow <= end) return 'ongoing';
+  return 'closed';
+};
 
-    if (kstNow < start) return 'upcoming';
-    if (kstNow >= start && kstNow <= end) return 'ongoing';
-    return 'closed';
+// 설문 수정
+export const editSurvey = ({
+  status,
+  is_active,
+}: {
+  status: SurveyStatus;
+  is_active: SurveyActive;
+}): boolean => {
+  if (status === 'draft') return true;
+  if (status === 'complete' && is_active === 'ongoing') return true;
+  return false;
+};
+
+// 설문참여 가능 여부
+export const canParticipateSurvey = ({
+  status,
+  is_active,
+}: {
+  status: SurveyStatus;
+  is_active: SurveyActive;
+}): boolean => {
+  return status === 'complete' && is_active === 'ongoing';
+};
+
+// 참여 저장 (임시저장/제출)
+export const createSurveyParticipant = async ({
+  user_id,
+  survey_id,
+  answers,
+  isSubmit = false, // false: 임시저장, true: 제출
+}: {
+  user_id: number;
+  survey_id: number;
+  answers: any;
+  isSubmit?: boolean;
+}) => {
+  // 참여 가능 상태 확인
+  const survey = await prisma.survey.findUnique({
+    where: { id: survey_id },
+    select: { status: true, is_active: true },
+  });
+
+  if (!survey) throw new Error('설문 없음');
+  if (!canParticipateSurvey(survey)) {
+    throw new Error('참여할 수 없는 상태입니다.');
+  }
+
+  // 기존 참여 내역 확인 (있으면 수정, 없으면 새로 생성)
+  const existing = await prisma.survey_Participants.findFirst({
+    where: { user_id, survey_id },
+  });
+
+  if (existing) {
+    return await prisma.survey_Participants.update({
+      where: { id: existing.id },
+      data: {
+        answers,
+        status: isSubmit ? 'complete' : 'draft',
+        rewarded: false,
+      },
+    });
+  }
+
+  return await prisma.survey_Participants.create({
+    data: {
+      user_id,
+      survey_id,
+      answers,
+      status: isSubmit ? 'complete' : 'draft',
+      rewarded: false,
+    },
+  });
 };
 
 // 설문 타입 유효성 검사
 const isSurveyType = (value: any): value is SurveyType => {
-    return Object.values(SurveyType).includes(value);
+  return Object.values(SurveyType).includes(value);
 };
 
-// 설문 생성
+//  설문 생성 
 export const createSurvey = async ({
-    userId,
-    adminId,
-    body,
+  userId,
+  body,
 }: {
-    userId?: string;
-    adminId?: string;
-    body: any;
+  userId?: number;
+  body: any;
 }) => {
-    try {
-        if (!userId && !adminId) {
-            throw new Error("User 또는 Admin 중 하나는 반드시 존재해야 합니다.");
-        }
+  try {
+    if (!userId) throw new Error('유저 필요');
+    if (!isSurveyType(body.type)) throw new Error(`잘못된 설문 타입: ${body.type}`);
 
-        if (userId && adminId) {
-            throw new Error("User와 Admin은 동시에 생성자로 들어올 수 없습니다.");
-        }
+    const surveyType = body.type as SurveyType;
 
-        // 타입 유효성 검사
-        if (!isSurveyType(body.type)) {
-            throw new Error(`잘못된 설문 타입 입니다: ${body.type}`);
-        }
+    return await prisma.$transaction(async (tx) => {
+      // 설문 생성
+      const startDate = new Date(body.start_at);
+      const endDate = new Date(body.end_at);
 
-        // 타입 캐스팅
-        const surveyType = body.type as SurveyType;
+      const survey: Survey = await tx.survey.create({
+        data: {
+          user_id: userId ?? 0,
 
-        return await prisma.$transaction(async (tx) => {
-            //  음악테이블 저장
-            const music = await tx.music.create({
-                data: {
-                    title: body.title,
-                    artist: body.artist,
-                    release_date: body.release_date ? new Date(body.release_date) : undefined,
-                    is_released: body.is_released,
-                    thumbnail_url: body.thumbnail_url,
-                    sample_url: body.sample_url,
-                    agency: '',
-                    description: '',
-                    nft_token_id: '',
-                },
-            });
+          // 음악 정보
+          music_title: body.music_title ?? null,
+          artist: body.artist ?? null,
+          music_uri: body.music_uri, // music 객체의 sample_url 사용
+          thumbnail_uri: body.thumbnail_uri,
+          genre: body.genre, //장르
 
-            // 설문태그 추출 및 필터링
-            const tagValues: SurveyTags[] = (Object.values(body.tags || {}) as string[])
-                .filter((v): v is SurveyTags =>
-                    Object.values(SurveyTags).includes(v as SurveyTags)
-                );
+          // 발매 여부 추가
+          is_released: !!body.is_released,
+          released_date: body.released_date
+            ? new Date(body.released_date)
+            : new Date(),
 
-            if (surveyType === SurveyType.official) {
-                if (
-                    body.reward == null ||
-                    body.expert_reward == null ||
-                    body.reward_amount == null
-                ) {
-                    throw new Error("공식 설문에는 reward, expert_reward, reward_amount 모두 필요합니다.");
-                }
-            }
+          // 기본 필드
+          type: surveyType,
+          start_at: startDate,
+          end_at: endDate,
+          is_active: checkSurveyActive(startDate, endDate),
+          survey_title: body.survey_title,
+          status: body.status ?? 'draft',
+          reward: body.reward ?? 0,
+          expert_reward: body.expert_reward ?? 0,
+          reward_amount: body.reward_amount ?? 0,
+          questions: body.questions ?? 0,
 
-            const startDate = new Date(body.start_at);
-            const endDate = new Date(body.end_at);
+          // 보상 정보 (official 설문에만)
+          ...(surveyType === SurveyType.official && {
+            reward: body.reward,
+            expert_reward: body.expert_reward,
+            reward_amount: body.reward_amount,
+          }),
+        },
+      });
 
-            // 설문 생성
-            const survey = await tx.survey.create({
-                data: {
-                    ...(userId ? { create_userId: userId } : {}),
-                    ...(adminId ? { create_adminId: adminId } : {}),
-                    music_id: music.id,
-                    type: surveyType,
-                    start_at: startDate,
-                    end_at: endDate,
-                    is_active: checkSurveyActive(startDate, endDate),
-                    tags: { set: tagValues },
-                    status: body.status ?? 'draft',
-                    survey_title: body.survey_title,
-                    template_id: body.template_id,
+      console.log(survey);
 
-                    ...(surveyType === SurveyType.official && {
-                        reward: body.reward,
-                        expert_reward: body.expert_reward,
-                        reward_amount: body.reward_amount,
-                    }),
-                },
-            });
+      // //  고정 질문 삽입
+      // const fixedQuestions = FIXED_SURVEY_QUESTIONS.map((q, idx) => ({
+      //   survey_id: survey.id,
+      //   question_text: q.question_text,
+      //   question_type: q.question_type,
+      //   options: JSON.stringify(q.options ?? []),
+      //   is_required: true,
+      //   question_order: idx + 1,
+      // }));
 
-            // 커스텀 문항 저장
-            const questions = Array.isArray(body.allQuestions)
-                ? body.allQuestions
-                : JSON.parse(body.allQuestions);
+      // // 커스텀 질문 삽입
+      // const additionalQuestions = Array.isArray(body.additionalQuestions)
+      //   ? body.additionalQuestions
+      //   : JSON.parse(body.additionalQuestions || '[]');
 
-            await Promise.all(
-                questions.map((q: any, idx: number) => {
-                    return tx.survey_Custom.create({
-                        data: {
-                            survey_id: survey.id,
-                            question_text: q.text?.trim() || '(비어 있는 질문)',
-                            question_type: convertType(q.type),
-                            options: JSON.stringify(q.options ?? []),
-                            is_required: true,
-                            question_order: idx + 1,
-                        },
-                    });
-                })
-            );
+      // const customQuestions = additionalQuestions.map((q: any, idx: number) => ({
+      //   survey_id: survey.id,
+      //   question_text: q.text?.trim() || '(비어 있는 질문)',
+      //   question_type: convertType(q.type),
+      //   options: JSON.stringify(q.options ?? []),
+      //   is_required: q.is_required ?? true,
+      //   question_order: FIXED_SURVEY_QUESTIONS.length + idx + 1,
+      // }));
 
-            console.log('설문 생성 완료:', survey.id);
-            return survey;
-        });
-    } catch (error) {
-        console.error("설문 생성 에러:", error);
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            console.error("Prisma Error Code:", error.code);
-            console.error("Meta:", error.meta);
-        }
-        throw error;
-    }
+      // 전체 질문 저장
+      // const surveyCustoms = [...fixedQuestions, ...customQuestions];
+      // if (surveyCustoms.length > 0) {
+      //   await tx.survey_Custom.createMany({ data: surveyCustoms });
+      // }
+
+      console.log('설문 생성 완료:', survey.id);
+      return survey;
+    });
+  } catch (err) {
+    console.error('설문 생성 실패:', err);
+    throw err;
+  }
 };
 
-// 설문 불러오기
+//  설문 불러오기
 export const getSurveyListService = async () => {
-    return await prisma.survey.findMany({
-        include: {
-            music: true,
-            creator: {
-                select: { id: true },
-            },
-            director: {
-                select: { id: true },
-            },
-            survey_custom: true,
-        },
-        orderBy: { start_at: 'desc' },
+  return await prisma.survey.findMany({
+    include: {
+      creator: { select: { id: true } },
+    },
+    orderBy: { start_at: 'desc' },
+  });
+};
+
+// 질문지 생성
+export const setSurveyQuestion = async ({
+  surveyId,
+  questionType,
+  question,
+  order
+}: {
+  surveyId: number;
+  questionType: QuestionType;
+  question: object;
+  order: number;
+}) => {
+  return await prisma.survey_Question.create({
+    data: {
+      question_type: questionType,
+      question: question,
+      question_order: order
+    }
+  });
+};
+
+//질문지 검색
+export const getSurveyQuestions = async (surveyId: number) => {
+  if (surveyId === 0) {
+    // 전체 설문 질문 조회
+    return await prisma.survey_Question.findMany({
+      orderBy: { question_order: 'asc' }
     });
+  }
+
+  // 특정 설문에 대한 질문만 조회
+  return await prisma.survey_Question.findMany({
+    where: { id: surveyId },
+    orderBy: { question_order: 'asc' }
+  });
+};
+
+// 전체 조회 (GET)
+export const getAllSurveyParticipants = async () => {
+  return await prisma.survey_Participants.findMany({
+    orderBy: { created_at: 'desc' },
+    include: {
+      user: true,
+      survey: true
+    }
+  });
 };
 
 // 설문 정보 수정
 export const updateSurveyService = async (surveyId: number, body: any) => {
-    return await prisma.$transaction(async (tx) => {
+  const survey = await prisma.survey.findUnique({
+    where: { id: surveyId },
+    select: { status: true, is_active: true },
+  });
 
-        const updatedSurvey = await tx.survey.update({
-            where: { id: surveyId },
-            data: {
-                survey_title: body.survey_title,
-                start_at: new Date(body.start_at),
-                end_at: new Date(body.end_at),
-                status: body.status,
-                is_active: checkSurveyActive(body.start_at, body.end_at),
-                tags: {
-                    set: (Object.values(body.tags || {}) as string[]).filter(
-                        (v): v is SurveyTags => Object.values(SurveyTags).includes(v as SurveyTags)
-                    ),
-                },
-                reward: body.reward,
-                reward_amount: body.reward_amount,
-                expert_reward: body.expert_reward,
-            },
-        });
+  if (!survey) throw new Error('설문 없음');
+  if (!editSurvey(survey)) {
+    throw new Error('설문이 종료되어 수정할 수 없습니다.');
+  }
 
-        // 기존 커스텀 문항 가져오기
-        const existingQuestions = await tx.survey_Custom.findMany({
-            where: { survey_id: surveyId },
-        });
-        const existingIds = new Set(existingQuestions.map((q) => q.id));
+  const updatedSurvey = await prisma.survey.update({
+    where: { id: surveyId },
+    data: {
+      survey_title: body.survey_title,
+      start_at: new Date(body.start_at),
+      end_at: new Date(body.end_at),
+      status: body.status,
+      is_active: checkSurveyActive(body.start_at, body.end_at),
+    },
+  });
 
-        const incomingQuestions = Array.isArray(body.allQuestions)
-            ? body.allQuestions
-            : JSON.parse(body.allQuestions);
+  return updatedSurvey;
+};
 
-        const incomingIds = new Set<number>();
+export const createSurveyResult = async ({
+  survey_id,
+  survey_statistics,
+  is_public = false,
+  metadata_ipfs,
+  respondents,
+  reward_claimed_amount,
+  reward_claimed
+}: {
+  survey_id: number;
+  survey_statistics: any;
+  is_public?: boolean;
+  version?: number;
+  metadata_ipfs?: string;
+  respondents: number;
+  reward_claimed_amount: number;
+  reward_claimed: number;
+}) => {
+  return await prisma.survey_Result.create({
+    data: {
+      survey_id,
+      survey_statistics,
+      is_public,
+      metadata_ipfs,
+      respondents,
+      reward_claimed_amount,
+      reward_claimed,
+      created_at: new Date()
+    }
+  });
+};
 
-        await Promise.all(
-            incomingQuestions.map(async (q: any, idx: number) => {
-                const questionData = {
-                    question_text: q.text?.trim() || '(비어 있는 질문)',
-                    question_type: convertType(q.type),
-                    options: JSON.stringify(q.options ?? []),
-                    is_required: q.is_required ?? true,
-                    question_order: idx + 1,
-                };
-
-                if (q.id && existingIds.has(q.id)) {
-                    incomingIds.add(q.id);
-                    await tx.survey_Custom.update({
-                        where: { id: q.id },
-                        data: questionData,
-                    });
-                } else {
-                    const created = await tx.survey_Custom.create({
-                        data: {
-                            survey_id: surveyId,
-                            ...questionData,
-                        },
-                    });
-                    incomingIds.add(created.id);
-                }
-            })
-        );
-
-        const idsToDelete = [...existingIds].filter((id) => !incomingIds.has(id));
-        if (idsToDelete.length > 0) {
-            await tx.survey_Custom.deleteMany({
-                where: { id: { in: idsToDelete } },
-            });
-        }
-
-        return updatedSurvey;
-    });
-}
+export const getSurveyResult = async (surveyId: number) => {
+  return await prisma.survey_Result.findUnique({
+    where: { survey_id: surveyId }
+  });
+};

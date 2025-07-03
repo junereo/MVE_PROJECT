@@ -5,6 +5,8 @@ import {
   oauthCallbackController,
   googleCallbackController,
   getUserController,
+  deleteAccount,
+  deleteAdminAccount,
   logout,
 } from "../controllers/auth.controller";
 import {
@@ -19,8 +21,11 @@ const router = express.Router();
 router.post("/signup", validateRegister, emailRegister);
 router.post("/me", verifyToken, getUserController);
 router.post("/login", validateLogin, emaillogin);
-router.get("/oauth/:provider", oauthCallbackController, validateOAuthRequest, oauthCallbackController);
+router.get("/oauth/:provider", oauthCallbackController, validateOAuthRequest);
 router.get('/google/callback', googleCallbackController);
 router.post("/logout", logout);
+router.delete("/delete", verifyToken, deleteAccount);
+router.delete("/delete", verifyToken, deleteAdminAccount);
+
 
 export default router;
