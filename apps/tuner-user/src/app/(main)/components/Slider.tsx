@@ -5,15 +5,34 @@ import Image from "next/image";
 import "swiper/css";
 import "swiper/css/autoplay";
 import { Autoplay } from "swiper/modules";
-
-const slideItems = [
-  { id: 1, thumbnail_uri: `https://i.ytimg.com/vi/LBHVOiw274A/hqdefault.jpg` },
-  { id: 2, thumbnail_uri: `https://i.ytimg.com/vi/08h8u8Z9iJQ/hqdefault.jpg` },
-  { id: 3, thumbnail_uri: `https://i.ytimg.com/vi/UDyPp9bkfD0/hqdefault.jpg` },
-  { id: 4, thumbnail_uri: `https://i.ytimg.com/vi/ppudgIu2TaM/hqdefault.jpg` },
-];
+import { getSurveyList } from "@/features/survey/services/survey";
+import { useEffect, useState } from "react";
+import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 
 export default function Slider() {
+  const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
+
+  useEffect(() => {
+    const fetchSurveys = async () => {
+      try {
+        const res = await getSurveyList();
+
+        const ongoing = res.data
+          .filter((item) => item.is_active === "ongoing")
+          .sort(
+            (a, b) =>
+              new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
+          );
+
+        setSurveys(ongoing);
+      } catch (err) {
+        console.error("설문 목록 가져오기 실패:", err);
+      }
+    };
+
+    fetchSurveys();
+  }, []);
+
   return (
     <div className="overflow-hidden">
       <Swiper
@@ -27,7 +46,7 @@ export default function Slider() {
           disableOnInteraction: false,
         }}
       >
-        {slideItems.map((item) => (
+        {surveys.map((item) => (
           <SwiperSlide key={item.id}>
             <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden shadow-md">
               <Image
