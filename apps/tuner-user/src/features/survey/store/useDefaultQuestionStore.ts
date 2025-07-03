@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { InputTypeEnum, QuestionTypeEnum } from "../types/enums";
 
 export type QuestionItem = {
-  id: string;
+  id: number;
   category: string;
   question_text: string;
   type: InputTypeEnum;

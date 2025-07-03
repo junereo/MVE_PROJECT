@@ -11,17 +11,18 @@ const statusTextMap: Record<SurveyResponse["is_active"], string> = {
   closed: "종료",
 };
 
+const statusList = ["all", "upcoming", "ongoing", "closed"] as const;
+type Status = (typeof statusList)[number];
+
 export default function SurveyList() {
-  const [status, setStatus] = useState<
-    "all" | "upcoming" | "ongoing" | "closed"
-  >("all");
+  const [status, setStatus] = useState<Status>("all");
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const res = await getSurveyList();
-        console.log("설문 목록", res);
+
         const sorted = res.data.sort((a: SurveyResponse, b: SurveyResponse) => {
           return (
             new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
@@ -44,7 +45,7 @@ export default function SurveyList() {
   return (
     <div className="space-y-4 max-w-[700px] mx-auto">
       <div className="flex justify-around border-b pb-2">
-        {["all", "upcoming", "ongoing", "closed"].map((s) => (
+        {statusList.map((s) => (
           <button
             key={s}
             className={`flex-1 min-w-0 py-1 text-sm sm:text-base transition ${
@@ -52,7 +53,7 @@ export default function SurveyList() {
                 ? "bg-blue-500 text-white font-semibold shadow-sm"
                 : "bg-gray-100 text-gray-800 hover:bg-blue-100"
             }`}
-            onClick={() => setStatus(s as any)}
+            onClick={() => setStatus(s)}
           >
             {s === "all"
               ? "전체"

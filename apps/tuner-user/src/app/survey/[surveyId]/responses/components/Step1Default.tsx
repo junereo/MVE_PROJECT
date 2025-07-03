@@ -9,9 +9,11 @@ import SurveyTabs from "@/app/survey/components/SurveyTabs";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
-import { InputTypeEnum, QuestionTypeEnum } from "@/features/survey/types/enums";
+import { InputTypeEnum } from "@/features/survey/types/enums";
 import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
 import { fetchSurveyQuestions } from "@/features/survey/services/survey";
+import { QuestionTypeEnum } from "@/features/survey/types/enums";
+import type { QuestionItem } from "@/features/survey/store/useDefaultQuestionStore";
 
 interface Step1props {
   onNext: () => void;
@@ -55,21 +57,37 @@ export default function Step1Default({ onNext }: Step1props) {
   useEffect(() => {
     if (questions.length === 0) {
       fetchSurveyQuestions(id).then((res) => {
-        console.log("fetch response", res); // 👈 여기에 로그!
-
         const template = res.data[0];
-        const defaultQuestions = Object.entries(
-          template.question as Record<string, any[]>
-        ).flatMap(([category, items]) =>
-          items.map((q) => ({
-            category,
-            ...q,
-          }))
+
+        type RawQuestion = {
+          id: number;
+          question_text: string;
+          type: InputTypeEnum;
+          options?: string[];
+          question_type?: string;
+        };
+
+        type QuestionMap = Record<string, RawQuestion[]>;
+
+        const rawMap = template.question as QuestionMap;
+
+        const defaultQuestions: QuestionItem[] = Object.entries(rawMap).flatMap(
+          ([category, items]) =>
+            items.map(
+              (q): QuestionItem => ({
+                id: q.id,
+                category,
+                question_text: q.question_text,
+                type: q.type,
+                options: q.options,
+                question_type: QuestionTypeEnum.FIXED,
+              })
+            )
         );
         setQuestions(defaultQuestions);
       });
     }
-  }, []);
+  }, [id, questions.length, setQuestions]);
 
   const handlePrev = () => {
     if (tabIndex > 0) {

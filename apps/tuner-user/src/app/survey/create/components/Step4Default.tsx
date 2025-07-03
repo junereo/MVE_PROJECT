@@ -9,7 +9,7 @@ import QuestionSubjective from "../../components/QuestionSubjective";
 import { fetchSurveyQuestions } from "@/features/survey/services/survey";
 import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
 import { InputTypeEnum } from "@/features/survey/types/enums";
-// import { defaultQuestions } from "@/features/survey/constants/defaultQuestions";
+import type { QuestionItem } from "@/features/survey/store/useDefaultQuestionStore";
 
 interface Step4Props {
   onPrev: () => void;
@@ -43,10 +43,10 @@ export default function Step4Default({
         if (!response.success || !Array.isArray(response.data)) {
           throw new Error("응답 형식이 올바르지 않습니다.");
         }
-
+        type QuestionMap = Record<string, Omit<QuestionItem, "category">[]>;
         const template = response.data[0];
-        const defaultQuestions = Object.entries(
-          template.question as Record<string, any[]>
+        const defaultQuestions: QuestionItem[] = Object.entries(
+          template.question as QuestionMap
         ).flatMap(([category, items]) =>
           items.map((q) => ({
             category,

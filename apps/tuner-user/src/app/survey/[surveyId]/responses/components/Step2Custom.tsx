@@ -8,7 +8,6 @@ import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 import { InputTypeEnum } from "@/features/survey/types/enums";
-import { postSurveyAnswer } from "@/features/survey/services/survey";
 
 interface Step2Props {
   onPrev: () => void;
