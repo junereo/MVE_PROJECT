@@ -5,7 +5,37 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Dropdown from "@/app/components/ui/DropDown";
 import { surveyList } from "@/lib/network/api";
-// 타입 정의
+
+import {
+  SurveyTypeEnum,
+  QuestionTypeEnum,
+} from "@/app/survey/create/complete/type";
+
+// 서버 응답 타입
+interface Creator {
+  id: number;
+  nickname: string;
+  role: string;
+}
+
+interface SurveyResponseItem {
+  id: number;
+  survey_title: string;
+  music_title: string;
+  artist: string;
+  music_uri: string;
+  thumbnail_uri: string;
+  start_at: string;
+  end_at: string;
+  is_active: "upcoming" | "ongoing" | "ended";
+  type: "general" | "official";
+  status: string;
+  reward_amount: number;
+  participants: { id: number }[];
+  creator: Creator;
+}
+
+// 리스트에서 사용할 내부 타입
 interface SurveyItem {
   id: number;
   survey_title: string;
@@ -13,84 +43,77 @@ interface SurveyItem {
   start_at: string;
   end_at: string;
   is_active: "예정" | "진행중" | "종료";
-  surveyType: "general" | "official";
+  surveyType: SurveyTypeEnum;
   participantCount: number;
   reward_amount?: number;
+  question_type: QuestionTypeEnum;
 }
 
 // 필터 옵션
 const statusOptions = ["전체 상태", "예정", "진행중", "종료"];
 const typeOptions = ["전체 유형", "일반 설문", "리워드 설문"];
 
-// 고정된 초기 더미 데이터 (절대 랜덤 X)
-const baseSurveys: SurveyItem[] = Array.from({ length: 20 }, (_, i) => {
-  const id = 20 - i;
-  const statuses = ["예정", "진행중", "종료"] as const;
-  const types = ["general", "official"] as const;
-  return {
-    id,
-    survey_title: `설문 제목 ${id}`,
-    title: `음원 ${id}`,
-    start_at: "2025-06-01",
-    end_at: "2025-06-30",
-    is_active: statuses[id % 3],
-    surveyType: types[id % 2],
-    participantCount: 0, // 여기서는 0으로 고정!
-    reward_amount: id % 2 === 1 ? undefined : 100 + id * 5,
-  };
-});
-export const surveylist = async (): Promise<SurveyItem[]> => {
-  const { data } = await surveyList();
+// 상태 변환
+const convertStatus = (status: string): "예정" | "진행중" | "종료" => {
+  switch (status) {
+    case "upcoming":
+      return "예정";
+    case "ongoing":
+      return "진행중";
+    case "ended":
+      return "종료";
+    default:
+      return "예정";
+  }
+};
 
-  // 응답 데이터 구조에 따라 아래를 맞춰줘야 함
-  console.log(data);
-
-  return data.map((item: any) => {
-    // 상태 변환 로직 (예정/진행중/종료 판단)
-    const now = new Date();
-    const start = new Date(item.start_at);
-    const end = new Date(item.end_at);
-    let status: "예정" | "진행중" | "종료" = "예정";
-
-    if (now >= end) status = "종료";
-    else if (now >= start) status = "진행중";
-
+// API 호출 및 변환
+const surveylist = async (): Promise<SurveyItem[]> => {
+  const { data }: { data: SurveyResponseItem[] } = await surveyList();
+  console.log("설문 리스트:", data);
+  return data.map((item) => {
     return {
       id: item.id,
       survey_title: item.survey_title,
-      title: item.title || item.music?.title || "제목 없음",
-      start_at: item.start_at,
-      end_at: item.end_at,
-      is_active: status,
-      surveyType: item.type === "official" ? "official" : "general",
-      participantCount: item.participantCount ?? 0,
+      title: item.music_title || "제목 없음",
+      start_at: item.start_at.slice(0, 10),
+      end_at: item.end_at.slice(0, 10),
+      is_active: convertStatus(item.is_active),
+      surveyType:
+        item.type === "official"
+          ? SurveyTypeEnum.OFFICIAL
+          : SurveyTypeEnum.GENERAL,
+      participantCount: item.participants?.length || 0,
       reward_amount: item.reward_amount ?? undefined,
+      question_type: QuestionTypeEnum.MULTIPLE,
     };
   });
 };
 
 export default function SurveyListPage() {
   const router = useRouter();
-  const [surveys, setSurveys] = useState<SurveyItem[]>(baseSurveys);
+  const [surveys, setSurveys] = useState<SurveyItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("전체 상태");
   const [typeFilter, setTypeFilter] = useState("전체 유형");
   const [sortNewestFirst, setSortNewestFirst] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  // const [surveyList, setSurveyList] = useState<SurveyItem[]>();
   const surveysPerPage = 10;
 
-  // 🔐 클라이언트에서만 랜덤 participantCount 주입
   useEffect(() => {
-    const randomized = baseSurveys.map((s) => ({
-      ...s,
-      participantCount: Math.floor(Math.random() * 100),
-    }));
-    setSurveys(randomized);
-    surveylist();
+    const fetchSurveys = async () => {
+      try {
+        const list = await surveylist();
+        console.log("불러온 설문 리스트:", list);
+
+        setSurveys(list);
+      } catch (err) {
+        console.error("설문 리스트 불러오기 실패:", err);
+      }
+    };
+    fetchSurveys();
   }, []);
 
-  // 필터링 + 정렬
   const filteredSurveys = surveys
     .filter((survey) => {
       const matchTitle = survey.survey_title
@@ -103,12 +126,13 @@ export default function SurveyListPage() {
         statusFilter === "전체 상태" || survey.is_active === statusFilter;
       const matchType =
         typeFilter === "전체 유형" ||
-        (typeFilter === "일반 설문" && survey.surveyType === "general") ||
-        (typeFilter === "리워드 설문" && survey.surveyType === "official");
+        (typeFilter === "일반 설문" &&
+          survey.surveyType === SurveyTypeEnum.GENERAL) ||
+        (typeFilter === "리워드 설문" &&
+          survey.surveyType === SurveyTypeEnum.OFFICIAL);
       return (matchTitle || matchMusic) && matchStatus && matchType;
     })
     .sort((a, b) => (sortNewestFirst ? b.id - a.id : a.id - b.id));
-
   const totalPages = Math.ceil(filteredSurveys.length / surveysPerPage);
   const paginatedSurveys = filteredSurveys.slice(
     (currentPage - 1) * surveysPerPage,
@@ -116,9 +140,11 @@ export default function SurveyListPage() {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">설문 리스트</h1>
+    <div>
+      <div className="w-full text-black text-2xl py-3 font-bold">
+        Survey List
+      </div>
+      <div className="flex justify-end items-center mb-6">
         <Link href="/survey/create/step1">
           <button className="bg-blue-600 text-white px-4 py-2 rounded">
             + 설문 만들기
@@ -126,7 +152,7 @@ export default function SurveyListPage() {
         </Link>
       </div>
 
-      {/* 검색 + 드롭다운 필터 */}
+      {/* 검색 + 필터 */}
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <input
           type="text"
@@ -190,17 +216,26 @@ export default function SurveyListPage() {
                 onClick={() => router.push(`/survey/${survey.id}`)}
                 className="hover:bg-blue-50 cursor-pointer"
               >
-                <td className="border px-2 py-1">{survey.id}</td>
-                <td className="border px-2 py-1 text-left pl-3">
-                  {survey.survey_title}
+                <td className="border px-2 py-1 h-[40px] align-middle">
+                  {survey.id}
                 </td>
-                <td className="border px-2 py-1 text-left pl-3">
-                  {survey.title}
+                <td className="border px-2 py-1 text-left pl-3 h-[40px] align-middle">
+                  <div
+                    className="truncate max-w-[180px]"
+                    title={survey.survey_title}
+                  >
+                    {survey.survey_title}
+                  </div>
                 </td>
-                <td className="border px-2 py-1">
+                <td className="border px-2 py-1 text-left pl-3 h-[40px] align-middle">
+                  <div className="truncate max-w-[180px]" title={survey.title}>
+                    {survey.title}
+                  </div>
+                </td>
+                <td className="border px-2 py-1 h-[40px] align-middle">
                   {survey.start_at} ~ {survey.end_at}
                 </td>
-                <td className="border px-2 py-1">
+                <td className="border px-2 py-1 h-[40px] align-middle">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       survey.is_active === "예정"
@@ -213,20 +248,20 @@ export default function SurveyListPage() {
                     {survey.is_active}
                   </span>
                 </td>
-                <td className="border px-2 py-1">
+                <td className="border px-2 py-1 h-[40px] align-middle">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      survey.surveyType === "official"
+                      survey.surveyType === SurveyTypeEnum.OFFICIAL
                         ? "bg-blue-100 text-blue-700"
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {survey.surveyType === "official"
+                    {survey.surveyType === SurveyTypeEnum.OFFICIAL
                       ? "리워드 설문"
                       : "일반 설문"}
                   </span>
                 </td>
-                <td className="border px-2 py-1">
+                <td className="border px-2 py-1 h-[40px] align-middle">
                   {survey.participantCount}명
                 </td>
               </tr>
