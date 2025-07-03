@@ -3,7 +3,7 @@ import { create } from "zustand";
 type SurveyType = "general" | "official";
 
 // 설문 생성 1단계 정보 구조 정의
-type SurveyStep1 = {
+export type SurveyStep1 = {
   survey_title: string; //설문 제목
   youtubeVideoId: string; // 유튜브 영상 ID
   youtubeTitle: string; // 유튜브 영상 제목

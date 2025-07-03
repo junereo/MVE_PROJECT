@@ -31,7 +31,7 @@ export default function SurveyQuestionBase({
       </p>
 
       <div className="grid grid-cols-5 gap-2 mb-4">
-        {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+        {Array.from({ length: 5 }, (_, i) => i + 1).map((num) => (
           <button
             key={num}
             className="px-2 py-1 text-sm border rounded bg-gray-200 text-gray-500 cursor-not-allowed"
