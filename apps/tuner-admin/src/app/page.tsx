@@ -1,31 +1,31 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-// import UseQueryGet from "./test/useQueryGet";
 import axiosClient from "@/lib/network/axios";
 
 const fetchSession = async () => {
-  const { data } = await axiosClient.get(
-    "https://jsonplaceholder.typicode.com/todos/1"
-  );
+  const { data } = await axiosClient.post("/auth/me");
   return data;
 };
 
-const Home = () => {
-  const { isLoading, isError } = useQuery({
+export default function HomePage() {
+  const router = useRouter();
+
+  const { data, isError } = useQuery({
     queryKey: ["session"],
     queryFn: fetchSession,
+    retry: false,
   });
 
-  if (isLoading) return <>로딩 중....</>;
-  if (isError) return <>에러 남</>;
+  useEffect(() => {
+    if (isError) {
+      router.replace("/login");
+    } else if (data) {
+      router.replace("/dashboard");
+    }
+  }, [isError, data, router]);
 
-  return (
-    <div>
-      {/* <UseQueryGet data={data} /> */}
-      <div>나는 홈</div>
-    </div>
-  );
-};
-
-export default Home;
+  return <></>; // 또는 null
+}

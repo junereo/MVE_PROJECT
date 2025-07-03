@@ -14,8 +14,8 @@ const prisma = new PrismaClient();
 const defaultCookieOptions: CookieOptions = {
     httpOnly: true,
     secure: true,
-    sameSite: 'none',
-    maxAge: 24 * 60 * 60 * 1000
+    sameSite: "none",
+    maxAge: 24 * 60 * 60 * 1000,
 };
 // 이메일 회원가입
 // export const emailRegister = async (data: any) => {
@@ -87,7 +87,7 @@ export const emailRegister = async (data: any) => {
     };
 };
 
-// 이메일 로그인 
+// 이메일 로그인
 export const emaillogin = async (email: string, password: string) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error("가입되지 않은 이메일입니다.");
@@ -107,8 +107,11 @@ export const emaillogin = async (email: string, password: string) => {
     };
 };
 
+// 관리자 회원가입
 export const adminRegister = async (data: any) => {
-    const isAdmin = await prisma.user.findUnique({ where: { email: data.email } });
+    const isAdmin = await prisma.user.findUnique({
+        where: { email: data.email },
+    });
     if (isAdmin) throw new Error("이미 등록된 관리자입니다.");
 
     const hashedPassword = await hashPassword(data.password);
@@ -142,7 +145,7 @@ export const adminLogin = async (email: string, password: string) => {
     const isValid = await verifyPassword(password, user.password);
     if (!isValid) throw new Error("비밀번호가 일치하지 않습니다.");
 
-    if (user.role !== 'admin' && user.role !== 'superadmin') {
+    if (user.role !== "admin" && user.role !== "superadmin") {
         throw new Error("권한이 없습니다. 관리자만 로그인할 수 있습니다.");
     }
 
@@ -218,17 +221,21 @@ export const oauthCallbackService = async (req: Request) => {
         });
         if (existingOauth) return existingOauth.user;
 
-        const existingUser = await tx.user.findUnique({ where: { email: safeEmail } });
-
-        const resolvedUser = existingUser ?? await tx.user.create({
-            data: {
-                email: safeEmail,
-                password: '',
-                nickname: profile.nickname,
-                phone_number: '',
-                role: roleEnum,
-            },
+        const existingUser = await tx.user.findUnique({
+            where: { email: safeEmail },
         });
+
+        const resolvedUser =
+            existingUser ??
+            (await tx.user.create({
+                data: {
+                    email: safeEmail,
+                    password: "",
+                    nickname: profile.nickname,
+                    phone_number: "",
+                    role: roleEnum,
+                },
+            }));
 
         await tx.user_Oauth.create({
             data: {
@@ -256,22 +263,24 @@ export const oauthCallbackService = async (req: Request) => {
 
 export const fetchKakaoProfile = async (code: string) => {
     const { data: tokenRes } = await axios.post(
-        'https://kauth.kakao.com/oauth/token',
+        "https://kauth.kakao.com/oauth/token",
         null,
         {
             params: {
-                grant_type: 'authorization_code',
+                grant_type: "authorization_code",
                 client_id: process.env.KAKAO_API_KEY!,
                 redirect_uri: process.env.KAKAO_REDIRECT_URI!,
                 code,
             },
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
-        },
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+            },
+        }
     );
 
     const { data: profileRes } = await axios.get(
-        'https://kapi.kakao.com/v2/user/me',
-        { headers: { Authorization: `Bearer ${tokenRes.access_token}` } },
+        "https://kapi.kakao.com/v2/user/me",
+        { headers: { Authorization: `Bearer ${tokenRes.access_token}` } }
     );
 
     return {
@@ -282,11 +291,14 @@ export const fetchKakaoProfile = async (code: string) => {
     };
 };
 
-// 구글 
+// 구글
 export const googleCallbackService = async ({
     code,
     role,
-}: { code: string; role?: string }) => {
+}: {
+    code: string;
+    role?: string;
+}) => {
     const roleEnum = mapRoleEnum(Number(role) || 3);
 
     console.log("=== GOOGLE CALLBACK SERVICE ===");
@@ -330,15 +342,17 @@ export const googleCallbackService = async ({
 
         const existingUser = await tx.user.findUnique({ where: { email } });
 
-        const resolvedUser = existingUser ?? await tx.user.create({
-            data: {
-                email,
-                password: "",
-                nickname: name,
-                phone_number: "",
-                role: roleEnum,
-            },
-        });
+        const resolvedUser =
+            existingUser ??
+            (await tx.user.create({
+                data: {
+                    email,
+                    password: "",
+                    nickname: name,
+                    phone_number: "",
+                    role: roleEnum,
+                },
+            }));
 
         await tx.user_Oauth.create({
             data: {
