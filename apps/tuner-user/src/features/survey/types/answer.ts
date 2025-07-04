@@ -1,3 +1,5 @@
+import type { UserInfo } from "@/features/users/types/userInfo";
+
 export type Answer = string | string[];
 
 export interface SurveyAnswers {
@@ -18,7 +20,6 @@ export interface SurveyAnswerState {
   setSubmitStatus: (status: "success" | "error") => void;
 }
 
-// API 제출용 타입
 export interface FormattedAnswer {
   question_id: number;
   answer: string | number | string[];
@@ -27,5 +28,6 @@ export interface FormattedAnswer {
 export interface SurveySubmitPayload {
   user_id: string;
   survey_id: number;
+  user_info: UserInfo;
   answers: FormattedAnswer[];
 }

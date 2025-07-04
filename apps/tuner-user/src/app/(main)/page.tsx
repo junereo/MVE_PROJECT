@@ -17,9 +17,12 @@ export default function Home() {
           </button>
         </div>
         <Card status="ongoing" />
-        <button className="flex mx-auto px-4 py-1 border border-blue-300 bg-white hover:bg-blue-50 transition">
-          <Link href="/survey">진행중 설문 더보기</Link>
-        </button>
+        <Link
+          href="/survey"
+          className="block w-fit mx-auto px-5 py-2 rounded-xl border border-blue-500 text-blue-500 text-sm sm:text-base font-semibold shadow-sm hover:bg-blue-600 hover:text-white hover:shadow-md transition-all"
+        >
+          진행중 설문 더보기
+        </Link>
       </section>
       <section className="space-y-4">
         <div className="flex justify-between items-center">

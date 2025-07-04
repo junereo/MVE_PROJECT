@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { getSurveyList } from "@/features/survey/services/survey";
 import List from "@/components/ui/List";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
@@ -15,6 +16,7 @@ const statusList = ["all", "upcoming", "ongoing", "closed"] as const;
 type Status = (typeof statusList)[number];
 
 export default function SurveyList() {
+  const router = useRouter();
   const [status, setStatus] = useState<Status>("all");
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
 
@@ -65,6 +67,7 @@ export default function SurveyList() {
       {surveys.map((item) => (
         <List
           key={item.id}
+          onClick={() => router.push(`/survey/${item.id}`)}
           image={item.thumbnail_uri}
           artist={item.artist}
           title={item.music_title}
