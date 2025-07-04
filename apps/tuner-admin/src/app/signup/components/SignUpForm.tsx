@@ -158,11 +158,10 @@ const SignUpForm = () => {
               <div className="flex gap-3">
                 <label
                   className={`cursor-pointer px-4 py-2 rounded border text-sm font-semibold flex items-center gap-1 transition
-                  ${
-                    formData.role === 1
+                  ${formData.role === 1
                       ? "bg-white text-black border-white shadow"
                       : "bg-transparent text-white border-gray-400 hover:border-white"
-                  }
+                    }
                 `}
                 >
                   <input
@@ -178,10 +177,9 @@ const SignUpForm = () => {
 
                 <label
                   className={`cursor-pointer px-4 py-2 rounded border text-sm font-semibold flex items-center gap-1 transition
-                    ${
-                      formData.role === 0
-                        ? "bg-white text-black border-white shadow"
-                        : "bg-transparent text-white border-gray-400 hover:border-white"
+                    ${formData.role === 0
+                      ? "bg-white text-black border-white shadow"
+                      : "bg-transparent text-white border-gray-400 hover:border-white"
                     }
                   `}
                 >

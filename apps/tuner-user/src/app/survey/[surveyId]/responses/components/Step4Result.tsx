@@ -5,8 +5,9 @@ import Button from "@/components/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
 
-interface Step3Props {
+interface Step4Props {
   onPrev: () => void;
+  surveyId: number;
 }
 
 type StatusKey = "success" | "error";
@@ -16,40 +17,30 @@ interface StatusUI {
   title: string;
   message: string;
   buttonText: string;
-  link?: string; // 선택적 링크
+  link?: string;
 }
 
-interface dummySurveyTypes {
-  id: number;
-  survey_title: string;
-}
+const getStatusUI = (status: StatusKey, surveyId: number): StatusUI =>
+  ({
+    success: {
+      image: "/images/check.png",
+      title: "설문 제출 완료",
+      message: "설문이 성공적으로 제출되었습니다.",
+      buttonText: "설문 보기",
+      link: `/survey/${surveyId}`,
+    },
+    error: {
+      image: "/images/x.png",
+      title: "설문 제출 실패",
+      message: "문제가 발생했습니다. 다시 시도해 주세요.",
+      buttonText: "뒤로 가기",
+    },
+  }[status]);
 
-const dummySurvey: dummySurveyTypes = {
-  id: 1,
-  survey_title: "빈지노 Fashion Hoarder 설문",
-};
-
-const statusMap: Record<StatusKey, StatusUI> = {
-  success: {
-    image: "/images/check.png",
-    title: "설문 제출 완료",
-    message: "설문이 성공적으로 제출되었습니다.",
-    buttonText: "설문 보기",
-    link: `/survey/${dummySurvey.id}`,
-  },
-  error: {
-    image: "/images/x.png",
-    title: "설문 제출 실패",
-    message: "문제가 발생했습니다. 다시 시도해 주세요.",
-    buttonText: "뒤로 가기",
-  },
-};
-
-export default function Step3Review({ onPrev }: Step3Props) {
+export default function Step4Result({ surveyId, onPrev }: Step4Props) {
   const { surveySubmitStatus } = useAnswerStore();
-
   const status: StatusKey = surveySubmitStatus || "error";
-  const ui = statusMap[status];
+  const ui = getStatusUI(status, surveyId);
 
   return (
     <div className="min-h-screen flex justify-center px-4">
