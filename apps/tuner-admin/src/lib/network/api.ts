@@ -38,6 +38,11 @@ export const surveyList = async () => {
 
   return res.data;
 };
+export const surveyView = async (id: number | string) => {
+  const res = await axiosClient.get(`/survey/s/${id}`);
+
+  return res.data;
+};
 
 // 새로운 설문 만들기
 export const surveyCreate = async (serverPayload: SurveyCreatePayload) => {
@@ -46,8 +51,10 @@ export const surveyCreate = async (serverPayload: SurveyCreatePayload) => {
 
 // 모든 유저 조회 list
 export const userList = async () => {
-  await axiosClient.get("/users");
+  const res = await axiosClient.get("/user");
+  return res;
 };
+
 export const userme = async () => {
   await axiosClient.get("/users/me");
 };
