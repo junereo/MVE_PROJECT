@@ -13,6 +13,10 @@ import {
 } from "../controllers/survey.controller";
 import { verifyUserOrAdmin } from "../middlewares/survey.middleware";
 
+import {
+  verifyToken,
+} from "../middlewares/auth.middleware";
+
 const router = express.Router();
 
 router.get("/list", getSurveyList);
@@ -21,10 +25,10 @@ router.get("/q/:questionnaireId", getSurveyQuestionList);
 router.get("/p", getAllSurveyParticipantsHandler);
 router.get("/r/:surveyId", getSurveyResultHandler);
 
-router.post("/r", createSurveyResultHandler);
-router.post("/p", createSurveyParticipantHandler);
-router.post("/", verifyUserOrAdmin, createSurveyHandler);
-router.post("/q", createSurveyQuestionHandler);
+router.post("/r", verifyToken, createSurveyResultHandler);
+router.post("/p", verifyToken, createSurveyParticipantHandler);
+router.post("/", verifyUserOrAdmin, verifyToken, createSurveyHandler);
+router.post("/q", verifyToken, createSurveyQuestionHandler);
 // router.post('/survey/temp');
 // router.post('/:surveyId/responses');
 // router.put('/:surveyId/responses');

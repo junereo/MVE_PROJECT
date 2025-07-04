@@ -33,8 +33,6 @@ export const createSurveyHandler = async (req: AuthRequest, res: Response) => {
     const user_Id = parseInt(userId);
     const data = req.body;
 
-    console.log(user_Id, data);
-
     if (!userId) {
       res.status(401).json({ success: false, message: "로그인이 필요합니다." });
       return;
@@ -112,11 +110,15 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
 
   try {
     if (surveyId === 0) {
-      // 전체 설문 리스트 조회
+      // ✅ 전체 설문 리스트 조회
       const allSurveys = await prisma.survey.findMany({
         orderBy: { created_at: "desc" },
         include: {
-          participants: true,
+          participants: {
+            include: {
+              user: true,
+            }
+          },
           result: true,
           creator: { select: { id: true, nickname: true, role: true } },
         },
@@ -125,23 +127,25 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // 특정 설문 상세 조회
+    // ✅ 특정 설문 상세 조회
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
       include: {
         participants: {
           include: {
             user: true,
-          },
+          }
         },
         creator: { select: { id: true, nickname: true, role: true } },
         result: true,
       },
     });
+
     if (!survey) {
       res.status(404).json({ message: "설문을 찾을 수 없습니다." });
       return;
     }
+
     res.status(200).json({ success: true, data: survey });
     return;
   } catch (err: any) {
@@ -175,57 +179,37 @@ export const getSurveyQuestionList = async (
     });
   }
 };
-// 설문 참여 저장/제출
+
+// POST /survey-participants
 export const createSurveyParticipantHandler = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
-) => {
+): Promise<void> => {
   try {
-    const { user_id, survey_id, answers, isSubmit } = req.body;
+    const { survey_id, answers, isSubmit } = req.body;
+    const user_id = req.user?.userId;
 
     if (!user_id || !survey_id || !answers) {
       res
         .status(400)
-        .json({ message: "필수값 누락: user_id, survey_id, answers" });
+        .json({ message: "user_id, survey_id, answers는 필수입니다." });
       return;
     }
 
-    const participant = await createSurveyParticipant({
+
+    const newParticipant = await createSurveyParticipant({
       user_id: parseInt(user_id),
-      survey_id: parseInt(survey_id),
+      survey_id : parseInt(survey_id),
       answers,
       isSubmit,
     });
 
-    res.status(201).json({ success: true, data: participant });
+    res.status(201).json({ success: true, data: newParticipant });
   } catch (err: any) {
-    console.error("설문 참여 오류:", err);
-    res.status(400).json({ success: false, message: err.message });
-  }
-};
-
-// 설문 정보 수정
-export const updateSurvey = async (req: Request, res: Response) => {
-  const surveyId = Number(req.params.surveyId);
-  const body = req.body;
-
-  if (!body || Object.keys(body).length === 0) {
-    res.status(400).json({ message: "요청 데이터가 없습니다." });
-    return;
-  }
-
-  try {
-    const updatedSurvey = await updateSurveyService(surveyId, body);
-    res.status(200).json({ success: true, data: updatedSurvey });
-  } catch (err: any) {
-    console.error("설문 수정 실패:", err);
-    res.status(400).json({
-      success: false,
-      message: err.message.includes("수정할 수 없습니다")
-        ? err.message
-        : "설문 수정 실패",
-      error: err.message,
-    });
+    console.error("설문 응답 생성 오류:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "응답 생성 실패", error: err.message });
   }
 };
 
@@ -245,6 +229,32 @@ export const getAllSurveyParticipantsHandler = async (
   }
 };
 
+export const updateSurvey = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const surveyId = Number(req.params.surveyId);
+  console.log("surveyId:", surveyId);
+  console.log("req.body:", req.body);
+
+  const body = req.body;
+  if (!body || Object.keys(body).length === 0) {
+    console.error("요청 본문이 비어 있습니다");
+    res.status(400).json({ message: "요청 데이터가 없습니다." });
+    return;
+  }
+
+  try {
+    const updatedSurvey = await updateSurveyService(surveyId, body);
+    res.status(200).json({ success: true, data: updatedSurvey });
+  } catch (err: any) {
+    console.error("설문 수정 실패:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "설문 수정 실패", error: err.message });
+  }
+};
+
 export const createSurveyResultHandler = async (
   req: Request,
   res: Response
@@ -261,6 +271,7 @@ export const createSurveyResultHandler = async (
       reward_claimed,
     } = req.body;
 
+    
     const result = await createSurveyResult({
       survey_id,
       survey_statistics,
