@@ -170,7 +170,7 @@ export const getSurveyQuestionList = async (
     });
   }
 };
-// 설문 참여 저장/제출 
+// 설문 참여 저장/제출
 export const createSurveyParticipantHandler = async (
   req: Request,
   res: Response
@@ -179,7 +179,9 @@ export const createSurveyParticipantHandler = async (
     const { user_id, survey_id, answers, isSubmit } = req.body;
 
     if (!user_id || !survey_id || !answers) {
-      res.status(400).json({ message: '필수값 누락: user_id, survey_id, answers' });
+      res
+        .status(400)
+        .json({ message: "필수값 누락: user_id, survey_id, answers" });
       return;
     }
 
@@ -192,18 +194,18 @@ export const createSurveyParticipantHandler = async (
 
     res.status(201).json({ success: true, data: participant });
   } catch (err: any) {
-    console.error('설문 참여 오류:', err);
+    console.error("설문 참여 오류:", err);
     res.status(400).json({ success: false, message: err.message });
   }
 };
 
-// 설문 정보 수정 
+// 설문 정보 수정
 export const updateSurvey = async (req: Request, res: Response) => {
   const surveyId = Number(req.params.surveyId);
   const body = req.body;
 
   if (!body || Object.keys(body).length === 0) {
-    res.status(400).json({ message: '요청 데이터가 없습니다.' });
+    res.status(400).json({ message: "요청 데이터가 없습니다." });
     return;
   }
 
@@ -211,17 +213,16 @@ export const updateSurvey = async (req: Request, res: Response) => {
     const updatedSurvey = await updateSurveyService(surveyId, body);
     res.status(200).json({ success: true, data: updatedSurvey });
   } catch (err: any) {
-    console.error('설문 수정 실패:', err);
+    console.error("설문 수정 실패:", err);
     res.status(400).json({
       success: false,
-      message: err.message.includes('수정할 수 없습니다')
+      message: err.message.includes("수정할 수 없습니다")
         ? err.message
-        : '설문 수정 실패',
+        : "설문 수정 실패",
       error: err.message,
     });
   }
 };
-
 
 // GET /survey-participants
 export const getAllSurveyParticipantsHandler = async (

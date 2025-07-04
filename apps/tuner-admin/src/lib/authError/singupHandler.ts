@@ -19,7 +19,7 @@ export const validateSignupField = (
         : "비밀번호는 8자 이상 문자, 숫자를 포함해주세요.";
     case "confirmPassword":
       return value === formData.password ? "" : "비밀번호가 일치하지 않습니다.";
-    case "name":
+    case "nickname":
       return value.length > 1
         ? ""
         : "닉네임은 2자 이상 8자 이하로 입력해주세요.";
