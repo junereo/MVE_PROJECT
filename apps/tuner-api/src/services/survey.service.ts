@@ -68,6 +68,8 @@ export const createSurveyParticipant = async ({
     select: { status: true, is_active: true },
   });
 
+  console.log(user_id, survey_id)
+
   if (!survey) throw new Error("설문 없음");
   if (!canParticipateSurvey(survey)) {
     throw new Error("참여할 수 없는 상태입니다.");
@@ -77,6 +79,7 @@ export const createSurveyParticipant = async ({
   const existing = await prisma.survey_Participants.findFirst({
     where: { user_id, survey_id },
   });
+
 
   if (existing) {
     return await prisma.survey_Participants.update({
@@ -89,7 +92,7 @@ export const createSurveyParticipant = async ({
     });
   }
 
-  return await prisma.survey_Participants.create({
+  const result = await prisma.survey_Participants.create({
     data: {
       user_id,
       survey_id,
@@ -98,6 +101,8 @@ export const createSurveyParticipant = async ({
       rewarded: false,
     },
   });
+
+  console.log("existing", result  )
 };
 
 // 설문 타입 유효성 검사

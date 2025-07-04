@@ -14,7 +14,6 @@ export default function MainLayout({
         <Header />
         <Wrapper>{children}</Wrapper>
         <BottomNavbar />
-        <Footer />
       </body>
     </html>
   );
