@@ -43,6 +43,7 @@ export default function AdminUserPage() {
     const fetchUsers = async () => {
       try {
         const { data } = await userList();
+        console.log(data);
 
         const mappedUsers: User[] = data.map((user: ServerUser) => ({
           id: user.id,
@@ -69,15 +70,13 @@ export default function AdminUserPage() {
     .filter((user) => {
       const matchQuery =
         user.nickname.includes(searchQuery) || user.email.includes(searchQuery);
-      const matchRole =
-        roleFilter === "전체" || user.role === roleFilter.toLowerCase();
+      const matchRole = roleFilter === "전체" || user.role === roleFilter;
       return matchQuery && matchRole;
     })
     .sort((a, b) => {
       if (rewardSort === "리워드 많은순") return b.rewardLeft - a.rewardLeft;
       return sortNewestFirst ? b.id - a.id : a.id - b.id;
     });
-
   const paginatedUsers = filteredUsers.slice(
     (currentPage - 1) * usersPerPage,
     currentPage * usersPerPage
@@ -207,23 +206,33 @@ export default function AdminUserPage() {
 
         {/* 유저 테이블 */}
         <div className="bg-white rounded-xl shadow p-4 w-full">
-          <table className="w-full border text-sm text-center">
+          <table className="w-full table-fixed border text-sm text-center">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border px-2 py-1">ID</th>
-                <th className="border px-2 py-1">닉네임</th>
-                <th className="border px-2 py-1">이메일</th>
-                <th className="border px-2 py-1">등급</th>
-                <th className="border px-2 py-1">리워드 잔량</th>
-                <th className="border px-2 py-1">관리</th>
+                <th className="border px-2 py-1 w-[25px]">ID</th>
+                <th className="border px-2 py-1 w-[140px]">닉네임</th>
+                <th className="border px-2 py-1 w-[200px]">이메일</th>
+                <th className="border px-2 py-1 w-[100px]">등급</th>
+                <th className="border px-2 py-1 w-[120px]">리워드 잔량</th>
+                <th className="border px-2 py-1 w-[160px]">관리</th>
               </tr>
             </thead>
             <tbody>
               {paginatedUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-blue-50">
                   <td className="border px-2 py-1">{user.id}</td>
-                  <td className="border px-2 py-1">{user.nickname}</td>
-                  <td className="border px-2 py-1">{user.email}</td>
+                  <td
+                    className="border px-2 py-1 truncate whitespace-nowrap overflow-hidden max-w-[140px]"
+                    title={user.nickname}
+                  >
+                    {user.nickname}
+                  </td>
+                  <td
+                    className="border px-2 py-1 truncate whitespace-nowrap overflow-hidden max-w-[200px]"
+                    title={user.email}
+                  >
+                    {user.email}
+                  </td>
                   <td className="border px-2 py-1 capitalize">{user.role}</td>
                   <td className="border px-2 py-1">{user.rewardLeft} STK</td>
                   <td className="border px-2 py-1 space-x-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import { surveyView, templateView } from "@/lib/network/api";
+import { fetchTemplates, surveyView } from "@/lib/network/api";
 import { SurveyData } from "@/types";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -22,18 +22,23 @@ import {
 interface SurveyParticipant {
   id: number;
   nickname: string;
-  grade: "일반" | "Expert";
+  role: "ordinary" | "Expert" | "admin" | "superadmin";
   reward: number;
+}
+interface FixedQuestion {
+  type: "multiple" | "checkbox" | "subjective";
+  options: string[];
+  category: string;
+  question_text: string;
+  question_type: "fixed";
+}
+
+interface TemplateQuestionResponse {
+  id: number;
+  question: Record<string, FixedQuestion[]>;
 }
 
 // 더미 데이터
-const questions = [
-  "이 곡의 작품성은 뛰어난가요?",
-  "대중성 있는 멜로디라고 생각하십니까?",
-  "지속적으로 듣고 싶은 음악인가요?",
-  "이 곡의 확장 가능성이 높다고 보십니까?",
-  "아티스트의 스타성이 느껴지나요?",
-];
 
 const radarData = [
   { category: "작품성", 남성: 4.6, 여성: 3.4 },
@@ -63,6 +68,10 @@ export default function SurveyDetailPage() {
   const [participants, setParticipants] = useState<SurveyParticipant[]>([]);
   const [gradeFilter, setGradeFilter] = useState("전체");
   const [currentPage, setCurrentPage] = useState(1);
+  const [templateQuestions, setTemplateQuestions] = useState<FixedQuestion[]>(
+    []
+  );
+
   const perPage = 20;
 
   useEffect(() => {
@@ -74,22 +83,33 @@ export default function SurveyDetailPage() {
         setSurveyData(result.data);
         console.log("설문상세 정보", result.data);
 
-        // participants를 surveyData 내부에서 바로 가져옴
         const rawParticipants = result.data.participants as {
           id: number;
           user: {
             id: number;
             nickname: string;
             badge_issued_at: string | null;
+            role: string;
           };
         }[];
 
         const formatted: SurveyParticipant[] = rawParticipants.map((p) => {
           const isExpert = p.user.badge_issued_at !== null;
+          let role: SurveyParticipant["role"];
+          switch (p.user.role) {
+            case "ordinary":
+            case "Expert":
+            case "admin":
+            case "superadmin":
+              role = p.user.role;
+              break;
+            default:
+              role = "ordinary";
+          }
           return {
             id: p.user.id,
             nickname: p.user.nickname,
-            grade: isExpert ? "Expert" : "일반",
+            role,
             reward: isExpert ? result.data.expert_reward : result.data.reward,
           };
         });
@@ -101,13 +121,29 @@ export default function SurveyDetailPage() {
     };
 
     fetchSurvey();
-
-    const Userdata = async () => {
-      const result = await templateView();
-      console.log("설문참여 유저", result);
-    };
-    Userdata();
   }, [id]);
+
+  // 템플릿 질문 fetch는 surveyData가 로드된 이후 실행
+  useEffect(() => {
+    if (!surveyData || !surveyData.questions) return;
+
+    const fetchQuestions = async () => {
+      try {
+        const { data }: { data: TemplateQuestionResponse[] } =
+          await fetchTemplates(surveyData.questions); // 이 부분 수정
+        console.log("고정설문 데이터", data);
+
+        if (data.length > 0) {
+          const all: FixedQuestion[] = Object.values(data[0].question).flat();
+          setTemplateQuestions(all);
+        }
+      } catch (err) {
+        console.error("질문 템플릿 요청 실패:", err);
+      }
+    };
+
+    fetchQuestions();
+  }, [surveyData]);
 
   if (!surveyData) {
     return <div className="p-6 text-gray-600">로딩 중...</div>;
@@ -128,7 +164,7 @@ export default function SurveyDetailPage() {
   const filteredParticipants =
     gradeFilter === "전체"
       ? participants
-      : participants.filter((p) => p.grade === gradeFilter);
+      : participants.filter((p) => p.role === gradeFilter);
 
   const totalPages = Math.ceil(filteredParticipants.length / perPage);
   const pageData = filteredParticipants.slice(
@@ -268,14 +304,26 @@ export default function SurveyDetailPage() {
             {/* 질문 아코디언 */}
             <div className="mt-2 space-y-2">
               <h2 className="text-lg font-bold">질문 리스트</h2>
-              {questions.map((q, i) => (
+              {templateQuestions.map((q, i) => (
                 <details key={i} className="border rounded px-4 py-2">
                   <summary className="cursor-pointer font-medium">
-                    Q{i + 1}. {q}
+                    Q{i + 1}. {q.question_text}
                   </summary>
                   <div className="text-sm text-gray-600 mt-2">
-                    이 문항은 사용자들의 성실도 평가에 활용됩니다.
+                    유형:{" "}
+                    {q.type === "multiple"
+                      ? "객관식"
+                      : q.type === "checkbox"
+                      ? "체크박스"
+                      : "주관식"}
                   </div>
+                  {q.options.length > 0 && (
+                    <ul className="mt-1 list-disc list-inside text-sm text-gray-500">
+                      {q.options.map((opt, idx) => (
+                        <li key={idx}>{opt}</li>
+                      ))}
+                    </ul>
+                  )}
                 </details>
               ))}
             </div>
@@ -312,7 +360,7 @@ export default function SurveyDetailPage() {
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="border px-2 py-1">{user.id}</td>
                     <td className="border px-2 py-1">{user.nickname}</td>
-                    <td className="border px-2 py-1">{user.grade}</td>
+                    <td className="border px-2 py-1">{user.role}</td>
                     <td className="border px-2 py-1">{user.reward} STK</td>
                   </tr>
                 ))}
