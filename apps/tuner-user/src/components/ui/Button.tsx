@@ -4,6 +4,7 @@ interface ButtonProps {
   type?: "submit" | "button";
   onClick?: () => void;
   disabled?: boolean;
+  optionClassName?: string;
 }
 
 const Button = ({
@@ -12,6 +13,7 @@ const Button = ({
   type = "button",
   onClick,
   disabled = false,
+  optionClassName,
 }: ButtonProps) => {
   const styles = {
     blue: "bg-blue-500 hover:bg-blue-600 text-white",
@@ -25,9 +27,9 @@ const Button = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-full py-2 rounded-md font-semibold ${styles[color]} ${
-        disabled ? "opacity-50 cursor-not-allowed" : ""
-      }`}
+      className={`w-full py-2 rounded-md font-semibold ${optionClassName} ${
+        styles[color]
+      } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
     >
       {children}
     </button>
