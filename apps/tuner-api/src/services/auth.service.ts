@@ -384,7 +384,7 @@ export const googleCallbackService = async ({
     return {
         token,
         user: { id: user.id, nickname: user.nickname, role: user.role },
-        redirectUrl: "https://tunemate.store",
+        redirectUrl: process.env.CLIENT_USER_IP || "http://localhost:3000",
         cookieOptions: defaultCookieOptions,
     };
 };
