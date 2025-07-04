@@ -99,26 +99,15 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
               type="number"
               value={reward}
               onChange={(e) => setReward(e.target.value)}
-              placeholder="일반 회원에게 지급할 리워드를 입력해주세요."
+              placeholder="각 일반 회원에게 지급할 리워드를 입력해주세요."
             />
             <Input
               label="Expert 회원 리워드"
               type="number"
               value={expertReward}
               onChange={(e) => setExpertReward(e.target.value)}
-              placeholder="Expert 회원에게 지급할 리워드를 입력해주세요."
+              placeholder="각 Expert 회원에게 지급할 리워드를 입력해주세요."
             />
-
-            {surveyType === SurveyTypeEnum.OFFICIAL &&
-              rewardAmount &&
-              reward &&
-              expertReward &&
-              total !== general + expert && (
-                <p className="text-sm text-red-500">
-                  리워드 총량 = 일반 회원 리워드 + Expert 회원 리워드여야
-                  합니다.
-                </p>
-              )}
           </>
         )}
         {surveyType === SurveyTypeEnum.GENERAL && (
