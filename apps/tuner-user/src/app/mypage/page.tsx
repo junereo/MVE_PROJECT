@@ -12,7 +12,7 @@ export default function MyPage() {
   if (!isInitialized) return null; // 아직 로그인 여부 확인 중이면 렌더링 X
 
   return (
-    <div className="bg-gray-100 min-h-screen space-y-2">
+    <div className="bg-gray-100 space-y-2">
       <Breadcrumb crumbs={[{ label: "마이페이지" }]} />
       <UserProfile />
       <WalletInfo />
