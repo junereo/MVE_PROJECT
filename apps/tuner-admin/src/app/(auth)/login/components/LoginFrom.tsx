@@ -58,7 +58,7 @@ const LoginForm = () => {
       <div className="w-full max-w-xl bg-black text-white p-12 rounded-2xl shadow-xl">
         <div className="flex flex-col items-center mb-10">
           <h1 className="text-4xl font-extrabold text-white mb-2 tracking-wide">
-            MVE Admin
+            Tunemate Admin
           </h1>
           <p className="text-base text-neutral-500">
             관리자 전용 로그인 페이지

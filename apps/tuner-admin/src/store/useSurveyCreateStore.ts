@@ -58,6 +58,8 @@ interface SurveyState {
 
   setCategoryQuestions: (data: Record<string, unknown[]>) => void;
   setTemplateSetKey: (key: string) => void;
+
+  resetSurvey: () => void; // 상태 초기화 함수
 }
 
 // Zustand 스토어 생성
@@ -121,6 +123,39 @@ export const useSurveyStore = create<SurveyState>((set) => ({
       step2: {
         ...state.step2,
         categoryQuestions: data,
+      },
+    })),
+
+  // 상태 초기화
+  resetSurvey: () =>
+    set(() => ({
+      step1: {
+        survey_title: "",
+        youtubeVideoId: "",
+        youtubeTitle: "",
+        youtubeThumbnail: "",
+        artist: "",
+        title: "",
+        isReleased: true,
+        releaseDate: "",
+        url: "",
+        genre: "",
+        start_at: "",
+        end_at: "",
+        surveyType: "general",
+        channelTitle: "",
+        reward_amount: 0,
+        reward: 0,
+        expertReward: 0,
+        respondent: [""],
+        templateSetKey: "",
+      },
+      step2: {
+        answers: {},
+        tags: {},
+        customQuestions: [],
+        categoryQuestions: {},
+        selectedTags: [],
       },
     })),
 }));

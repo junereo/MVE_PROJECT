@@ -7,6 +7,7 @@ import {
   SurveyTypeEnum,
 } from "@/app/survey/create/complete/type";
 import { Question_type, SurveyStatus } from "@/types";
+import { useRouter } from "next/navigation";
 
 const mapToQuestionTypeEnum = (type: string): QuestionTypeEnum => {
   switch (type?.toLowerCase()) {
@@ -22,7 +23,7 @@ const mapToQuestionTypeEnum = (type: string): QuestionTypeEnum => {
 };
 
 export default function SurveyComplete() {
-  const { step1, step2 } = useSurveyStore();
+  const { step1, step2, resetSurvey } = useSurveyStore();
 
   // 템플릿 세트 문자열 → 객체로 변환
   const templateSetKeyString = step1.templateSetKey;
@@ -100,6 +101,7 @@ export default function SurveyComplete() {
     // ),
   };
   //서버로 전송할 데이터 구조
+  const router = useRouter();
   const handleSubmit = async () => {
     try {
       console.log(" 전송 데이터:", serverPayload);
@@ -108,7 +110,9 @@ export default function SurveyComplete() {
     } catch (error) {
       console.error("서버 전송 중 오류 발생:", error);
     }
+    resetSurvey();
     alert("서버로 보낼 JSON을 콘솔과 화면에 출력했습니다.");
+    router.push("/survey");
   };
 
   return (

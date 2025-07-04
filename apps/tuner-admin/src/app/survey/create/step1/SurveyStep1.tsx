@@ -6,7 +6,18 @@ import Dropdown from "../../../components/ui/DropDown";
 import Link from "next/link";
 
 const SurveyStep1 = () => {
-  const genreOptions = ["발라드", "댄스", "팝", "트로트", "국악", "CCM"];
+  const genreOptions = [
+    "발라드",
+    "힙합",
+    "스윙",
+    "댄스",
+    "재즈",
+    "클래식",
+    "EDM",
+    "국악",
+    "스윙",
+    "락",
+  ];
   const { step1, setStep1 } = useSurveyStore();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -182,9 +193,15 @@ const SurveyStep1 = () => {
                   발라드: "ballad",
                   팝: "pop",
                   트로트: "trot",
-                  국악: "Korean traditional music",
+                  국악: "gukak",
                   댄스: "dance",
                   CCM: "CCM",
+                  힙합: "hiphop",
+                  재즈: "jazz",
+                  클래식: "classical",
+                  스윙: "rnb",
+                  락: "rock",
+                  EDM: "edm",
                 };
                 handleInputChange("genre", mapToValue[selectedOption]);
               }}

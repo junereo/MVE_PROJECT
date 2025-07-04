@@ -1,6 +1,6 @@
 "use client";
 
-import { surveyView } from "@/lib/network/api";
+import { surveyView, templateView } from "@/lib/network/api";
 import { SurveyData } from "@/types";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -72,6 +72,7 @@ export default function SurveyDetailPage() {
       try {
         const result = await surveyView(Array.isArray(id) ? id[0] : id);
         setSurveyData(result.data);
+        console.log("설문상세 정보", result.data);
 
         // participants를 surveyData 내부에서 바로 가져옴
         const rawParticipants = result.data.participants as {
@@ -100,6 +101,12 @@ export default function SurveyDetailPage() {
     };
 
     fetchSurvey();
+
+    const Userdata = async () => {
+      const result = await templateView();
+      console.log("설문참여 유저", result);
+    };
+    Userdata();
   }, [id]);
 
   if (!surveyData) {

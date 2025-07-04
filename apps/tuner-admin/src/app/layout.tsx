@@ -3,8 +3,15 @@ import { usePathname } from "next/navigation";
 import Navigate from "./components/layouts/navigate";
 import SessionChecker from "./components/SessionChecRer";
 import "./globals.css";
+import { Noto_Sans_KR } from "next/font/google";
 import Providers from "./provider";
 import Header from "./components/layouts/header";
+
+const notoSansKr = Noto_Sans_KR({
+  subsets: ["latin"], // 보통 latin + korean은 자동 포함됨
+  weight: ["400", "500", "700"], // 원하는 굵기
+  display: "swap", // 웹폰트 로딩 전략
+});
 
 export default function RootLayout({
   children,
@@ -16,7 +23,7 @@ export default function RootLayout({
 
   return (
     <html lang="ko">
-      <body className="overflow-y-scroll flex">
+      <body className={`${notoSansKr.className} overflow-y-scroll flex`}>
         <Providers>
           {!isLoginPage && <Navigate />}
           {!isLoginPage && <Header />}
