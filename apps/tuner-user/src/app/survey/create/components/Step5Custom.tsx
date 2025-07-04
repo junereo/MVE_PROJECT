@@ -145,12 +145,16 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
   return (
     <>
       <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
-        <button onClick={onPrev}>←</button>
-        <h1 className="font-bold text-lg text-center flex-1">설문 생성</h1>
+        <button onClick={onPrev} className="text-lg font-medium text-gray-700">
+          ←
+        </button>
+        <h1 className="flex-1 text-center text-base sm:text-lg font-bold text-gray-900">
+          설문 생성
+        </h1>
       </header>
 
-      <div className="space-y-4 min-h-screen">
-        <h2 className="text-xl font-bold">
+      <div className="space-y-4">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-16">
           Step 5: 커스텀 설문 <span className="text-red-500">(선택)</span>
         </h2>
 

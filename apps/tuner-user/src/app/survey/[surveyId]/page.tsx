@@ -12,6 +12,8 @@ import { useAuthStore } from "@/features/auth/store/authStore";
 import { getSurveyById } from "@/features/survey/services/survey";
 import { useEffect, useState } from "react";
 import { SurveyResponse } from "@/features/survey/types/surveyResponse";
+import SurveyResult from "./components/SurveyResult";
+import Link from "next/link";
 
 type SurveyStatus = "upcoming" | "ongoing" | "closed";
 
@@ -44,6 +46,7 @@ export default function SurveyDetail() {
 
   const {
     id,
+    music_uri,
     thumbnail_uri,
     survey_title,
     music_title,
@@ -61,21 +64,24 @@ export default function SurveyDetail() {
     <>
       <Header />
 
-      <SurveyWrapper>
+      <div>
         <Breadcrumb
           crumbs={[
             { label: "설문", href: "/survey" },
             { label: `${survey_title}` },
           ]}
         />
-        <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-5 shadow-md">
-          <Image
-            src={thumbnail_uri}
-            alt={music_title}
-            layout="fill"
-            objectFit="cover"
-            className="rounded-xl"
-          />
+
+        <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-6 shadow-md">
+          <Link href={music_uri} rel="">
+            <Image
+              src={thumbnail_uri}
+              alt={music_title}
+              layout="fill"
+              objectFit="cover"
+              className="rounded-xl"
+            />
+          </Link>
           <div className="absolute top-3 left-3 px-3 py-1 bg-white/80 text-xs font-medium rounded-full backdrop-blur-sm text-blue-600">
             {type === "official" ? "공식 설문" : "일반 설문"}
           </div>
@@ -100,7 +106,7 @@ export default function SurveyDetail() {
           <p className="text-base sm:text-lg text-gray-600">{music_title}</p>
         </div>
 
-        <section className="rounded-2xl mb-10 border border-gray-100 bg-gray-50 px-4 py-5 shadow-sm space-y-4">
+        <section className="rounded-2xl border mb-6 border-gray-100 bg-gray-50 px-4 py-5 shadow-sm space-y-4">
           <InfoRow
             label="설문 기간"
             value={`${start_at.slice(0, 10)} ~ ${end_at.slice(0, 10)}`}
@@ -127,6 +133,22 @@ export default function SurveyDetail() {
             }
           />
         </section>
+
+        {is_active === "closed" && (
+          <section className="space-y-6 pt-6 border-t border-gray-100">
+            <h1 className="text-xl font-bold text-gray-800 ">설문 결과</h1>
+            <p className="text-sm text-gray-500">
+              총{" "}
+              <span className="text-gray-800 font-semibold">
+                {(participantCount ?? 0).toLocaleString()}명
+              </span>
+              이 참여했어요.
+            </p>
+
+            <SurveyResult />
+          </section>
+        )}
+
         {is_active === "ongoing" && user && (
           <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
             <Button
@@ -137,7 +159,7 @@ export default function SurveyDetail() {
             </Button>
           </div>
         )}
-      </SurveyWrapper>
+      </div>
       <BottomNavbar />
     </>
   );
