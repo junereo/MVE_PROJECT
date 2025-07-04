@@ -114,7 +114,7 @@ CREATE TABLE "Survey_Question" (
 -- CreateTable
 CREATE TABLE "Survey_Participants" (
     "id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
+    "user_id" INTEGER,
     "survey_id" INTEGER NOT NULL,
     "answers" JSONB NOT NULL,
     "status" "SurveyStatus" NOT NULL DEFAULT 'draft',
@@ -174,13 +174,13 @@ CREATE UNIQUE INDEX "User_Oauth_provider_id_key" ON "User_Oauth"("provider_id");
 CREATE UNIQUE INDEX "Survey_Result_survey_id_key" ON "Survey_Result"("survey_id");
 
 -- AddForeignKey
-ALTER TABLE "User_Oauth" ADD CONSTRAINT "User_Oauth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User_Oauth" ADD CONSTRAINT "User_Oauth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Survey" ADD CONSTRAINT "Survey_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Survey" ADD CONSTRAINT "Survey_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Survey_Participants" ADD CONSTRAINT "Survey_Participants_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Survey_Participants" ADD CONSTRAINT "Survey_Participants_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Survey_Participants" ADD CONSTRAINT "Survey_Participants_survey_id_fkey" FOREIGN KEY ("survey_id") REFERENCES "Survey"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -189,7 +189,7 @@ ALTER TABLE "Survey_Participants" ADD CONSTRAINT "Survey_Participants_survey_id_
 ALTER TABLE "Survey_Result" ADD CONSTRAINT "Survey_Result_survey_id_fkey" FOREIGN KEY ("survey_id") REFERENCES "Survey"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "WithdrawalRequest" ADD CONSTRAINT "WithdrawalRequest_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "WithdrawalRequest" ADD CONSTRAINT "WithdrawalRequest_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
