@@ -58,12 +58,12 @@ export default function Card({
             />
           </div>
           <div className="p-3 space-y-1">
-            <div className="flex justify-between">
-              <p className="text-base font-semibold text-gray-900 truncate">
+            <div className="flex justify-between items-start gap-2">
+              <p className="text-base font-semibold text-gray-900 truncate w-[calc(100%-60px)]">
                 {item.survey_title}
               </p>
-              <p className="text-xs sm:text-sm text-orange-500 font-medium">
-                🎁 {item.reward_amount} STK
+              <p className="flex-shrink-0 text-xs sm:text-sm text-orange-500 font-medium text-right">
+                🎁 {item.reward_amount}
               </p>
             </div>
             <p className="text-sm text-gray-500 truncate">

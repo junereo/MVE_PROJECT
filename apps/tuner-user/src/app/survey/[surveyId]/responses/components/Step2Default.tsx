@@ -1,21 +1,23 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useMemo, useEffect } from "react";
 import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
+import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
+import { fetchSurveyQuestions } from "@/features/survey/services/survey";
+import type { QuestionItem } from "@/features/survey/store/useDefaultQuestionStore";
+import { InputTypeEnum, QuestionTypeEnum } from "@/features/survey/types/enums";
+
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import SurveyTabs from "@/app/survey/components/SurveyTabs";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
-import { InputTypeEnum } from "@/features/survey/types/enums";
-import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
-import { fetchSurveyQuestions } from "@/features/survey/services/survey";
-import { QuestionTypeEnum } from "@/features/survey/types/enums";
-import type { QuestionItem } from "@/features/survey/store/useDefaultQuestionStore";
 
-interface Step1props {
+interface Step2Props {
+  surveyId: number;
+  surveyTitle: string;
+  onPrev: () => void;
   onNext: () => void;
 }
 
@@ -27,55 +29,56 @@ const baseCategories = [
   { key: "stardom", label: "스타성" },
 ];
 
-const dummySurvey = {
-  id: 1,
-  survey_title: "빈지노 Fashion Hoarder 설문",
-};
-
-export default function Step1Default({ onNext }: Step1props) {
+export default function Step2Default({
+  surveyId,
+  surveyTitle,
+  onPrev,
+  onNext,
+}: Step2Props) {
   const { answers, setAnswer } = useAnswerStore();
+  const { questions, setQuestions } = useDefaultQuestionStore();
 
   const [tabIndex, setTabIndex] = useState(0);
+
   const currentKey = baseCategories[tabIndex]?.key ?? "";
-  const { questions, setQuestions } = useDefaultQuestionStore();
-  const currentQuestion = useMemo(
+  const currentQuestions = useMemo(
     () => questions.filter((q) => q.category === currentKey),
     [questions, currentKey]
   );
 
-  const { id, survey_title } = dummySurvey;
-
   const isValid = useMemo(() => {
     const currentAnswers = answers[currentKey] || {};
-    return currentQuestion.every((_, idx) => {
+    return currentQuestions.every((_, idx) => {
       const val = currentAnswers[idx];
-      if (Array.isArray(val)) return val.length > 0;
-      return val !== undefined && val !== "";
+      return Array.isArray(val)
+        ? val.length > 0
+        : val !== undefined && val !== "";
     });
-  }, [answers, currentKey, currentQuestion]);
+  }, [answers, currentKey, currentQuestions]);
 
   useEffect(() => {
     if (questions.length === 0) {
-      fetchSurveyQuestions(id).then((res) => {
-        const template = res.data[0];
+      // 기본 설문 불러옴
+      fetchSurveyQuestions(1).then((res) => {
+        const data = res.data[0];
 
         type RawQuestion = {
           id: number;
           question_text: string;
           type: InputTypeEnum;
           options?: string[];
-          question_type?: string;
+          question_type?: QuestionTypeEnum;
         };
 
         type QuestionMap = Record<string, RawQuestion[]>;
 
-        const rawMap = template.question as QuestionMap;
+        const rawMap = data.question as QuestionMap;
 
         const defaultQuestions: QuestionItem[] = Object.entries(rawMap).flatMap(
           ([category, items]) =>
             items.map(
-              (q): QuestionItem => ({
-                id: q.id,
+              (q, index): QuestionItem => ({
+                id: index + 1,
                 category,
                 question_text: q.question_text,
                 type: q.type,
@@ -84,16 +87,17 @@ export default function Step1Default({ onNext }: Step1props) {
               })
             )
         );
+
         setQuestions(defaultQuestions);
       });
     }
-  }, [id, questions.length, setQuestions]);
+  }, [questions.length, setQuestions]);
 
   const handlePrev = () => {
     if (tabIndex > 0) {
       setTabIndex((prev) => prev - 1);
     } else {
-      return;
+      onPrev();
     }
   };
 
@@ -108,7 +112,7 @@ export default function Step1Default({ onNext }: Step1props) {
   return (
     <>
       <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
-        <Link href={`/survey/${id}`}>←</Link>
+        <button onClick={handlePrev}>←</button>
         <h1 className="font-bold text-lg text-center flex-1">설문 참여</h1>
       </header>
 
@@ -116,7 +120,7 @@ export default function Step1Default({ onNext }: Step1props) {
         <Breadcrumb
           crumbs={[
             { label: "설문", href: "/survey" },
-            { label: `${survey_title}`, href: `/survey/${id}` },
+            { label: surveyTitle, href: `/survey/${surveyId}` },
             { label: "기본 설문" },
           ]}
         />
@@ -127,7 +131,7 @@ export default function Step1Default({ onNext }: Step1props) {
           setTab={setTabIndex}
         />
 
-        {currentQuestion.map((q, idx) => {
+        {currentQuestions.map((q, idx) => {
           const saved = answers[currentKey]?.[idx] as
             | string
             | string[]
