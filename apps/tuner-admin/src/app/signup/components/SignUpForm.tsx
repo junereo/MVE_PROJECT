@@ -173,7 +173,7 @@ const SignUpForm = () => {
                     onChange={() => handleChange("role", AdminRole.admin)}
                     checked={formData.role === 1}
                   />
-                  {formData.role === 1} admin
+                  admin
                 </label>
 
                 <label
@@ -190,10 +190,10 @@ const SignUpForm = () => {
                     name="role"
                     value="0"
                     className="hidden"
-                    onChange={() => handleChange("role", AdminRole.superadmin)} // ✅ 숫자로
+                    onChange={() => handleChange("role", AdminRole.superadmin)}
                     checked={formData.role === 0}
                   />
-                  {formData.role === 0} Superadmin
+                  Superadmin
                 </label>
               </div>
             </div>
