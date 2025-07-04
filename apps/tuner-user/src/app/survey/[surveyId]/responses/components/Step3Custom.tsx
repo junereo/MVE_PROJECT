@@ -7,6 +7,7 @@ import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
 import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
 import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
 import { formatDefaultAnswers } from "@/features/survey/utils/fotmatAnswers";
+import { SurveyStatusEnum } from "@/features/survey/types/enums";
 
 interface Step3Props {
   surveyId: number;
@@ -44,6 +45,7 @@ export default function Step3Custom({
         isMusicRelated,
       },
       answers: formattedAnswers,
+      status: SurveyStatusEnum.COMPLETE,
     };
 
     try {
