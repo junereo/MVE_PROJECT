@@ -6,6 +6,7 @@ type AdminType = {
   email: string;
   nickname: string;
   role: "admin" | "superadmin";
+  balance: number;
 };
 
 type SessionState = {

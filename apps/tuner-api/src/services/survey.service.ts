@@ -6,21 +6,24 @@ import {
   SurveyStatus,
   Survey,
   Survey_Question,
-} from '@prisma/client';
+} from "@prisma/client";
 // import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
 
 const prisma = new PrismaClient();
 
 // 상태 계산 (한국시간 기준)
-const checkSurveyActive = (_start: Date | string, _end: Date | string): SurveyActive => {
+const checkSurveyActive = (
+  _start: Date | string,
+  _end: Date | string
+): SurveyActive => {
   const now = new Date();
   const start = new Date(_start);
   const end = new Date(_end);
   const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 
-  if (kstNow < start) return 'upcoming';
-  if (kstNow >= start && kstNow <= end) return 'ongoing';
-  return 'closed';
+  if (kstNow < start) return "upcoming";
+  if (kstNow >= start && kstNow <= end) return "ongoing";
+  return "closed";
 };
 
 // 설문 수정
@@ -31,8 +34,8 @@ export const editSurvey = ({
   status: SurveyStatus;
   is_active: SurveyActive;
 }): boolean => {
-  if (status === 'draft') return true;
-  if (status === 'complete' && is_active === 'ongoing') return true;
+  if (status === "draft") return true;
+  if (status === "complete" && is_active === "ongoing") return true;
   return false;
 };
 
@@ -44,7 +47,7 @@ export const canParticipateSurvey = ({
   status: SurveyStatus;
   is_active: SurveyActive;
 }): boolean => {
-  return status === 'complete' && is_active === 'ongoing';
+  return status === "complete" && is_active === "ongoing";
 };
 
 // 참여 저장 (임시저장/제출)
@@ -65,9 +68,11 @@ export const createSurveyParticipant = async ({
     select: { status: true, is_active: true },
   });
 
-  if (!survey) throw new Error('설문 없음');
+  console.log(user_id, survey_id)
+
+  if (!survey) throw new Error("설문 없음");
   if (!canParticipateSurvey(survey)) {
-    throw new Error('참여할 수 없는 상태입니다.');
+    throw new Error("참여할 수 없는 상태입니다.");
   }
 
   // 기존 참여 내역 확인 (있으면 수정, 없으면 새로 생성)
@@ -75,26 +80,29 @@ export const createSurveyParticipant = async ({
     where: { user_id, survey_id },
   });
 
+
   if (existing) {
     return await prisma.survey_Participants.update({
       where: { id: existing.id },
       data: {
         answers,
-        status: isSubmit ? 'complete' : 'draft',
+        status: isSubmit ? "complete" : "draft",
         rewarded: false,
       },
     });
   }
 
-  return await prisma.survey_Participants.create({
+  const result = await prisma.survey_Participants.create({
     data: {
       user_id,
       survey_id,
       answers,
-      status: isSubmit ? 'complete' : 'draft',
+      status: isSubmit ? "complete" : "draft",
       rewarded: false,
     },
   });
+
+  console.log("existing", result  )
 };
 
 // 설문 타입 유효성 검사
@@ -102,7 +110,7 @@ const isSurveyType = (value: any): value is SurveyType => {
   return Object.values(SurveyType).includes(value);
 };
 
-//  설문 생성 
+//  설문 생성
 export const createSurvey = async ({
   userId,
   body,
@@ -111,8 +119,9 @@ export const createSurvey = async ({
   body: any;
 }) => {
   try {
-    if (!userId) throw new Error('유저 필요');
-    if (!isSurveyType(body.type)) throw new Error(`잘못된 설문 타입: ${body.type}`);
+    if (!userId) throw new Error("유저 필요");
+    if (!isSurveyType(body.type))
+      throw new Error(`잘못된 설문 타입: ${body.type}`);
 
     const surveyType = body.type as SurveyType;
 
@@ -144,7 +153,7 @@ export const createSurvey = async ({
           end_at: endDate,
           is_active: checkSurveyActive(startDate, endDate),
           survey_title: body.survey_title,
-          status: body.status ?? 'draft',
+          status: body.status ?? "draft",
           reward: body.reward ?? 0,
           expert_reward: body.expert_reward ?? 0,
           reward_amount: body.reward_amount ?? 0,
@@ -191,11 +200,11 @@ export const createSurvey = async ({
       //   await tx.survey_Custom.createMany({ data: surveyCustoms });
       // }
 
-      console.log('설문 생성 완료:', survey.id);
+      console.log("설문 생성 완료:", survey.id);
       return survey;
     });
   } catch (err) {
-    console.error('설문 생성 실패:', err);
+    console.error("설문 생성 실패:", err);
     throw err;
   }
 };
@@ -206,7 +215,7 @@ export const getSurveyListService = async () => {
     include: {
       creator: { select: { id: true } },
     },
-    orderBy: { start_at: 'desc' },
+    orderBy: { start_at: "desc" },
   });
 };
 
@@ -215,7 +224,7 @@ export const setSurveyQuestion = async ({
   surveyId,
   questionType,
   question,
-  order
+  order,
 }: {
   surveyId: number;
   questionType: QuestionType;
@@ -226,8 +235,8 @@ export const setSurveyQuestion = async ({
     data: {
       question_type: questionType,
       question: question,
-      question_order: order
-    }
+      question_order: order,
+    },
   });
 };
 
@@ -236,25 +245,25 @@ export const getSurveyQuestions = async (surveyId: number) => {
   if (surveyId === 0) {
     // 전체 설문 질문 조회
     return await prisma.survey_Question.findMany({
-      orderBy: { question_order: 'asc' }
+      orderBy: { question_order: "asc" },
     });
   }
 
   // 특정 설문에 대한 질문만 조회
   return await prisma.survey_Question.findMany({
     where: { id: surveyId },
-    orderBy: { question_order: 'asc' }
+    orderBy: { question_order: "asc" },
   });
 };
 
 // 전체 조회 (GET)
 export const getAllSurveyParticipants = async () => {
   return await prisma.survey_Participants.findMany({
-    orderBy: { created_at: 'desc' },
+    orderBy: { created_at: "desc" },
     include: {
       user: true,
-      survey: true
-    }
+      survey: true,
+    },
   });
 };
 
@@ -265,9 +274,9 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
     select: { status: true, is_active: true },
   });
 
-  if (!survey) throw new Error('설문 없음');
+  if (!survey) throw new Error("설문 없음");
   if (!editSurvey(survey)) {
-    throw new Error('설문이 종료되어 수정할 수 없습니다.');
+    throw new Error("설문이 종료되어 수정할 수 없습니다.");
   }
 
   const updatedSurvey = await prisma.survey.update({
@@ -291,7 +300,7 @@ export const createSurveyResult = async ({
   metadata_ipfs,
   respondents,
   reward_claimed_amount,
-  reward_claimed
+  reward_claimed,
 }: {
   survey_id: number;
   survey_statistics: any;
@@ -311,13 +320,13 @@ export const createSurveyResult = async ({
       respondents,
       reward_claimed_amount,
       reward_claimed,
-      created_at: new Date()
-    }
+      created_at: new Date(),
+    },
   });
 };
 
 export const getSurveyResult = async (surveyId: number) => {
   return await prisma.survey_Result.findUnique({
-    where: { survey_id: surveyId }
+    where: { survey_id: surveyId },
   });
 };

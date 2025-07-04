@@ -158,11 +158,10 @@ const SignUpForm = () => {
               <div className="flex gap-3">
                 <label
                   className={`cursor-pointer px-4 py-2 rounded border text-sm font-semibold flex items-center gap-1 transition
-                  ${
-                    formData.role === 1
+                  ${formData.role === 1
                       ? "bg-white text-black border-white shadow"
                       : "bg-transparent text-white border-gray-400 hover:border-white"
-                  }
+                    }
                 `}
                 >
                   <input
@@ -173,15 +172,14 @@ const SignUpForm = () => {
                     onChange={() => handleChange("role", AdminRole.admin)}
                     checked={formData.role === 1}
                   />
-                  {formData.role === 1} admin
+                  admin
                 </label>
 
                 <label
                   className={`cursor-pointer px-4 py-2 rounded border text-sm font-semibold flex items-center gap-1 transition
-                    ${
-                      formData.role === 0
-                        ? "bg-white text-black border-white shadow"
-                        : "bg-transparent text-white border-gray-400 hover:border-white"
+                    ${formData.role === 0
+                      ? "bg-white text-black border-white shadow"
+                      : "bg-transparent text-white border-gray-400 hover:border-white"
                     }
                   `}
                 >
@@ -190,10 +188,10 @@ const SignUpForm = () => {
                     name="role"
                     value="0"
                     className="hidden"
-                    onChange={() => handleChange("role", AdminRole.superadmin)} // ✅ 숫자로
+                    onChange={() => handleChange("role", AdminRole.superadmin)}
                     checked={formData.role === 0}
                   />
-                  {formData.role === 0} Superadmin
+                  Superadmin
                 </label>
               </div>
             </div>
