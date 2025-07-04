@@ -149,7 +149,7 @@ model User_Oauth {
   updated_at    DateTime @updatedAt
 
   userId Int
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Survey {
@@ -174,7 +174,7 @@ model Survey {
   status        SurveyStatus          @default(draft)
   created_at    DateTime              @default(now())
   updated_at    DateTime              @updatedAt
-  creator       User                  @relation(fields: [user_id], references: [id])
+  creator       User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   questions     Int
   participants  Survey_Participants[]
   result        Survey_Result?
@@ -191,14 +191,14 @@ model Survey_Question {
 
 model Survey_Participants {
   id         Int          @id @default(autoincrement())
-  user_id    Int
+  user_id    Int?
   survey_id  Int
   answers    Json
   status     SurveyStatus @default(draft)
   rewarded   Boolean      @default(false)
   created_at DateTime     @default(now())
   updated_at DateTime     @updatedAt
-  user       User         @relation(fields: [user_id], references: [id])
+  user       User?        @relation(fields: [user_id], references: [id], onDelete: SetNull)
   survey     Survey       @relation(fields: [survey_id], references: [id])
 }
 
@@ -223,7 +223,7 @@ model Transaction {
   amount     Int // 양수 값만 저장
   memo       String? // 출금요청/리워드 지급 등
   created_at DateTime        @default(now())
-  user       User            @relation(fields: [user_id], references: [id])
+  user       User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model WithdrawalRequest {
@@ -233,5 +233,5 @@ model WithdrawalRequest {
   txhash       String
   status       WithdrawalStatus // PENDING | COMPLETED | REJECTED
   requested_at DateTime         @default(now())
-  user         User             @relation(fields: [user_id], references: [id])
+  user         User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

@@ -81,3 +81,35 @@ export interface SurveyQuestion {
   question: Record<string, FixedQuestion[]>;
 }
 // types/survey.ts
+
+// 설문 상세 get 데이터
+export interface SurveyData {
+  id: number;
+  survey_title: string;
+  music_title: string;
+  artist: string;
+  music_uri: string;
+  thumbnail_uri: string;
+  is_released: boolean;
+  released_date: string;
+  user_id: number;
+  type: "general" | "official";
+  genre: string;
+  start_at: string;
+  end_at: string;
+  reward_amount: number;
+  reward: number;
+  expert_reward: number;
+  is_active: "upcoming" | "ongoing" | "closed";
+  ended_by: number | null;
+  status: "draft" | "complete";
+  created_at: string;
+  updated_at: string;
+  questions: number;
+  creator: {
+    id: number;
+    nickname: string;
+    role: string;
+  };
+  result: unknown;
+}

@@ -1,19 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { userList } from "@/lib/network/api";
 import Dropdown from "@/app/components/ui/DropDown";
 import RankChangeModal from "./components/RankChaingeModal";
 import RewardModal from "./components/RewardModal";
+import { useSessionStore } from "@/store/useAuthmeStore";
 
 interface User {
   id: number;
   nickname: string;
   email: string;
-  role: "superadmin" | "admin" | "general" | "expert";
+  role: "superadmin" | "admin" | "ordinary" | "expert";
   rewardLeft: number;
 }
-
+interface ServerUser {
+  id: number;
+  email: string;
+  nickname: string;
+  role: "superadmin" | "admin" | "ordinary";
+  balance: number;
+  badge_issued_at: string | null;
+}
 export default function AdminUserPage() {
+  const { user } = useSessionStore();
+  const [users, setUsers] = useState<User[]>([]);
   const [threshold, setThreshold] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("전체");
@@ -25,17 +36,34 @@ export default function AdminUserPage() {
     id: number;
     nickname: string;
   } | null>(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 15;
 
-  const users: User[] = Array.from({ length: 20 }).map((_, i) => ({
-    id: i + 1,
-    nickname: `유저${i + 1}`,
-    email: `user${i + 1}@email.com`,
-    role: ["superadmin", "admin", "general", "expert"][i % 4] as User["role"],
-    rewardLeft: i % 2 === 0 ? 50 - i : i * 2,
-  }));
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data } = await userList();
+
+        const mappedUsers: User[] = data.map((user: ServerUser) => ({
+          id: user.id,
+          nickname: user.nickname,
+          email: user.email,
+          role: user.badge_issued_at
+            ? "expert"
+            : user.role === "ordinary"
+            ? "ordinary"
+            : user.role,
+          rewardLeft: user.balance ?? 0,
+        }));
+
+        setUsers(mappedUsers);
+      } catch (err) {
+        console.error("유저 목록 불러오기 실패:", err);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const filteredUsers = users
     .filter((user) => {
@@ -84,22 +112,29 @@ export default function AdminUserPage() {
       setSelectedUser(null);
     }
   };
+
   const handleUpdateThreshold = () => {
     console.log("저장된 기준:", threshold);
   };
 
   return (
     <div>
-      <div className="w-full  text-black text-2xl py-3  font-bold">
+      <div className="w-full text-black text-2xl py-3 font-bold">
         UserListTable
       </div>
       <div className="p-6">
-        {/* 출금 가능 리워드 */}
-        <div className="bg-white p-4 rounded-xl shadow mb-6 text-sm">
-          현재 출금 가능 리워드 총합:{" "}
-          <span className="font-semibold">120 STK</span>
+        <div className="bg-white p-4 rounded-xl shadow mb-6 text-sm flex flex-wrap gap-4">
+          <div>
+            출금 가능 리워드:{" "}
+            <span className="font-semibold">{user?.balance ?? 0} STK</span>
+          </div>
+          <div>
+            전체 리워드 총합:{" "}
+            <span className="font-semibold">
+              {users.reduce((acc, user) => acc + user.rewardLeft, 0)} STK
+            </span>
+          </div>
         </div>
-
         {/* 상단 필터 줄 */}
         <div className="flex flex-wrap items-center gap-2 mb-4 w-full">
           {/* 검색창 */}
@@ -111,7 +146,7 @@ export default function AdminUserPage() {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="border rounded px-3 py-2 text-sm w-[200px]"
+            className="border min-w-[500px] rounded px-3 py-2 text-sm w-[200px]"
           />
 
           {/* 최신순 버튼 */}
@@ -127,7 +162,7 @@ export default function AdminUserPage() {
 
           {/* 전체 등급 필터 */}
           <Dropdown
-            options={["전체", "superadmin", "admin", "general", "expert"]}
+            options={["전체", "superadmin", "admin", "ordinary", "expert"]}
             selected={roleFilter}
             onSelect={(value) => {
               setRoleFilter(value);
@@ -146,7 +181,7 @@ export default function AdminUserPage() {
           />
 
           {/* Expert 기준 설정 (오른쪽 정렬) */}
-          <div className="flex items-center gap-2  bg-white px-3 py-2 rounded shadow ml-auto">
+          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded shadow ml-auto">
             <span className="text-sm text-gray-600">Expert 자동 기준</span>
             <button
               className="bg-gray-300 px-2 rounded text-lg"

@@ -23,12 +23,12 @@ export const createUser = async (data: any) => {
 
 export const getUsers = async () => {
   return prisma.user.findMany({
-    include:{
-        oauths: true,
-        surveys: true,
-        surveyResponses: true,
-        transaction:true,
-        withdrawalRequest:true
+    include: {
+      oauths: true,
+      surveys: true,
+      surveyResponses: true,
+      transaction: true,
+      withdrawalRequest: true
     }
   });
 };
@@ -36,19 +36,19 @@ export const getUsers = async () => {
 export const getUserById = async (id: number) => {
   return prisma.user.findUnique({
     where: { id },
-        include:{
-        oauths: true,
-        surveys: true,
-        surveyResponses: true,
-        transaction:true,
-        withdrawalRequest:true
+    include: {
+      oauths: true,
+      surveys: true,
+      surveyResponses: true,
+      transaction: true,
+      withdrawalRequest: true
     }
   });
 };
 
 export const updateUser = async (id: number, data: any) => {
 
-    console.log(id);
+  console.log(id);
   const basicUpdate = prisma.user.update({
     where: { id },
     data: {
