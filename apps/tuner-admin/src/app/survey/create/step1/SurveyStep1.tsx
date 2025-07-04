@@ -278,8 +278,8 @@ const SurveyStep1 = () => {
                   return alert("곡 제목을 입력해주세요.");
                 if (!step1.start_at || !step1.end_at)
                   return alert("설문 기간을 입력해주세요.");
-                if (step1.start_at > step1.end_at)
-                  return alert("시작일은 종료일보다 이전이어야 합니다.");
+                // if (step1.start_at > step1.end_at)
+                //   return alert("시작일은 종료일보다 이전이어야 합니다.");
                 if (!step1.genre) return alert("장르를 선택해주세요.");
                 if (
                   step1.surveyType === "official" &&

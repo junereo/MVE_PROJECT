@@ -14,6 +14,11 @@ export enum Question_type {
   fixed = "fixed",
   custom = "custom",
 }
+// 설문 상태 임시저장 or 생성
+export enum SurveyStatus {
+  draft = "draft", // 임시저장
+  complete = "complete", // 생성 완료
+}
 // 설문 타입 enum
 export type SurveyType = "general" | "official";
 
@@ -29,6 +34,7 @@ export interface SurveyCreatePayload {
   // is_released: boolean; // 발매 여부
 
   // 설문 정보
+  status: SurveyStatus; // 설문 상태 (임시저장 | 생성 완료)
   survey_title: string; // 설문 제목
   start_at: string; // 설문 시작일
   end_at: string; // 설문 종료일
