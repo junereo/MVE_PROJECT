@@ -1,7 +1,7 @@
 // 전역 으로 관리 되는 로그인 상태관리
 import { create } from "zustand";
 
-export type AdminType = {
+type AdminType = {
   id: number;
   email: string;
   nickname: string;

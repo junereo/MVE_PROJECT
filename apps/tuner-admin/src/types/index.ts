@@ -111,5 +111,5 @@ export interface SurveyData {
     nickname: string;
     role: string;
   };
-  result: any;
+  result: unknown;
 }

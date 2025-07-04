@@ -129,6 +129,11 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
       include: {
+        participants: {
+          include: {
+            user: true,
+          },
+        },
         creator: { select: { id: true, nickname: true, role: true } },
         result: true,
       },
