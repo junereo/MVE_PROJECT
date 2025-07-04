@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useMemo, useEffect } from "react";
 import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
 import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
@@ -113,7 +112,7 @@ export default function Step2Default({
   return (
     <>
       <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
-        <Link href={`/survey/${surveyId}`}>←</Link>
+        <button onClick={handlePrev}>←</button>
         <h1 className="font-bold text-lg text-center flex-1">설문 참여</h1>
       </header>
 

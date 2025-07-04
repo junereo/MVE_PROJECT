@@ -21,7 +21,6 @@ export default function SurveyResponsesClient({
   const { isInitialized } = useAuthGuard();
   const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
   if (!isInitialized) return null;
-  console.log("설문 ID:", surveyId);
 
   return (
     <div className="mx-auto py-8">

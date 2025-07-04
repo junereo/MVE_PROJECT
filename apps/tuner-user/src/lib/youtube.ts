@@ -26,7 +26,7 @@ export const fetchYoutubeVideos = async (query: string) => {
     }) => ({
       music_title: item.snippet.title,
       artist: item.snippet.channelTitle,
-      thumbnail_uri: item.snippet.thumbnails.medium.url,
+      thumbnail_uri: `https://i.ytimg.com/vi/${item.id.videoId}/sddefault.jpg`,
       channelTitle: item.snippet.channelTitle,
       music_uri: `https://www.youtube.com/watch?v=${item.id.videoId}`,
       select_url: `https://www.youtube.com/embed/${item.id.videoId}`,

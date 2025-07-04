@@ -21,7 +21,6 @@ export default function Step3Custom({
   onPrev,
   onNext,
 }: Step3Props) {
-  const survey_title = "설문 제목";
   const { setSubmitStatus } = useAnswerStore();
 
   if (!surveyId) {
@@ -29,8 +28,9 @@ export default function Step3Custom({
   }
 
   const handleSubmit = async () => {
-    const { answers } = useAnswerStore.getState();
-    const { gender, age, genres, isMusicRelated } = useSurveyInfo.getState();
+    const { answers, resetAnswers } = useAnswerStore.getState();
+    const { gender, age, genres, isMusicRelated, resetUserInfo } =
+      useSurveyInfo.getState();
     const { questions } = useDefaultQuestionStore.getState();
     const formattedAnswers = formatDefaultAnswers(answers, questions);
 
@@ -49,6 +49,9 @@ export default function Step3Custom({
     try {
       await postSurveyAnswer(payload);
       setSubmitStatus("success");
+      resetAnswers();
+      resetUserInfo();
+
       onNext();
     } catch (err) {
       console.error("설문 생성 에러", err);
