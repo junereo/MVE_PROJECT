@@ -67,7 +67,9 @@ export const emailRegister = async (data: any) => {
 
     const hashedPassword = await hashPassword(data.password);
 
-    const roleEnum = mapRoleEnum(Number(data.role) || 3);
+    const roleEnum = mapRoleEnum(
+        data.role !== undefined ? Number(data.role) : 3
+    );
 
     const newUser = await prisma.user.create({
         data: {
@@ -213,7 +215,11 @@ export const adminLogin = async (email: string, password: string) => {
 export const oauthCallbackService = async (req: Request) => {
     const { provider } = req.params;
     const code = req.query.code as string;
-    const roleEnum = mapRoleEnum(Number(req.query.role) || 3);
+    // const roleEnum = mapRoleEnum(Number(req.query.role) || 3);
+    const roleEnum = mapRoleEnum(
+        req.query.role !== undefined ? Number(req.query.role) : 3
+    );
+
 
     const profile = await fetchKakaoProfile(code);
     const safeEmail = profile.email ?? `noemail_${profile.id}@${provider}.com`;
@@ -303,7 +309,9 @@ export const googleCallbackService = async ({
     code: string;
     role?: string;
 }) => {
-    const roleEnum = mapRoleEnum(Number(role) || 3);
+    const roleEnum = mapRoleEnum(
+        role !== undefined ? Number(role) : 3
+    );
 
     console.log("=== GOOGLE CALLBACK SERVICE ===");
     console.log("code:", code);
