@@ -38,9 +38,15 @@ export const surveyList = async () => {
 
   return res.data;
 };
+// 설문 상세페이지
 export const surveyView = async (id: number | string) => {
   const res = await axiosClient.get(`/survey/s/${id}`);
 
+  return res.data;
+};
+// 설문 참여자
+export const templateView = async () => {
+  const res = await axiosClient.get(`/survey/p`);
   return res.data;
 };
 
@@ -78,11 +84,6 @@ export const createTemplate = async (formData: SurveyQuestion) => {
 export const fetchTemplates = async (id: number | string) => {
   const response = await axiosClient.get(`/survey/q/${id}`);
   return response.data;
-};
-
-// 설문 템플릿 상세 조회
-export const templateView = async () => {
-  await axiosClient.post("/survey/q/id");
 };
 
 // 설문 템플릿 수정

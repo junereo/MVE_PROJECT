@@ -19,6 +19,13 @@ import {
   Legend,
 } from "recharts";
 
+interface SurveyParticipant {
+  id: number;
+  nickname: string;
+  grade: "일반" | "Expert";
+  reward: number;
+}
+
 // 더미 데이터
 const questions = [
   "이 곡의 작품성은 뛰어난가요?",
@@ -46,16 +53,16 @@ const ageDistribution = [
 
 // 유튜브 ID 추출 함수
 const extractYoutubeId = (url: string): string => {
-  const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+  const match = url.match(/(?:v=|\/(?:embed\/)?)([0-9A-Za-z_-]{11})/);
   return match ? match[1] : "";
 };
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
   const [surveyData, setSurveyData] = useState<SurveyData | null>(null);
+  const [participants, setParticipants] = useState<SurveyParticipant[]>([]);
   const [gradeFilter, setGradeFilter] = useState("전체");
   const [currentPage, setCurrentPage] = useState(1);
-
   const perPage = 20;
 
   useEffect(() => {
@@ -64,10 +71,31 @@ export default function SurveyDetailPage() {
     const fetchSurvey = async () => {
       try {
         const result = await surveyView(Array.isArray(id) ? id[0] : id);
-        console.log("설문 데이터:", result);
         setSurveyData(result.data);
+
+        // participants를 surveyData 내부에서 바로 가져옴
+        const rawParticipants = result.data.participants as {
+          id: number;
+          user: {
+            id: number;
+            nickname: string;
+            badge_issued_at: string | null;
+          };
+        }[];
+
+        const formatted: SurveyParticipant[] = rawParticipants.map((p) => {
+          const isExpert = p.user.badge_issued_at !== null;
+          return {
+            id: p.user.id,
+            nickname: p.user.nickname,
+            grade: isExpert ? "Expert" : "일반",
+            reward: isExpert ? result.data.expert_reward : result.data.reward,
+          };
+        });
+
+        setParticipants(formatted);
       } catch (error) {
-        console.error("요청 실패:", error);
+        console.error("설문 데이터 요청 실패:", error);
       }
     };
 
@@ -89,13 +117,6 @@ export default function SurveyDetailPage() {
     normal: surveyData.reward || 0,
     expert: surveyData.expert_reward || 0,
   };
-
-  const participants = Array.from({ length: 40 }, (_, i) => ({
-    id: i + 1,
-    nickname: `user_${i + 1}`,
-    grade: i % 4 === 0 ? "Expert" : "일반",
-    reward: i % 4 === 0 ? reward.expert : reward.normal,
-  }));
 
   const filteredParticipants =
     gradeFilter === "전체"
