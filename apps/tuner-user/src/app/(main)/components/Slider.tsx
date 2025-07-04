@@ -5,11 +5,13 @@ import Image from "next/image";
 import "swiper/css";
 import "swiper/css/autoplay";
 import { Autoplay } from "swiper/modules";
+import { useRouter } from "next/navigation";
 import { getSurveyList } from "@/features/survey/services/survey";
 import { useEffect, useState } from "react";
 import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 
 export default function Slider() {
+  const router = useRouter();
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
 
   useEffect(() => {
@@ -48,7 +50,10 @@ export default function Slider() {
       >
         {surveys.map((item) => (
           <SwiperSlide key={item.id}>
-            <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden shadow-md">
+            <div
+              onClick={() => router.push(`/survey/${item.id}`)}
+              className="relative aspect-[16/9] w-full rounded-xl overflow-hidden shadow-md cursor-pointer"
+            >
               <Image
                 src={item.thumbnail_uri}
                 alt={`slide YouTube Thumbnail ${item.id}`}

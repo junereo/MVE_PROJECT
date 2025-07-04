@@ -64,7 +64,7 @@ export default function SurveyDetail() {
     <>
       <Header />
 
-      <SurveyWrapper>
+      <div>
         <Breadcrumb
           crumbs={[
             { label: "설문", href: "/survey" },
@@ -159,7 +159,7 @@ export default function SurveyDetail() {
             </Button>
           </div>
         )}
-      </SurveyWrapper>
+      </div>
       <BottomNavbar />
     </>
   );

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
 import { InputTypeEnum } from "@/features/survey/types/enums";
 import QuestionText from "@/app/survey/components/QuestionText";

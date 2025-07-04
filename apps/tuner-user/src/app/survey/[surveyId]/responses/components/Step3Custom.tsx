@@ -49,7 +49,8 @@ export default function Step3Custom({
     };
 
     try {
-      await postSurveyAnswer(payload);
+      const res = await postSurveyAnswer(payload);
+      console.log(res);
       setSubmitStatus("success");
       resetAnswers();
       resetUserInfo();

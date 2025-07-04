@@ -55,7 +55,7 @@ export default function Step6Result({ onPrev }: Step6Props) {
   const ui = statusMap[status];
 
   return (
-    <div className="min-h-screen flex justify-center px-4">
+    <div className="flex justify-center px-4">
       <div className="bg-white w-full max-w-[485px] py-10 text-center flex flex-col justify-center items-center gap-10">
         <Image
           src={ui.image}
