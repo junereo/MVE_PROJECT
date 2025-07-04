@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
 import { InputTypeEnum } from "@/features/survey/types/enums";
 import QuestionText from "@/app/survey/components/QuestionText";
@@ -20,11 +20,7 @@ export default function Step1Info({
   surveyTitle,
   onNext,
 }: Step1Props) {
-  const { setUserInfo } = useSurveyInfo();
-  const [gender, setGender] = useState<string>("");
-  const [age, setAge] = useState<string>("");
-  const [genres, setGenres] = useState<string[]>([]);
-  const [isMusicRelated, setIsMusicRelated] = useState<string>("");
+  const { gender, age, genres, isMusicRelated, setUserInfo } = useSurveyInfo();
 
   const genreOptions = [
     "발라드",
@@ -37,6 +33,10 @@ export default function Step1Info({
     "EDM",
     "국악",
   ];
+
+  useEffect(() => {
+    console.log(gender, age, genres, isMusicRelated);
+  }, [gender, age, genres, isMusicRelated]);
 
   const handleNext = () => {
     setUserInfo({ gender, age, genres, isMusicRelated });
@@ -67,7 +67,7 @@ export default function Step1Info({
             <QuestionOptions
               options={["남성", "여성"]}
               value={gender}
-              onChange={(val) => setGender(val as string)}
+              onChange={(val) => setUserInfo({ gender: val as string })}
               type={InputTypeEnum.MULTIPLE}
               layout="horizontal"
             />
@@ -78,7 +78,7 @@ export default function Step1Info({
             <QuestionOptions
               options={["10대", "20대", "30대", "40대", "50대 이상"]}
               value={age}
-              onChange={(val) => setAge(val as string)}
+              onChange={(val) => setUserInfo({ age: val as string })}
               type={InputTypeEnum.MULTIPLE}
               layout="horizontal"
             />
@@ -89,7 +89,7 @@ export default function Step1Info({
             <QuestionOptions
               options={genreOptions}
               value={genres}
-              onChange={(val) => setGenres(val as string[])}
+              onChange={(val) => setUserInfo({ genres: val as string[] })}
               type={InputTypeEnum.CHECKBOX}
               layout="horizontal"
             />
@@ -102,7 +102,7 @@ export default function Step1Info({
             <QuestionOptions
               options={["예", "아니오"]}
               value={isMusicRelated}
-              onChange={(val) => setIsMusicRelated(val as string)}
+              onChange={(val) => setUserInfo({ isMusicRelated: val as string })}
               type={InputTypeEnum.MULTIPLE}
               layout="horizontal"
             />
