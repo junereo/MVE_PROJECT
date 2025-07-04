@@ -46,7 +46,7 @@ export default function Card({
         <div
           key={item.id}
           onClick={() => router.push(`/survey/${item.id}`)}
-          className="rounded-xl bg-white shadow hover:shadow-lg transition overflow-hidden"
+          className="rounded-xl bg-white shadow hover:shadow-lg transition overflow-hidden cursor-pointer"
         >
           <div className="relative w-full aspect-[4/3]">
             <Image
