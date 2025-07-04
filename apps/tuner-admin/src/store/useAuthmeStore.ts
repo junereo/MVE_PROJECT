@@ -1,11 +1,12 @@
 // 전역 으로 관리 되는 로그인 상태관리
 import { create } from "zustand";
 
-type AdminType = {
+export type AdminType = {
   id: number;
   email: string;
   nickname: string;
   role: "admin" | "superadmin";
+  balance: number;
 };
 
 type SessionState = {
