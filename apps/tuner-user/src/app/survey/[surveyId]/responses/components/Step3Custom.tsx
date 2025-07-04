@@ -9,12 +9,18 @@ import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuest
 import { formatDefaultAnswers } from "@/features/survey/utils/fotmatAnswers";
 
 interface Step3Props {
+  surveyId: number;
+  surveyTitle: string;
   onPrev: () => void;
   onNext: () => void;
-  surveyId: number;
 }
 
-export default function Step3Custom({ surveyId, onPrev, onNext }: Step3Props) {
+export default function Step3Custom({
+  surveyId,
+  surveyTitle,
+  onPrev,
+  onNext,
+}: Step3Props) {
   const survey_title = "설문 제목";
   const { setSubmitStatus } = useAnswerStore();
 
@@ -26,11 +32,6 @@ export default function Step3Custom({ surveyId, onPrev, onNext }: Step3Props) {
     const { answers } = useAnswerStore.getState();
     const { gender, age, genres, isMusicRelated } = useSurveyInfo.getState();
     const { questions } = useDefaultQuestionStore.getState();
-    console.log("🧪 현재 answers 상태", useAnswerStore.getState().answers);
-    console.log(
-      "🧪 현재 questions 상태",
-      useDefaultQuestionStore.getState().questions
-    );
     const formattedAnswers = formatDefaultAnswers(answers, questions);
 
     const payload = {
@@ -44,7 +45,7 @@ export default function Step3Custom({ surveyId, onPrev, onNext }: Step3Props) {
       },
       answers: formattedAnswers,
     };
-    console.log("📦 payload to submit", JSON.stringify(payload, null, 2));
+
     try {
       await postSurveyAnswer(payload);
       setSubmitStatus("success");
@@ -67,7 +68,7 @@ export default function Step3Custom({ surveyId, onPrev, onNext }: Step3Props) {
         <Breadcrumb
           crumbs={[
             { label: "설문", href: "/survey" },
-            { label: `${survey_title}`, href: `/survey/${surveyId}` },
+            { label: `${surveyTitle}`, href: `/survey/${surveyId}` },
             { label: "커스텀 설문" },
           ]}
         />

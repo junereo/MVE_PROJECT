@@ -3,19 +3,24 @@
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
+import { InputTypeEnum } from "@/features/survey/types/enums";
+import QuestionText from "@/app/survey/components/QuestionText";
+import QuestionOptions from "@/app/survey/components/QuestionOptions";
 
 interface Step1Props {
+  surveyId: number;
+  surveyTitle: string;
   onNext: () => void;
 }
 
-export default function Step1Info({ onNext }: Step1Props) {
-  const params = useParams();
-  const surveyId = Number(params.id);
+export default function Step1Info({
+  surveyId,
+  surveyTitle,
+  onNext,
+}: Step1Props) {
   const { setUserInfo } = useSurveyInfo();
-  const [surveyTitle, setSurveyTitle] = useState("");
   const [gender, setGender] = useState<string>("");
   const [age, setAge] = useState<string>("");
   const [genres, setGenres] = useState<string[]>([]);
@@ -32,12 +37,6 @@ export default function Step1Info({ onNext }: Step1Props) {
     "EDM",
     "국악",
   ];
-
-  const toggleGenre = (genre: string) => {
-    setGenres((prev) =>
-      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
-    );
-  };
 
   const handleNext = () => {
     setUserInfo({ gender, age, genres, isMusicRelated });
@@ -61,66 +60,53 @@ export default function Step1Info({ onNext }: Step1Props) {
             { label: "사용자 기본 정보 수집" },
           ]}
         />
+
         <div className="space-y-4">
-          <h2 className="font-bold">성별</h2>
-          <div className="flex gap-3">
-            <Button
-              color={gender === "남성" ? "blue" : "white"}
-              onClick={() => setGender("남성")}
-            >
-              남성
-            </Button>
-            <Button
-              color={gender === "여성" ? "blue" : "white"}
-              onClick={() => setGender("여성")}
-            >
-              여성
-            </Button>
-          </div>
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+            <QuestionText text="성별" />
+            <QuestionOptions
+              options={["남성", "여성"]}
+              value={gender}
+              onChange={(val) => setGender(val as string)}
+              type={InputTypeEnum.MULTIPLE}
+              layout="horizontal"
+            />
+          </section>
 
-          <h2 className="font-bold">연령대</h2>
-          <div className="flex flex-wrap gap-2">
-            {["10대", "20대", "30대", "40대", "50대 이상"].map((a) => (
-              <Button
-                key={a}
-                color={age === a ? "blue" : "white"}
-                onClick={() => setAge(a)}
-              >
-                {a}
-              </Button>
-            ))}
-          </div>
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+            <QuestionText text="연령대" />
+            <QuestionOptions
+              options={["10대", "20대", "30대", "40대", "50대 이상"]}
+              value={age}
+              onChange={(val) => setAge(val as string)}
+              type={InputTypeEnum.MULTIPLE}
+              layout="horizontal"
+            />
+          </section>
 
-          <h2 className="font-bold">좋아하는 장르 (복수 선택)</h2>
-          <div className="flex flex-wrap gap-2">
-            {genreOptions.map((g) => (
-              <Button
-                key={g}
-                color={genres.includes(g) ? "blue" : "white"}
-                onClick={() => toggleGenre(g)}
-              >
-                {g}
-              </Button>
-            ))}
-          </div>
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+            <QuestionText text="좋아하는 장르 (복수선택)" />
+            <QuestionOptions
+              options={genreOptions}
+              value={genres}
+              onChange={(val) => setGenres(val as string[])}
+              type={InputTypeEnum.CHECKBOX}
+              layout="horizontal"
+            />
+          </section>
 
-          <h2 className="font-bold">
-            음악을 전공하셨거나 음악 관련 산업에 종사하고 계신가요?
-          </h2>
-          <div className="flex gap-3">
-            <Button
-              color={isMusicRelated === "예" ? "blue" : "white"}
-              onClick={() => setIsMusicRelated("예")}
-            >
-              예
-            </Button>
-            <Button
-              color={isMusicRelated === "아니오" ? "blue" : "white"}
-              onClick={() => setIsMusicRelated("아니오")}
-            >
-              아니오
-            </Button>
-          </div>
+          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+            <QuestionText
+              text={`음악을 전공하셨거나\n음악 관련 산업에 종사하고 계신가요?`}
+            />
+            <QuestionOptions
+              options={["예", "아니오"]}
+              value={isMusicRelated}
+              onChange={(val) => setIsMusicRelated(val as string)}
+              type={InputTypeEnum.MULTIPLE}
+              layout="horizontal"
+            />
+          </section>
         </div>
       </div>
 

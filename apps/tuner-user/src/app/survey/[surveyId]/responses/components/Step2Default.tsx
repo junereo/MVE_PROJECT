@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, useMemo, useEffect } from "react";
-import { useParams } from "next/navigation";
 import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
 import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
 import { fetchSurveyQuestions } from "@/features/survey/services/survey";
@@ -17,6 +16,8 @@ import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 
 interface Step2Props {
+  surveyId: number;
+  surveyTitle: string;
   onPrev: () => void;
   onNext: () => void;
 }
@@ -29,15 +30,16 @@ const baseCategories = [
   { key: "stardom", label: "스타성" },
 ];
 
-export default function Step2Default({ onPrev, onNext }: Step2Props) {
-  const params = useParams();
-  const surveyId = Number(params.id);
-
+export default function Step2Default({
+  surveyId,
+  surveyTitle,
+  onPrev,
+  onNext,
+}: Step2Props) {
   const { answers, setAnswer } = useAnswerStore();
   const { questions, setQuestions } = useDefaultQuestionStore();
 
   const [tabIndex, setTabIndex] = useState(0);
-  const [surveyTitle, setSurveyTitle] = useState(""); // 서버에서 받아올 title
 
   const currentKey = baseCategories[tabIndex]?.key ?? "";
   const currentQuestions = useMemo(
@@ -60,8 +62,6 @@ export default function Step2Default({ onPrev, onNext }: Step2Props) {
       // 기본 설문 불러옴
       fetchSurveyQuestions(1).then((res) => {
         const data = res.data[0];
-        console.log(data);
-        setSurveyTitle(data.title);
 
         type RawQuestion = {
           id: number;

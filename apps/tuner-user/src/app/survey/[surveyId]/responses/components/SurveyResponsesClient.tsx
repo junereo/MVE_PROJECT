@@ -9,12 +9,14 @@ import Step4Result from "./Step4Result";
 
 interface SurveyResponsesClientProps {
   surveyId: number;
+  surveyTitle: string;
 }
 
 type Step = "step1" | "step2" | "step3" | "step4";
 
 export default function SurveyResponsesClient({
   surveyId,
+  surveyTitle,
 }: SurveyResponsesClientProps) {
   const { isInitialized } = useAuthGuard();
   const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
@@ -25,23 +27,30 @@ export default function SurveyResponsesClient({
     <div className="mx-auto py-8">
       <Funnel>
         <Funnel.Step name="step1">
-          <Step1Info onNext={() => setStep("step2")} />
+          <Step1Info
+            surveyId={surveyId}
+            surveyTitle={surveyTitle}
+            onNext={() => setStep("step2")}
+          />
         </Funnel.Step>
         <Funnel.Step name="step2">
           <Step2Default
+            surveyId={surveyId}
+            surveyTitle={surveyTitle}
             onPrev={() => setStep("step1")}
             onNext={() => setStep("step3")}
           />
         </Funnel.Step>
         <Funnel.Step name="step3">
           <Step3Custom
+            surveyId={surveyId}
+            surveyTitle={surveyTitle}
             onPrev={() => setStep("step2")}
             onNext={() => setStep("step4")}
-            surveyId={surveyId}
           />
         </Funnel.Step>
         <Funnel.Step name="step4">
-          <Step4Result onPrev={() => setStep("step3")} surveyId={surveyId} />
+          <Step4Result surveyId={surveyId} onPrev={() => setStep("step3")} />
         </Funnel.Step>
       </Funnel>
 
