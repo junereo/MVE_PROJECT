@@ -114,7 +114,7 @@ CREATE TABLE "Survey_Question" (
 -- CreateTable
 CREATE TABLE "Survey_Participants" (
     "id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
+    "user_id" INTEGER,
     "survey_id" INTEGER NOT NULL,
     "answers" JSONB NOT NULL,
     "status" "SurveyStatus" NOT NULL DEFAULT 'draft',
@@ -180,7 +180,7 @@ ALTER TABLE "User_Oauth" ADD CONSTRAINT "User_Oauth_userId_fkey" FOREIGN KEY ("u
 ALTER TABLE "Survey" ADD CONSTRAINT "Survey_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Survey_Participants" ADD CONSTRAINT "Survey_Participants_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Survey_Participants" ADD CONSTRAINT "Survey_Participants_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Survey_Participants" ADD CONSTRAINT "Survey_Participants_survey_id_fkey" FOREIGN KEY ("survey_id") REFERENCES "Survey"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

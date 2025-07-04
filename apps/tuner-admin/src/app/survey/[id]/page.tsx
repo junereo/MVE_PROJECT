@@ -1,7 +1,9 @@
 "use client";
 
+import { surveyView } from "@/lib/network/api";
+import { SurveyData } from "@/types";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Radar,
   RadarChart,
@@ -17,18 +19,14 @@ import {
   Legend,
 } from "recharts";
 
+interface SurveyParticipant {
+  id: number;
+  nickname: string;
+  grade: "일반" | "Expert";
+  reward: number;
+}
+
 // 더미 데이터
-const youtubeId = "0LwcvjNJTuM";
-const surveyTitle = " 레전드 일렉기타 감성 평가";
-const youtubeTitle = "Lynyrd Skynyrd - Free Bird ";
-const channelTitle = " Lynyrd Skynyrd";
-console.log(channelTitle);
-
-const author = { nickname: "musicfan99", id: "user_33", type: "official" };
-const reward = { total: 500, normal: 10, expert: 20 };
-const status = "종료";
-console.log(status);
-
 const questions = [
   "이 곡의 작품성은 뛰어난가요?",
   "대중성 있는 멜로디라고 생각하십니까?",
@@ -53,20 +51,72 @@ const ageDistribution = [
   { age: "50대+", count: 15 },
 ];
 
-const participants = Array.from({ length: 40 }, (_, i) => ({
-  id: i + 1,
-  nickname: `user_${i + 1}`,
-  grade: i % 4 === 0 ? "Expert" : "일반",
-  reward: i % 4 === 0 ? reward.expert : reward.normal,
-}));
+// 유튜브 ID 추출 함수
+const extractYoutubeId = (url: string): string => {
+  const match = url.match(/(?:v=|\/(?:embed\/)?)([0-9A-Za-z_-]{11})/);
+  return match ? match[1] : "";
+};
 
 export default function SurveyDetailPage() {
   const { id } = useParams();
-  console.log(id);
-
+  const [surveyData, setSurveyData] = useState<SurveyData | null>(null);
+  const [participants, setParticipants] = useState<SurveyParticipant[]>([]);
   const [gradeFilter, setGradeFilter] = useState("전체");
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 20;
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchSurvey = async () => {
+      try {
+        const result = await surveyView(Array.isArray(id) ? id[0] : id);
+        setSurveyData(result.data);
+
+        // participants를 surveyData 내부에서 바로 가져옴
+        const rawParticipants = result.data.participants as {
+          id: number;
+          user: {
+            id: number;
+            nickname: string;
+            badge_issued_at: string | null;
+          };
+        }[];
+
+        const formatted: SurveyParticipant[] = rawParticipants.map((p) => {
+          const isExpert = p.user.badge_issued_at !== null;
+          return {
+            id: p.user.id,
+            nickname: p.user.nickname,
+            grade: isExpert ? "Expert" : "일반",
+            reward: isExpert ? result.data.expert_reward : result.data.reward,
+          };
+        });
+
+        setParticipants(formatted);
+      } catch (error) {
+        console.error("설문 데이터 요청 실패:", error);
+      }
+    };
+
+    fetchSurvey();
+  }, [id]);
+
+  if (!surveyData) {
+    return <div className="p-6 text-gray-600">로딩 중...</div>;
+  }
+
+  const youtubeId = extractYoutubeId(surveyData.music_uri || "");
+  const author = {
+    nickname: surveyData.creator?.nickname || "",
+    id: surveyData.creator?.id || "",
+    type: surveyData.type,
+  };
+  const reward = {
+    total: surveyData.reward_amount || 0,
+    normal: surveyData.reward || 0,
+    expert: surveyData.expert_reward || 0,
+  };
 
   const filteredParticipants =
     gradeFilter === "전체"
@@ -81,18 +131,15 @@ export default function SurveyDetailPage() {
 
   return (
     <div>
-      <div className=" w-full  text-black text-2xl py-3  font-bold">
-        Survey Detail - {surveyTitle}
+      <div className="w-full text-black text-2xl py-3 font-bold">
+        Survey Detail - {surveyData.survey_title}
       </div>
-      <div className="p-6 ">
-        <div className=" flex flex-col md:flex-row gap-6">
+      <div className="p-6">
+        <div className="flex flex-col md:flex-row gap-6">
           {/* 왼쪽 */}
-          <div className="flex-1 flex flex-col space-y-4  ">
-            {/* 설문 제목 */}
-
-            {/* 유튜브 영상 + 작성자 정보 레이아웃 */}
+          <div className="flex-1 flex flex-col space-y-4">
+            {/* 유튜브 영상 + 작성자 정보 */}
             <div className="flex flex-col md:flex-row md:items-start gap-10">
-              {/* 유튜브 영상 */}
               <div className="rounded overflow-hidden aspect-[3/2] md:w-[480px] w-full border">
                 <iframe
                   src={`https://www.youtube.com/embed/${youtubeId}`}
@@ -101,12 +148,10 @@ export default function SurveyDetailPage() {
                 />
               </div>
 
-              {/* 작성자 및 설문 정보 */}
               <div className="space-y-5 w-full flex-1 flex flex-col items-start justify-end gap-1">
                 <p className="text-gray-800 font-semibold">
                   👤 작성자:{" "}
-                  <span className="text-black">{author.nickname}</span> (
-                  {author.id})
+                  <span className="text-black">{author.nickname}</span>
                 </p>
                 <p className="text-gray-800 font-semibold">
                   📘 설문 유형:{" "}
@@ -147,11 +192,10 @@ export default function SurveyDetailPage() {
                       일반 유저: {reward.normal} STK / Expert: {reward.expert}{" "}
                       STK
                     </p>
-                    <div>{youtubeTitle}</div>
+                    <div>{surveyData.music_title}</div>
                   </>
                 )}
 
-                {/* 유튜브에서 보기 버튼 - 하단에 배치 */}
                 <a
                   href={`https://www.youtube.com/watch?v=${youtubeId}`}
                   target="_blank"
@@ -166,7 +210,6 @@ export default function SurveyDetailPage() {
             <div className="border-t pt-4 space-y-3">
               <h2 className="font-semibold text-lg">설문 결과</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* 오각형 그래프 */}
                 <div>
                   <p className="text-sm mb-1 text-center font-medium">
                     성별별 평균 점수
@@ -181,7 +224,6 @@ export default function SurveyDetailPage() {
                     <PolarGrid />
                     <PolarAngleAxis dataKey="category" />
                     <PolarRadiusAxis angle={30} domain={[0, 5]} />
-                    {/* 점수 보여주기 */}
                     <Tooltip />
                     <Radar
                       name="남성"
@@ -201,7 +243,6 @@ export default function SurveyDetailPage() {
                   </RadarChart>
                 </div>
 
-                {/* 막대 그래프 */}
                 <div>
                   <p className="text-sm mb-1 text-center font-medium">
                     연령대별 참여자 수
@@ -271,7 +312,6 @@ export default function SurveyDetailPage() {
               </tbody>
             </table>
 
-            {/* 페이지네이션 */}
             {totalPages > 1 && (
               <div className="mt-4 flex justify-center gap-2">
                 {Array.from({ length: totalPages }).map((_, i) => (
