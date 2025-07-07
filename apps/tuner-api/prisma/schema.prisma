@@ -235,3 +235,15 @@ model WithdrawalRequest {
   requested_at DateTime         @default(now())
   user         User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
+
+model TunerContract {
+  id          Int      @id @default(autoincrement())
+  ca_token    String?
+  ca_badge    String?
+  ca_survey   String?
+  ca_transac  String?
+  abi_survey  Json?
+  abi_transac Json?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
