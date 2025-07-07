@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import fixedQuestions from "./components/Templates";
-import { createTemplate } from "@/lib/network/api";
+import React, { useEffect, useState } from "react";
+import { fetchFixedQuestions, createTemplate } from "@/lib/network/api";
 import { QuestionTypeEnum } from "@/app/survey/create/complete/type";
 import { Question_type } from "@/types";
+import fixedQuestions from "./components/Templates";
 
 export interface FixedQuestion {
   category: string;
@@ -12,68 +12,205 @@ export interface FixedQuestion {
   question_type: Question_type;
   type: QuestionTypeEnum;
   options: string[];
+  max_num?: number;
 }
 
-const groupByCategory = (
-  questions: FixedQuestion[]
-): Record<string, FixedQuestion[]> => {
-  return questions.reduce((acc, q) => {
-    if (!acc[q.category]) acc[q.category] = [];
-    acc[q.category].push(q);
-    return acc;
-  }, {} as Record<string, FixedQuestion[]>);
+const defaultQuestion: FixedQuestion = {
+  category: "",
+  question_text: "",
+  question_type: Question_type.fixed,
+  type: QuestionTypeEnum.MULTIPLE,
+  options: [],
+  max_num: 1,
 };
 
+function parseServerQuestions(data: any): FixedQuestion[] {
+  const questionObj = data?.data?.[0]?.question || {};
+  const mergedQuestions = Object.values(questionObj).flat() as FixedQuestion[];
+  return Array.isArray(mergedQuestions) ? mergedQuestions : [];
+}
+
 export default function FixedQuestionTemplatePage() {
+  const [questions, setQuestions] = useState<FixedQuestion[]>([]);
   const [loading, setLoading] = useState(false);
+  const [initLoading, setInitLoading] = useState(true);
+  const [questionnaireId, setQuestionnaireId] = useState<number|string>(1);
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    fetchFixedQuestions(questionnaireId).then(data => {
+      const questionObj = data?.data?.[0]?.question;
+      if (questionObj) {
+        const mergedQuestions = Object.values(questionObj).flat() as FixedQuestion[];
+        setQuestions(Array.isArray(mergedQuestions) ? mergedQuestions : []);
+      } else {
+        // 서버에 값이 없거나 연결되지 않은 경우 로컬 템플릿 사용
+        setQuestions(fixedQuestions);
+      }
+      setInitLoading(false);
+    }).catch(() => {
+      // 네트워크 에러 등 예외 발생 시에도 로컬 템플릿 사용
+      setQuestions(fixedQuestions);
+      setInitLoading(false);
+    });
+  }, [questionnaireId]);
+
+  const handleChange = (idx: number, field: keyof FixedQuestion, value: any) => {
+    setQuestions(prev =>
+      prev.map((q, i) => (i === idx ? { ...q, [field]: value } : q))
+    );
+  };
+
+  const handleOptionChange = (qIdx: number, oIdx: number, value: string) => {
+    setQuestions(prev =>
+      prev.map((q, i) =>
+        i === qIdx
+          ? { ...q, options: q.options.map((opt, j) => (j === oIdx ? value : opt)) }
+          : q
+      )
+    );
+  };
+
+  const handleMaxNumChange = (idx: number, value: number) => {
+    setQuestions(prev =>
+      prev.map((q, i) => (i === idx ? { ...q, max_num: value } : q))
+    );
+  };
+
+  const addOption = (qIdx: number) => {
+    setQuestions(prev =>
+      prev.map((q, i) =>
+        i === qIdx ? { ...q, options: [...q.options, ""] } : q
+      )
+    );
+  };
+
+  const removeOption = (qIdx: number, oIdx: number) => {
+    setQuestions(prev =>
+      prev.map((q, i) =>
+        i === qIdx ? { ...q, options: q.options.filter((_, j) => j !== oIdx) } : q
+      )
+    );
+  };
+
+  const addQuestion = () => {
+    setQuestions(prev => [...prev, { ...defaultQuestion }]);
+  };
+
+  const removeQuestion = (idx: number) => {
+    setQuestions(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const save = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-
-      const groupedQuestions = groupByCategory(fixedQuestions); // category별로 묶기
-
-      const formData = {
-        Survey_question: "고정 질문1",
-        question: groupedQuestions,
-        question_type: Question_type.fixed, // 고정 질문 타입
+      // 카테고리별로 그룹화
+      const grouped = questions.reduce((acc, q) => {
+        if (!acc[q.category]) acc[q.category] = [];
+        acc[q.category].push(q);
+        return acc;
+      }, {} as Record<string, FixedQuestion[]>);
+      const payload = {
+        survey_id : questionnaireId,
+        Survey_question: "고정 질문 템플릿",
+        question: grouped,
+        question_type: Question_type.fixed,
         question_order: 1,
       };
-
-      console.log("전송 데이터 ", formData);
-      await createTemplate(formData);
-      alert("고정 질문 템플릿 저장 완료!");
-    } catch (error) {
-      console.error("템플릿 저장 실패 ", error);
-      alert("저장 중 오류가 발생했습니다.");
+      await createTemplate(payload);
+      alert("저장 완료!");
+    } catch (e) {
+      alert("저장 실패");
     } finally {
       setLoading(false);
     }
   };
 
+  if (initLoading) return <div className="flex justify-center items-center h-64 text-lg">로딩중...</div>;
+
   return (
-    <div>
-      <div className="w-full  text-black text-2xl py-3  font-bold">
-        Fixed Question
-      </div>
-      <div className="p-6 space-y-6 w-[100%]">
-        <div className="bg-white p-8 rounded-xl shadow-md max-w-xl w-full">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">
-            고정 질문 템플릿 업로드
-          </h1>
-
-          <p className="text-sm text-gray-500 mb-4">
-            아래 버튼을 클릭하면 고정 질문 세트를 서버로 전송합니다.
-          </p>
-
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            {loading ? "저장 중..." : "템플릿 저장하기"}
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 py-10">
+      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+        <div className="text-3xl font-extrabold text-blue-700 mb-6 text-center drop-shadow">고정 질문 템플릿 관리</div>
+        <div className="flex items-center mb-6 gap-2">
+          <label className="font-semibold text-gray-700">Questionnaire ID:</label>
+          <input
+            type="number"
+            className="border rounded px-2 py-1 w-24"
+            value={questionnaireId}
+            onChange={e => setQuestionnaireId(Number(e.target.value))}
+            min={1}
+          />
         </div>
+        {questions && questions.map((q, idx) => (
+          <div key={idx} className="mb-8 border-b pb-6 bg-gray-50 rounded-xl p-4 shadow-sm">
+            <div className="flex flex-col md:flex-row gap-2 mb-2">
+              <input
+                className="border p-2 rounded flex-1 text-base"
+                value={q.category}
+                onChange={e => handleChange(idx, "category", e.target.value)}
+                placeholder="카테고리"
+              />
+            </div>
+            <div>
+              <input
+                className="border p-2 rounded flex-1 text-base w-full"
+                value={q.question_text}
+                onChange={e => handleChange(idx, "question_text", e.target.value)}
+                placeholder="질문"
+              />
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <select
+                className="border p-2 rounded text-base"
+                value={q.type}
+                onChange={e => handleChange(idx, "type", e.target.value as QuestionTypeEnum)}
+              >
+                <option value={QuestionTypeEnum.MULTIPLE}>객관식</option>
+                <option value={QuestionTypeEnum.CHECKBOX}>체크박스</option>
+                <option value={QuestionTypeEnum.SUBJECTIVE}>주관식</option>
+              </select>
+              <button className="ml-2 text-red-500 hover:underline" onClick={() => removeQuestion(idx)}>삭제</button>
+            </div>
+            <div className="ml-2 mt-2">
+              {q.options.map((opt, oIdx) => (
+                <div key={oIdx} className="flex items-center mb-1 gap-2">
+                  <input
+                    className="border p-1 rounded text-base"
+                    value={opt}
+                    onChange={e => handleOptionChange(idx, oIdx, e.target.value)}
+                    placeholder="옵션"
+                  />
+                  <button className="text-xs text-red-400 hover:underline" onClick={() => removeOption(idx, oIdx)}>옵션 삭제</button>
+                </div>
+              ))}
+              {(q.type === QuestionTypeEnum.MULTIPLE || q.type === QuestionTypeEnum.CHECKBOX) && (
+                <button className="text-xs text-blue-500 hover:underline mt-1" onClick={() => addOption(idx)}>옵션 추가</button>
+              )}
+            </div>
+            {q.type === QuestionTypeEnum.CHECKBOX && (
+              <div className="flex items-center gap-2 mt-2">
+                <label className="text-sm text-gray-600">최대 선택 가능 수:</label>
+                <select
+                  className="border p-1 rounded text-base"
+                  value={q.max_num || 1}
+                  onChange={e => handleMaxNumChange(idx, Number(e.target.value))}
+                >
+                  {Array.from({length: q.options.length}, (_, i) => i+1).map(i => (
+                    <option key={i} value={i}>{i}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        ))}
+        <button className="w-full bg-gray-200 py-2 rounded mb-4 font-semibold hover:bg-gray-300" onClick={addQuestion}>질문 추가</button>
+        <button
+          onClick={save}
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-500 text-white py-3 rounded-md font-bold text-lg hover:from-blue-700 hover:to-purple-600 transition disabled:opacity-50 shadow-lg"
+        >
+          {loading ? "저장 중..." : "템플릿 저장하기"}
+        </button>
       </div>
     </div>
   );
