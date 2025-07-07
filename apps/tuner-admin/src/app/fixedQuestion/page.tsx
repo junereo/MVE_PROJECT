@@ -24,44 +24,44 @@ const defaultQuestion: FixedQuestion = {
   max_num: 1,
 };
 
-function parseServerQuestions(data: any): FixedQuestion[] {
-  const questionObj = data?.data?.[0]?.question || {};
-  const mergedQuestions = Object.values(questionObj).flat() as FixedQuestion[];
-  return Array.isArray(mergedQuestions) ? mergedQuestions : [];
-}
-
 export default function FixedQuestionTemplatePage() {
   const [questions, setQuestions] = useState<FixedQuestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
-  const [questionnaireId, setQuestionnaireId] = useState<number|string>(1);
+  const [questionnaireId, setQuestionnaireId] = useState<number | string>(1);
 
   useEffect(() => {
-    fetchFixedQuestions(questionnaireId).then(data => {
-      const questionObj = data?.data?.[0]?.question;
-      if (questionObj) {
-        const mergedQuestions = Object.values(questionObj).flat() as FixedQuestion[];
-        setQuestions(Array.isArray(mergedQuestions) ? mergedQuestions : []);
-      } else {
-        // 서버에 값이 없거나 연결되지 않은 경우 로컬 템플릿 사용
+    fetchFixedQuestions(questionnaireId)
+      .then((data) => {
+        const questionObj = data?.data?.[0]?.question;
+        if (questionObj) {
+          const mergedQuestions = Object.values(
+            questionObj
+          ).flat() as FixedQuestion[];
+          setQuestions(Array.isArray(mergedQuestions) ? mergedQuestions : []);
+        } else {
+          setQuestions(fixedQuestions);
+        }
+        setInitLoading(false);
+      })
+      .catch(() => {
         setQuestions(fixedQuestions);
-      }
-      setInitLoading(false);
-    }).catch(() => {
-      // 네트워크 에러 등 예외 발생 시에도 로컬 템플릿 사용
-      setQuestions(fixedQuestions);
-      setInitLoading(false);
-    });
+        setInitLoading(false);
+      });
   }, [questionnaireId]);
 
-  const handleChange = (idx: number, field: keyof FixedQuestion, value: any) => {
-    setQuestions(prev =>
+  const handleChange = (
+    idx: number,
+    field: keyof FixedQuestion,
+    value: any
+  ) => {
+    setQuestions((prev) =>
       prev.map((q, i) => (i === idx ? { ...q, [field]: value } : q))
     );
   };
 
   const handleOptionChange = (qIdx: number, oIdx: number, value: string) => {
-    setQuestions(prev =>
+    setQuestions((prev) =>
       prev.map((q, i) =>
         i === qIdx
           ? { ...q, options: q.options.map((opt, j) => (j === oIdx ? value : opt)) }
@@ -71,13 +71,13 @@ export default function FixedQuestionTemplatePage() {
   };
 
   const handleMaxNumChange = (idx: number, value: number) => {
-    setQuestions(prev =>
+    setQuestions((prev) =>
       prev.map((q, i) => (i === idx ? { ...q, max_num: value } : q))
     );
   };
 
   const addOption = (qIdx: number) => {
-    setQuestions(prev =>
+    setQuestions((prev) =>
       prev.map((q, i) =>
         i === qIdx ? { ...q, options: [...q.options, ""] } : q
       )
@@ -85,7 +85,7 @@ export default function FixedQuestionTemplatePage() {
   };
 
   const removeOption = (qIdx: number, oIdx: number) => {
-    setQuestions(prev =>
+    setQuestions((prev) =>
       prev.map((q, i) =>
         i === qIdx ? { ...q, options: q.options.filter((_, j) => j !== oIdx) } : q
       )
@@ -93,24 +93,23 @@ export default function FixedQuestionTemplatePage() {
   };
 
   const addQuestion = () => {
-    setQuestions(prev => [...prev, { ...defaultQuestion }]);
+    setQuestions((prev) => [...prev, { ...defaultQuestion }]);
   };
 
   const removeQuestion = (idx: number) => {
-    setQuestions(prev => prev.filter((_, i) => i !== idx));
+    setQuestions((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const save = async () => {
     setLoading(true);
     try {
-      // 카테고리별로 그룹화
       const grouped = questions.reduce((acc, q) => {
         if (!acc[q.category]) acc[q.category] = [];
         acc[q.category].push(q);
         return acc;
       }, {} as Record<string, FixedQuestion[]>);
       const payload = {
-        survey_id : questionnaireId,
+        survey_id: questionnaireId,
         Survey_question: "고정 질문 템플릿",
         question: grouped,
         question_type: Question_type.fixed,
@@ -125,85 +124,125 @@ export default function FixedQuestionTemplatePage() {
     }
   };
 
-  if (initLoading) return <div className="flex justify-center items-center h-64 text-lg">로딩중...</div>;
+  if (initLoading)
+    return (
+      <div className="flex justify-center items-center h-64 text-lg">
+        로딩중...
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 py-10">
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-        <div className="text-3xl font-extrabold text-blue-700 mb-6 text-center drop-shadow">고정 질문 템플릿 관리</div>
+        <div className="text-3xl font-extrabold text-blue-700 mb-6 text-center drop-shadow">
+          고정 질문 템플릿 관리
+        </div>
         <div className="flex items-center mb-6 gap-2">
           <label className="font-semibold text-gray-700">Questionnaire ID:</label>
           <input
             type="number"
             className="border rounded px-2 py-1 w-24"
             value={questionnaireId}
-            onChange={e => setQuestionnaireId(Number(e.target.value))}
+            onChange={(e) => setQuestionnaireId(Number(e.target.value))}
             min={1}
           />
         </div>
-        {questions && questions.map((q, idx) => (
-          <div key={idx} className="mb-8 border-b pb-6 bg-gray-50 rounded-xl p-4 shadow-sm">
-            <div className="flex flex-col md:flex-row gap-2 mb-2">
-              <input
-                className="border p-2 rounded flex-1 text-base"
-                value={q.category}
-                onChange={e => handleChange(idx, "category", e.target.value)}
-                placeholder="카테고리"
-              />
-            </div>
-            <div>
-              <input
-                className="border p-2 rounded flex-1 text-base w-full"
-                value={q.question_text}
-                onChange={e => handleChange(idx, "question_text", e.target.value)}
-                placeholder="질문"
-              />
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <select
-                className="border p-2 rounded text-base"
-                value={q.type}
-                onChange={e => handleChange(idx, "type", e.target.value as QuestionTypeEnum)}
-              >
-                <option value={QuestionTypeEnum.MULTIPLE}>객관식</option>
-                <option value={QuestionTypeEnum.CHECKBOX}>체크박스</option>
-                <option value={QuestionTypeEnum.SUBJECTIVE}>주관식</option>
-              </select>
-              <button className="ml-2 text-red-500 hover:underline" onClick={() => removeQuestion(idx)}>삭제</button>
-            </div>
-            <div className="ml-2 mt-2">
-              {q.options.map((opt, oIdx) => (
-                <div key={oIdx} className="flex items-center mb-1 gap-2">
-                  <input
+        {questions &&
+          questions.map((q, idx) => (
+            <div
+              key={idx}
+              className="mb-8 border-b pb-6 bg-gray-50 rounded-xl p-4 shadow-sm"
+            >
+              <div className="flex flex-col md:flex-row gap-2 mb-2">
+                <input
+                  className="border p-2 rounded flex-1 text-base"
+                  value={q.category}
+                  onChange={(e) => handleChange(idx, "category", e.target.value)}
+                  placeholder="카테고리"
+                />
+              </div>
+              <div>
+                <input
+                  className="border p-2 rounded flex-1 text-base w-full"
+                  value={q.question_text}
+                  onChange={(e) => handleChange(idx, "question_text", e.target.value)}
+                  placeholder="질문"
+                />
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <select
+                  className="border p-2 rounded text-base"
+                  value={q.type}
+                  onChange={(e) =>
+                    handleChange(idx, "type", e.target.value as QuestionTypeEnum)
+                  }
+                >
+                  <option value={QuestionTypeEnum.MULTIPLE}>객관식</option>
+                  <option value={QuestionTypeEnum.CHECKBOX}>체크박스</option>
+                  <option value={QuestionTypeEnum.SUBJECTIVE}>주관식</option>
+                </select>
+                <button
+                  className="ml-2 text-red-500 hover:underline"
+                  onClick={() => removeQuestion(idx)}
+                >
+                  삭제
+                </button>
+              </div>
+              <div className="ml-2 mt-2">
+                {q.options.map((opt, oIdx) => (
+                  <div key={oIdx} className="flex items-center mb-1 gap-2">
+                    <input
+                      className="border p-1 rounded text-base"
+                      value={opt}
+                      onChange={(e) =>
+                        handleOptionChange(idx, oIdx, e.target.value)
+                      }
+                      placeholder="옵션"
+                    />
+                    <button
+                      className="text-xs text-red-400 hover:underline"
+                      onClick={() => removeOption(idx, oIdx)}
+                    >
+                      옵션 삭제
+                    </button>
+                  </div>
+                ))}
+                {(q.type === QuestionTypeEnum.MULTIPLE ||
+                  q.type === QuestionTypeEnum.CHECKBOX) && (
+                  <button
+                    className="text-xs text-blue-500 hover:underline mt-1"
+                    onClick={() => addOption(idx)}
+                  >
+                    옵션 추가
+                  </button>
+                )}
+              </div>
+              {q.type === QuestionTypeEnum.CHECKBOX && (
+                <div className="flex items-center gap-2 mt-2">
+                  <label className="text-sm text-gray-600">최대 선택 가능 수:</label>
+                  <select
                     className="border p-1 rounded text-base"
-                    value={opt}
-                    onChange={e => handleOptionChange(idx, oIdx, e.target.value)}
-                    placeholder="옵션"
-                  />
-                  <button className="text-xs text-red-400 hover:underline" onClick={() => removeOption(idx, oIdx)}>옵션 삭제</button>
+                    value={q.max_num || 1}
+                    onChange={(e) => handleMaxNumChange(idx, Number(e.target.value))}
+                  >
+                    {Array.from({ length: q.options.length }, (_, i) => i + 1).map(
+                      (i) => (
+                        <option key={i} value={i}>
+                          {i}
+                        </option>
+                      )
+                    )}
+                  </select>
                 </div>
-              ))}
-              {(q.type === QuestionTypeEnum.MULTIPLE || q.type === QuestionTypeEnum.CHECKBOX) && (
-                <button className="text-xs text-blue-500 hover:underline mt-1" onClick={() => addOption(idx)}>옵션 추가</button>
               )}
             </div>
-            {q.type === QuestionTypeEnum.CHECKBOX && (
-              <div className="flex items-center gap-2 mt-2">
-                <label className="text-sm text-gray-600">최대 선택 가능 수:</label>
-                <select
-                  className="border p-1 rounded text-base"
-                  value={q.max_num || 1}
-                  onChange={e => handleMaxNumChange(idx, Number(e.target.value))}
-                >
-                  {Array.from({length: q.options.length}, (_, i) => i+1).map(i => (
-                    <option key={i} value={i}>{i}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-        ))}
-        <button className="w-full bg-gray-200 py-2 rounded mb-4 font-semibold hover:bg-gray-300" onClick={addQuestion}>질문 추가</button>
+          ))}
+        <button
+          className="w-full bg-gray-200 py-2 rounded mb-4 font-semibold hover:bg-gray-300"
+          onClick={addQuestion}
+        >
+          질문 추가
+        </button>
         <button
           onClick={save}
           disabled={loading}
