@@ -65,9 +65,13 @@ interface SurveyState {
   setStep3: (data: Partial<SurveyStep3>) => void;
   step5: SurveyStep5;
   setStep5: (data: SurveyStep5) => void;
+  createdSurveyId: number | null;
+  setCreatedSurveyId: (id: number) => void;
 
   surveySubmitStatus: SurveySubmitStatus;
   setSurveySubmitStatus: (status: SurveySubmitStatus) => void;
+
+  resetSurvey: () => void;
 }
 
 export const useSurveyStore = create<SurveyState>((set) => ({
@@ -118,8 +122,35 @@ export const useSurveyStore = create<SurveyState>((set) => ({
     set(() => ({
       step5: data,
     })),
+  createdSurveyId: null,
+  setCreatedSurveyId: (id) => set(() => ({ createdSurveyId: id })),
 
   surveySubmitStatus: null,
   setSurveySubmitStatus: (status) =>
     set(() => ({ surveySubmitStatus: status })),
+
+  resetSurvey: () =>
+    set(() => ({
+      selectedVideo: null,
+      step1: {
+        video: null,
+        start_at: "",
+        end_at: "",
+      },
+      step2: {
+        survey_title: "",
+        is_released: true,
+        release_date: "",
+        genre: "",
+      },
+      step3: {
+        surveyType: SurveyTypeEnum.OFFICIAL,
+        reward_amount: 0,
+        reward: 0,
+        expert_reward: 0,
+      },
+      step5: {
+        customQuestions: [],
+      },
+    })),
 }));

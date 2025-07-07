@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import YoutubeSearchBox from "../../components/YoutubeSearchBox";
 import Button from "@/components/ui/Button";
 import DateRangePicker from "../../components/DateRangePicker";
-import Link from "next/link";
 
 interface Step1Props {
   onNext: () => void;
@@ -15,6 +15,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const { selectedVideo, setStep1 } = useSurveyStore();
+  const [error, setError] = useState<string | null>(null);
 
   const isValid =
     selectedVideo !== null &&
@@ -24,12 +25,23 @@ export default function Step1YouTube({ onNext }: Step1Props) {
     !isNaN(endDate.getTime());
 
   const handleNext = () => {
+    if (
+      !startDate ||
+      !endDate ||
+      isNaN(startDate.getTime()) ||
+      isNaN(endDate.getTime())
+    ) {
+      setError("설문 시작일과 종료일을 정확히 입력해주세요.");
+      return;
+    }
+
     setStep1({
       video: selectedVideo,
       start_at: startDate?.toISOString(),
       end_at: endDate?.toISOString(),
     });
 
+    setError(null);
     onNext();
   };
 
@@ -62,6 +74,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
             setEndDate(end);
           }}
         />
+        {error && <p className="text-sm text-red-500 mt-2 px-2">{error}</p>}
       </div>
 
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">

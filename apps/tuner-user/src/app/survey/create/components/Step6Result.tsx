@@ -16,7 +16,7 @@ interface StatusUI {
   title: string;
   message: string;
   buttonText: string;
-  link?: string; // 선택적 링크
+  link?: string;
 }
 
 const statusMap: Record<StatusKey, StatusUI> = {
@@ -25,7 +25,6 @@ const statusMap: Record<StatusKey, StatusUI> = {
     title: "설문 생성 완료",
     message: "설문이 성공적으로 생성되었습니다.",
     buttonText: "설문 보기",
-    link: "/survey",
   },
   error: {
     image: "/images/x.png",
@@ -49,10 +48,15 @@ const statusMap: Record<StatusKey, StatusUI> = {
 };
 
 export default function Step6Result({ onPrev }: Step6Props) {
-  const { surveySubmitStatus } = useSurveyStore();
+  const { surveySubmitStatus, createdSurveyId } = useSurveyStore();
 
   const status: StatusKey = surveySubmitStatus || "error";
   const ui = statusMap[status];
+
+  const dynamicLink =
+    status === "success" && createdSurveyId
+      ? `/survey/${createdSurveyId}`
+      : ui.link;
 
   return (
     <div className="flex justify-center px-4">
@@ -69,8 +73,8 @@ export default function Step6Result({ onPrev }: Step6Props) {
           <p className="text-base text-gray-600 mt-2">{ui.message}</p>
         </div>
 
-        {ui.link ? (
-          <Link href={ui.link} className="w-full">
+        {dynamicLink ? (
+          <Link href={dynamicLink} className="w-full">
             <Button color="blue">{ui.buttonText}</Button>
           </Link>
         ) : (
