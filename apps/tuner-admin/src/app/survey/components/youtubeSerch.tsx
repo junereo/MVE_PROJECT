@@ -14,12 +14,31 @@ export default function YoutubeSearch() {
   const [query, setQuery] = useState("");
   const [videos, setVideos] = useState<YoutubeVideo[]>([]);
   const router = useRouter();
-
   const handleSearch = async () => {
     if (!query.trim()) return;
-    const results = await fetchYoutubeVideos(query);
 
-    setVideos(results);
+    try {
+      const url = new URL(query, "https://www.youtube.com");
+      const videoId = url.searchParams.get("v");
+
+      if (videoId) {
+        const result = await fetchYoutubeVideos(videoId, true);
+        if (result && !Array.isArray(result)) {
+          setVideos([result]);
+          return;
+        }
+      }
+
+      const results = await fetchYoutubeVideos(query);
+      if (results && Array.isArray(results)) {
+        setVideos(results);
+      } else {
+        setVideos([]);
+      }
+    } catch (err) {
+      console.error("검색 중 오류 발생:", err);
+      setVideos([]);
+    }
   };
 
   return (
@@ -29,7 +48,7 @@ export default function YoutubeSearch() {
         <div className="flex gap-2 mb-4 max-w-3x">
           <input
             className="border border-gray-400 p-2 flex-1 rounded"
-            placeholder="검색어를 입력해주세요"
+            placeholder="검색어 또는 Url 을 입력해주세요"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {

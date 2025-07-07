@@ -101,7 +101,7 @@ const LoginForm = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-neutral-800 text-white text-lg font-semibold py-3 rounded-md transition-colors duration-300"
+            className="w-full bg-blue-600 hover:bg-blue-800 text-white text-lg font-semibold py-3 rounded-md transition-colors duration-300"
           >
             로그인
           </button>

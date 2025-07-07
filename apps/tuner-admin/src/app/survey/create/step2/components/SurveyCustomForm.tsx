@@ -19,6 +19,7 @@ interface SurveyCustomFormProps {
   onChangeType: (index: number, type: QuestionTypeEnum) => void;
   onChangeOption: (qIndex: number, optIndex: number, value: string) => void;
   onAddOption: (qIndex: number) => void;
+  onRemove: (id: number) => void;
 }
 
 export default function SurveyCustomForm({
@@ -29,6 +30,7 @@ export default function SurveyCustomForm({
   onChangeType,
   onChangeOption,
   onAddOption,
+  onRemove,
 }: SurveyCustomFormProps) {
   const lastQuestionRef = useRef<HTMLDivElement>(null);
 
@@ -50,9 +52,17 @@ export default function SurveyCustomForm({
         <div
           key={q.id}
           ref={qIndex === questions.length - 1 ? lastQuestionRef : null}
-          className="mb-6 border p-4 rounded"
+          className="mb-6 border p-4 rounded relative"
         >
-          {/* 질문 제목과 유형 드롭다운 */}
+          <button
+            onClick={() => onRemove(q.id)}
+            className="absolute top-0 right-1  text-blue-500 text-sm hover:text-red-500"
+            title="질문 삭제"
+          >
+            ✕
+          </button>
+
+          {/* 질문 제목 + 드롭다운 */}
           <div className="flex justify-between items-center mb-2">
             <div className="font-semibold">질문 {qIndex + 1}</div>
             <Dropdown
@@ -71,7 +81,6 @@ export default function SurveyCustomForm({
               }}
             />
           </div>
-
           {/* 질문 텍스트 입력 */}
           <input
             type="text"

@@ -4,6 +4,13 @@ export interface LoginFormData {
   email: string;
   password: string;
 }
+// 유튜브 타입
+export interface YoutubeVideo {
+  videoId: string;
+  title: string;
+  thumbnail: string;
+  channelTitle: string;
+}
 
 export enum AdminRole {
   superadmin = 0,
@@ -112,4 +119,14 @@ export interface SurveyData {
     role: string;
   };
   result: unknown;
+}
+
+export interface SurveyCustomFormProps {
+  questions: CustomQuestion[];
+  typeOptions: { label: string; value: QuestionTypeEnum }[];
+  onAdd: () => void;
+  onChangeText: (index: number, text: string) => void;
+  onChangeType: (index: number, type: QuestionTypeEnum) => void;
+  onChangeOption: (qIndex: number, optIndex: number, value: string) => void;
+  onAddOption: (qIndex: number) => void;
 }

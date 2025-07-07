@@ -72,7 +72,6 @@ export default function SurveyComplete() {
     survey_title: step1.survey_title, // 설문 제목
     title: step1.title,
     music_uri: step1.url, // 유튜브 URL
-    thumbnail_uri: step1.youtubeThumbnail,
     artist: step1.artist,
     release_date: step1.releaseDate, // 발매일 (YYYY-MM-DD 형식)
     thumbnail_url: step1.youtubeThumbnail,

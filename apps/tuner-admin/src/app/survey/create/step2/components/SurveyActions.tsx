@@ -8,7 +8,7 @@ export default function SurveyActions({
   onComplete,
 }: SurveyActionsProps) {
   return (
-    <div className="flex justify-center gap-4">
+    <div className="flex justify-center gap-4 mt-4">
       <button
         className="bg-gray-400 text-white px-6 py-2 rounded"
         onClick={onTempSave}

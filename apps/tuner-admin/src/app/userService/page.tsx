@@ -6,6 +6,7 @@ import Dropdown from "@/app/components/ui/DropDown";
 import RankChangeModal from "./components/RankChaingeModal";
 import RewardModal from "./components/RewardModal";
 import { useSessionStore } from "@/store/useAuthmeStore";
+import { useRouter } from "next/navigation";
 
 interface User {
   id: number;
@@ -24,6 +25,7 @@ interface ServerUser {
 }
 export default function AdminUserPage() {
   const { user } = useSessionStore();
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [threshold, setThreshold] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
@@ -219,7 +221,11 @@ export default function AdminUserPage() {
             </thead>
             <tbody>
               {paginatedUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-blue-50">
+                <tr
+                  key={user.id}
+                  className="hover:bg-blue-50 cursor-pointer"
+                  onClick={() => router.push(`/userService/${user.id}`)} // 🔥 여기가 핵심!
+                >
                   <td className="border px-2 py-1">{user.id}</td>
                   <td
                     className="border px-2 py-1 truncate whitespace-nowrap overflow-hidden max-w-[140px]"
@@ -235,7 +241,10 @@ export default function AdminUserPage() {
                   </td>
                   <td className="border px-2 py-1 capitalize">{user.role}</td>
                   <td className="border px-2 py-1">{user.rewardLeft} STK</td>
-                  <td className="border px-2 py-1 space-x-2">
+                  <td
+                    className="border px-2 py-1 space-x-2"
+                    onClick={(e) => e.stopPropagation()} // ⚠️ 버튼 클릭 시 페이지 이동 막기
+                  >
                     <button
                       className="bg-yellow-400 px-2 py-1 rounded text-white text-xs"
                       onClick={() => handleRankClick(user.id, user.nickname)}
