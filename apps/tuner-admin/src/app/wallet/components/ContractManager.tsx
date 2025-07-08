@@ -26,6 +26,7 @@ export default function ContractManager() {
   const [caSurvey, setCaSurvey] = useState("");
   const [caTransac, setCaTransac] = useState("");
   const [abiSurvey, setAbiSurvey] = useState("");
+  const [abiBadge, setAbiBadge] = useState("");
   const [abiTransac, setAbiTransac] = useState("");
 
   // 에러 상태 관리
@@ -35,6 +36,7 @@ export default function ContractManager() {
     caSurvey: false,
     caTransac: false,
     abiSurvey: false,
+    abiBadge: false,
     abiTransac: false,
   });
 
@@ -61,13 +63,15 @@ export default function ContractManager() {
   };
 
   // ABI 입력값 변경 시 검증
-  const handleAbiChange = (field: 'abiSurvey' | 'abiTransac', value: string) => {
+  const handleAbiChange = (field: 'abiSurvey' | 'abiBadge' | 'abiTransac', value: string) => {
     const isValid = validateAbiFormat(value);
     setErrors(prev => ({ ...prev, [field]: !isValid }));
     
     // 해당 필드의 setter 함수 호출
     if (field === 'abiSurvey') {
       setAbiSurvey(value);
+    } else if (field === 'abiBadge') {
+      setAbiBadge(value);
     } else {
       setAbiTransac(value);
     }
@@ -82,6 +86,7 @@ export default function ContractManager() {
       setCaSurvey(data.ca_survey || "");
       setCaTransac(data.ca_transac || "");
       setAbiSurvey(data.abi_survey ? JSON.stringify(data.abi_survey, null, 2) : "");
+      setAbiBadge(data.abi_badge ? JSON.stringify(data.abi_badge, null, 2) : "");
       setAbiTransac(data.abi_transac ? JSON.stringify(data.abi_transac, null, 2) : "");
       
       // 초기 로드 시 에러 상태 초기화
@@ -91,6 +96,7 @@ export default function ContractManager() {
         caSurvey: false,
         caTransac: false,
         abiSurvey: false,
+        abiBadge: false,
         abiTransac: false,
       });
     } catch (e) {
@@ -103,13 +109,14 @@ export default function ContractManager() {
   }, []);
 
   const handleContractSave = async () => {
-    if (!caToken || !caBadge || !caSurvey || !caTransac || !abiSurvey || !abiTransac) {
+    if (!caToken || !caBadge || !caSurvey || !caTransac || !abiSurvey || !abiBadge || !abiTransac) {
       let emptyFields = [];
       if (!caToken) emptyFields.push("Token Address");
       if (!caBadge) emptyFields.push("Badge Address");
       if (!caSurvey) emptyFields.push("Survey Address");
       if (!caTransac) emptyFields.push("Transac Address");
       if (!abiSurvey) emptyFields.push("Survey ABI");
+      if (!abiBadge) emptyFields.push("Badge ABI");
       if (!abiTransac) emptyFields.push("Transac ABI");
       alert(`빈 값: ${emptyFields.join(", ")}`);
       return;
@@ -125,6 +132,7 @@ export default function ContractManager() {
       if (errors.caSurvey) errorFields.push("서베이 컨트랙트");
       if (errors.caTransac) errorFields.push("메타 트랜잭션 컨트랙트");
       if (errors.abiSurvey) errorFields.push("Survey ABI");
+      if (errors.abiBadge) errorFields.push("Badge ABI");
       if (errors.abiTransac) errorFields.push("Transac ABI");
       
       alert(`입력 형식이 올바르지 않습니다.\n\n문제가 있는 필드:\n${errorFields.join("\n")}\n\n컨트랙트 주소: 0x로 시작하고 총 42자여야 합니다.\nABI: [ 또는 { 로 시작해야 합니다.`);
@@ -138,6 +146,7 @@ export default function ContractManager() {
         ca_survey: caSurvey,
         ca_transac: caTransac,
         abi_survey: JSON.parse(abiSurvey),
+        abi_badge: JSON.parse(abiBadge),
         abi_transac: JSON.parse(abiTransac),
       });
       toast.success("컨트랙트 정보가 저장되었습니다.");
@@ -217,6 +226,20 @@ export default function ContractManager() {
         )}
       </div>
       
+      <div>
+        <label className="font-semibold">Badge ABI (JSON)</label>
+        <textarea
+          className={`border rounded p-2 w-full font-mono ${errors.abiBadge ? "border-red-500" : ""}`}
+          rows={4}
+          placeholder="Badge ABI (JSON)"
+          value={abiBadge}
+          onChange={e => handleAbiChange('abiBadge', e.target.value)}
+        />
+        {errors.abiBadge && (
+          <p className="text-red-500 text-sm mt-1">형식이 맞지 않습니다</p>
+        )}
+      </div>
+
       <div>
         <label className="font-semibold">Transac ABI (JSON)</label>
         <textarea
