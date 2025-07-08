@@ -1,7 +1,7 @@
 import { useSurveyStore } from "../store/useSurveyStore";
 import { SurveyPayload } from "../types/surveyPayload";
 import { SurveyStatusEnum } from "../types/enums";
-import { InputTypeEnum, QuestionTypeEnum } from "../types/enums";
+import { QuestionTypeEnum } from "../types/enums";
 
 export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
   const { selectedVideo, step1, step2, step3, step4 } =
@@ -31,15 +31,13 @@ export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
     question_type: QuestionTypeEnum.FIXED,
     questions: 1,
 
-    allQuestions: JSON.stringify(
-      allQuestions.map((q) => ({
-        question_text: q.question_text,
-        type: q.type,
-        category: q.category,
-        question_type: q.question_type,
-        options: q.options ?? [],
-      }))
-    ),
+    survey_question: allQuestions.map((q) => ({
+      question_text: q.question_text,
+      type: q.type,
+      category: q.category,
+      question_type: q.question_type,
+      options: q.options ?? [],
+    })),
 
     status,
   };

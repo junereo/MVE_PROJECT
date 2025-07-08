@@ -2,9 +2,11 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
-import { useDefaultQuestionStore } from "@/features/survey/store/useQuestionStore";
+import {
+  useDefaultQuestionStore,
+  Questions,
+} from "@/features/survey/store/useSurveyStore";
 import { fetchSurveyQuestions } from "@/features/survey/services/survey";
-import type { QuestionItem } from "@/features/survey/store/useQuestionStore";
 import { InputTypeEnum, QuestionTypeEnum } from "@/features/survey/types/enums";
 
 import Button from "@/components/ui/Button";
@@ -74,10 +76,10 @@ export default function Step2Default({
 
         const rawMap = data.question as QuestionMap;
 
-        const defaultQuestions: QuestionItem[] = Object.entries(rawMap).flatMap(
+        const defaultQuestions: Questions[] = Object.entries(rawMap).flatMap(
           ([category, items]) =>
             items.map(
-              (q, index): QuestionItem => ({
+              (q, index): Questions => ({
                 id: index + 1,
                 category,
                 question_text: q.question_text,
