@@ -45,7 +45,8 @@ cron.schedule('* * * * *', async () => {
       });
 
       for (const participant of participants) {
-        const isExpert = participant.user.role === 'expert';
+        if (!participant.user || participant.user_id == null) continue;
+        const isExpert = participant.user.badge_issued_at != null;
         const rewardAmount = isExpert
           ? survey.expert_reward ?? 0
           : survey.reward ?? 0;
