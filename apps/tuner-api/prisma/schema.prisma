@@ -243,6 +243,7 @@ model TunerContract {
   ca_survey   String?
   ca_transac  String?
   abi_survey  Json?
+  abi_badge   Json?
   abi_transac Json?
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
