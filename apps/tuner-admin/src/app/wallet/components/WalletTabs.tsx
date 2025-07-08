@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import axios from 'axios';
+import { toast } from 'sonner';
 
 export default function WalletTabs() {
     const [uid, setUid] = useState('');
@@ -15,7 +17,19 @@ export default function WalletTabs() {
     const [activeSubTab] = useState<string>('createWallet');
     const baseUrl = 'http://localhost:4000';
 
-    // 실제 요청 함수는 props로 넘기거나 context로 처리하는 것이 좋으나, 예시로 버튼만 둡니다.
+    // API 요청 함수
+    const handleRequest = async (
+        url: string,
+        method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+        data?: Record<string, unknown>,
+    ) => {
+        try {
+            const res = await axios({ url, method, data });
+            toast.success('성공: ' + (res.data?.message || ''));
+        } catch (e: any) {
+            toast.error(e?.response?.data?.error || '요청 실패');
+        }
+    };
 
     return (
         <Tabs value={activeMainTab} onValueChange={setActiveMainTab}>
@@ -47,7 +61,17 @@ export default function WalletTabs() {
                                 value={uid}
                                 onChange={(e) => setUid(e.target.value)}
                             />
-                            <Button>지갑 생성</Button>
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl + '/contract/wallet',
+                                        'POST',
+                                        { uid },
+                                    )
+                                }
+                            >
+                                지갑 생성
+                            </Button>
                         </div>
                     </TabsContent>
 
@@ -63,7 +87,17 @@ export default function WalletTabs() {
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
                             />
-                            <Button>토큰 생성</Button>
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl + '/contract/wallet/token',
+                                        'POST',
+                                        { uid, value },
+                                    )
+                                }
+                            >
+                                토큰 생성
+                            </Button>
                         </div>
                     </TabsContent>
 
@@ -74,7 +108,17 @@ export default function WalletTabs() {
                                 value={uid}
                                 onChange={(e) => setUid(e.target.value)}
                             />
-                            <Button>토큰 조회</Button>
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl +
+                                            `/contract/wallet/token/${uid}`,
+                                        'GET',
+                                    )
+                                }
+                            >
+                                토큰 조회
+                            </Button>
                         </div>
                     </TabsContent>
 
@@ -95,7 +139,17 @@ export default function WalletTabs() {
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
                             />
-                            <Button>토큰 전송</Button>
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl + '/contract/wallet/token',
+                                        'PUT',
+                                        { uid, to, value: Number(value) },
+                                    )
+                                }
+                            >
+                                토큰 전송
+                            </Button>
                         </div>
                     </TabsContent>
 
@@ -111,7 +165,17 @@ export default function WalletTabs() {
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
                             />
-                            <Button>토큰 소각</Button>
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl + '/contract/wallet/token',
+                                        'DELETE',
+                                        { uid, value: Number(value) },
+                                    )
+                                }
+                            >
+                                토큰 소각
+                            </Button>
                         </div>
                     </TabsContent>
 
@@ -122,7 +186,17 @@ export default function WalletTabs() {
                                 value={uid}
                                 onChange={(e) => setUid(e.target.value)}
                             />
-                            <Button>뱃지 조회</Button>
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl +
+                                            `/contract/wallet/badge/${uid}`,
+                                        'GET',
+                                    )
+                                }
+                            >
+                                뱃지 조회
+                            </Button>
                         </div>
                     </TabsContent>
                 </Tabs>
@@ -156,7 +230,17 @@ export default function WalletTabs() {
                                 value={answers}
                                 onChange={(e) => setAnswers(e.target.value)}
                             />
-                            <Button>설문 제출</Button>
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl + `/contract/survey/submit`,
+                                        'POST',
+                                        { uid, surveyId, answers },
+                                    )
+                                }
+                            >
+                                설문 제출
+                            </Button>
                         </div>
                     </TabsContent>
 
@@ -167,7 +251,17 @@ export default function WalletTabs() {
                                 value={surveyId}
                                 onChange={(e) => setSurveyId(e.target.value)}
                             />
-                            <Button>설문 URI 조회</Button>
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl +
+                                            `/contract/survey/uri/${surveyId}`,
+                                        'GET',
+                                    )
+                                }
+                            >
+                                설문 URI 조회
+                            </Button>
                         </div>
                     </TabsContent>
                 </Tabs>
@@ -200,20 +294,57 @@ export default function WalletTabs() {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                             />
-                            <Button>TxPool 서명</Button>
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl + `/contract/tx/sign`,
+                                        'POST',
+                                        { message },
+                                    )
+                                }
+                            >
+                                TxPool 서명
+                            </Button>
                         </div>
                     </TabsContent>
 
                     <TabsContent value="submitTxPool">
-                        <Button>TxPool 제출</Button>
+                        <Button
+                            onClick={() =>
+                                handleRequest(
+                                    baseUrl + `/contract/tx/submit`,
+                                    'POST',
+                                )
+                            }
+                        >
+                            TxPool 제출
+                        </Button>
                     </TabsContent>
 
                     <TabsContent value="clearTxPool">
-                        <Button>TxPool 초기화</Button>
+                        <Button
+                            onClick={() =>
+                                handleRequest(
+                                    baseUrl + `/contract/tx/clear`,
+                                    'GET',
+                                )
+                            }
+                        >
+                            TxPool 초기화
+                        </Button>
                     </TabsContent>
 
                     <TabsContent value="viewTxPool">
-                        <Button>TxPool 조회</Button>
+                        <Button
+                            onClick={() =>
+                                handleRequest(
+                                    baseUrl + `/contract/tx/pool`,
+                                    'GET',
+                                )
+                            }
+                        >
+                            TxPool 조회
+                        </Button>
                     </TabsContent>
                 </Tabs>
             </TabsContent>
