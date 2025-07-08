@@ -3,6 +3,7 @@ import express, { Router } from "express";
 import walletRoutes from "./wallet.routes";
 import txpoolRoutes from "./txpool.routes";
 import surveyRoutes from "./survey.routes";
+import contractRoutes from "./contract.info.routes";
 import { verifyToken } from "../middlewares/auth.middleware";
 
 const router: Router = express.Router();
@@ -11,5 +12,6 @@ const router: Router = express.Router();
 router.use('/wallet',  walletRoutes);
 router.use('/tx',  txpoolRoutes);
 router.use('/survey',  surveyRoutes);
+router.use('/ca',  contractRoutes);
 
 export default router;
