@@ -26,7 +26,8 @@ const typeOptions = [
 ];
 
 export default function Step5Custom({ onPrev, onNext }: Step5Props) {
-  const { setStep5, setSurveySubmitStatus } = useSurveyStore();
+  const { setStep5, setSurveySubmitStatus, setCreatedSurveyId, resetSurvey } =
+    useSurveyStore();
   const [questions, setQuestions] = useState<CustomQuestion[]>([
     {
       id: 1,
@@ -116,8 +117,12 @@ export default function Step5Custom({ onPrev, onNext }: Step5Props) {
 
     try {
       const payload = formatSurveyPayload(SurveyStatusEnum.COMPLETE);
-      await createSurvey(payload);
+      const res = await createSurvey(payload);
+      const surveyId = res.data.data.id;
+      setCreatedSurveyId(surveyId);
+      console.log("설문 생성", res);
       setSurveySubmitStatus("success");
+      resetSurvey();
       onNext();
     } catch (err) {
       console.error("설문 생성 에러", err);

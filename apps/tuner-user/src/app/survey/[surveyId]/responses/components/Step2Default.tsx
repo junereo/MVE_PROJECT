@@ -2,9 +2,9 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
-import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
+import { useDefaultQuestionStore } from "@/features/survey/store/useQuestionStore";
 import { fetchSurveyQuestions } from "@/features/survey/services/survey";
-import type { QuestionItem } from "@/features/survey/store/useDefaultQuestionStore";
+import type { QuestionItem } from "@/features/survey/store/useQuestionStore";
 import { InputTypeEnum, QuestionTypeEnum } from "@/features/survey/types/enums";
 
 import Button from "@/components/ui/Button";

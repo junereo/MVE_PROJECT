@@ -69,8 +69,9 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
 
         <Input
           label="설문 제목"
-          placeholder="예) 6월 감성 R&B 설문"
+          placeholder="30자 이내, 예) 6월 감성 R&B 설문"
           value={surveyTitle}
+          maxLength={30}
           onChange={(e) => setSurveyTitle(e.target.value)}
         />
         <div className="space-y-2">
