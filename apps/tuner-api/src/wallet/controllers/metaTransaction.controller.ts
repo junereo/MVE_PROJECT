@@ -13,6 +13,7 @@ export const createWallet =  async (req: Request, res: Response) => {
   console.log(uid);
   try {
     const wallet = await metaTransctionService.createWallet(uid);
+    console.log(wallet);
     res.json({ address: wallet.address });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

@@ -4,8 +4,8 @@ import {
     Contract, 
     Wallet,
 } from 'ethers';
-import contractABI from '../../../ABI/meta_transction_ABI.json' assert { type: 'json' };
 import { MetaTransctionService } from './meta_transction.service';
+import { TunerContractService } from './tunerContract.service';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -15,6 +15,7 @@ interface TxMessage {
 }
 
 interface TxPoolItem {
+  user_id: string;
   message: TxMessage;
   signature: string;
 }
@@ -25,6 +26,7 @@ export class TxPoolService {
     private wallet!: Wallet;
     private msgSigner!: Contract;
     private metaService: MetaTransctionService;
+    private tunerContractService = new TunerContractService();
 
     constructor(metaService: MetaTransctionService) {
         this.metaService = metaService;
@@ -34,6 +36,16 @@ export class TxPoolService {
         this.provider = new JsonRpcProvider(process.env.SEPLOIA_RPC_URL!);
         this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
         const contractAddress = process.env.META_CONTRACT_ADDRESS!;
+        // DB에서 ABI 동적 로드
+        const latest = await this.tunerContractService.getLatestContract();
+        let contractABI: any[] = [];
+        if (latest?.abi_transac) {
+          if (typeof latest.abi_transac === 'string') {
+            contractABI = JSON.parse(latest.abi_transac);
+          } else {
+            contractABI = latest.abi_transac as any[];
+          }
+        }
         this.msgSigner = new Contract(contractAddress, contractABI, this.provider).connect(this.wallet) as Contract;
     }
 
@@ -44,7 +56,7 @@ export class TxPoolService {
   async verifyAndAdd(message: string, uid: string): Promise<TxPoolItem> {
     const singer_wallet = await this.metaService.createWallet(uid);
     const signature = await this.metaService.createSign(singer_wallet, JSON.stringify(message));
-    const txData = { message : {sender: singer_wallet.address, data: message}, signature };
+    const txData = { user_id: uid, message : {sender: singer_wallet.address, data: message}, signature };
     this.txpool.push(txData);
     return txData;
   }

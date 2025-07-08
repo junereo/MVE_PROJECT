@@ -2,6 +2,7 @@
 import express, { Request, Response, Router } from 'express';
 import { TxPoolService } from '../services/txpool.service.js';
 import { MetaTransctionService } from '../services/meta_transction.service.js';
+import { updateWithdrawStatus } from '../services/withdraw.service';
 
 const router: Router = express.Router();
 
@@ -48,9 +49,20 @@ export const txSign = async(req: Request, res: Response) => {
 // 3. txpool 처리 (트랜잭션 실행)
 export const submit = async (req: Request, res: Response) => {
   try {
+    // 트랜잭션 처리
     const result = await txPoolService.processPool();
+    // 트랜잭션 결과에서 user_id, txhash 추출 (예시)
+    // 실제 result 구조에 따라 아래를 수정해야 함
+    // 예: result = { user_id, hash }
+    if (result && result.hash && result.user_id) {
+      await updateWithdrawStatus(Number(result.user_id), 'completed', result.hash);
+    }
     res.status(200).json(result);
   } catch (err:any) {
+    // 실패 시 user_id, txhash가 있다면 failed로 업데이트
+    if (err && err.user_id && err.hash) {
+      await updateWithdrawStatus(Number(err.user_id), 'failed', err.hash);
+    }
     console.error('TxPool processing error:', err);
     res.status(500).json({ error: 'Failed to process txpool', details: err.message });
   }
