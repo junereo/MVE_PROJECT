@@ -47,7 +47,7 @@ const statusMap: Record<StatusKey, StatusUI> = {
   },
 };
 
-export default function Step6Result({ onPrev }: Step6Props) {
+export default function Step5Result({ onPrev }: Step6Props) {
   const { surveySubmitStatus, createdSurveyId } = useSurveyStore();
 
   const status: StatusKey = surveySubmitStatus || "error";

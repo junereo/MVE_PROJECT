@@ -12,8 +12,8 @@ interface Step1Props {
 }
 
 export default function Step1YouTube({ onNext }: Step1Props) {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [endDate, setEndDate] = useState<Date | null>(new Date());
   const { selectedVideo, setStep1 } = useSurveyStore();
   const [error, setError] = useState<string | null>(null);
 
