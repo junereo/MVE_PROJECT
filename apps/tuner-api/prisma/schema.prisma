@@ -176,6 +176,7 @@ model Survey {
   updated_at    DateTime              @updatedAt
   creator       User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   questions     Int
+  survey_question Json? 
   participants  Survey_Participants[]
   result        Survey_Result?
 }
