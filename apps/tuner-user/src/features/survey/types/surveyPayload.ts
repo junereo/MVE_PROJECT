@@ -26,7 +26,7 @@ export type SurveyPayload = {
   // 질문
   question_type: QuestionTypeEnum;
   questions: number; // 고정 질문 id
-  allQuestions?: string; // 커스텀 질문 JSON.stringify 문자열
+  allQuestions?: string; // 고정 + 커스텀 질문 JSON.stringify 문자열
 
   // 상태
   status: SurveyStatusEnum;

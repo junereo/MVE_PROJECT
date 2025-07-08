@@ -38,17 +38,20 @@ export type SurveyStep3 = {
   expert_reward: number;
 };
 
-// Step5Custom
-export type CustomQuestion = {
+// 기본 설문 + 커스텀 설문
+export type Questions = {
   id: number;
-  question_type: QuestionTypeEnum.CUSTOM;
+  category: string;
   question_text: string;
   type: InputTypeEnum;
-  options: string[];
+  question_type: QuestionTypeEnum;
+  options?: string[];
 };
 
-export interface SurveyStep5 {
-  customQuestions: CustomQuestion[];
+// Step4Question
+export interface SurveyStep4 {
+  questions: Questions[]; // 기본 질문
+  customQuestions: Questions[]; // 커스텀 질문
 }
 
 // 설문 생성 성공 / 에러 / 임시저장 성공 / 에러
@@ -63,16 +66,26 @@ interface SurveyState {
   setStep2: (data: Partial<SurveyStep2>) => void;
   step3: SurveyStep3;
   setStep3: (data: Partial<SurveyStep3>) => void;
-  step5: SurveyStep5;
-  setStep5: (data: SurveyStep5) => void;
+
+  step4: SurveyStep4;
+  setStep4: (data: SurveyStep4) => void;
+  addCustomQuestion: (question: Questions) => void; // 커스텀 질문 추가
+  updateCustomQuestion: (id: number, updated: Questions) => void; // 커스텀 질문 수정
+  removeCustomQuestion: (id: number) => void; // 커스텀 질문 삭제
+
+  createdSurveyId: number | null;
+  setCreatedSurveyId: (id: number) => void;
 
   surveySubmitStatus: SurveySubmitStatus;
   setSurveySubmitStatus: (status: SurveySubmitStatus) => void;
+
+  resetSurvey: () => void;
 }
 
 export const useSurveyStore = create<SurveyState>((set) => ({
   selectedVideo: null,
   setSelectedVideo: (video) => set(() => ({ selectedVideo: video })),
+
   step1: {
     video: null,
     start_at: "",
@@ -85,6 +98,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
         ...data,
       },
     })),
+
   step2: {
     survey_title: "",
     is_released: true,
@@ -98,6 +112,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
         ...data,
       },
     })),
+
   step3: {
     surveyType: SurveyTypeEnum.OFFICIAL,
     reward_amount: 0,
@@ -111,15 +126,69 @@ export const useSurveyStore = create<SurveyState>((set) => ({
         ...data,
       },
     })),
-  step5: {
+
+  step4: {
+    questions: [],
     customQuestions: [],
   },
-  setStep5: (data) =>
-    set(() => ({
-      step5: data,
+  setStep4: (data) => set({ step4: data }),
+
+  addCustomQuestion: (question) =>
+    set((state) => ({
+      step4: {
+        ...state.step4,
+        customQuestions: [...state.step4.customQuestions, question],
+      },
     })),
+
+  updateCustomQuestion: (id, updated) =>
+    set((state) => ({
+      step4: {
+        ...state.step4,
+        customQuestions: state.step4.customQuestions.map((q) =>
+          q.id === id ? updated : q
+        ),
+      },
+    })),
+
+  removeCustomQuestion: (id) =>
+    set((state) => ({
+      step4: {
+        ...state.step4,
+        customQuestions: state.step4.customQuestions.filter((q) => q.id !== id),
+      },
+    })),
+
+  createdSurveyId: null,
+  setCreatedSurveyId: (id) => set(() => ({ createdSurveyId: id })),
 
   surveySubmitStatus: null,
   setSurveySubmitStatus: (status) =>
     set(() => ({ surveySubmitStatus: status })),
+
+  resetSurvey: () =>
+    set(() => ({
+      selectedVideo: null,
+      step1: {
+        video: null,
+        start_at: "",
+        end_at: "",
+      },
+      step2: {
+        survey_title: "",
+        is_released: true,
+        release_date: "",
+        genre: "",
+      },
+      step3: {
+        surveyType: SurveyTypeEnum.OFFICIAL,
+        reward_amount: 0,
+        reward: 0,
+        expert_reward: 0,
+      },
+      step4: {
+        questions: [],
+        customQuestions: [],
+      },
+    })),
 }));

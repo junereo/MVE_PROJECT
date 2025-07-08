@@ -41,8 +41,7 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
       !isNaN(expert) &&
       total > 0 &&
       general > 0 &&
-      expert > 0 &&
-      total === general + expert);
+      expert > 0);
 
   const handleNext = () => {
     setStep3({

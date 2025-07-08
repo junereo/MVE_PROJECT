@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import { postSurveyAnswer } from "@/features/survey/services/survey";
 import { useAnswerStore } from "@/features/survey/store/useAnswerStore";
 import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
-import { useDefaultQuestionStore } from "@/features/survey/store/useDefaultQuestionStore";
+import { useDefaultQuestionStore } from "@/features/survey/store/useQuestionStore";
 import { formatDefaultAnswers } from "@/features/survey/utils/fotmatAnswers";
 import { SurveyStatusEnum } from "@/features/survey/types/enums";
 
