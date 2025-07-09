@@ -8,7 +8,7 @@ import {
   formatUnits,
   BigNumberish,
 } from 'ethers';
-import metaContractABI from '../../../ABI/meta_transction_ABI.json' assert { type: 'json' }; // Node.js에서 json import 시 필요
+import { TunerContractService } from './tunerContract.service';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -17,6 +17,7 @@ export class MetaTransctionService {
   wallet!: Wallet;
   contract!: Contract;
   msgSigner!: Contract;
+  private tunerContractService = new TunerContractService();
 
   constructor() {
     // init은 반드시 호출되어야 함
@@ -28,12 +29,36 @@ export class MetaTransctionService {
     );
 
     this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
+    // DB에서 ABI 및 contract address 동적 로드
+    const latest = await this.tunerContractService.getLatestContract();
+    let metaContractABI: any[] = [];
+    let badgeABI: any[] = [];
+    let contractAddress = '';
+    if (latest?.abi_transac) {
+      if (typeof latest.abi_transac === 'string') {
+        metaContractABI = JSON.parse(latest.abi_transac);
+      } else {
+        metaContractABI = latest.abi_transac as any[];
+      }
+    }
+    if (latest && 'abi_badge' in latest && latest.abi_badge) {
+      if (typeof latest.abi_badge === 'string') {
+        badgeABI = JSON.parse(latest.abi_badge);
+      } else {
+        badgeABI = latest.abi_badge as any[];
+      }
+    }
+    if (latest?.ca_transac) {
+      contractAddress = latest.ca_transac;
+    } else {
+      throw new Error('No contract address (ca_transac) found in TunerContract table');
+    }
     this.contract = new Contract(
-      process.env.META_CONTRACT_ADDRESS!,
+      contractAddress,
       metaContractABI,
       this.provider
     );
-
+    // 필요하다면 badgeABI로 별도 컨트랙트 인스턴스 생성 가능
     this.msgSigner = this.contract.connect(this.wallet) as Contract;
   }
 

@@ -90,3 +90,9 @@ export const fetchTemplates = async (id: number | string) => {
 export const templatePut = async () => {
   await axiosClient.put("/survey/q/id");
 };
+
+// fixedQuestions 템플릿 불러오기 (서버에서)
+export const fetchFixedQuestions = async (questionnaireId: number | string = 1) => {
+  const response = await axiosClient.get(`/survey/q/${questionnaireId}`);
+  return response.data;
+};

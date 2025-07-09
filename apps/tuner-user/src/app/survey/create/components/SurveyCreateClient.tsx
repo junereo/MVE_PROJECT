@@ -18,7 +18,7 @@ export default function SurveyCreateClient() {
   if (!isInitialized) return null; // 아직 로그인 여부 확인 중이면 렌더링 X
 
   return (
-    <div className="mx-auto py-8">
+    <div>
       <Funnel>
         <Funnel.Step name="step1">
           <Step1YouTube onNext={() => setStep("step2")} />
@@ -51,10 +51,6 @@ export default function SurveyCreateClient() {
           <Step6Result onPrev={() => setStep("step5")} />
         </Funnel.Step>
       </Funnel>
-
-      <p className="text-center text-sm text-gray-400">
-        현재 단계: {currentStep}
-      </p>
     </div>
   );
 }

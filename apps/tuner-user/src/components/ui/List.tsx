@@ -33,7 +33,7 @@ export default function List({
   return (
     <div
       onClick={onClick}
-      className="flex gap-3 items-center p-3 sm:p-4 md:p-5 rounded-md border hover:shadow-sm transition bg-white w-full max-w-[485px] sm:max-w-[600px] md:max-w-[700px] mx-auto"
+      className="flex gap-3 items-center p-3 sm:p-4 md:p-5 rounded-md border hover:shadow-sm transition bg-white w-full max-w-[485px] sm:max-w-[600px] md:max-w-[700px] mx-auto cursor-pointer"
     >
       <div className="relative w-[100px] h-[60px] sm:w-[140px] sm:h-[80px] rounded overflow-hidden border shrink-0">
         <Image

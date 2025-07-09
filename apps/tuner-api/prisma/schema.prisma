@@ -176,6 +176,7 @@ model Survey {
   updated_at    DateTime              @updatedAt
   creator       User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   questions     Int
+  survey_question Json? 
   participants  Survey_Participants[]
   result        Survey_Result?
 }
@@ -231,7 +232,20 @@ model WithdrawalRequest {
   user_id      Int
   amount       Int
   txhash       String
-  status       WithdrawalStatus // PENDING | COMPLETED | REJECTED
+  status       WithdrawalStatus @default(pending)//   pending // 대기중 completed // 완료failed //실패
   requested_at DateTime         @default(now())
   user         User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model TunerContract {
+  id          Int      @id @default(autoincrement())
+  ca_token    String?
+  ca_badge    String?
+  ca_survey   String?
+  ca_transac  String?
+  abi_survey  Json?
+  abi_badge   Json?
+  abi_transac Json?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 }
