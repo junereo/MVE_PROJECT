@@ -1,6 +1,6 @@
 // src/wallet/service/survey.services.ts
 import { JsonRpcProvider, Contract, Wallet, keccak256, toUtf8Bytes } from 'ethers';
-import surveyABI from '../../../ABI/survey1155_ABI.json' assert { type: 'json' };
+import { TunerContractService } from './tunerContract.service';
 import { MetaTransctionService } from './meta_transction.service';
 import { create as createIpfsClient, IPFSHTTPClient } from 'ipfs-http-client';
 // import { createReadStream, existsSync } from 'fs';
@@ -37,6 +37,7 @@ export class SurveyService {
   private contract!: Contract;
   private metaService: MetaTransctionService;
   private txpool: TxPoolItem[] = [];
+  private tunerContractService = new TunerContractService();
 
   constructor(metaService: MetaTransctionService) {
     this.metaService = metaService;
@@ -45,6 +46,16 @@ export class SurveyService {
   async init(): Promise<void> {
     this.provider = new JsonRpcProvider(process.env.SEPLOIA_RPC_URL!);
     this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
+    // DB에서 ABI 동적 로드
+    const latest = await this.tunerContractService.getLatestContract();
+    let surveyABI: any[] = [];
+    if (latest?.abi_survey) {
+      if (typeof latest.abi_survey === 'string') {
+        surveyABI = JSON.parse(latest.abi_survey);
+      } else {
+        surveyABI = latest.abi_survey as any[];
+      }
+    }
     this.contract = new Contract(process.env.SURVEY_CONTRACT_ADDRESS!, surveyABI, this.wallet);
   }
 

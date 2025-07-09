@@ -19,6 +19,7 @@ export interface FixedQuestion {
   question_type: Question_type;
   type: QuestionTypeEnum;
   options: string[];
+  max_num?: number;
 }
 
 const fixedQuestions: FixedQuestion[] = [
@@ -71,6 +72,7 @@ const fixedQuestions: FixedQuestion[] = [
     question_type: Question_type.fixed,
     type: QuestionTypeEnum.CHECKBOX,
     options: ["광고", "영화/드라마", "무대 공연", "SNS 배경음", "없음"],
+    max_num: 3,
   },
   {
     category: "expandability",

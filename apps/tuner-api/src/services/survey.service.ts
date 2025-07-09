@@ -80,7 +80,6 @@ export const createSurveyParticipant = async ({
     where: { user_id, survey_id },
   });
 
-
   if (existing) {
     return await prisma.survey_Participants.update({
       where: { id: existing.id },
@@ -102,7 +101,7 @@ export const createSurveyParticipant = async ({
     },
   });
 
-  console.log("existing", result  )
+  console.log("existing", result)
 };
 
 // 설문 타입 유효성 검사
@@ -194,7 +193,6 @@ export const createSurvey = async ({
       //   question_order: FIXED_SURVEY_QUESTIONS.length + idx + 1,
       // }));
 
-      // 전체 질문 저장
       // const surveyCustoms = [...fixedQuestions, ...customQuestions];
       // if (surveyCustoms.length > 0) {
       //   await tx.survey_Custom.createMany({ data: surveyCustoms });
@@ -219,7 +217,7 @@ export const getSurveyListService = async () => {
   });
 };
 
-// 질문지 생성
+// 질문지 생성 또는 업데이트
 export const setSurveyQuestion = async ({
   surveyId,
   questionType,
@@ -231,8 +229,15 @@ export const setSurveyQuestion = async ({
   question: object;
   order: number;
 }) => {
-  return await prisma.survey_Question.create({
-    data: {
+  return await prisma.survey_Question.upsert({
+    where: { id: surveyId },
+    update: {
+      question_type: questionType,
+      question: question,
+      question_order: order,
+    },
+    create: {
+      id: surveyId,
       question_type: questionType,
       question: question,
       question_order: order,
@@ -256,16 +261,23 @@ export const getSurveyQuestions = async (surveyId: number) => {
   });
 };
 
-// 전체 조회 (GET)
+// 전체 조회 
 export const getAllSurveyParticipants = async () => {
   return await prisma.survey_Participants.findMany({
     orderBy: { created_at: "desc" },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          nickname: true,
+          role: true,
+        },
+      },
       survey: true,
     },
   });
 };
+
 
 // 설문 정보 수정
 export const updateSurveyService = async (surveyId: number, body: any) => {
