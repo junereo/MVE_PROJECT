@@ -170,7 +170,7 @@ model Survey {
   reward        Int?
   expert_reward Int?
   is_active     SurveyActive
-  ended_by      EndedBy?
+  ended_by      EndedBy?              @default(expired)
   status        SurveyStatus          @default(draft)
   created_at    DateTime              @default(now())
   updated_at    DateTime              @updatedAt
