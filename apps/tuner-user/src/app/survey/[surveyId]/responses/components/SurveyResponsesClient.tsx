@@ -3,16 +3,15 @@
 import { useFunnel } from "@/features/survey/hooks/useFunnel";
 import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
 import Step1Info from "./Step1Info";
-import Step2Default from "./Step2Default";
-import Step3Custom from "./Step3Custom";
-import Step4Result from "./Step4Result";
+import Step2Question from "./Step2Question";
+import Step3Result from "./Step3Result";
 
 interface SurveyResponsesClientProps {
   surveyId: number;
   surveyTitle: string;
 }
 
-type Step = "step1" | "step2" | "step3" | "step4";
+type Step = "step1" | "step2" | "step3";
 
 export default function SurveyResponsesClient({
   surveyId,
@@ -33,7 +32,7 @@ export default function SurveyResponsesClient({
           />
         </Funnel.Step>
         <Funnel.Step name="step2">
-          <Step2Default
+          <Step2Question
             surveyId={surveyId}
             surveyTitle={surveyTitle}
             onPrev={() => setStep("step1")}
@@ -41,15 +40,7 @@ export default function SurveyResponsesClient({
           />
         </Funnel.Step>
         <Funnel.Step name="step3">
-          <Step3Custom
-            surveyId={surveyId}
-            surveyTitle={surveyTitle}
-            onPrev={() => setStep("step2")}
-            onNext={() => setStep("step4")}
-          />
-        </Funnel.Step>
-        <Funnel.Step name="step4">
-          <Step4Result surveyId={surveyId} onPrev={() => setStep("step3")} />
+          <Step3Result surveyId={surveyId} onPrev={() => setStep("step2")} />
         </Funnel.Step>
       </Funnel>
 

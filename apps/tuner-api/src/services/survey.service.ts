@@ -68,7 +68,7 @@ export const createSurveyParticipant = async ({
     select: { status: true, is_active: true },
   });
 
-  console.log(user_id, survey_id)
+  console.log(user_id, survey_id);
 
   if (!survey) throw new Error("설문 없음");
   if (!canParticipateSurvey(survey)) {
@@ -102,6 +102,7 @@ export const createSurveyParticipant = async ({
   });
 
   console.log("existing", result)
+
 };
 
 // 설문 타입 유효성 검사
@@ -152,6 +153,7 @@ export const createSurvey = async ({
           end_at: endDate,
           is_active: checkSurveyActive(startDate, endDate),
           survey_title: body.survey_title,
+          survey_question: body.survey_question,
           status: body.status ?? "draft",
           reward: body.reward ?? 0,
           expert_reward: body.expert_reward ?? 0,

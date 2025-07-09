@@ -3,7 +3,7 @@
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Dropdown from "@/components/ui/DropDown";
-import { InputTypeEnum, QuestionTypeEnum } from "@/features/survey/types/enums";
+import { InputTypeEnum } from "@/features/survey/types/enums";
 import { Questions } from "@/features/survey/store/useSurveyStore";
 
 interface CustomFormProps {
@@ -14,7 +14,7 @@ interface CustomFormProps {
   onChangeText: (id: number, value: string) => void;
   onChangeType: (id: number, type: string) => void;
   onChangeOption: (qId: number, oIndex: number, value: string) => void;
-  onAddOption: (qIndex: number) => void;
+  onAddOption: (qId: number) => void;
 }
 
 export default function CustomForm({
@@ -34,6 +34,7 @@ export default function CustomForm({
           key={q.id}
           className="relative rounded-xl border bg-white p-5 space-y-4 shadow-sm"
         >
+          {/* 질문 번호 + 삭제 버튼 */}
           <div className="flex justify-between items-center">
             <h3 className="font-semibold text-sm text-gray-800">{`질문 ${
               qIndex + 1
@@ -47,6 +48,7 @@ export default function CustomForm({
             </button>
           </div>
 
+          {/* 유형 드롭다운 */}
           <Dropdown
             options={typeOptions.map((o) => o.label)}
             selected={
@@ -58,19 +60,21 @@ export default function CustomForm({
             }}
           />
 
+          {/* 질문 입력 */}
           <Input
             label="질문 내용"
             value={q.question_text}
             onChange={(e) => onChangeText(q.id, e.target.value)}
           />
 
+          {/* 객관식 (5개 고정) */}
           {q.type === InputTypeEnum.MULTIPLE && (
             <div className="space-y-2">
               {[...Array(5)].map((_, optIndex) => (
                 <input
                   key={optIndex}
                   type="text"
-                  value={(q.options ?? [])[optIndex] ?? ""}
+                  value={q.options?.[optIndex] ?? ""}
                   onChange={(e) =>
                     onChangeOption(q.id, optIndex, e.target.value)
                   }
@@ -81,6 +85,7 @@ export default function CustomForm({
             </div>
           )}
 
+          {/* 체크박스형 (기본 5개, 최대 8개) */}
           {q.type === InputTypeEnum.CHECKBOX && (
             <div className="space-y-2">
               {(q.options ?? []).map((opt, optIndex) => (
@@ -89,16 +94,17 @@ export default function CustomForm({
                   type="text"
                   value={opt}
                   onChange={(e) =>
-                    onChangeOption(qIndex, optIndex, e.target.value)
+                    onChangeOption(q.id, optIndex, e.target.value)
                   }
                   placeholder={`선택지 ${optIndex + 1}`}
                   className="w-full border rounded px-3 py-2 text-sm"
                 />
               ))}
-              {(q.options ?? []).length < 8 && (
+
+              {(q.options?.length ?? 0) < 8 && (
                 <button
                   type="button"
-                  onClick={() => onAddOption(qIndex)}
+                  onClick={() => onAddOption(q.id)}
                   className="text-xs text-blue-500 underline mt-1"
                 >
                   + 선택지 추가
@@ -107,6 +113,7 @@ export default function CustomForm({
             </div>
           )}
 
+          {/* 서술형 */}
           {q.type === InputTypeEnum.SUBJECTIVE && (
             <textarea
               className="w-full p-2 border rounded text-sm"

@@ -65,15 +65,26 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
     const getData = async () => {
       try {
         const response = await fetchSurveyQuestions(questionsId);
-        console.log(response);
+        console.log("기본 설문", response);
         if (!response.success || !Array.isArray(response.data)) {
           throw new Error("응답 형식이 올바르지 않습니다.");
         }
 
         type QuestionMap = Record<string, Omit<Questions, "category">[]>;
-        const template = response.data[0];
+        const surveyQuestions = response.data[0];
+
+        let parsedQuestion: QuestionMap = {};
+        try {
+          parsedQuestion =
+            typeof surveyQuestions.question === "string"
+              ? JSON.parse(surveyQuestions.question)
+              : surveyQuestions.question;
+        } catch (e) {
+          console.error("설문 질문 JSON 파싱 실패:", e);
+        }
+
         const defaultQuestions: Questions[] = Object.entries(
-          template.question as QuestionMap
+          parsedQuestion
         ).flatMap(([category, items]) =>
           items.map((q) => ({ category, ...q }))
         );
@@ -139,19 +150,20 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
     );
   };
 
-  const handleOptionChange = (
-    qIndex: number,
-    optIndex: number,
-    value: string
-  ) => {
-    const prev = currentCustomQuestions[qIndex];
-    const updated = {
-      ...prev,
-      options: (prev.options ?? []).map((opt, j) =>
-        j === optIndex ? value : opt
-      ),
-    };
-    updateCustomQuestion(updated.id, updated);
+  const handleOptionChange = (qId: number, optIndex: number, value: string) => {
+    const question = customQuestions.find((q) => q.id === qId);
+    if (!question) return;
+
+    const updatedOptions = [...(question.options ?? [])];
+
+    // 인덱스 맞춰서 길이 채우기
+    while (updatedOptions.length <= optIndex) {
+      updatedOptions.push("");
+    }
+
+    updatedOptions[optIndex] = value;
+
+    updateCustomQuestion(qId, { ...question, options: updatedOptions });
   };
 
   const handlePrev = () => {
@@ -168,7 +180,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
   const handleSubmit = async () => {
     try {
       const payload = formatSurveyPayload(SurveyStatusEnum.COMPLETE);
-      console.log(payload);
+      console.log("payload", payload);
       const res = await createSurvey(payload);
       const surveyId = res.data.data.id;
       setCreatedSurveyId(surveyId);
@@ -252,6 +264,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
           }
         />
       </div>
+
       {tabIndex < baseCategories.length - 1 ? (
         <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
           <div className="w-[140px] sm:w-[200px]">
