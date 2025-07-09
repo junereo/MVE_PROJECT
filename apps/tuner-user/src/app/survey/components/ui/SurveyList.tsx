@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getSurveyList } from "@/features/survey/services/survey";
 import List from "@/components/ui/List";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
+import { SurveyTypeEnum } from "@/features/survey/types/enums";
 
 const statusTextMap: Record<SurveyResponse["is_active"], string> = {
   upcoming: "예정",
@@ -78,6 +79,7 @@ export default function SurveyList() {
             .slice(2, 10)
             .replace(/-/g, ".")}`}
           status={statusTextMap[item.is_active] as "예정" | "진행중" | "종료"}
+          surveyType={item.type}
           participants={item.survey_custom?.length || 0}
           reward={item.reward_amount}
         />

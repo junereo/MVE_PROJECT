@@ -51,7 +51,7 @@ export default function MainSurveyList({
 
   return (
     <div className="flex flex-col gap-3">
-      {surveys.map((item) => (
+      {surveys.slice(0, 6).map((item) => (
         <List
           key={item.id}
           onClick={() => router.push(`/survey/${item.id}`)}

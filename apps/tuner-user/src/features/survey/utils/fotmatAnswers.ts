@@ -1,5 +1,5 @@
 import { SurveyAnswers } from "@/features/survey/store/useAnswerStore";
-import { QuestionItem } from "@/features/survey/store/useDefaultQuestionStore";
+import { Questions } from "@/features/survey/store/useSurveyStore";
 
 type FormattedAnswer = {
   question_id: number;
@@ -8,7 +8,7 @@ type FormattedAnswer = {
 
 export const formatDefaultAnswers = (
   answers: SurveyAnswers,
-  defaultQuestions: QuestionItem[]
+  defaultQuestions: Questions[]
 ): FormattedAnswer[] => {
   const result: FormattedAnswer[] = [];
 
