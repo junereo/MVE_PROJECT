@@ -133,6 +133,7 @@ export default function SurveyStep2() {
             [stepKey]: prev[stepKey].filter((q) => q.id !== id),
         }));
     };
+    // 옵션 갯수에 따라 설문 문항 선택수 조절
     const handleRemoveOption = (
         categoryKey: string,
         qIndex: number,
@@ -143,11 +144,18 @@ export default function SurveyStep2() {
             const targetQuestion = updated[qIndex];
             if (!targetQuestion) return prev;
 
+            const newOptions = targetQuestion.options.filter(
+                (_, i) => i !== optIndex,
+            );
+            const newMaxNum = Math.min(
+                targetQuestion.max_num ?? 1,
+                newOptions.length,
+            );
+
             updated[qIndex] = {
                 ...targetQuestion,
-                options: targetQuestion.options.filter(
-                    (_, i) => i !== optIndex,
-                ),
+                options: newOptions,
+                max_num: newMaxNum,
             };
 
             return {
@@ -336,34 +344,44 @@ export default function SurveyStep2() {
     };
 
     const handleComplete = () => {
+        const invalid = Object.entries(customQuestions).some(([, questions]) =>
+            questions.some((q) => {
+                if (q.question_text.trim() === '') return true;
+                if (
+                    q.type !== QuestionTypeEnum.SUBJECTIVE &&
+                    q.options.some((opt) => opt.trim() === '')
+                )
+                    return true;
+                return false;
+            }),
+        );
+
+        if (invalid) {
+            alert('빈 질문 또는 빈 선택지가 있는 문항이 있습니다.');
+            return;
+        }
+
         const validCustom = Object.entries(customQuestions).flatMap(
             ([stepKey, questions]) =>
-                questions
-                    .filter(
-                        (q) =>
-                            q.question_text.trim() !== '' &&
-                            (q.type === QuestionTypeEnum.SUBJECTIVE ||
-                                q.options.every((opt) => opt.trim() !== '')),
-                    )
-                    .map((q) => {
-                        const base = {
-                            id: q.id,
-                            question_text: q.question_text,
-                            question_type: Question_type.custom,
-                            type: q.type,
-                            category: stepKey,
-                            options: q.options,
-                        };
+                questions.map((q) => {
+                    const base = {
+                        id: q.id,
+                        question_text: q.question_text,
+                        question_type: Question_type.custom,
+                        type: q.type,
+                        category: stepKey,
+                        options: q.options,
+                    };
 
-                        if (
-                            q.type === QuestionTypeEnum.CHECKBOX &&
-                            q.max_num !== undefined
-                        ) {
-                            return { ...base, max_num: q.max_num };
-                        }
+                    if (
+                        q.type === QuestionTypeEnum.CHECKBOX &&
+                        q.max_num !== undefined
+                    ) {
+                        return { ...base, max_num: q.max_num };
+                    }
 
-                        return base;
-                    }),
+                    return base;
+                }),
         );
 
         const templateQs = Object.entries(categoryQuestions).flatMap(

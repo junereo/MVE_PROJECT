@@ -1,9 +1,10 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSurveyStore } from '@/store/useSurveyCreateStore';
 import Dropdown from '../../../components/ui/DropDown';
+import { surveyView } from '@/lib/network/api';
 const SurveyStep1 = () => {
     const genreOptions = [
         '발라드',
@@ -21,27 +22,66 @@ const SurveyStep1 = () => {
     const { step1, setStep1, resetSurvey } = useSurveyStore();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const id = searchParams.get('id');
     const videoId = searchParams.get('videoId');
     const title = searchParams.get('title');
     const thumbnail = searchParams.get('thumbnail');
     const channelTitle = searchParams.get('channelTitle');
+    const [rewardInput, setRewardInput] = useState({
+        reward_amount: '',
+        reward: '',
+        expertReward: '',
+    });
 
     useEffect(() => {
         const url = new URL(window.location.href);
         const isFromSearch = url.searchParams.get('fromSearch') === 'true';
 
-        if (videoId && title && thumbnail && isFromSearch) {
-            setStep1({
-                youtubeVideoId: videoId,
-                youtubeTitle: title,
-                youtubeThumbnail: thumbnail,
-                channelTitle: channelTitle ?? undefined,
-                url: `https://www.youtube.com/watch?v=${videoId}`,
-                title,
-                artist: channelTitle || '',
-            });
-        }
-    }, [videoId, title, thumbnail, channelTitle]);
+        const setup = async () => {
+            if (id) {
+                // 설문 수정
+                try {
+                    const { data } = await surveyView(id);
+                    console.log(data);
+
+                    setStep1({
+                        youtubeVideoId: data.music_id,
+                        youtubeTitle: data.music_title,
+                        youtubeThumbnail: data.music_thumbnail,
+                        channelTitle: data.artist,
+                        url: data.music_uri,
+                        title: data.music_title,
+                        artist: data.artist,
+                        survey_title: data.survey_title,
+                        isReleased: data.is_released,
+                        releaseDate: data.release_date,
+                        genre: data.genre,
+                        start_at: data.start_at.split('T')[0],
+                        end_at: data.end_at.split('T')[0],
+                        surveyType: data.type,
+                        reward_amount: data.reward_amount,
+                        reward: data.reward,
+                        expertReward: data.expert_reward,
+                    });
+                } catch (err) {
+                    console.error('❌ 수정 설문 불러오기 실패:', err);
+                }
+            } else if (videoId && title && thumbnail && isFromSearch) {
+                // ✅ 새 설문 (유튜브 검색 기반)
+                setStep1({
+                    youtubeVideoId: videoId,
+                    youtubeTitle: title,
+                    youtubeThumbnail: thumbnail,
+                    channelTitle: channelTitle ?? '',
+                    url: `https://www.youtube.com/watch?v=${videoId}`,
+                    title,
+                    artist: channelTitle || '',
+                });
+            }
+        };
+
+        setup();
+    }, [id, videoId, title, thumbnail, channelTitle]);
 
     useEffect(() => {
         if (!step1.start_at && !step1.end_at) {
@@ -74,9 +114,7 @@ const SurveyStep1 = () => {
         field: keyof typeof step1,
         value: string | number | boolean,
     ) => {
-        if (value !== undefined) {
-            setStep1({ [field]: value });
-        }
+        setStep1((prev) => ({ ...prev, [field]: value }));
     };
 
     const setSurveyPeriod = (days: number) => {
@@ -368,29 +406,36 @@ const SurveyStep1 = () => {
                                         전체 리워드 (STK)
                                     </label>
                                     <input
-                                        type="number"
-                                        min="0"
-                                        step="0.001"
-                                        value={
-                                            step1.reward_amount !== undefined
-                                                ? step1.reward_amount / 1000
-                                                : ''
-                                        }
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder="예: 0.001"
+                                        value={rewardInput.reward_amount}
                                         onChange={(e) => {
-                                            const val = parseFloat(
-                                                e.target.value,
+                                            const val = e.target.value;
+                                            // 숫자/소수점만 필터링
+                                            if (/^[0-9]*\.?[0-9]*$/.test(val)) {
+                                                setRewardInput((prev) => ({
+                                                    ...prev,
+                                                    reward_amount: val,
+                                                }));
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            const parsed = parseFloat(
+                                                rewardInput.reward_amount,
                                             );
                                             handleInputChange(
                                                 'reward_amount',
-                                                isNaN(val)
+                                                isNaN(parsed)
                                                     ? 0
-                                                    : Math.max(
-                                                          0,
-                                                          Math.round(
-                                                              val * 1000,
-                                                          ),
-                                                      ),
+                                                    : Math.round(parsed * 1000),
                                             );
+                                            setRewardInput((prev) => ({
+                                                ...prev,
+                                                reward_amount: isNaN(parsed)
+                                                    ? ''
+                                                    : String(parsed),
+                                            }));
                                         }}
                                         className="border p-2"
                                     />
@@ -400,29 +445,36 @@ const SurveyStep1 = () => {
                                         일반 유저 리워드
                                     </label>
                                     <input
-                                        type="number"
-                                        min="0"
-                                        step="0.001"
-                                        value={
-                                            step1.reward !== undefined
-                                                ? step1.reward / 1000
-                                                : ''
-                                        }
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder="예: 0.001"
+                                        value={rewardInput.reward}
                                         onChange={(e) => {
-                                            const val = parseFloat(
-                                                e.target.value,
+                                            const val = e.target.value;
+                                            // 숫자/소수점만 필터링
+                                            if (/^[0-9]*\.?[0-9]*$/.test(val)) {
+                                                setRewardInput((prev) => ({
+                                                    ...prev,
+                                                    reward: val,
+                                                }));
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            const parsed = parseFloat(
+                                                rewardInput.reward,
                                             );
                                             handleInputChange(
                                                 'reward',
-                                                isNaN(val)
+                                                isNaN(parsed)
                                                     ? 0
-                                                    : Math.max(
-                                                          0,
-                                                          Math.round(
-                                                              val * 1000,
-                                                          ),
-                                                      ),
+                                                    : Math.round(parsed * 1000),
                                             );
+                                            setRewardInput((prev) => ({
+                                                ...prev,
+                                                reward: isNaN(parsed)
+                                                    ? ''
+                                                    : String(parsed),
+                                            }));
                                         }}
                                         className="border p-2"
                                     />
@@ -432,29 +484,36 @@ const SurveyStep1 = () => {
                                         Expert 유저 리워드
                                     </label>
                                     <input
-                                        type="number"
-                                        min="0"
-                                        step="0.001"
-                                        value={
-                                            step1.expertReward !== undefined
-                                                ? step1.expertReward / 1000
-                                                : ''
-                                        }
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder="예: 0.001"
+                                        value={rewardInput.expertReward}
                                         onChange={(e) => {
-                                            const val = parseFloat(
-                                                e.target.value,
+                                            const val = e.target.value;
+                                            // 숫자/소수점만 필터링
+                                            if (/^[0-9]*\.?[0-9]*$/.test(val)) {
+                                                setRewardInput((prev) => ({
+                                                    ...prev,
+                                                    expertReward: val,
+                                                }));
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            const parsed = parseFloat(
+                                                rewardInput.expertReward,
                                             );
                                             handleInputChange(
                                                 'expertReward',
-                                                isNaN(val)
+                                                isNaN(parsed)
                                                     ? 0
-                                                    : Math.max(
-                                                          0,
-                                                          Math.round(
-                                                              val * 1000,
-                                                          ),
-                                                      ),
+                                                    : Math.round(parsed * 1000),
                                             );
+                                            setRewardInput((prev) => ({
+                                                ...prev,
+                                                expertReward: isNaN(parsed)
+                                                    ? ''
+                                                    : String(parsed),
+                                            }));
                                         }}
                                         className="border p-2"
                                     />

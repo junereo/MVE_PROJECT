@@ -1,25 +1,11 @@
-// 설문 상세 페이지 - 리팩토링 최종본 (UI 원형 유지, 컴포넌트 분리 없음)
 'use client';
 
-import { fetchTemplates, surveyView } from '@/lib/network/api';
+import { surveyView } from '@/lib/network/api';
 import { SurveyData } from '@/types';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import {
-    // RadarChart,
-    // Radar,
-    // PolarGrid,
-    // PolarAngleAxis,
-    // PolarRadiusAxis,
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    // Legend,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 // 사용 예정: 참여자 타입 (현재 UI에선 사용 안하지만 삭제하지 않음)
 // interface SurveyParticipant {
@@ -29,17 +15,13 @@ import {
 //   reward: number;
 // }
 
-interface FixedQuestion {
+interface QuestionItem {
+    question_text: string;
     type: 'multiple' | 'checkbox' | 'subjective';
+    question_type: 'fixed' | 'custom';
     options: string[];
     category: string;
-    question_text: string;
-    question_type: 'fixed';
-}
-
-interface TemplateQuestionResponse {
-    id: number;
-    question: Record<string, FixedQuestion[]>;
+    max_num?: number;
 }
 
 interface SurveyResponse {
@@ -86,9 +68,8 @@ const getStatusClass = (status: 'upcoming' | 'ongoing' | 'closed') => {
 export default function SurveyDetailPage() {
     const { id } = useParams();
     const [surveyData, setSurveyData] = useState<SurveyData | null>(null);
-    const [templateQuestions, setTemplateQuestions] = useState<FixedQuestion[]>(
-        [],
-    );
+    const [fixedQuestions, setFixedQuestions] = useState<QuestionItem[]>([]);
+    const [customQuestions, setCustomQuestions] = useState<QuestionItem[]>([]);
     const [genderFilter, setGenderFilter] = useState('전체');
     const [ageFilter, setAgeFilter] = useState('전체');
 
@@ -98,9 +79,19 @@ export default function SurveyDetailPage() {
         const fetchSurvey = async () => {
             try {
                 const result = await surveyView(Array.isArray(id) ? id[0] : id);
-                console.log('설문 데이터', result);
-
                 setSurveyData(result.data);
+
+                if (result.data?.survey_question) {
+                    const parsed: QuestionItem[] = JSON.parse(
+                        result.data.survey_question,
+                    );
+                    setFixedQuestions(
+                        parsed.filter((q) => q.question_type === 'fixed'),
+                    );
+                    setCustomQuestions(
+                        parsed.filter((q) => q.question_type === 'custom'),
+                    );
+                }
             } catch (error) {
                 console.error('설문 데이터 요청 실패:', error);
             }
@@ -108,27 +99,6 @@ export default function SurveyDetailPage() {
 
         fetchSurvey();
     }, [id]);
-
-    useEffect(() => {
-        if (!surveyData || !surveyData.questions) return;
-
-        const fetchQuestions = async () => {
-            try {
-                const { data }: { data: TemplateQuestionResponse[] } =
-                    await fetchTemplates(surveyData.questions);
-                if (data.length > 0) {
-                    const all: FixedQuestion[] = Object.values(
-                        data[0].question,
-                    ).flat();
-                    setTemplateQuestions(all);
-                }
-            } catch (err) {
-                console.error('질문 템플릿 요청 실패:', err);
-            }
-        };
-
-        fetchQuestions();
-    }, [surveyData]);
 
     if (!surveyData) return <div className="p-6 text-gray-600">로딩 중...</div>;
 
@@ -153,17 +123,88 @@ export default function SurveyDetailPage() {
         return genderOk && ageOk;
     });
 
+    const renderQuestionAccordion = (
+        questions: QuestionItem[],
+        typeLabel: string,
+    ) => (
+        <div className="mt-4">
+            <h2 className="text-lg font-bold mb-2">{typeLabel}</h2>
+            {questions.map((q, i) => {
+                const answerCount = q.options.map((opt) => {
+                    const count = filteredResponses.filter((res) => {
+                        const ans =
+                            q.question_type === 'fixed'
+                                ? res.templateAnswers?.[q.question_text]
+                                : res.customAnswers?.[q.question_text];
+                        return Array.isArray(ans)
+                            ? ans.includes(opt)
+                            : ans === opt;
+                    }).length;
+                    return { option: opt, count };
+                });
+                const total = answerCount.reduce(
+                    (acc, cur) => acc + cur.count,
+                    0,
+                );
+
+                return (
+                    <details key={i} className="border rounded px-4 py-2 mb-2">
+                        <summary className="cursor-pointer font-medium">
+                            Q{i + 1}. {q.question_text}
+                        </summary>
+                        <div className="text-sm text-gray-600 mt-2">
+                            유형:{' '}
+                            {q.type === 'multiple'
+                                ? '객관식'
+                                : q.type === 'checkbox'
+                                ? '체크박스'
+                                : '주관식'}
+                        </div>
+                        {q.options.length > 0 && (
+                            <ul className="mt-1 text-sm text-gray-700 space-y-1">
+                                {answerCount.map(({ option, count }, idx) => {
+                                    const percent =
+                                        total === 0
+                                            ? 0
+                                            : Math.round((count / total) * 100);
+                                    return (
+                                        <li
+                                            key={idx}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <span className="w-1/4">
+                                                {option}
+                                            </span>
+                                            <div className="w-3/4 bg-gray-200 rounded h-4">
+                                                <div
+                                                    className="h-4 bg-blue-500 rounded"
+                                                    style={{
+                                                        width: `${percent}%`,
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className="text-sm w-10 text-right">
+                                                {percent}%
+                                            </span>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                    </details>
+                );
+            })}
+        </div>
+    );
+
     return (
         <div>
-            {/* 상단 네비게이션 */}
-            <div className="w-full  text-black text-2xl py-3  font-bold">
+            <div className="w-full text-black text-2xl py-3 font-bold">
                 Survey Detail - {surveyData.survey_title}
             </div>
             <div className="p-6">
                 <div className="flex flex-col md:flex-row gap-6">
-                    {/* 왼쪽 영역 */}
                     <div className="flex-1 flex flex-col space-y-4">
-                        {/* 유튜브 및 작성자 정보 */}
                         <div className="flex flex-col md:flex-row gap-6">
                             <div className="aspect-[3/2] md:w-[480px] w-full border">
                                 <iframe
@@ -198,8 +239,6 @@ export default function SurveyDetailPage() {
                                     {surveyData.expert_reward} STK
                                 </p>
                                 <div>{surveyData.music_title}</div>
-
-                                {/* 상태 + 수정버튼 */}
                                 <div className="flex items-center gap-2">
                                     <span
                                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(
@@ -235,7 +274,6 @@ export default function SurveyDetailPage() {
                             </div>
                         </div>
 
-                        {/* 필터 드롭다운 */}
                         <div className="flex gap-4 mt-4">
                             <select
                                 value={genderFilter}
@@ -261,7 +299,7 @@ export default function SurveyDetailPage() {
                                 <option value="50대+">50대+</option>
                             </select>
                         </div>
-                        {/* 연령대별 BarChart 유지 */}
+
                         <div className="w-full">
                             <BarChart
                                 width={400}
@@ -281,91 +319,11 @@ export default function SurveyDetailPage() {
                             </BarChart>
                         </div>
 
-                        {/* 질문 아코디언 */}
-                        <div className="mt-4">
-                            <h2 className="text-lg font-bold mb-2">
-                                질문 리스트
-                            </h2>
-                            {templateQuestions.map((q, i) => {
-                                const answerCount = q.options.map((opt) => {
-                                    const count = filteredResponses.filter(
-                                        (res) => {
-                                            const ans =
-                                                res.templateAnswers?.[
-                                                    q.question_text
-                                                ];
-                                            return Array.isArray(ans)
-                                                ? ans.includes(opt)
-                                                : ans === opt;
-                                        },
-                                    ).length;
-                                    return { option: opt, count };
-                                });
-                                const total = answerCount.reduce(
-                                    (acc, cur) => acc + cur.count,
-                                    0,
-                                );
-
-                                return (
-                                    <details
-                                        key={i}
-                                        className="border rounded px-4 py-2"
-                                    >
-                                        <summary className="cursor-pointer font-medium">
-                                            Q{i + 1}. {q.question_text}
-                                        </summary>
-                                        <div className="text-sm text-gray-600 mt-2">
-                                            유형:{' '}
-                                            {q.type === 'multiple'
-                                                ? '객관식'
-                                                : q.type === 'checkbox'
-                                                ? '체크박스'
-                                                : '주관식'}
-                                        </div>
-                                        {q.options.length > 0 && (
-                                            <ul className="mt-1 text-sm text-gray-700 space-y-1">
-                                                {answerCount.map(
-                                                    (
-                                                        { option, count },
-                                                        idx,
-                                                    ) => {
-                                                        const percent =
-                                                            total === 0
-                                                                ? 0
-                                                                : Math.round(
-                                                                      (count /
-                                                                          total) *
-                                                                          100,
-                                                                  );
-                                                        return (
-                                                            <li
-                                                                key={idx}
-                                                                className="flex items-center gap-2"
-                                                            >
-                                                                <span className="w-1/4">
-                                                                    {option}
-                                                                </span>
-                                                                <div className="w-3/4 bg-gray-200 rounded h-4">
-                                                                    <div
-                                                                        className="h-4 bg-blue-500 rounded"
-                                                                        style={{
-                                                                            width: `${percent}%`,
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                                <span className="text-sm w-10 text-right">
-                                                                    {percent}%
-                                                                </span>
-                                                            </li>
-                                                        );
-                                                    },
-                                                )}
-                                            </ul>
-                                        )}
-                                    </details>
-                                );
-                            })}
-                        </div>
+                        {renderQuestionAccordion(fixedQuestions, '고정 질문')}
+                        {renderQuestionAccordion(
+                            customQuestions,
+                            '커스텀 질문',
+                        )}
                     </div>
                 </div>
             </div>

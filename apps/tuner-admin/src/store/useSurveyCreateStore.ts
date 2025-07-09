@@ -55,7 +55,9 @@ type SurveyStep2 = {
 // 상태 구조 정의
 interface SurveyState {
     step1: SurveyStep1;
-    setStep1: (data: Partial<SurveyStep1>) => void;
+    setStep1: (
+        update: Partial<SurveyStep1> | ((prev: SurveyStep1) => SurveyStep1),
+    ) => void;
 
     step2: SurveyStep2;
     setStep2: (data: Partial<SurveyStep2>) => void;
