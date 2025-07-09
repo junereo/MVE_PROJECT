@@ -46,9 +46,10 @@ export class SurveyService {
   async init(): Promise<void> {
     this.provider = new JsonRpcProvider(process.env.SEPLOIA_RPC_URL!);
     this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
-    // DB에서 ABI 동적 로드
+    // DB에서 ABI 및 contract address 동적 로드
     const latest = await this.tunerContractService.getLatestContract();
     let surveyABI: any[] = [];
+    let contractAddress = '';
     if (latest?.abi_survey) {
       if (typeof latest.abi_survey === 'string') {
         surveyABI = JSON.parse(latest.abi_survey);
@@ -56,7 +57,12 @@ export class SurveyService {
         surveyABI = latest.abi_survey as any[];
       }
     }
-    this.contract = new Contract(process.env.SURVEY_CONTRACT_ADDRESS!, surveyABI, this.wallet);
+    if (latest?.ca_survey) {
+      contractAddress = latest.ca_survey;
+    } else {
+      throw new Error('No contract address (ca_survey) found in TunerContract table');
+    }
+    this.contract = new Contract(contractAddress, surveyABI, this.wallet);
   }
 
   // ✅ submitSurveyAndMint (서베이 응답 + NFT 민팅)

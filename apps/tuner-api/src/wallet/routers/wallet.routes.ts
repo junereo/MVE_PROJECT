@@ -5,7 +5,9 @@ import { createWallet,
         getAddressToken,
         getAddressBadge,
         sendToken, 
-        burnToken } from "../controllers/metaTransaction.controller";
+        burnToken,
+        approveTunerToken,
+        revokeTunerToken } from "../controllers/metaTransaction.controller";
 
 const router: Router = express.Router();
 
@@ -20,5 +22,8 @@ router.get('/badge/:uid', getAddressBadge ); // 뱃지 조회
 router.put('/token', sendToken); // 토큰 전송
 
 router.delete('/token', burnToken); // 토큰 사용
+
+router.post('/approve', approveTunerToken); // 토큰 approve
+router.post('/revoke', revokeTunerToken); // 토큰 approve 해제
 
 export default router; 

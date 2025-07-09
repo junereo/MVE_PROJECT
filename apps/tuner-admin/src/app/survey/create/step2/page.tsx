@@ -1,318 +1,464 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useSurveyStore } from "@/store/useSurveyCreateStore";
-import { useRouter } from "next/navigation";
-import SurveyTabs from "@/app/survey/create/step2/components/SurveyTabs";
-import SurveyQuestionBase from "@/app/survey/create/step2/components/SurveyQuestionBase";
-import SurveyCustomForm from "@/app/survey/create/step2/components/SurveyCustomForm";
-import SurveyActions from "@/app/survey/create/step2/components/SurveyActions";
-import SurveyNavigation from "@/app/survey/create/step2/components/SurveyNavigation";
-import { fetchTemplates, surveyCreate } from "@/lib/network/api";
-import { QuestionTypeEnum } from "@/app/survey/create/complete/type";
-import { Question_type, SurveyStatus } from "@/types";
+import { useState, useEffect } from 'react';
+import { useSurveyStore } from '@/store/useSurveyCreateStore';
+import { useRouter } from 'next/navigation';
+import SurveyTabs from '@/app/survey/create/step2/components/SurveyTabs';
+// import SurveyQuestionBase from '@/app/survey/create/step2/components/SurveyQuestionBase';
+import SurveyCustomForm from '@/app/survey/create/step2/components/SurveyCustomForm';
+import SurveyActions from '@/app/survey/create/step2/components/SurveyActions';
+import SurveyNavigation from '@/app/survey/create/step2/components/SurveyNavigation';
+import { fetchTemplates, surveyCreate } from '@/lib/network/api';
+import { QuestionTypeEnum } from '@/app/survey/create/complete/type';
+import { Question_type, SurveyStatus } from '@/types';
 
-// 🔷 백엔드에서 받아오는 질문 타입 정의
 interface RawTemplateQuestion {
-  question_text: string;
-  question_type: string;
-  options: string[];
-  category: string;
-  type?: string;
+    question_text: string;
+    question_type: string;
+    options: string[];
+    category: string;
+    type: string;
+    max_num?: number;
 }
 
-// 🔷 프론트에서 사용하는 질문 타입 정의
-interface Question {
-  id: number;
-  question_text: string;
-  question_type: QuestionTypeEnum;
-  options: string[];
-  category?: string;
+export interface Question {
+    id: number;
+    question_text: string;
+    question_type: Question_type;
+    type: QuestionTypeEnum;
+    options: string[];
+    category?: string;
+    max_num?: number;
 }
 
 export default function SurveyStep2() {
-  const router = useRouter();
-  const { step1, step2, setStep2, setTemplateSetKey } = useSurveyStore();
+    const router = useRouter();
+    const { step1, step2, setStep2, setTemplateSetKey } = useSurveyStore();
 
-  // 🔹 탭 카테고리 정의
-  const baseCategories = [
-    { key: "originality", label: "작품성" },
-    { key: "popularity", label: "대중성" },
-    { key: "sustainability", label: "지속성" },
-    { key: "expandability", label: "확장성" },
-    { key: "stardom", label: "스타성" },
-  ];
+    const baseCategories = [
+        { key: 'step1', label: 'Step 1' },
+        { key: 'step2', label: 'Step 2' },
+        { key: 'step3', label: 'Step 3' },
+    ];
 
-  // 🔹 질문 타입 선택 옵션
-  const typeOptions = [
-    { label: "객관식", value: QuestionTypeEnum.MULTIPLE },
-    { label: "체크박스형", value: QuestionTypeEnum.CHECKBOX },
-    { label: "서술형", value: QuestionTypeEnum.SUBJECTIVE },
-  ];
+    const typeOptions = [
+        { label: '객관식', value: QuestionTypeEnum.MULTIPLE },
+        { label: '체크박스형', value: QuestionTypeEnum.CHECKBOX },
+        { label: '서술형', value: QuestionTypeEnum.SUBJECTIVE },
+    ];
 
-  const mapToQuestionTypeEnum = (type?: string): QuestionTypeEnum => {
-    switch (type?.toLowerCase()) {
-      case "multiple":
-        return QuestionTypeEnum.MULTIPLE;
-      case "checkbox":
-        return QuestionTypeEnum.CHECKBOX;
-      case "text":
-      case "subjective":
-        return QuestionTypeEnum.SUBJECTIVE;
-      default:
-        return QuestionTypeEnum.MULTIPLE;
-    }
-  };
+    const [tabIndex, setTabIndex] = useState(0);
+    const allTabs = baseCategories;
+    const currentTab = allTabs[tabIndex];
 
-  // 🔹 탭 인덱스 및 커스텀 여부
-  const [tabIndex, setTabIndex] = useState(0);
-  const [customTabCreated, setCustomTabCreated] = useState(false);
-  const allTabs = [
-    ...baseCategories,
-    ...(customTabCreated ? [{ key: "custom", label: "커스텀" }] : []),
-  ];
-  const currentTab = allTabs[tabIndex];
-  const isCustomTab = currentTab.key === "custom";
-  const isStardomTab = currentTab.key === "stardom";
+    const [categoryQuestions, setCategoryQuestions] = useState<
+        Record<string, Question[]>
+    >({});
+    const [customQuestions, setCustomQuestions] = useState<
+        Record<string, Question[]>
+    >({});
 
-  // 🔹 상태 - 템플릿 기반 질문, 커스텀 질문
-  const [categoryQuestions, setCategoryQuestions] = useState<
-    Record<string, Question[]>
-  >({});
-  const [customQuestions, setCustomQuestions] = useState<Question[]>([]);
+    useEffect(() => {
+        const loadTemplate = async () => {
+            try {
+                const templateId = 1;
+                const { data } = await fetchTemplates(templateId);
+                console.log('템플릿', data);
 
-  // 🔹 템플릿 데이터 불러오기
-  useEffect(() => {
-    const loadTemplate = async () => {
-      try {
-        const templateId = 1;
-        const { data } = await fetchTemplates(templateId);
-        console.log("불러온 템플릿 데이터:", data);
+                const template = data[0]?.question;
+                const parsed: Record<string, Question[]> = {};
 
-        const template = data[0]?.question;
+                let i = 0;
+                for (const step of ['step1', 'step2', 'step3']) {
+                    parsed[step] = (template[step] || []).map(
+                        (q: RawTemplateQuestion) => ({
+                            id: i++,
+                            category: step,
+                            question_text: q.question_text,
+                            question_type: 'fixed',
+                            type: q.type || 'multiple',
+                            options: Array.isArray(q.options) ? q.options : [],
+                            ...(q.type === 'checkbox'
+                                ? { max_num: q.max_num ?? 1 }
+                                : {}),
+                        }),
+                    );
+                }
 
-        const parsed: Record<string, Question[]> = {};
+                setCategoryQuestions(parsed);
+                setTemplateSetKey(JSON.stringify(parsed));
+                setStep2({ template_id: data[0].id });
+            } catch (error) {
+                console.error('템플릿 불러오기 실패:', error);
+            }
+        };
+        loadTemplate();
+    }, [setStep2, setTemplateSetKey]);
 
-        for (const [category, questions] of Object.entries(template)) {
-          parsed[category] = (questions as RawTemplateQuestion[]).map(
-            (q: RawTemplateQuestion, i) => ({
-              id: i,
-              category,
-              question_text: q.question_text,
-              question_type: mapToQuestionTypeEnum(q.question_type || q.type),
-              options: Array.isArray(q.options) ? q.options : [],
-            })
-          );
-        }
+    const addCustomQuestion = (stepKey: string) => {
+        const defaultType = QuestionTypeEnum.MULTIPLE;
 
-        setCategoryQuestions(parsed);
-        setTemplateSetKey(JSON.stringify(parsed));
-        setStep2({ template_id: data[0].id });
-      } catch (error) {
-        console.error("템플릿 불러오기 실패:", error);
-      }
+        setCustomQuestions((prev) => ({
+            ...prev,
+            [stepKey]: [
+                ...(prev[stepKey] || []),
+                {
+                    id: Date.now(),
+                    question_text: '',
+                    question_type: Question_type.custom,
+                    type: defaultType,
+                    options: ['', '', '', ''],
+                },
+            ] as Question[],
+        }));
     };
 
-    loadTemplate();
-  }, [setStep2, setTemplateSetKey]);
-
-  const basePayload = {
-    survey_title: step1.survey_title,
-    title: step1.title,
-    music_uri: step1.url,
-    thumbnail_uri: step1.youtubeThumbnail,
-    artist: step1.artist,
-    release_date: step1.releaseDate,
-    thumbnail_url: step1.youtubeThumbnail,
-    music_title: step1.title,
-    genre: step1.genre,
-    start_at: step1.start_at,
-    end_at: step1.end_at,
-    type: step1.surveyType,
-    reward_amount: step1.reward_amount ?? 0,
-    reward: step1.reward ?? 0,
-    expert_reward: step1.expertReward ?? 0,
-    questions: step2.template_id!,
-    question_type: "fixed" as Question_type,
-    is_released: step1.isReleased,
-  };
-  const handleTempSave = async () => {
-    const draftPayload = {
-      ...basePayload,
-      status: SurveyStatus.draft,
+    const handleChangeMaxNum = (
+        stepKey: string,
+        index: number,
+        value: number,
+    ) => {
+        const safeValue = Math.max(1, value);
+        setCustomQuestions((prev) => ({
+            ...prev,
+            [stepKey]: prev[stepKey].map((q, i) =>
+                i === index ? { ...q, max_num: safeValue } : q,
+            ),
+        }));
     };
 
-    try {
-      console.log("임시 저장 데이터:", draftPayload);
-      const res = await surveyCreate(draftPayload);
-      console.log("서버 응답:", res);
-      alert("임시 저장 완료!");
-    } catch (error) {
-      console.error("임시 저장 오류:", error);
-      alert("임시 저장 실패");
-    }
-  };
+    const removeCustomQuestion = (stepKey: string, id: number) => {
+        setCustomQuestions((prev) => ({
+            ...prev,
+            [stepKey]: prev[stepKey].filter((q) => q.id !== id),
+        }));
+    };
+    const handleRemoveOption = (
+        categoryKey: string,
+        qIndex: number,
+        optIndex: number,
+    ) => {
+        setCustomQuestions((prev) => {
+            const updated = [...(prev[categoryKey] || [])];
+            const targetQuestion = updated[qIndex];
+            if (!targetQuestion) return prev;
 
-  // 🔹 커스텀 탭 생성
-  const createCustomTab = () => {
-    if (!customTabCreated) {
-      setCustomTabCreated(true);
-      setTabIndex(baseCategories.length);
-      addCustomQuestion();
-    }
-  };
+            updated[qIndex] = {
+                ...targetQuestion,
+                options: targetQuestion.options.filter(
+                    (_, i) => i !== optIndex,
+                ),
+            };
 
-  // 🔹 커스텀 질문 추가
-  const addCustomQuestion = () => {
-    setCustomQuestions((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        question_text: "",
-        question_type: QuestionTypeEnum.MULTIPLE,
-        options: ["", "", "", ""],
-      },
-    ]);
-  };
+            return {
+                ...prev,
+                [categoryKey]: updated,
+            };
+        });
+    };
 
-  // 🔹 커스텀 질문 핸들러들
-  const handleQuestionChange = (index: number, text: string) => {
-    setCustomQuestions((prev) =>
-      prev.map((q, i) => (i === index ? { ...q, question_text: text } : q))
-    );
-  };
+    const handleChangeCustomText = (
+        stepKey: string,
+        index: number,
+        text: string,
+    ) => {
+        setCustomQuestions((prev) => ({
+            ...prev,
+            [stepKey]: prev[stepKey].map((q, i) =>
+                i === index ? { ...q, question_text: text } : q,
+            ),
+        }));
+    };
 
-  const handleOptionChange = (
-    qIndex: number,
-    optIndex: number,
-    value: string
-  ) => {
-    setCustomQuestions((prev) =>
-      prev.map((q, i) =>
-        i === qIndex
-          ? {
-              ...q,
-              options: q.options.map((opt, j) =>
-                j === optIndex ? value : opt
-              ),
-            }
-          : q
-      )
-    );
-  };
+    const handleChangeType = (
+        stepKey: string,
+        index: number,
+        type: QuestionTypeEnum,
+    ) => {
+        setCustomQuestions((prev) => {
+            const updatedQuestions = prev[stepKey].map((q, i) => {
+                if (i !== index) return q;
 
-  const handleTypeChange = (index: number, newType: QuestionTypeEnum) => {
-    setCustomQuestions((prev) =>
-      prev.map((q, i) =>
-        i === index
-          ? {
-              ...q,
-              question_type: newType,
-              options:
-                newType === QuestionTypeEnum.SUBJECTIVE
-                  ? []
-                  : q.options.length
-                  ? q.options
-                  : ["", "", "", ""],
-            }
-          : q
-      )
-    );
-  };
+                const updatedQuestion: Question = {
+                    ...q,
+                    question_type: Question_type.custom,
+                    type,
+                    options:
+                        type === QuestionTypeEnum.SUBJECTIVE
+                            ? []
+                            : q.options.length
+                            ? q.options
+                            : ['', '', '', ''],
+                };
 
-  const handleAddOption = (qIndex: number) => {
-    setCustomQuestions((prev) =>
-      prev.map((q, i) => {
-        if (i === qIndex) {
-          if (q.options.length >= 8) {
-            alert("선택지는 최대 8개까지 추가할 수 있습니다.");
-            return q;
-          }
-          return { ...q, options: [...q.options, ""] };
+                // 체크박스형이면 max_num 기본 1 설정
+                if (type === QuestionTypeEnum.CHECKBOX) {
+                    updatedQuestion.max_num = q.max_num ?? 1;
+                } else {
+                    delete updatedQuestion.max_num;
+                }
+
+                return updatedQuestion;
+            });
+
+            return {
+                ...prev,
+                [stepKey]: updatedQuestions,
+            };
+        });
+    };
+
+    const handleChangeOption = (
+        stepKey: string,
+        qIndex: number,
+        optIndex: number,
+        value: string,
+    ) => {
+        setCustomQuestions((prev) => ({
+            ...prev,
+            [stepKey]: prev[stepKey].map((q, i) =>
+                i === qIndex
+                    ? {
+                          ...q,
+                          options: q.options.map((opt, j) =>
+                              j === optIndex ? value : opt,
+                          ),
+                      }
+                    : q,
+            ),
+        }));
+    };
+
+    const handleAddOption = (stepKey: string, qIndex: number) => {
+        setCustomQuestions((prev) => ({
+            ...prev,
+            [stepKey]: prev[stepKey].map((q, i) => {
+                if (i === qIndex) {
+                    if (q.options.length >= 8) return q;
+                    return { ...q, options: [...q.options, ''] };
+                }
+                return q;
+            }),
+        }));
+    };
+
+    const handleTempSave = async () => {
+        const validCustom = Object.entries(customQuestions).flatMap(
+            ([stepKey, questions]) =>
+                questions
+                    .filter(
+                        (q) =>
+                            q.question_text.trim() !== '' &&
+                            (q.type === QuestionTypeEnum.SUBJECTIVE ||
+                                q.options.every((opt) => opt.trim() !== '')),
+                    )
+                    .map((q) => {
+                        const base = {
+                            id: q.id,
+                            question_text: q.question_text,
+                            question_type: Question_type.custom,
+                            type: q.type,
+                            category: stepKey,
+                            options: q.options,
+                        };
+
+                        if (
+                            q.type === QuestionTypeEnum.CHECKBOX &&
+                            q.max_num !== undefined
+                        ) {
+                            return { ...base, max_num: q.max_num };
+                        }
+
+                        return base;
+                    }),
+        );
+
+        // 2. 템플릿 문항 정제
+        const templateQs = Object.entries(categoryQuestions).flatMap(
+            ([stepKey, questions]) =>
+                questions.map((q) => ({
+                    ...q,
+                    category: stepKey,
+                })),
+        );
+
+        // 3. 최종 allQuestions 배열
+        const allQuestions = [...templateQs, ...validCustom];
+
+        // 4. payload 작성
+        const draftPayload = {
+            survey_title: step1.survey_title,
+            title: step1.title,
+            music_uri: step1.url,
+            thumbnail_uri: step1.youtubeThumbnail,
+            artist: step1.artist,
+            release_date: step1.releaseDate,
+            music_title: step1.title,
+            genre: step1.genre,
+            start_at: step1.start_at,
+            end_at: step1.end_at,
+            type: step1.surveyType,
+            reward_amount: step1.reward_amount ?? 0,
+            reward: step1.reward ?? 0,
+            expert_reward: step1.expertReward ?? 0,
+            questions: step2.template_id!,
+            question_type: 'fixed' as Question_type,
+            is_released: step1.isReleased,
+            status: SurveyStatus.draft,
+            survey_question: JSON.stringify(
+                allQuestions.map((q) => {
+                    const question = q as Question & { max_num?: number };
+
+                    return {
+                        question_text: question.question_text,
+                        type: question.type,
+                        question_type: String(question.question_type),
+                        options: question.options,
+                        category: question.category,
+                        ...(question.type === QuestionTypeEnum.CHECKBOX &&
+                        question.max_num
+                            ? { max_num: question.max_num }
+                            : {}),
+                    };
+                }),
+            ),
+        };
+
+        try {
+            const res = await surveyCreate(draftPayload);
+            console.log(res);
+
+            alert('임시 저장 완료!');
+        } catch (error) {
+            console.error('임시 저장 오류:', error);
+            alert('임시 저장 실패');
         }
-        return q;
-      })
-    );
-  };
+    };
 
-  // 🔹 설문 완료 시 상태 저장
-  const handleComplete = () => {
-    const validCustom = customQuestions.filter(
-      (q) =>
-        q.question_text.trim() !== "" &&
-        (q.question_type === QuestionTypeEnum.SUBJECTIVE ||
-          q.options.every((opt) => opt.trim() !== ""))
-    );
+    const handleComplete = () => {
+        const validCustom = Object.entries(customQuestions).flatMap(
+            ([stepKey, questions]) =>
+                questions
+                    .filter(
+                        (q) =>
+                            q.question_text.trim() !== '' &&
+                            (q.type === QuestionTypeEnum.SUBJECTIVE ||
+                                q.options.every((opt) => opt.trim() !== '')),
+                    )
+                    .map((q) => {
+                        const base = {
+                            id: q.id,
+                            question_text: q.question_text,
+                            question_type: Question_type.custom,
+                            type: q.type,
+                            category: stepKey,
+                            options: q.options,
+                        };
 
-    setStep2({ customQuestions: validCustom });
-    router.push("/survey/create/complete");
-  };
+                        if (
+                            q.type === QuestionTypeEnum.CHECKBOX &&
+                            q.max_num !== undefined
+                        ) {
+                            return { ...base, max_num: q.max_num };
+                        }
 
-  return (
-    <div>
-      <div className="w-full text-black font-bold text-2xl py-3">
-        Survey create Step2
-      </div>
-      <div className="p-6">
-        <div className="w-[50%] min-h-[800px] pb-[20px] rounded-xl max-w-[485px] md:max-w-3xl bg-white px-4 sm:px-6 md:px-8">
-          <SurveyTabs tabs={allTabs} current={tabIndex} setTab={setTabIndex} />
+                        return base;
+                    }),
+        );
 
-          <h1 className="text-lg md:text-2xl font-bold mb-4 pt-[30px]">
-            🎵 {step1.title || step1.youtubeTitle || "제목 없음"}
-          </h1>
+        const templateQs = Object.entries(categoryQuestions).flatMap(
+            ([stepKey, questions]) =>
+                questions.map((q) => ({
+                    ...q,
+                    category: stepKey,
+                })),
+        );
 
-          {/* 🔹 기본 템플릿 탭 */}
-          {!isCustomTab ? (
-            <>
-              {(categoryQuestions[currentTab.key] || []).map((q) => (
-                <div key={q.id} className="mb-6 border p-4 rounded">
-                  <p className="font-medium mb-1">{q.question_text}</p>
-                  {q.options.map((opt, i) => (
-                    <div key={i} className="text-sm text-gray-600">
-                      ⦿ {opt}
-                    </div>
-                  ))}
+        const allQuestions = [...templateQs, ...validCustom];
+
+        setStep2({
+            customQuestions: validCustom,
+            survey_question: JSON.stringify(allQuestions),
+        });
+
+        router.push('/survey/create/complete');
+    };
+
+    return (
+        <div>
+            <div className="w-full text-black font-bold text-2xl py-3">
+                Survey create Step2
+            </div>
+            <div className="p-6">
+                <div className="w-[50%] min-h-[800px] pb-[20px] rounded-xl max-w-[485px] md:max-w-3xl bg-white px-4 sm:px-6 md:px-8">
+                    <SurveyTabs
+                        tabs={allTabs}
+                        current={tabIndex}
+                        setTab={setTabIndex}
+                    />
+                    <h1 className="text-lg md:text-2xl font-bold mb-4 pt-[30px]">
+                        🎵 {step1.survey_title}
+                    </h1>
+
+                    {(categoryQuestions[currentTab.key] || []).map((q) => (
+                        <div key={q.id} className="mb-6 border p-4 rounded">
+                            <p className="font-medium mb-1">
+                                {q.question_text}
+                            </p>
+                            {q.options.map((opt, i) => (
+                                <div key={i} className="text-sm text-gray-600">
+                                    ⦿ {opt}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+
+                    <SurveyCustomForm
+                        typeOptions={typeOptions}
+                        questions={customQuestions[currentTab.key] || []}
+                        onAdd={() => addCustomQuestion(currentTab.key)}
+                        onChangeText={(i, text) =>
+                            handleChangeCustomText(currentTab.key, i, text)
+                        }
+                        onChangeType={(i, type) =>
+                            handleChangeType(currentTab.key, i, type)
+                        }
+                        onChangeOption={(qi, oi, val) =>
+                            handleChangeOption(currentTab.key, qi, oi, val)
+                        }
+                        onAddOption={(qi) =>
+                            handleAddOption(currentTab.key, qi)
+                        }
+                        onRemove={(id) =>
+                            removeCustomQuestion(currentTab.key, id)
+                        }
+                        onChangeMaxNum={(index, value) =>
+                            handleChangeMaxNum(currentTab.key, index, value)
+                        }
+                        onRemoveOption={(qi, oi) =>
+                            handleRemoveOption(currentTab.key, qi, oi)
+                        }
+                    />
+
+                    <SurveyNavigation
+                        tabIndex={tabIndex}
+                        totalTabs={allTabs.length}
+                        onPrev={() =>
+                            setTabIndex((prev) => Math.max(0, prev - 1))
+                        }
+                        onNext={() =>
+                            setTabIndex((prev) =>
+                                Math.min(allTabs.length - 1, prev + 1),
+                            )
+                        }
+                    />
+
+                    <SurveyActions
+                        onTempSave={handleTempSave}
+                        onComplete={handleComplete}
+                    />
                 </div>
-              ))}
-
-              <SurveyQuestionBase
-                label={currentTab.label}
-                showCustomButton={isStardomTab && !customTabCreated}
-                onCustomClick={createCustomTab}
-              />
-            </>
-          ) : (
-            // 🔹 커스텀 탭
-            <SurveyCustomForm
-              typeOptions={typeOptions}
-              questions={customQuestions}
-              onAdd={addCustomQuestion}
-              onChangeText={handleQuestionChange}
-              onChangeType={handleTypeChange}
-              onChangeOption={handleOptionChange}
-              onAddOption={handleAddOption}
-            />
-          )}
-
-          {/* 🔹 네비게이션 버튼 */}
-          <SurveyNavigation
-            tabIndex={tabIndex}
-            totalTabs={allTabs.length}
-            onPrev={() => setTabIndex((prev) => Math.max(0, prev - 1))}
-            onNext={() =>
-              setTabIndex((prev) => Math.min(allTabs.length - 1, prev + 1))
-            }
-          />
-
-          {/* 🔹 완료 버튼 */}
-          {(isStardomTab || isCustomTab) && (
-            <SurveyActions
-              onTempSave={handleTempSave}
-              onComplete={handleComplete}
-            />
-          )}
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
