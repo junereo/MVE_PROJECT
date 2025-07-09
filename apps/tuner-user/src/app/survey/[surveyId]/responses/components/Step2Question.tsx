@@ -81,17 +81,18 @@ export default function Step2Question({
         console.log("📦 fetchSurveyQuestions response:", res.data); // 👈 이거 찍어봐
 
         const data = res.data?.[0];
-        const rawMap = data?.survey_question;
+        const questions = data?.question;
 
-        if (!rawMap) {
-          console.error("❌ 설문 항목이 없습니다.", res.data);
+        if (!questions || questions.length === 0) {
+          console.error("❌ 설문 항목이 없습니다.", questions);
           return;
         }
+
 
         const fixedQuestions: Questions[] = [];
         const customQuestions: Questions[] = [];
 
-        Object.entries(rawMap).forEach(([category, items]) => {
+        Object.entries(questions).forEach(([category, items]) => {
           (items as any[]).forEach((q) => {
             const question: Questions = {
               id: q.id,
