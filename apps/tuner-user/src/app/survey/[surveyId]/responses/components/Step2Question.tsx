@@ -114,7 +114,7 @@ export default function Step2Question({
         setStep4({
           ...step4,
           questions: fixedQuestions,
-          customQuestions,
+          customQuestions: customQuestions,
         });
       });
     }
