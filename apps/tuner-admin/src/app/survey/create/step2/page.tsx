@@ -17,15 +17,18 @@ interface RawTemplateQuestion {
     question_type: string;
     options: string[];
     category: string;
-    type?: string;
+    type: string;
+    max_num?: number;
 }
 
-interface Question {
+export interface Question {
     id: number;
     question_text: string;
-    question_type: QuestionTypeEnum;
+    question_type: Question_type;
+    type: QuestionTypeEnum;
     options: string[];
     category?: string;
+    max_num?: number;
 }
 
 export default function SurveyStep2() {
@@ -43,21 +46,6 @@ export default function SurveyStep2() {
         { label: '체크박스형', value: QuestionTypeEnum.CHECKBOX },
         { label: '서술형', value: QuestionTypeEnum.SUBJECTIVE },
     ];
-
-    const mapToQuestionTypeEnum = (
-        question_type?: string,
-    ): QuestionTypeEnum => {
-        switch (question_type?.toLowerCase()) {
-            case 'multiple':
-                return QuestionTypeEnum.MULTIPLE;
-            case 'checkbox':
-                return QuestionTypeEnum.CHECKBOX;
-            case 'subjective':
-                return QuestionTypeEnum.SUBJECTIVE;
-            default:
-                return QuestionTypeEnum.MULTIPLE;
-        }
-    };
 
     const [tabIndex, setTabIndex] = useState(0);
     const allTabs = baseCategories;
@@ -87,10 +75,12 @@ export default function SurveyStep2() {
                             id: i++,
                             category: step,
                             question_text: q.question_text,
-                            question_type: mapToQuestionTypeEnum(
-                                q.question_type || q.type,
-                            ),
+                            question_type: 'fixed',
+                            type: q.type || 'multiple',
                             options: Array.isArray(q.options) ? q.options : [],
+                            ...(q.type === 'checkbox'
+                                ? { max_num: q.max_num ?? 1 }
+                                : {}),
                         }),
                     );
                 }
@@ -106,6 +96,8 @@ export default function SurveyStep2() {
     }, [setStep2, setTemplateSetKey]);
 
     const addCustomQuestion = (stepKey: string) => {
+        const defaultType = QuestionTypeEnum.MULTIPLE;
+
         setCustomQuestions((prev) => ({
             ...prev,
             [stepKey]: [
@@ -113,10 +105,25 @@ export default function SurveyStep2() {
                 {
                     id: Date.now(),
                     question_text: '',
-                    question_type: QuestionTypeEnum.MULTIPLE,
+                    question_type: Question_type.custom,
+                    type: defaultType,
                     options: ['', '', '', ''],
                 },
-            ],
+            ] as Question[],
+        }));
+    };
+
+    const handleChangeMaxNum = (
+        stepKey: string,
+        index: number,
+        value: number,
+    ) => {
+        const safeValue = Math.max(1, value);
+        setCustomQuestions((prev) => ({
+            ...prev,
+            [stepKey]: prev[stepKey].map((q, i) =>
+                i === index ? { ...q, max_num: safeValue } : q,
+            ),
         }));
     };
 
@@ -125,6 +132,29 @@ export default function SurveyStep2() {
             ...prev,
             [stepKey]: prev[stepKey].filter((q) => q.id !== id),
         }));
+    };
+    const handleRemoveOption = (
+        categoryKey: string,
+        qIndex: number,
+        optIndex: number,
+    ) => {
+        setCustomQuestions((prev) => {
+            const updated = [...(prev[categoryKey] || [])];
+            const targetQuestion = updated[qIndex];
+            if (!targetQuestion) return prev;
+
+            updated[qIndex] = {
+                ...targetQuestion,
+                options: targetQuestion.options.filter(
+                    (_, i) => i !== optIndex,
+                ),
+            };
+
+            return {
+                ...prev,
+                [categoryKey]: updated,
+            };
+        });
     };
 
     const handleChangeCustomText = (
@@ -145,23 +175,37 @@ export default function SurveyStep2() {
         index: number,
         type: QuestionTypeEnum,
     ) => {
-        setCustomQuestions((prev) => ({
-            ...prev,
-            [stepKey]: prev[stepKey].map((q, i) =>
-                i === index
-                    ? {
-                          ...q,
-                          question_type: type,
-                          options:
-                              type === QuestionTypeEnum.SUBJECTIVE
-                                  ? []
-                                  : q.options.length
-                                  ? q.options
-                                  : ['', '', '', ''],
-                      }
-                    : q,
-            ),
-        }));
+        setCustomQuestions((prev) => {
+            const updatedQuestions = prev[stepKey].map((q, i) => {
+                if (i !== index) return q;
+
+                const updatedQuestion: Question = {
+                    ...q,
+                    question_type: Question_type.custom,
+                    type,
+                    options:
+                        type === QuestionTypeEnum.SUBJECTIVE
+                            ? []
+                            : q.options.length
+                            ? q.options
+                            : ['', '', '', ''],
+                };
+
+                // 체크박스형이면 max_num 기본 1 설정
+                if (type === QuestionTypeEnum.CHECKBOX) {
+                    updatedQuestion.max_num = q.max_num ?? 1;
+                } else {
+                    delete updatedQuestion.max_num;
+                }
+
+                return updatedQuestion;
+            });
+
+            return {
+                ...prev,
+                [stepKey]: updatedQuestions,
+            };
+        });
     };
 
     const handleChangeOption = (
@@ -199,6 +243,49 @@ export default function SurveyStep2() {
     };
 
     const handleTempSave = async () => {
+        const validCustom = Object.entries(customQuestions).flatMap(
+            ([stepKey, questions]) =>
+                questions
+                    .filter(
+                        (q) =>
+                            q.question_text.trim() !== '' &&
+                            (q.type === QuestionTypeEnum.SUBJECTIVE ||
+                                q.options.every((opt) => opt.trim() !== '')),
+                    )
+                    .map((q) => {
+                        const base = {
+                            id: q.id,
+                            question_text: q.question_text,
+                            question_type: Question_type.custom,
+                            type: q.type,
+                            category: stepKey,
+                            options: q.options,
+                        };
+
+                        if (
+                            q.type === QuestionTypeEnum.CHECKBOX &&
+                            q.max_num !== undefined
+                        ) {
+                            return { ...base, max_num: q.max_num };
+                        }
+
+                        return base;
+                    }),
+        );
+
+        // 2. 템플릿 문항 정제
+        const templateQs = Object.entries(categoryQuestions).flatMap(
+            ([stepKey, questions]) =>
+                questions.map((q) => ({
+                    ...q,
+                    category: stepKey,
+                })),
+        );
+
+        // 3. 최종 allQuestions 배열
+        const allQuestions = [...templateQs, ...validCustom];
+
+        // 4. payload 작성
         const draftPayload = {
             survey_title: step1.survey_title,
             title: step1.title,
@@ -206,7 +293,6 @@ export default function SurveyStep2() {
             thumbnail_uri: step1.youtubeThumbnail,
             artist: step1.artist,
             release_date: step1.releaseDate,
-            thumbnail_url: step1.youtubeThumbnail,
             music_title: step1.title,
             genre: step1.genre,
             start_at: step1.start_at,
@@ -219,6 +305,23 @@ export default function SurveyStep2() {
             question_type: 'fixed' as Question_type,
             is_released: step1.isReleased,
             status: SurveyStatus.draft,
+            survey_question: JSON.stringify(
+                allQuestions.map((q) => {
+                    const question = q as Question & { max_num?: number };
+
+                    return {
+                        question_text: question.question_text,
+                        type: question.type,
+                        question_type: String(question.question_type),
+                        options: question.options,
+                        category: question.category,
+                        ...(question.type === QuestionTypeEnum.CHECKBOX &&
+                        question.max_num
+                            ? { max_num: question.max_num }
+                            : {}),
+                    };
+                }),
+            ),
         };
 
         try {
@@ -239,15 +342,28 @@ export default function SurveyStep2() {
                     .filter(
                         (q) =>
                             q.question_text.trim() !== '' &&
-                            (q.question_type === QuestionTypeEnum.SUBJECTIVE ||
+                            (q.type === QuestionTypeEnum.SUBJECTIVE ||
                                 q.options.every((opt) => opt.trim() !== '')),
                     )
-                    .map((q) => ({
-                        ...q,
-                        category: stepKey,
-                        type: q.question_type.toLowerCase(), // "multiple", etc.
-                        question_type: Question_type.custom, // "custom"
-                    })),
+                    .map((q) => {
+                        const base = {
+                            id: q.id,
+                            question_text: q.question_text,
+                            question_type: Question_type.custom,
+                            type: q.type,
+                            category: stepKey,
+                            options: q.options,
+                        };
+
+                        if (
+                            q.type === QuestionTypeEnum.CHECKBOX &&
+                            q.max_num !== undefined
+                        ) {
+                            return { ...base, max_num: q.max_num };
+                        }
+
+                        return base;
+                    }),
         );
 
         const templateQs = Object.entries(categoryQuestions).flatMap(
@@ -255,7 +371,6 @@ export default function SurveyStep2() {
                 questions.map((q) => ({
                     ...q,
                     category: stepKey,
-                    // type은 명시 안 함 (혹은 "fixed"를 넣고 싶으면 추가 가능)
                 })),
         );
 
@@ -263,7 +378,7 @@ export default function SurveyStep2() {
 
         setStep2({
             customQuestions: validCustom,
-            allQuestions: JSON.stringify(allQuestions),
+            survey_question: JSON.stringify(allQuestions),
         });
 
         router.push('/survey/create/complete');
@@ -316,6 +431,12 @@ export default function SurveyStep2() {
                         }
                         onRemove={(id) =>
                             removeCustomQuestion(currentTab.key, id)
+                        }
+                        onChangeMaxNum={(index, value) =>
+                            handleChangeMaxNum(currentTab.key, index, value)
+                        }
+                        onRemoveOption={(qi, oi) =>
+                            handleRemoveOption(currentTab.key, qi, oi)
                         }
                     />
 

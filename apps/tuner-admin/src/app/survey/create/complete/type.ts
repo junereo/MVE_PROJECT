@@ -1,5 +1,7 @@
 // 설문 유형, 공식/일반
 
+import { Question_type } from '@/types';
+
 export enum SurveyTypeEnum {
     GENERAL = 'general',
     OFFICIAL = 'official',
@@ -31,11 +33,23 @@ export interface SurveyResponse {
         sample_url: string;
         thumbnail_url: string;
     };
+}
 
-    survey_custom: {
-        id: number;
-        question_type: QuestionTypeEnum;
-        question_text: string;
-        options: string[];
-    }[];
+// 모든 질문 통합 타입
+export interface AllQuestion {
+    question_text: string;
+    question_type: Question_type;
+    type: QuestionTypeEnum;
+    category: string;
+    options: string[];
+    max_num?: number;
+}
+
+//템플릿 문자열
+export interface ParsedTemplateQuestion {
+    question_text: string;
+    question_type: string;
+    options: string[];
+    type: string;
+    max_num?: number;
 }

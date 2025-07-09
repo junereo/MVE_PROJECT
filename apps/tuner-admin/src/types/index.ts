@@ -79,8 +79,8 @@ export type SignupFormErrors = Partial<Record<keyof SignupFormData, string>>;
 // 고정 질문  데이터
 export interface BackendQuestionPayload {
     question_text: string;
-    question_type: string; // 문자열로 내려감
-    type: 'fixed';
+    question_type: Question_type;
+    type: 'multiple' | 'checkbox' | 'subjective';
     options: string[];
     category: string;
     max_num?: number;

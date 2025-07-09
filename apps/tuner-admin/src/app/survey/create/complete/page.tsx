@@ -3,6 +3,8 @@
 import { useSurveyStore } from '@/store/useSurveyCreateStore';
 import { surveyCreate } from '@/lib/network/api';
 import {
+    AllQuestion,
+    ParsedTemplateQuestion,
     QuestionTypeEnum,
     SurveyTypeEnum,
 } from '@/app/survey/create/complete/type';
@@ -18,6 +20,7 @@ const mapToQuestionTypeEnum = (type: string): QuestionTypeEnum => {
         case 'subjective':
             return QuestionTypeEnum.SUBJECTIVE;
         default:
+            console.warn('Unknown type:', type);
             return QuestionTypeEnum.MULTIPLE;
     }
 };
@@ -26,53 +29,64 @@ export default function SurveyComplete() {
     const { step1, step2, resetSurvey } = useSurveyStore();
 
     // 템플릿 세트 문자열 → 객체로 변환
+    type ParsedTemplateSet = Record<string, ParsedTemplateQuestion[]>;
     const templateSetKeyString = step1.templateSetKey;
-    let parsedTemplateSet = {};
+    let parsedTemplateSet: ParsedTemplateSet = {};
     try {
-        parsedTemplateSet = JSON.parse(templateSetKeyString);
+        parsedTemplateSet = JSON.parse(
+            templateSetKeyString,
+        ) as ParsedTemplateSet;
     } catch (e) {
         console.error('templateSetKey 파싱 오류:', e);
         parsedTemplateSet = {};
     }
 
     // 템플릿 질문 변환
-    const templateQuestions = Object.entries(parsedTemplateSet).flatMap(
-        ([categoryKey, questionArray]) =>
-            Array.isArray(questionArray)
-                ? questionArray.map((q) => {
-                      return {
-                          category: categoryKey,
-                          question_text: q.question_text || categoryKey,
-                          question_type: Question_type.fixed,
-                          options: Array.isArray(q.options)
-                              ? q.options
-                              : typeof q.options === 'string'
-                              ? JSON.parse(q.options)
-                              : [],
-                          type: mapToQuestionTypeEnum(
-                              q.question_type || q.type,
-                          ),
-                      };
-                  })
-                : [],
+    const templateQuestions: AllQuestion[] = Object.entries(
+        parsedTemplateSet,
+    ).flatMap(([categoryKey, questionArray]) =>
+        Array.isArray(questionArray)
+            ? questionArray.map((q) => {
+                  //   console.log('템플릿 question:', q);
+                  const parsedType = mapToQuestionTypeEnum(q.type);
+
+                  return {
+                      category: categoryKey,
+                      question_text: q.question_text || categoryKey,
+                      question_type: Question_type.fixed,
+                      options: Array.isArray(q.options)
+                          ? q.options
+                          : typeof q.options === 'string'
+                          ? JSON.parse(q.options)
+                          : [],
+                      type: parsedType,
+                      ...(parsedType === QuestionTypeEnum.CHECKBOX && q.max_num
+                          ? { max_num: q.max_num }
+                          : {}),
+                  };
+              })
+            : [],
     );
 
     // 커스텀 질문 변환
-    const customQuestions = step2.customQuestions.map((q) => {
-        const typeEnum = mapToQuestionTypeEnum(q.question_type);
+    const customQuestions: AllQuestion[] = step2.customQuestions.map((q) => {
+        const typeEnum =
+            typeof q.type === 'string' ? mapToQuestionTypeEnum(q.type) : q.type;
 
         return {
             question_text: q.question_text,
-            question_type: Question_type.custom, // 출처는 커스텀
+            question_type: Question_type.custom,
             options: typeEnum === QuestionTypeEnum.SUBJECTIVE ? [] : q.options,
             category: q.category ?? 'custom',
-            type: typeEnum, // ✅ 올바른 type 적용
+            type: typeEnum,
+            ...(typeEnum === QuestionTypeEnum.CHECKBOX && q.max_num
+                ? { max_num: q.max_num }
+                : {}),
         };
     });
 
     // 템플릿 + 커스텀 문항 통합
     const allQuestionsRaw = [...templateQuestions, ...customQuestions];
-
     // 최종 전송 payload
     const serverPayload = {
         survey_title: step1.survey_title, // 설문 제목
@@ -97,14 +111,17 @@ export default function SurveyComplete() {
         // evaluationScores: step2.answers, // 평가 점수
         // tags: step2.tags, // 해시태그
 
-        // 커스텀 질문
-        allQuestions: JSON.stringify(
+        // 모든 질문
+        survey_question: JSON.stringify(
             allQuestionsRaw.map((q) => ({
                 question_text: q.question_text,
-                type: q.type, //  "multiple", "checkbox", "subjective"
+                type: q.type,
                 question_type: String(q.question_type),
                 options: q.options,
                 category: q.category,
+                ...(q.type === QuestionTypeEnum.CHECKBOX && q.max_num
+                    ? { max_num: q.max_num }
+                    : {}),
             })),
         ),
     };
@@ -183,8 +200,8 @@ export default function SurveyComplete() {
                         {allQuestionsRaw.map((q, i) => (
                             <div key={i} className="border p-3 rounded mt-3">
                                 <p className="font-medium mb-2">
-                                    [{mapToQuestionTypeEnum(q.type)}]{' '}
-                                    {q.question_text || ''}
+                                    [{mapToQuestionTypeEnum(q.type)}] [
+                                    {q.question_type}] {q.question_text || ''}
                                 </p>
                                 {mapToQuestionTypeEnum(q.type) !==
                                     QuestionTypeEnum.SUBJECTIVE && (

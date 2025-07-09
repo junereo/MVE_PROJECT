@@ -3,16 +3,10 @@
 import { useEffect, useRef } from 'react';
 import Dropdown from '@/app/components/ui/DropDown';
 import { QuestionTypeEnum } from '@/app/survey/create/complete/type';
-
-interface CustomQuestion {
-    id: number;
-    question_text: string;
-    question_type: QuestionTypeEnum;
-    options: string[];
-}
+import { Question } from '../page';
 
 interface SurveyCustomFormProps {
-    questions: CustomQuestion[];
+    questions: Question[];
     typeOptions: { label: string; value: QuestionTypeEnum }[];
     onAdd: () => void;
     onChangeText: (index: number, text: string) => void;
@@ -20,6 +14,8 @@ interface SurveyCustomFormProps {
     onChangeOption: (qIndex: number, optIndex: number, value: string) => void;
     onAddOption: (qIndex: number) => void;
     onRemove: (id: number) => void;
+    onChangeMaxNum: (index: number, max: number) => void;
+    onRemoveOption: (qIndex: number, optIndex: number) => void;
 }
 
 export default function SurveyCustomForm({
@@ -31,6 +27,8 @@ export default function SurveyCustomForm({
     onChangeOption,
     onAddOption,
     onRemove,
+    onChangeMaxNum,
+    onRemoveOption,
 }: SurveyCustomFormProps) {
     const lastQuestionRef = useRef<HTMLDivElement>(null);
 
@@ -70,9 +68,8 @@ export default function SurveyCustomForm({
                         <Dropdown
                             options={typeOptions.map((o) => o.label)}
                             selected={
-                                typeOptions.find(
-                                    (o) => o.value === q.question_type,
-                                )?.label ?? '유형 선택'
+                                typeOptions.find((o) => o.value === q.type)
+                                    ?.label ?? '유형 선택'
                             }
                             onSelect={(label: string) => {
                                 const selectedOption = typeOptions.find(
@@ -94,28 +91,41 @@ export default function SurveyCustomForm({
                     />
 
                     {/* 객관식/체크박스형일 경우 선택지 */}
-                    {q.question_type === QuestionTypeEnum.MULTIPLE ||
-                    q.question_type === QuestionTypeEnum.CHECKBOX ? (
+                    {q.type === QuestionTypeEnum.MULTIPLE ||
+                    q.type === QuestionTypeEnum.CHECKBOX ? (
                         <div className="space-y-2">
                             {q.options.map((opt, optIndex) => (
-                                <input
+                                <div
                                     key={optIndex}
-                                    type="text"
-                                    placeholder={`선택지 ${optIndex + 1}`}
-                                    className="w-full p-2 border rounded"
-                                    value={opt}
-                                    onChange={(e) =>
-                                        onChangeOption(
-                                            qIndex,
-                                            optIndex,
-                                            e.target.value,
-                                        )
-                                    }
-                                />
+                                    className="flex items-center gap-2"
+                                >
+                                    <input
+                                        type="text"
+                                        placeholder={`선택지 ${optIndex + 1}`}
+                                        className="w-full p-2 border rounded"
+                                        value={opt}
+                                        onChange={(e) =>
+                                            onChangeOption(
+                                                qIndex,
+                                                optIndex,
+                                                e.target.value,
+                                            )
+                                        }
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            onRemoveOption(qIndex, optIndex)
+                                        }
+                                        className="text-xs text-red-400 hover:underline whitespace-nowrap"
+                                    >
+                                        옵션 삭제
+                                    </button>
+                                </div>
                             ))}
 
                             {/* 체크박스형일 경우에만 선택지 추가 허용 */}
-                            {q.question_type === QuestionTypeEnum.CHECKBOX &&
+                            {q.type === QuestionTypeEnum.CHECKBOX &&
                                 q.options.length < 8 && (
                                     <button
                                         type="button"
@@ -125,6 +135,32 @@ export default function SurveyCustomForm({
                                         + 선택지 추가하기
                                     </button>
                                 )}
+
+                            {/* 체크박스형일 경우 최대 선택 수 설정 */}
+                            {q.type === QuestionTypeEnum.CHECKBOX && (
+                                <div className="mt-2">
+                                    <label className="text-sm mr-2">
+                                        최대 선택 개수:
+                                    </label>
+                                    <Dropdown
+                                        options={Array.from(
+                                            { length: q.options.length },
+                                            (_, i) => String(i + 1),
+                                        )}
+                                        selected={String(q.max_num)}
+                                        onSelect={(val) =>
+                                            onChangeMaxNum(qIndex, Number(val))
+                                        }
+                                    />
+
+                                    {q.max_num! > q.options.length && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            ⚠ 최대 선택 수는 선택지 수보다 클 수
+                                            없습니다.
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ) : (
                         // 서술형일 경우 비활성화 예시 input

@@ -45,9 +45,11 @@ type SurveyStep2 = {
         options: string[];
         question_type: string;
         category?: string;
+        max_num?: number;
+        type: string;
     }[];
     categoryQuestions: Record<string, unknown[]>; // 템플릿에서 자동 주입된 기본 설문 문항들
-    allQuestions?: string;
+    survey_question?: string;
 };
 
 // 상태 구조 정의

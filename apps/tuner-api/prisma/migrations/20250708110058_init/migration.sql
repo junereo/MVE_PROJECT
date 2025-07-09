@@ -95,6 +95,7 @@ CREATE TABLE "Survey" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "questions" INTEGER NOT NULL,
+    "survey_question" JSONB,
 
     CONSTRAINT "Survey_pkey" PRIMARY KEY ("id")
 );
@@ -158,10 +159,26 @@ CREATE TABLE "WithdrawalRequest" (
     "user_id" INTEGER NOT NULL,
     "amount" INTEGER NOT NULL,
     "txhash" TEXT NOT NULL,
-    "status" "WithdrawalStatus" NOT NULL,
+    "status" "WithdrawalStatus" NOT NULL DEFAULT 'pending',
     "requested_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "WithdrawalRequest_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TunerContract" (
+    "id" SERIAL NOT NULL,
+    "ca_token" TEXT,
+    "ca_badge" TEXT,
+    "ca_survey" TEXT,
+    "ca_transac" TEXT,
+    "abi_survey" JSONB,
+    "abi_badge" JSONB,
+    "abi_transac" JSONB,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "TunerContract_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
