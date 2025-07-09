@@ -296,13 +296,15 @@ export default function ContractManager() {
             </div>
 
             <div>
-                <label className="font-semibold">Transac ABI (JSON)</label>
+                <label className="font-semibold">
+                    Meta Transaction ABI (JSON)
+                </label>
                 <textarea
                     className={`border rounded p-2 w-full font-mono ${
                         errors.abiTransac ? 'border-red-500' : ''
                     }`}
                     rows={4}
-                    placeholder="Transac ABI (JSON)"
+                    placeholder="Meta Transaction ABI (JSON)"
                     value={abiTransac}
                     onChange={(e) =>
                         handleAbiChange('abiTransac', e.target.value)

@@ -16,7 +16,7 @@ async function main() {
         },
     });
 
-    console.log(" 초기 관리자 생성:", admin);
+    console.log("초기 관리자 생성:", admin);
 }
 
 main()

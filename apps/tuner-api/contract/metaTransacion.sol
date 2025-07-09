@@ -74,9 +74,7 @@ contract MetaTransaction is Ownable {
         emit event03(ecrecover(ethSign, v, r, s));
         emit event03(user);
         address signer = ecrecover(ethSign, v, r, s);
-        require(signer != address(0), "Invalid signature");
-        require(user == signer);
-        
+        require(user == signer);        
     }
 
     function getEthSignMsgHash(

@@ -110,14 +110,19 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
 
   try {
     if (surveyId === 0) {
-      // ✅ 전체 설문 리스트 조회
       const allSurveys = await prisma.survey.findMany({
         orderBy: { created_at: "desc" },
         include: {
           participants: {
             include: {
-              user: true,
-            }
+              user: {
+                select: {
+                  id: true,
+                  nickname: true,
+                  role: true,
+                },
+              },
+            },
           },
           result: true,
           creator: { select: { id: true, nickname: true, role: true } },
@@ -127,14 +132,20 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // ✅ 특정 설문 상세 조회
+    // 특정 설문 상세 조회 
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
       include: {
         participants: {
           include: {
-            user: true,
-          }
+            user: {
+              select: {
+                id: true,
+                nickname: true,
+                role: true,
+              },
+            },
+          },
         },
         creator: { select: { id: true, nickname: true, role: true } },
         result: true,
@@ -155,6 +166,7 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
       .json({ message: "설문 조회 중 오류 발생", error: err.message });
   }
 };
+
 
 export const getSurveyQuestionList = async (
   req: Request,
@@ -199,7 +211,7 @@ export const createSurveyParticipantHandler = async (
 
     const newParticipant = await createSurveyParticipant({
       user_id: parseInt(user_id),
-      survey_id : parseInt(survey_id),
+      survey_id: parseInt(survey_id),
       answers,
       isSubmit,
     });
@@ -271,7 +283,7 @@ export const createSurveyResultHandler = async (
       reward_claimed,
     } = req.body;
 
-    
+
     const result = await createSurveyResult({
       survey_id,
       survey_statistics,

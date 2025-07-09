@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import SurveyResult from "./components/SurveyResult";
 import Link from "next/link";
+import { SurveyTypeEnum } from "@/features/survey/types/enums";
 
 type SurveyStatus = "upcoming" | "ongoing" | "closed";
 
@@ -116,11 +117,13 @@ export default function SurveyDetail() {
             label="참여자 수"
             value={`${(participantCount ?? 0).toLocaleString()}명`}
           />
-          <InfoRow
-            label="리워드"
-            value={`🎁 ${reward_amount} STK`}
-            valueClass="text-orange-500"
-          />
+          {type === SurveyTypeEnum.OFFICIAL && (
+            <InfoRow
+              label="리워드"
+              value={`🎁 ${reward_amount / 1000} STK`}
+              valueClass="text-orange-500"
+            />
+          )}
           <InfoRow
             label="상태"
             value={statusTextMap[is_active]}

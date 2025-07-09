@@ -35,16 +35,21 @@ export class TxPoolService {
     async init(): Promise<void> {
         this.provider = new JsonRpcProvider(process.env.SEPLOIA_RPC_URL!);
         this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
-        const contractAddress = process.env.META_CONTRACT_ADDRESS!;
         // DB에서 ABI 동적 로드
         const latest = await this.tunerContractService.getLatestContract();
         let contractABI: any[] = [];
+        let contractAddress = '';
         if (latest?.abi_transac) {
           if (typeof latest.abi_transac === 'string') {
             contractABI = JSON.parse(latest.abi_transac);
           } else {
             contractABI = latest.abi_transac as any[];
           }
+        }
+        if (latest?.ca_transac) {
+          contractAddress = latest.ca_transac;
+        } else {
+          throw new Error('No contract address (ca_transac) found in TunerContract table');
         }
         this.msgSigner = new Contract(contractAddress, contractABI, this.provider).connect(this.wallet) as Contract;
     }

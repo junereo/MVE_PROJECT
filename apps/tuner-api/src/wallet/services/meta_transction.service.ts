@@ -1,5 +1,6 @@
 // src/wallet/service/meta_transaction.services.ts
-import {
+import  {
+  ethers,
   Wallet,
   JsonRpcProvider,
   Contract,
@@ -7,6 +8,8 @@ import {
   toUtf8Bytes,
   formatUnits,
   BigNumberish,
+  getBytes,
+  MaxUint256,
 } from 'ethers';
 import { TunerContractService } from './tunerContract.service';
 import dotenv from 'dotenv';
@@ -24,25 +27,23 @@ export class MetaTransctionService {
   }
 
   async init(): Promise<void> {
-    this.provider = new JsonRpcProvider(
-      `${process.env.SEPLOIA_RPC_URL}`
-    );
+    this.provider = new JsonRpcProvider(`${process.env.SEPLOIA_RPC_URL}`);
 
     this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
     // DB에서 ABI 및 contract address 동적 로드
     const latest = await this.tunerContractService.getLatestContract();
     let metaContractABI: any[] = [];
     let badgeABI: any[] = [];
-    let contractAddress = '';
+    let contractAddress = "";
     if (latest?.abi_transac) {
-      if (typeof latest.abi_transac === 'string') {
+      if (typeof latest.abi_transac === "string") {
         metaContractABI = JSON.parse(latest.abi_transac);
       } else {
         metaContractABI = latest.abi_transac as any[];
       }
     }
-    if (latest && 'abi_badge' in latest && latest.abi_badge) {
-      if (typeof latest.abi_badge === 'string') {
+    if (latest && "abi_badge" in latest && latest.abi_badge) {
+      if (typeof latest.abi_badge === "string") {
         badgeABI = JSON.parse(latest.abi_badge);
       } else {
         badgeABI = latest.abi_badge as any[];
@@ -51,8 +52,11 @@ export class MetaTransctionService {
     if (latest?.ca_transac) {
       contractAddress = latest.ca_transac;
     } else {
-      throw new Error('No contract address (ca_transac) found in TunerContract table');
+      throw new Error(
+        "No contract address (ca_transac) found in TunerContract table"
+      );
     }
+
     this.contract = new Contract(
       contractAddress,
       metaContractABI,
@@ -63,11 +67,22 @@ export class MetaTransctionService {
   }
 
   async createKGTToken(address: string, value: string, msg: any, sign: string) {
+    // 모든 인자를 배열로 변환
+    const addresses = [address];
+    const values = [BigInt(value)]; // 또는 Number(value)
+    const messages = [msg];
+    const signatures = [getBytes(sign)]; // 👈 이것이 핵심
+  
+    const signerFromSig = ethers.verifyMessage(msg, sign);
+    console.log("🔍 signer from sig:", signerFromSig);
+    console.log("🧾 expected sender :", address);
+
     const { hash: txHash } = await this.msgSigner.mint(
       address, value, JSON.stringify(msg), sign
     );
+  
     const tx = await this.provider.getTransaction(txHash);
-    if(!tx) return;
+    if (!tx) return;
     return await tx.wait();
   }
 
@@ -83,21 +98,39 @@ export class MetaTransctionService {
     return Math.floor(Number(formatted));
   }
 
-  async useKGTToken(address: string, value: BigNumberish, msg: any, sign: string) {
+  async useKGTToken(
+    address: string,
+    value: BigNumberish,
+    msg: any,
+    sign: string
+  ) {
     const { hash: txHash } = await this.msgSigner.burn(
-      address, value, JSON.stringify(msg), sign
+      address,
+      value,
+      JSON.stringify(msg),
+      sign
     );
     const tx = await this.provider.getTransaction(txHash);
-    if(!tx) return;
+    if (!tx) return;
     return await tx.wait();
   }
 
-  async sendKGTToken(sender: string, to: string, value: BigNumberish, msg: any, sign: string) {
+  async sendKGTToken(
+    sender: string,
+    to: string,
+    value: BigNumberish,
+    msg: any,
+    sign: string
+  ) {
     const { hash: txHash } = await this.msgSigner.transferFrom(
-      sender, to, value, JSON.stringify(msg), sign
+      sender,
+      to,
+      value,
+      JSON.stringify(msg),
+      sign
     );
     const tx = await this.provider.getTransaction(txHash);
-    if(!tx) return;
+    if (!tx) return;
     return await tx.wait();
   }
 
@@ -111,4 +144,30 @@ export class MetaTransctionService {
     const privateKey = hash.slice(0, 66);
     return new Wallet(privateKey, this.provider);
   }
+    /**
+   * TunerToken에 approve (owner → MetaTransaction)
+   */
+  async approveTunerToken(spender: string, tokenAddress: string, amount: string = MaxUint256.toString()) {
+    const abi = ["function approve(address spender, uint256 amount) public returns (bool)"];
+    const tunerToken = new Contract(tokenAddress, abi, this.wallet);
+
+    const tx = await tunerToken.approve(spender, amount);
+    await tx.wait();
+
+    return { txHash: tx.hash, approved: amount };
+  }
+
+  /**
+   * TunerToken에 대한 approve 해제
+   */
+  async revokeTunerToken(spender: string, tokenAddress: string) {
+    const abi = ["function approve(address spender, uint256 amount) public returns (bool)"];
+    const tunerToken = new Contract(tokenAddress, abi, this.wallet);
+
+    const tx = await tunerToken.approve(spender, 0);
+    await tx.wait();
+
+    return { txHash: tx.hash, revoked: true };
+  }
+
 }

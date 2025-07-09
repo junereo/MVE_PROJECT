@@ -5,9 +5,19 @@ import WalletInfo from "./components/WalletInfo";
 import SurveyStats from "./components/SurveyStatus";
 import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import { getUserInfo } from "@/features/users/services/user";
+import { useEffect, useState } from "react";
 
 export default function MyPage() {
   const { isInitialized } = useAuthGuard();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await getUserInfo();
+      console.log("내 정보", res);
+    };
+    fetchUser();
+  }, []);
 
   if (!isInitialized) return null; // 아직 로그인 여부 확인 중이면 렌더링 X
 
