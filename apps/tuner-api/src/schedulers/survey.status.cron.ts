@@ -48,6 +48,7 @@ cron.schedule('* * * * *', async () => {
             select: {
               id: true,
               role: true,
+              badge_issued_at: true,
             },
           },
         },
