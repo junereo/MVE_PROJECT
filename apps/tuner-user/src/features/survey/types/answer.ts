@@ -1,4 +1,5 @@
 import type { UserInfo } from "@/features/users/types/userInfo";
+import { SurveyStatusEnum } from "./enums";
 
 export type Answer = string | string[];
 
@@ -30,4 +31,5 @@ export interface SurveySubmitPayload {
   survey_id: number;
   user_info: UserInfo;
   answers: FormattedAnswer[];
+  status: SurveyStatusEnum;
 }
