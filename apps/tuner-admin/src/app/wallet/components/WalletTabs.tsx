@@ -15,6 +15,9 @@ export default function WalletTabs() {
   const [message, setMessage] = useState("");
   const [activeMainTab, setActiveMainTab] = useState<string>("token");
   const [activeSubTab] = useState<string>("createWallet");
+  const [resultMessage, setResultMessage] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const baseUrl = "http://localhost:4000";
 
   // API 요청 함수
@@ -23,11 +26,38 @@ export default function WalletTabs() {
     method: "GET" | "POST" | "PUT" | "DELETE",
     data?: Record<string, unknown>
   ) => {
+    setResultMessage("");
+    setLoading(true);
+    // 20초 타임아웃
+    const tId = setTimeout(() => setLoading(false), 20000);
+    setTimeoutId(tId);
     try {
       const res = await axios({ url, method, data });
-      toast.success("성공: " + (res.data?.message || ""));
+      if (timeoutId) clearTimeout(timeoutId);
+      setLoading(false);
+      // txHash, allowance 등 주요 결과값 우선 노출
+      const txHash = res.data?.txHash;
+      const allowance = res.data?.allowance;
+      const token = res.data?.token;
+      let msg = "성공";
+      if (txHash) msg += `\nTxHash: ${txHash}`;
+      if (allowance) msg += `\nAllowance: ${allowance}`;
+      if (token) msg += `\nToken: ${token}`;
+      if (res.data && typeof res.data === 'object') {
+        for (const k of Object.keys(res.data)) {
+          if (!["txHash","allowance","token"].includes(k)) {
+            msg += `\n${k}: ${res.data[k]}`;
+          }
+        }
+      }
+      setResultMessage(msg);
+      toast.success(msg);
     } catch (e: any) {
-      toast.error(e?.response?.data?.error || "요청 실패");
+      if (timeoutId) clearTimeout(timeoutId);
+      setLoading(false);
+      const errMsg = e?.response?.data?.error || "요청 실패";
+      setResultMessage("실패: " + errMsg);
+      toast.error(errMsg);
     }
   };
 
@@ -62,17 +92,29 @@ export default function WalletTabs() {
           <TabsContent value="createToken">
             <div className="space-y-2">
               <Input placeholder="UID" value={uid} onChange={e => setUid(e.target.value)} />
-              <Input placeholder="Amount" value={value} onChange={e => setValue(e.target.value)} />
-              <Button onClick={() => handleRequest(baseUrl + "/contract/wallet/token", "POST", { uid, value })}>
-                토큰 생성
+              <Input placeholder="Amount (ETH)" value={value} onChange={e => setValue(e.target.value)} />
+              <Button onClick={() => handleRequest(baseUrl + "/contract/wallet/token", "POST", { uid, value })} disabled={loading}>
+                {loading ? "실행 중..." : "토큰 생성"}
               </Button>
+              {resultMessage && (
+                <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                  {resultMessage}
+                </div>
+              )}
             </div>
           </TabsContent>
 
           <TabsContent value="getToken">
             <div className="space-y-2">
               <Input placeholder="UID" value={uid} onChange={e => setUid(e.target.value)} />
-              <Button onClick={() => handleRequest(baseUrl + `/contract/wallet/token/${uid}`, "GET")}>토큰 조회</Button>
+              <Button onClick={() => handleRequest(baseUrl + `/contract/wallet/token/${uid}`, "GET")} disabled={loading}>
+                {loading ? "조회 중..." : "토큰 조회"}
+              </Button>
+              {resultMessage && (
+                <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                  {resultMessage}
+                </div>
+              )}
             </div>
           </TabsContent>
 
@@ -80,10 +122,15 @@ export default function WalletTabs() {
             <div className="space-y-2">
               <Input placeholder="Sender UID" value={uid} onChange={e => setUid(e.target.value)} />
               <Input placeholder="To UID" value={to} onChange={e => setTo(e.target.value)} />
-              <Input placeholder="Amount" value={value} onChange={e => setValue(e.target.value)} />
-              <Button onClick={() => handleRequest(baseUrl + "/contract/wallet/token", "PUT", { uid, to, value: Number(value) })}>
-                토큰 전송
+              <Input placeholder="Amount (ETH)" value={value} onChange={e => setValue(e.target.value)} />
+              <Button onClick={() => handleRequest(baseUrl + "/contract/wallet/token", "PUT", { uid, to, value })} disabled={loading}>
+                {loading ? "실행 중..." : "토큰 전송"}
               </Button>
+              {resultMessage && (
+                <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                  {resultMessage}
+                </div>
+              )}
             </div>
           </TabsContent>
 
@@ -147,23 +194,73 @@ export default function WalletTabs() {
           <TabsContent value="signTx">
             <div className="space-y-2">
               <Input placeholder="UID" value={uid} onChange={e => setUid(e.target.value)} />
-              <Input placeholder="Message" value={message} onChange={e => setMessage(e.target.value)} />
-              <Button onClick={() => handleRequest(baseUrl + `/contract/tx/sign`, "POST", { message })}>
-                TxPool 서명
+              <Input placeholder="Message (Amount, ETH)" type="number" value={message} onChange={e => setMessage(e.target.value.replace(/[^0-9.]/g, ''))} min={0} step="any" />
+              <Button onClick={() => {
+                if (!message || isNaN(Number(message))) {
+                  toast.error("숫자만 입력하세요 (ether 단위)");
+                  return;
+                }
+                handleRequest(baseUrl + `/contract/tx/sign`, "POST", { message: message, uid });
+              }} disabled={loading}>
+                {loading ? "실행 중..." : "TxPool 서명"}
               </Button>
+              {resultMessage && (
+                <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                  {resultMessage}
+                </div>
+              )}
             </div>
           </TabsContent>
 
           <TabsContent value="submitTxPool">
-            <Button onClick={() => handleRequest(baseUrl + `/contract/tx/submit`, "POST")}>TxPool 제출</Button>
+            <Button onClick={() => handleRequest(baseUrl + `/contract/tx/submit`, "POST") } disabled={loading}>
+              {loading ? "실행 중..." : "TxPool 제출"}
+            </Button>
+            {resultMessage && (
+              <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                {resultMessage}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="clearTxPool">
-            <Button onClick={() => handleRequest(baseUrl + `/contract/tx/clear`, "GET")}>TxPool 초기화</Button>
+            <Button onClick={() => handleRequest(baseUrl + `/contract/tx/clear`, "GET") } disabled={loading}>
+              {loading ? "실행 중..." : "TxPool 초기화"}
+            </Button>
+            {resultMessage && (
+              <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                {resultMessage}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="viewTxPool">
-            <Button onClick={() => handleRequest(baseUrl + `/contract/tx/pool`, "GET")}>TxPool 조회</Button>
+            <Button onClick={async () => {
+              setResultMessage("");
+              setLoading(true);
+              const tId = setTimeout(() => setLoading(false), 20000);
+              setTimeoutId(tId);
+              try {
+                const res = await axios.get(baseUrl + `/contract/tx/pool`);
+                if (timeoutId) clearTimeout(timeoutId);
+                setLoading(false);
+                setResultMessage(typeof res.data === 'object' ? JSON.stringify(res.data, null, 2) : String(res.data));
+                toast.success("조회 성공");
+              } catch (e: any) {
+                if (timeoutId) clearTimeout(timeoutId);
+                setLoading(false);
+                const errMsg = e?.response?.data?.error || "요청 실패";
+                setResultMessage("실패: " + errMsg);
+                toast.error(errMsg);
+              }
+            }} disabled={loading}>
+              {loading ? "조회 중..." : "TxPool 조회"}
+            </Button>
+            {resultMessage && (
+              <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                {resultMessage}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </TabsContent>
