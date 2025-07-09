@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
 
-interface Step4Props {
+interface Step3Props {
   onPrev: () => void;
   surveyId: number;
 }
@@ -37,7 +37,7 @@ const getStatusUI = (status: StatusKey, surveyId: number): StatusUI =>
     },
   }[status]);
 
-export default function Step4Result({ surveyId, onPrev }: Step4Props) {
+export default function Step3Result({ surveyId, onPrev }: Step3Props) {
   const { surveySubmitStatus } = useAnswerStore();
   const status: StatusKey = surveySubmitStatus || "error";
   const ui = getStatusUI(status, surveyId);

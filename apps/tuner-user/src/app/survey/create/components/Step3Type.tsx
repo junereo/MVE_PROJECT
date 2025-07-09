@@ -2,7 +2,7 @@
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
 
@@ -17,15 +17,46 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const [surveyType, setSurveyType] = useState<SurveyTypeEnum>(
     step3.surveyType ?? SurveyTypeEnum.OFFICIAL
   );
-  const [rewardAmount, setRewardAmount] = useState(
-    step3.reward_amount ? String(step3.reward_amount) : ""
-  );
-  const [reward, setReward] = useState(
-    step3.reward ? String(step3.reward) : ""
-  );
-  const [expertReward, setExpertReward] = useState(
-    step3.expert_reward ? String(step3.expert_reward) : ""
-  );
+  const [rewardAmount, setRewardAmount] = useState("");
+  const [reward, setReward] = useState("");
+  const [expertReward, setExpertReward] = useState("");
+
+  useEffect(() => {
+    if (step3.reward_amount) {
+      setRewardAmount(String(step3.reward_amount / 1000));
+    }
+    if (step3.reward) {
+      setReward(String(step3.reward / 1000));
+    }
+    if (step3.expert_reward) {
+      setExpertReward(String(step3.expert_reward / 1000));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (surveyType === SurveyTypeEnum.GENERAL) {
+      setRewardAmount("");
+      setExpertReward("");
+    }
+  }, [surveyType]);
+
+  const handleNext = () => {
+    if (surveyType === SurveyTypeEnum.GENERAL) {
+      setStep3({
+        surveyType,
+        reward: 1000, // 1 * 1000
+      });
+    } else {
+      setStep3({
+        surveyType,
+        reward_amount: Math.round(Number(rewardAmount) * 1000),
+        reward: Math.round(Number(reward) * 1000),
+        expert_reward: Math.round(Number(expertReward) * 1000),
+      });
+    }
+
+    onNext();
+  };
 
   const total = Number(rewardAmount);
   const general = Number(reward);
@@ -42,16 +73,6 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
       total > 0 &&
       general > 0 &&
       expert > 0);
-
-  const handleNext = () => {
-    setStep3({
-      surveyType,
-      reward_amount: Number(rewardAmount),
-      reward: Number(reward),
-      expert_reward: Number(expertReward),
-    });
-    onNext();
-  };
 
   return (
     <>
@@ -102,6 +123,8 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
             <Input
               label="일반 회원 리워드"
               type="number"
+              min="0.001"
+              inputMode="decimal"
               value={reward}
               onChange={(e) => setReward(e.target.value)}
               placeholder="각 일반 회원에게 지급할 리워드를 입력해주세요."
@@ -109,6 +132,8 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
             <Input
               label="Expert 회원 리워드"
               type="number"
+              min="0.001"
+              inputMode="decimal"
               value={expertReward}
               onChange={(e) => setExpertReward(e.target.value)}
               placeholder="각 Expert 회원에게 지급할 리워드를 입력해주세요."
@@ -116,11 +141,9 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
           </>
         )}
         {surveyType === SurveyTypeEnum.GENERAL && (
-          <Input
-            label="일반 리워드"
-            type="number"
-            placeholder="기본으로 지급되는 리워드입니다."
-          />
+          <p className="text-sm text-gray-600 bg-gray-50 border rounded-md p-3">
+            일반 서베이는 기본 리워드 1이 자동 설정됩니다.
+          </p>
         )}
       </div>
 

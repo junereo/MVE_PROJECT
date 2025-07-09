@@ -1,5 +1,6 @@
 import Image from "next/image";
 import clsx from "clsx";
+import { SurveyTypeEnum } from "@/features/survey/types/enums";
 
 type Props = {
   image: string;
@@ -8,6 +9,7 @@ type Props = {
   surveyTitle: string;
   period: string;
   status: "예정" | "진행중" | "종료";
+  surveyType: SurveyTypeEnum;
   participants: number;
   reward?: number;
   onClick?: () => void;
@@ -26,6 +28,7 @@ export default function List({
   surveyTitle,
   period,
   status,
+  surveyType,
   participants,
   reward,
   onClick,
@@ -67,9 +70,9 @@ export default function List({
         <p className="text-[11px] sm:text-xs text-gray-600 whitespace-nowrap">
           {participants}명 참여
         </p>
-        {reward !== undefined && (
+        {reward !== undefined && surveyType === SurveyTypeEnum.OFFICIAL && (
           <p className="text-xs sm:text-sm text-orange-500 font-medium">
-            🎁 {reward} STK
+            🎁 {reward / 1000} STK
           </p>
         )}
       </div>

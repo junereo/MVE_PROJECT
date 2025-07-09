@@ -42,7 +42,7 @@ export default function Card({
 
   return (
     <div className="grid grid-cols-2 gap-4">
-      {surveys.map((item) => (
+      {surveys.slice(0, 4).map((item) => (
         <div
           key={item.id}
           onClick={() => router.push(`/survey/${item.id}`)}
