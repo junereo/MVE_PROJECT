@@ -9,6 +9,8 @@ import {
   getAllSurveyParticipants,
   getSurveyResult,
   createSurveyResult,
+  getSurveyParticipation,
+
 } from "../services/survey.service";
 import { PrismaClient, QuestionType } from "@prisma/client";
 const prisma = new PrismaClient();
@@ -326,5 +328,24 @@ export const getSurveyResultHandler = async (
   } catch (err: any) {
     console.error("Survey Result 조회 실패:", err);
     res.status(500).json({ message: "결과 조회 실패", error: err.message });
+  }
+};
+
+export const getSurveyParticipationController = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const surveyId = Number(req.params.surveyId);
+    const userId = Number(req.user?.userId);
+
+    if (isNaN(surveyId) || isNaN(userId)) {
+      res.status(400).json({ message: "잘못된 요청" });
+      return
+    }
+
+    const result = await getSurveyParticipation({ surveyId, userId });
+
+    res.status(200).json({ success: true, data: result });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "서버 오류" });
   }
 };

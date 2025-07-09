@@ -119,11 +119,7 @@ export const adminRegister = async (data: any) => {
     // const role = data.role === 0 ? 'superadmin' : 'admin';
 
     const roleNum = data.role !== undefined ? Number(data.role) : 1; // 기본 admin
-    const roleEnum = mapRoleEnum(roleNum); // 무조건 enum string!
-
-    console.log(" data.role:", data.role);   // 원본
-    console.log(" roleNum:", roleNum);       // Number 변환
-    console.log(" roleEnum:", roleEnum);     // enum string: 'superadmin' or 'admin'
+    const roleEnum = mapRoleEnum(roleNum);
 
     const newAdmin = await prisma.user.create({
         data: {
@@ -219,7 +215,6 @@ export const oauthCallbackService = async (req: Request) => {
     const roleEnum = mapRoleEnum(
         req.query.role !== undefined ? Number(req.query.role) : 3
     );
-
 
     const profile = await fetchKakaoProfile(code);
     const safeEmail = profile.email ?? `noemail_${profile.id}@${provider}.com`;
