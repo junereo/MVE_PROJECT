@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Dropdown from "@/components/ui/DropDown";
@@ -15,6 +16,8 @@ interface CustomFormProps {
   onChangeType: (id: number, type: string) => void;
   onChangeOption: (qId: number, oIndex: number, value: string) => void;
   onAddOption: (qId: number) => void;
+  onChangeMaxNum: (id: number, max: number) => void;
+  onRemoveOption: (qId: number, oIndex: number) => void;
 }
 
 export default function CustomForm({
@@ -26,25 +29,36 @@ export default function CustomForm({
   onChangeType,
   onChangeOption,
   onAddOption,
+  onChangeMaxNum,
+  onRemoveOption,
 }: CustomFormProps) {
+  const lastQuestionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (lastQuestionRef.current) {
+      lastQuestionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [questions.length]);
+
   return (
-    <div className="space-y-6 pb-20">
+    <div className="flex flex-col gap-8 pb-28">
       {questions.map((q, qIndex) => (
         <div
           key={q.id}
+          ref={qIndex === questions.length - 1 ? lastQuestionRef : null}
           className="relative rounded-xl border bg-white p-5 space-y-4 shadow-sm"
         >
           {/* 질문 번호 + 삭제 버튼 */}
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-sm text-gray-800">{`질문 ${
+            <h3 className="text-sm font-bold text-gray-800">{`질문 ${
               qIndex + 1
             }`}</h3>
             <button
               type="button"
               onClick={() => onRemove(qIndex)}
-              className="text-xs text-gray-400 hover:text-red-500 font-bold"
+              className="text-sm text-gray-400 hover:text-red-500"
             >
-              X
+              삭제
             </button>
           </div>
 
@@ -67,12 +81,12 @@ export default function CustomForm({
             onChange={(e) => onChangeText(q.id, e.target.value)}
           />
 
-          {/* 객관식 (5개 고정) */}
+          {/* 객관식 */}
           {q.type === InputTypeEnum.MULTIPLE && (
             <div className="space-y-2">
               {[...Array(5)].map((_, optIndex) => (
                 <input
-                  key={optIndex}
+                  key={`${q.id}-m-${optIndex}`}
                   type="text"
                   value={q.options?.[optIndex] ?? ""}
                   onChange={(e) =>
@@ -85,27 +99,65 @@ export default function CustomForm({
             </div>
           )}
 
-          {/* 체크박스형 (기본 5개, 최대 8개) */}
+          {/* 체크박스 */}
           {q.type === InputTypeEnum.CHECKBOX && (
             <div className="space-y-2">
+              {/* 최대 선택 개수 */}
+              {q.type === InputTypeEnum.CHECKBOX && (
+                <div className="flex justify-end items-center gap-2">
+                  <label className="block text-sm font-medium text-gray-700 pt-2">
+                    최대 선택 개수
+                  </label>
+
+                  <div className="w-32">
+                    <Dropdown
+                      options={
+                        q.options && q.options.length > 0
+                          ? Array.from({ length: q.options.length }, (_, i) =>
+                              String(i + 1)
+                            )
+                          : ["1"]
+                      }
+                      selected={String(q.max_num ?? "")}
+                      onSelect={(val) => onChangeMaxNum(q.id, Number(val))}
+                    />
+                  </div>
+                  {q.max_num && q.options && q.max_num > q.options.length && (
+                    <p className="text-sm text-red-500">
+                      ⚠ 최대 선택 수는 선택지 수보다 클 수 없습니다.
+                    </p>
+                  )}
+                </div>
+              )}
               {(q.options ?? []).map((opt, optIndex) => (
-                <input
-                  key={optIndex}
-                  type="text"
-                  value={opt}
-                  onChange={(e) =>
-                    onChangeOption(q.id, optIndex, e.target.value)
-                  }
-                  placeholder={`선택지 ${optIndex + 1}`}
-                  className="w-full border rounded px-3 py-2 text-sm"
-                />
+                <div
+                  key={`${q.id}-c-${optIndex}`}
+                  className="flex items-center gap-2"
+                >
+                  <input
+                    type="text"
+                    value={opt}
+                    onChange={(e) =>
+                      onChangeOption(q.id, optIndex, e.target.value)
+                    }
+                    placeholder={`선택지 ${optIndex + 1}`}
+                    className="w-full border rounded px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onRemoveOption(q.id, optIndex)}
+                    className="text-xs text-red-400 hover:underline whitespace-nowrap"
+                  >
+                    옵션 삭제
+                  </button>
+                </div>
               ))}
 
               {(q.options?.length ?? 0) < 8 && (
                 <button
                   type="button"
                   onClick={() => onAddOption(q.id)}
-                  className="text-xs text-blue-500 underline mt-1"
+                  className="text-blue-600 text-sm font-medium underline hover:opacity-80 transition"
                 >
                   + 선택지 추가
                 </button>
