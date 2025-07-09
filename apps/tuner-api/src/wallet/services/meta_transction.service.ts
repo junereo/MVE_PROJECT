@@ -1,5 +1,6 @@
 // src/wallet/service/meta_transaction.services.ts
-import {
+import  {
+  ethers,
   Wallet,
   JsonRpcProvider,
   Contract,
@@ -7,6 +8,8 @@ import {
   toUtf8Bytes,
   formatUnits,
   BigNumberish,
+  getBytes,
+  MaxUint256,
 } from 'ethers';
 import { TunerContractService } from './tunerContract.service';
 import dotenv from 'dotenv';
@@ -53,6 +56,7 @@ export class MetaTransctionService {
     } else {
       throw new Error('No contract address (ca_transac) found in TunerContract table');
     }
+
     this.contract = new Contract(
       contractAddress,
       metaContractABI,
@@ -63,11 +67,25 @@ export class MetaTransctionService {
   }
 
   async createKGTToken(address: string, value: string, msg: any, sign: string) {
+    // 모든 인자를 배열로 변환
+    const addresses = [address];
+    const values = [BigInt(value)]; // 또는 Number(value)
+    const messages = [msg];
+    const signatures = [getBytes(sign)]; // 👈 이것이 핵심
+  
+    const signerFromSig = ethers.verifyMessage(msg, sign);
+    console.log("🔍 signer from sig:", signerFromSig);
+    console.log("🧾 expected sender :", address);
+
     const { hash: txHash } = await this.msgSigner.mint(
-      address, value, JSON.stringify(msg), sign
+      addresses,
+      values,
+      messages,
+      signatures
     );
+  
     const tx = await this.provider.getTransaction(txHash);
-    if(!tx) return;
+    if (!tx) return;
     return await tx.wait();
   }
 
@@ -111,4 +129,30 @@ export class MetaTransctionService {
     const privateKey = hash.slice(0, 66);
     return new Wallet(privateKey, this.provider);
   }
+    /**
+   * TunerToken에 approve (owner → MetaTransaction)
+   */
+  async approveTunerToken(spender: string, tokenAddress: string, amount: string = MaxUint256.toString()) {
+    const abi = ["function approve(address spender, uint256 amount) public returns (bool)"];
+    const tunerToken = new Contract(tokenAddress, abi, this.wallet);
+
+    const tx = await tunerToken.approve(spender, amount);
+    await tx.wait();
+
+    return { txHash: tx.hash, approved: amount };
+  }
+
+  /**
+   * TunerToken에 대한 approve 해제
+   */
+  async revokeTunerToken(spender: string, tokenAddress: string) {
+    const abi = ["function approve(address spender, uint256 amount) public returns (bool)"];
+    const tunerToken = new Contract(tokenAddress, abi, this.wallet);
+
+    const tx = await tunerToken.approve(spender, 0);
+    await tx.wait();
+
+    return { txHash: tx.hash, revoked: true };
+  }
+
 }

@@ -14,4 +14,8 @@ export interface IMetaTransctionService {
   getKGTToken(address: string): Promise<number>;
   sendKGTToken(sender: string, to: string, value: BigNumberish, msg: TxMessage, sign: string): Promise<any>;
   useKGTToken(sender: string, value: BigNumberish, msg: TxMessage, sign: string): Promise<any>;
+  approveTunerToken(spender: string, tokenAddress: string, amount: string): Promise<any>;
+  revokeTunerToken(spender: string, tokenAddress: string): Promise<any>;
+
+  
 }
