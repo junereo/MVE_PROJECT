@@ -46,6 +46,7 @@ export type Questions = {
   type: InputTypeEnum;
   question_type: QuestionTypeEnum;
   options?: string[];
+  max_num?: number;
 };
 
 // Step4Question

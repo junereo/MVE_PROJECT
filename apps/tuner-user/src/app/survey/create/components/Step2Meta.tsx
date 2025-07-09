@@ -14,11 +14,14 @@ interface Step2Props {
 
 const genreOptions = [
   { value: "Ballad", label: "발라드" },
+  { value: "Hiphop", label: "힙합" },
+  { value: "R&B", label: "R&B" },
   { value: "Dance", label: "댄스" },
-  { value: "Pop", label: "팝" },
   { value: "Jazz", label: "재즈" },
+  { value: "Classical", label: "클래식" },
+  { value: "EDM", label: "EDM" },
   { value: "Korean traditional music", label: "국악" },
-  { value: "CCM", label: "CCM" },
+  { value: "rock", label: "락" },
 ];
 
 export default function Step2Meta({ onPrev, onNext }: Step2Props) {

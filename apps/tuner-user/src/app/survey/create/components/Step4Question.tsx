@@ -61,6 +61,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
     (q) => q.category === currentKey
   );
 
+  // 기본 설문 불러옴
   useEffect(() => {
     const getData = async () => {
       try {
@@ -100,58 +101,63 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
     getData();
   }, [setStep4]);
 
+  // 커스텀 질문 추가
   const handleAddCustom = () => {
-    const newId = Date.now();
+    const newId = Date.now() + Math.random();
+
     addCustomQuestion({
       id: newId,
       category: currentKey,
       question_type: QuestionTypeEnum.CUSTOM,
       question_text: "",
       type: InputTypeEnum.MULTIPLE,
-      options: ["", "", "", ""],
+      options: ["", "", "", "", ""],
     });
   };
 
   const handleQuestionChange = (id: number, text: string) => {
-    const question = customQuestions.find((q) => q.id === id);
+    const question = customQuestions.find(
+      (q) => q.id === id && q.category === currentKey
+    );
     if (!question) return;
 
     updateCustomQuestion(id, { ...question, question_text: text });
   };
 
+  // 질문 형식 변경
   const handleTypeChange = (id: number, newType: string) => {
-    const question = customQuestions.find((q) => q.id === id);
+    const question = customQuestions.find(
+      (q) => q.id === id && q.category === currentKey
+    );
     if (!question) return;
 
-    const updated = {
-      ...question,
+    const newQuestion = {
+      ...structuredClone(question),
       type: newType as InputTypeEnum,
-      options:
-        newType === InputTypeEnum.SUBJECTIVE
-          ? []
-          : (question.options ?? []).length
-          ? question.options
-          : ["", "", "", "", ""],
+      question_text: "",
+      options: newType === InputTypeEnum.SUBJECTIVE ? [] : ["", "", "", "", ""],
+      max_num: newType === InputTypeEnum.CHECKBOX ? 1 : undefined,
     };
-    updateCustomQuestion(id, updated);
+
+    updateCustomQuestion(id, newQuestion);
   };
 
-  const handleAddOption = (qIndex: number) => {
-    const prev = currentCustomQuestions[qIndex];
-    if ((prev.options ?? []).length >= 8) return;
-
-    const updated = {
-      ...prev,
-      options: [...(prev.options ?? []), ""],
-    };
-    updateCustomQuestion(
-      customQuestions.findIndex((q) => q.id === updated.id),
-      updated
+  // 옵션 추가
+  const handleAddOption = (qId: number) => {
+    const question = customQuestions.find(
+      (q) => q.id === qId && q.category === currentKey
     );
+    if (!question || (question.options?.length ?? 0) >= 8) return;
+    updateCustomQuestion(qId, {
+      ...question,
+      options: [...(question.options ?? []), ""],
+    });
   };
 
   const handleOptionChange = (qId: number, optIndex: number, value: string) => {
-    const question = customQuestions.find((q) => q.id === qId);
+    const question = customQuestions.find(
+      (q) => q.id === qId && q.category === currentKey
+    );
     if (!question) return;
 
     const updatedOptions = [...(question.options ?? [])];
@@ -262,6 +268,25 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
           onRemove={(index) =>
             removeCustomQuestion(currentCustomQuestions[index].id)
           }
+          onChangeMaxNum={(id, max) => {
+            const q = customQuestions.find((q) => q.id === id);
+            if (!q) return;
+            updateCustomQuestion(id, { ...q, max_num: max });
+          }}
+          onRemoveOption={(qId, optIndex) => {
+            const q = customQuestions.find((q) => q.id === qId);
+            if (!q) return;
+            const updated = {
+              ...q,
+              options: (q.options ?? []).filter((_, i) => i !== optIndex),
+              // max_num도 같이 조정해야 안전
+              max_num:
+                q.max_num && q.max_num > (q.options?.length ?? 1) - 1
+                  ? (q.options?.length ?? 1) - 1
+                  : q.max_num,
+            };
+            updateCustomQuestion(qId, updated);
+          }}
         />
       </div>
 
