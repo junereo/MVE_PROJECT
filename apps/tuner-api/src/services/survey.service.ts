@@ -124,43 +124,47 @@ export const createSurvey = async ({
       throw new Error(`잘못된 설문 타입: ${body.type}`);
 
     const surveyType = body.type as SurveyType;
+    const startDate = new Date(body.start_at);
+    const endDate = new Date(body.end_at);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      throw new Error("유효하지 않은 시작일 또는 종료일입니다.");
+    }
+
+    // ✅ 발매일 변환 및 유효성 검사
+    const releasedDate = body.released_date ? new Date(body.released_date) : new Date();
+    if (isNaN(releasedDate.getTime())) {
+      throw new Error("유효하지 않은 발매일입니다.");
+    }
 
     return await prisma.$transaction(async (tx) => {
-      // 설문 생성
-      const startDate = new Date(body.start_at);
-      const endDate = new Date(body.end_at);
-
       const survey: Survey = await tx.survey.create({
         data: {
-          user_id: userId ?? 0,
+          user_id: userId,
 
           // 음악 정보
           music_title: body.music_title ?? null,
           artist: body.artist ?? null,
-          music_uri: body.music_uri, // music 객체의 sample_url 사용
-          thumbnail_uri: body.thumbnail_uri,
-          genre: body.genre, //장르
+          music_uri: body.music_uri ?? null,
+          thumbnail_uri: body.thumbnail_uri ?? null,
+          genre: body.genre ?? null,
 
-          // 발매 여부 추가
+          // 발매 여부 및 일자
           is_released: !!body.is_released,
-          released_date: body.released_date
-            ? new Date(body.released_date)
-            : new Date(),
+          released_date: releasedDate,
 
           // 기본 필드
           type: surveyType,
           start_at: startDate,
           end_at: endDate,
           is_active: checkSurveyActive(startDate, endDate),
-          survey_title: body.survey_title,
-          survey_question: body.survey_question,
+          survey_title: body.survey_title ?? "",
+          survey_question: body.survey_question ?? [],
           status: body.status ?? "draft",
           reward: body.reward ?? 0,
           expert_reward: body.expert_reward ?? 0,
           reward_amount: body.reward_amount ?? 0,
           questions: body.questions ?? 0,
 
-          // 보상 정보 (official 설문에만)
           ...(surveyType === SurveyType.official && {
             reward: body.reward,
             expert_reward: body.expert_reward,
@@ -168,8 +172,6 @@ export const createSurvey = async ({
           }),
         },
       });
-
-      console.log(survey);
 
       // //  고정 질문 삽입
       // const fixedQuestions = FIXED_SURVEY_QUESTIONS.map((q, idx) => ({
@@ -343,4 +345,49 @@ export const getSurveyResult = async (surveyId: number) => {
   return await prisma.survey_Result.findUnique({
     where: { survey_id: surveyId },
   });
+};
+
+
+export const getSurveyParticipation = async ({
+  surveyId,
+  userId,
+}: {
+  surveyId: number;
+  userId: number;
+}) => {
+  // 설문 기본 정보 
+  const survey = await prisma.survey.findUnique({
+    where: { id: surveyId },
+    select: {
+      id: true,
+      survey_title: true,
+      artist: true,
+      music_title: true,
+      start_at: true,
+      end_at: true,
+      is_active: true,
+      status: true,
+      survey_question: true,
+    },
+  });
+
+  if (!survey) throw new Error("설문 없음");
+
+  //  참여 내역 
+  const participant = await prisma.survey_Participants.findFirst({
+    where: { user_id: userId, survey_id: surveyId },
+    select: {
+      id: true,
+      answers: true,
+      status: true,
+      rewarded: true,
+      created_at: true,
+    },
+  });
+
+  return {
+    survey,
+    questions: survey.survey_question,
+    participant,
+  };
 };
