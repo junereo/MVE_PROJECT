@@ -1,4 +1,3 @@
-// Zustand Store - with persist
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { UserInfo } from "../types/userInfo";

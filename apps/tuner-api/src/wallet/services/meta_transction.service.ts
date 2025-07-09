@@ -27,25 +27,23 @@ export class MetaTransctionService {
   }
 
   async init(): Promise<void> {
-    this.provider = new JsonRpcProvider(
-      `${process.env.SEPLOIA_RPC_URL}`
-    );
+    this.provider = new JsonRpcProvider(`${process.env.SEPLOIA_RPC_URL}`);
 
     this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
     // DB에서 ABI 및 contract address 동적 로드
     const latest = await this.tunerContractService.getLatestContract();
     let metaContractABI: any[] = [];
     let badgeABI: any[] = [];
-    let contractAddress = '';
+    let contractAddress = "";
     if (latest?.abi_transac) {
-      if (typeof latest.abi_transac === 'string') {
+      if (typeof latest.abi_transac === "string") {
         metaContractABI = JSON.parse(latest.abi_transac);
       } else {
         metaContractABI = latest.abi_transac as any[];
       }
     }
-    if (latest && 'abi_badge' in latest && latest.abi_badge) {
-      if (typeof latest.abi_badge === 'string') {
+    if (latest && "abi_badge" in latest && latest.abi_badge) {
+      if (typeof latest.abi_badge === "string") {
         badgeABI = JSON.parse(latest.abi_badge);
       } else {
         badgeABI = latest.abi_badge as any[];
@@ -54,7 +52,9 @@ export class MetaTransctionService {
     if (latest?.ca_transac) {
       contractAddress = latest.ca_transac;
     } else {
-      throw new Error('No contract address (ca_transac) found in TunerContract table');
+      throw new Error(
+        "No contract address (ca_transac) found in TunerContract table"
+      );
     }
 
     this.contract = new Contract(
@@ -78,10 +78,7 @@ export class MetaTransctionService {
     console.log("🧾 expected sender :", address);
 
     const { hash: txHash } = await this.msgSigner.mint(
-      addresses,
-      values,
-      messages,
-      signatures
+      address, value, JSON.stringify(msg), sign
     );
   
     const tx = await this.provider.getTransaction(txHash);
@@ -101,21 +98,39 @@ export class MetaTransctionService {
     return Math.floor(Number(formatted));
   }
 
-  async useKGTToken(address: string, value: BigNumberish, msg: any, sign: string) {
+  async useKGTToken(
+    address: string,
+    value: BigNumberish,
+    msg: any,
+    sign: string
+  ) {
     const { hash: txHash } = await this.msgSigner.burn(
-      address, value, JSON.stringify(msg), sign
+      address,
+      value,
+      JSON.stringify(msg),
+      sign
     );
     const tx = await this.provider.getTransaction(txHash);
-    if(!tx) return;
+    if (!tx) return;
     return await tx.wait();
   }
 
-  async sendKGTToken(sender: string, to: string, value: BigNumberish, msg: any, sign: string) {
+  async sendKGTToken(
+    sender: string,
+    to: string,
+    value: BigNumberish,
+    msg: any,
+    sign: string
+  ) {
     const { hash: txHash } = await this.msgSigner.transferFrom(
-      sender, to, value, JSON.stringify(msg), sign
+      sender,
+      to,
+      value,
+      JSON.stringify(msg),
+      sign
     );
     const tx = await this.provider.getTransaction(txHash);
-    if(!tx) return;
+    if (!tx) return;
     return await tx.wait();
   }
 

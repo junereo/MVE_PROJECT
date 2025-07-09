@@ -5,11 +5,10 @@ import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
 import Step1YouTube from "./Step1YouTube";
 import Step2Meta from "./Step2Meta";
 import Step3Type from "./Step3Type";
-import Step4Default from "./Step4Default";
-import Step5Custom from "./Step5Custom";
-import Step6Result from "./Step6Result";
+import Step4Question from "./Step4Question";
+import Step5Result from "./Step5Result";
 
-type Step = "step1" | "step2" | "step3" | "step4" | "step5" | "step6";
+type Step = "step1" | "step2" | "step3" | "step4" | "step5";
 
 export default function SurveyCreateClient() {
   const { isInitialized } = useAuthGuard();
@@ -36,19 +35,13 @@ export default function SurveyCreateClient() {
           />
         </Funnel.Step>
         <Funnel.Step name="step4">
-          <Step4Default
+          <Step4Question
             onPrev={() => setStep("step3")}
             onNext={() => setStep("step5")}
           />
         </Funnel.Step>
         <Funnel.Step name="step5">
-          <Step5Custom
-            onPrev={() => setStep("step4")}
-            onNext={() => setStep("step6")}
-          />
-        </Funnel.Step>
-        <Funnel.Step name="step6">
-          <Step6Result onPrev={() => setStep("step5")} />
+          <Step5Result onPrev={() => setStep("step4")} />
         </Funnel.Step>
       </Funnel>
     </div>

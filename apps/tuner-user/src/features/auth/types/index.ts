@@ -19,6 +19,12 @@ export interface SignupFormData {
 // 회원가입 데이터 에러
 export type SignupFormErrors = Partial<Record<keyof SignupFormData, string>>;
 
+export interface MypageInfo {
+  user: {
+    nickname: string;
+    role: string;
+  };
+}
 /*
     SignupFormData : 회원가입 폼 데이터의 타입 정의
      => {
