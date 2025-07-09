@@ -110,7 +110,7 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
 
   try {
     if (surveyId === 0) {
-      // ✅ 전체 설문 리스트 조회
+      // 전체 설문 리스트 조회
       const allSurveys = await prisma.survey.findMany({
         orderBy: { created_at: "desc" },
         include: {
@@ -127,7 +127,7 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // ✅ 특정 설문 상세 조회
+    // 특정 설문 상세 조회
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
       include: {
@@ -199,7 +199,7 @@ export const createSurveyParticipantHandler = async (
 
     const newParticipant = await createSurveyParticipant({
       user_id: parseInt(user_id),
-      survey_id : parseInt(survey_id),
+      survey_id: parseInt(survey_id),
       answers,
       isSubmit,
     });
@@ -271,7 +271,7 @@ export const createSurveyResultHandler = async (
       reward_claimed,
     } = req.body;
 
-    
+
     const result = await createSurveyResult({
       survey_id,
       survey_statistics,

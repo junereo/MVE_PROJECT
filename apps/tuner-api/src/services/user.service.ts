@@ -1,13 +1,16 @@
 import { PrismaClient, UserRole } from '@prisma/client';
 import { buildUserRelationOperations } from './user.relation.service';
+import { hashPassword } from '../utils/auth.utils'; // 너네 해시 함수 경로 맞게 바꿔
 
 const prisma = new PrismaClient();
 
 export const createUser = async (data: any) => {
+  const hashedPassword = await hashPassword(data.password);
+
   return prisma.user.create({
     data: {
       email: data.email,
-      password: data.password,
+      password: hashedPassword,
       phone_number: data.phone_number,
       nickname: data.nickname,
       gender: data.gender,
@@ -15,62 +18,122 @@ export const createUser = async (data: any) => {
       genre: data.genre,
       job_domain: data.job_domain,
       wallet_address: data.wallet_address,
-      simple_password: data.simple_password,
       role: data.role || UserRole.ordinary,
-    }
+    },
+    select: {
+      id: true,
+      email: true,
+      phone_number: true,
+      nickname: true,
+      gender: true,
+      age: true,
+      genre: true,
+      job_domain: true,
+      wallet_address: true,
+      role: true,
+      created_at: true,
+      updated_at: true,
+    },
   });
 };
 
 export const getUsers = async () => {
   return prisma.user.findMany({
-    include: {
+    select: {
+      id: true,
+      email: true,
+      phone_number: true,
+      nickname: true,
+      gender: true,
+      age: true,
+      genre: true,
+      job_domain: true,
+      wallet_address: true,
+      role: true,
+      created_at: true,
+      updated_at: true,
       oauths: true,
       surveys: true,
       surveyResponses: true,
       transaction: true,
-      withdrawalRequest: true
-    }
+      withdrawalRequest: true,
+    },
   });
 };
 
 export const getUserById = async (id: number) => {
   return prisma.user.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      email: true,
+      phone_number: true,
+      nickname: true,
+      gender: true,
+      age: true,
+      genre: true,
+      job_domain: true,
+      wallet_address: true,
+      role: true,
+      created_at: true,
+      updated_at: true,
       oauths: true,
       surveys: true,
       surveyResponses: true,
       transaction: true,
-      withdrawalRequest: true
-    }
+      withdrawalRequest: true,
+    },
   });
 };
 
 export const updateUser = async (id: number, data: any) => {
+  let updateData: any = {
+    email: data.email,
+    phone_number: data.phone_number,
+    nickname: data.nickname,
+    gender: data.gender,
+    age: data.age,
+    genre: data.genre,
+    job_domain: data.job_domain,
+    wallet_address: data.wallet_address,
+    role: data.role,
+  };
 
-  console.log(id);
+  if (data.password) {
+    updateData.password = await hashPassword(data.password);
+  }
+
   const basicUpdate = prisma.user.update({
     where: { id },
-    data: {
-      email: data.email,
-      password: data.password,
-      phone_number: data.phone_number,
-      nickname: data.nickname,
-      gender: data.gender,
-      age: data.age,
-      genre: data.genre,
-      job_domain: data.job_domain,
-      wallet_address: data.wallet_address,
-      simple_password: data.simple_password,
-      role: data.role,
-    },
+    data: updateData,
   });
 
   const relationOps = await buildUserRelationOperations(id, data);
 
   await prisma.$transaction([basicUpdate, ...relationOps]);
 
-  return prisma.user.findUnique({ where: { id } });
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      email: true,
+      phone_number: true,
+      nickname: true,
+      gender: true,
+      age: true,
+      genre: true,
+      job_domain: true,
+      wallet_address: true,
+      role: true,
+      created_at: true,
+      updated_at: true,
+      oauths: true,
+      surveys: true,
+      surveyResponses: true,
+      transaction: true,
+      withdrawalRequest: true,
+    },
+  });
 };
 
 export const deleteUser = async (id: number) => {
