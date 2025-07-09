@@ -153,32 +153,32 @@ model User_Oauth {
 }
 
 model Survey {
-  id            Int                   @id @default(autoincrement())
-  survey_title  String
-  music_title   String
-  artist        String
-  music_uri     String
-  thumbnail_uri String
-  is_released   Boolean
-  released_date DateTime
-  user_id       Int
-  type          SurveyType
-  genre         Genre
-  start_at      DateTime
-  end_at        DateTime
-  reward_amount Int?
-  reward        Int?
-  expert_reward Int?
-  is_active     SurveyActive
-  ended_by      EndedBy?              @default(expired)
-  status        SurveyStatus          @default(draft)
-  created_at    DateTime              @default(now())
-  updated_at    DateTime              @updatedAt
-  creator       User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  questions     Int
-  survey_question Json? 
-  participants  Survey_Participants[]
-  result        Survey_Result?
+  id              Int                   @id @default(autoincrement())
+  survey_title    String
+  music_title     String
+  artist          String
+  music_uri       String
+  thumbnail_uri   String
+  is_released     Boolean
+  released_date   DateTime
+  user_id         Int
+  type            SurveyType
+  genre           Genre
+  start_at        DateTime
+  end_at          DateTime
+  reward_amount   Int?
+  reward          Int?
+  expert_reward   Int?
+  is_active       SurveyActive
+  ended_by        EndedBy?              @default(expired)
+  status          SurveyStatus          @default(draft)
+  created_at      DateTime              @default(now())
+  updated_at      DateTime              @updatedAt
+  creator         User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  questions       Int
+  survey_question Json?
+  participants    Survey_Participants[]
+  result          Survey_Result?
 }
 
 model Survey_Question {
@@ -232,7 +232,7 @@ model WithdrawalRequest {
   user_id      Int
   amount       Int
   txhash       String
-  status       WithdrawalStatus @default(pending)//   pending // 대기중 completed // 완료failed //실패
+  status       WithdrawalStatus @default(pending) //   pending // 대기중 completed // 완료failed //실패
   requested_at DateTime         @default(now())
   user         User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

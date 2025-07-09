@@ -120,18 +120,20 @@ export const createSurvey = async ({
 }) => {
   try {
     if (!userId) throw new Error("유저 필요");
-    if (!isSurveyType(body.type))
+    if (!isSurveyType(body.type)) {
       throw new Error(`잘못된 설문 타입: ${body.type}`);
+    }
 
     const surveyType = body.type as SurveyType;
     const startDate = new Date(body.start_at);
     const endDate = new Date(body.end_at);
+    const releasedDate = body.released_date
+      ? new Date(body.released_date)
+      : new Date();
+
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       throw new Error("유효하지 않은 시작일 또는 종료일입니다.");
     }
-
-    // ✅ 발매일 변환 및 유효성 검사
-    const releasedDate = body.released_date ? new Date(body.released_date) : new Date();
     if (isNaN(releasedDate.getTime())) {
       throw new Error("유효하지 않은 발매일입니다.");
     }
@@ -140,19 +142,13 @@ export const createSurvey = async ({
       const survey: Survey = await tx.survey.create({
         data: {
           user_id: userId,
-
-          // 음악 정보
           music_title: body.music_title ?? null,
           artist: body.artist ?? null,
           music_uri: body.music_uri ?? null,
           thumbnail_uri: body.thumbnail_uri ?? null,
           genre: body.genre ?? null,
-
-          // 발매 여부 및 일자
           is_released: !!body.is_released,
           released_date: releasedDate,
-
-          // 기본 필드
           type: surveyType,
           start_at: startDate,
           end_at: endDate,
@@ -164,7 +160,6 @@ export const createSurvey = async ({
           expert_reward: body.expert_reward ?? 0,
           reward_amount: body.reward_amount ?? 0,
           questions: body.questions ?? 0,
-
           ...(surveyType === SurveyType.official && {
             reward: body.reward,
             expert_reward: body.expert_reward,
@@ -172,7 +167,6 @@ export const createSurvey = async ({
           }),
         },
       });
-
       // //  고정 질문 삽입
       // const fixedQuestions = FIXED_SURVEY_QUESTIONS.map((q, idx) => ({
       //   survey_id: survey.id,
@@ -241,7 +235,7 @@ export const setSurveyQuestion = async ({
       question_order: order,
     },
     create: {
-      id: surveyId,
+      survey_id: surveyId,
       question_type: questionType,
       question: question,
       question_order: order,
@@ -355,39 +349,42 @@ export const getSurveyParticipation = async ({
   surveyId: number;
   userId: number;
 }) => {
-  // 설문 기본 정보 
   const survey = await prisma.survey.findUnique({
     where: { id: surveyId },
     select: {
       id: true,
       survey_title: true,
-      artist: true,
-      music_title: true,
-      start_at: true,
-      end_at: true,
+      survey_question: true,
       is_active: true,
       status: true,
-      survey_question: true,
     },
   });
 
   if (!survey) throw new Error("설문 없음");
 
-  //  참여 내역 
+  // 
+  let groupedQuestions: Record<string, any[]> = {};
+
+  if (Array.isArray(survey.survey_question)) {
+    groupedQuestions = survey.survey_question.reduce((acc, item) => {
+      const question = item as any;
+      const category = question.category || "step1";
+      if (!acc[category]) acc[category] = [];
+      acc[category].push(item);
+      return acc;
+    }, {} as Record<string, any[]>);
+  }
+
   const participant = await prisma.survey_Participants.findFirst({
     where: { user_id: userId, survey_id: surveyId },
-    select: {
-      id: true,
-      answers: true,
-      status: true,
-      rewarded: true,
-      created_at: true,
-    },
   });
 
-  return {
-    survey,
-    questions: survey.survey_question,
-    participant,
-  };
+  return [
+    {
+      id: survey.id,
+      survey_title: survey.survey_title,
+      questions: groupedQuestions,
+      participant,
+    },
+  ];
 };
