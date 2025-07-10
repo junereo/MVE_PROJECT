@@ -112,20 +112,23 @@ export default function SurveyCustomForm({
                                             )
                                         }
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            onRemoveOption(qIndex, optIndex)
-                                        }
-                                        className="text-xs text-red-400 hover:underline whitespace-nowrap"
-                                    >
-                                        옵션 삭제
-                                    </button>
+                                    {q.options.length > 2 && (
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                onRemoveOption(qIndex, optIndex)
+                                            }
+                                            className="text-xs text-red-400 hover:underline whitespace-nowrap"
+                                        >
+                                            옵션 삭제
+                                        </button>
+                                    )}
                                 </div>
                             ))}
 
                             {/* 체크박스형일 경우에만 선택지 추가 허용 */}
-                            {q.type === QuestionTypeEnum.CHECKBOX &&
+                            {(q.type === QuestionTypeEnum.MULTIPLE ||
+                                q.type === QuestionTypeEnum.CHECKBOX) &&
                                 q.options.length < 8 && (
                                     <button
                                         type="button"
