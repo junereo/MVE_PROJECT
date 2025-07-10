@@ -6,7 +6,7 @@ export enum SurveyTypeEnum {
 
 // 설문 상태
 export enum SurveyStatusEnum {
-  DRAFT = "eraft",
+  DRAFT = "draft",
   COMPLETE = "complete",
 }
 
