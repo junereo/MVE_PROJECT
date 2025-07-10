@@ -24,6 +24,11 @@ export default function Navigate() {
         },
         { label: '유저관리', href: '/userService', activePath: '/userService' },
         { label: '지갑관리', href: '/wallet', activePath: '/wallet' },
+        {
+            label: 'SBT출금',
+            href: '/userWithdrawal',
+            activePath: '/userWithdrawal',
+        },
     ];
 
     return (

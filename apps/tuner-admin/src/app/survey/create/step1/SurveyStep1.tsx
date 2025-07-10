@@ -62,12 +62,25 @@ const SurveyStep1 = () => {
                         reward_amount: data.reward_amount,
                         reward: data.reward,
                         expertReward: data.expert_reward,
+                        surveyId: data.id.toString(),
+                        thumbnail_uri: data.thumbnail_uri ?? '', // 사용자가 업로드한 썸네일 수정시 받아오기
+                        surveyQuestionsRaw: data.survey_question, // 사용자가 업로드한 설문정보 step2 에서 이걸로 설문을 데이터를 수정
+                    });
+                    setRewardInput({
+                        reward_amount: data.reward_amount
+                            ? (data.reward_amount / 1000).toString()
+                            : '',
+                        reward: data.reward
+                            ? (data.reward / 1000).toString()
+                            : '',
+                        expertReward: data.expert_reward
+                            ? (data.expert_reward / 1000).toString()
+                            : '',
                     });
                 } catch (err) {
                     console.error('❌ 수정 설문 불러오기 실패:', err);
                 }
             } else if (videoId && title && thumbnail && isFromSearch) {
-                // ✅ 새 설문 (유튜브 검색 기반)
                 setStep1({
                     youtubeVideoId: videoId,
                     youtubeTitle: title,
@@ -114,7 +127,10 @@ const SurveyStep1 = () => {
         field: keyof typeof step1,
         value: string | number | boolean,
     ) => {
-        setStep1((prev) => ({ ...prev, [field]: value }));
+        console.log('💡 변경 필드:', field, value); // 추가
+        if (value !== undefined) {
+            setStep1({ [field]: value });
+        }
     };
 
     const setSurveyPeriod = (days: number) => {
@@ -169,7 +185,7 @@ const SurveyStep1 = () => {
                                     handleInputChange('title', e.target.value)
                                 }
                                 className="border p-2 w-full"
-                                disabled={!step1.youtubeVideoId}
+                                // disabled={!step1.youtubeVideoId}
                             />
 
                             <label className="font-bold text-lg pb-2 mt-4 block">
@@ -181,16 +197,16 @@ const SurveyStep1 = () => {
                                     handleInputChange('artist', e.target.value)
                                 }
                                 className="border p-2 w-full"
-                                disabled={!step1.youtubeVideoId}
+                                // disabled={!step1.youtubeVideoId}
                             />
                         </div>
 
                         <div className="flex-1 flex items-center justify-center">
                             <div className="flex flex-col items-center">
-                                {step1.youtubeThumbnail ? (
+                                {step1.thumbnail_uri ? (
                                     <img
                                         alt="썸네일"
-                                        src={step1.youtubeThumbnail}
+                                        src={step1.thumbnail_uri}
                                         className="w-[280px] h-[180px] rounded object-contain border mb-2"
                                     />
                                 ) : (
@@ -218,8 +234,7 @@ const SurveyStep1 = () => {
                                                     const result =
                                                         reader.result as string;
                                                     setStep1({
-                                                        youtubeThumbnail:
-                                                            result,
+                                                        thumbnail_uri: result,
                                                     });
                                                 };
                                                 reader.readAsDataURL(file);
@@ -528,10 +543,6 @@ const SurveyStep1 = () => {
                             onClick={() => {
                                 if (!step1.survey_title?.trim())
                                     return alert('설문 제목을 입력해주세요.');
-                                if (!step1.youtubeThumbnail)
-                                    return alert(
-                                        '썸네일 이미지를 등록해주세요.',
-                                    );
                                 if (!step1.title?.trim())
                                     return alert('곡 제목을 입력해주세요.');
                                 if (!step1.start_at || !step1.end_at)

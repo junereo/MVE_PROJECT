@@ -1,7 +1,7 @@
 'use client';
 
 import { useSurveyStore } from '@/store/useSurveyCreateStore';
-import { surveyCreate } from '@/lib/network/api';
+import { surveyCreate, surveyPut } from '@/lib/network/api';
 import {
     AllQuestion,
     ParsedTemplateQuestion,
@@ -94,7 +94,7 @@ export default function SurveyComplete() {
         music_uri: step1.url, // 유튜브 URL
         artist: step1.artist,
         release_date: step1.releaseDate, // 발매일 (YYYY-MM-DD 형식)
-        thumbnail_uri: step1.youtubeThumbnail,
+        thumbnail_uri: step1.thumbnail_uri,
         music_title: step1.title, //음악 제목
         genre: step1.genre,
         start_at: step1.start_at,
@@ -124,20 +124,31 @@ export default function SurveyComplete() {
                     : {}),
             })),
         ),
+        id: step1.surveyId ? Number(step1.surveyId) : undefined, // 설문 수정
     };
     //서버로 전송할 데이터 구조
     const router = useRouter();
     const handleSubmit = async () => {
         try {
             console.log(' 전송 데이터:', serverPayload);
-            const res = await surveyCreate(serverPayload);
-            console.log('서버 응답:', res);
+
+            if (step1.surveyId) {
+                // 수정 (PUT)
+                const id = Number(step1.surveyId);
+                await surveyPut(serverPayload, id);
+                console.log('✅ 수정 완료');
+            } else {
+                // 새로 생성 (POST)
+                await surveyCreate(serverPayload);
+                console.log('✅ 생성 완료');
+            }
+
+            alert('서버로 보낼 JSON을 콘솔과 화면에 출력했습니다.');
+            resetSurvey();
+            router.push('/survey');
         } catch (error) {
-            console.error('서버 전송 중 오류 발생:', error);
+            console.error('❌ 서버 전송 중 오류 발생:', error);
         }
-        resetSurvey();
-        alert('서버로 보낼 JSON을 콘솔과 화면에 출력했습니다.');
-        router.push('/survey');
     };
 
     return (

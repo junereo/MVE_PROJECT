@@ -35,7 +35,7 @@ export interface SurveyCreatePayload {
     title: string; // 음원 제목
     artist: string; // 아티스트명
     release_date?: string; // 발매일 (YYYY-MM-DD 형식)
-    thumbnail_uri: string; // 유튜브 썸네일 이미지
+    thumbnail_uri: string | undefined; // 유튜브 썸네일 이미지
     music_uri: string; // 유튜브 URL
     genre: string; // 장르 (예: hiphop, ballad 등)
     // is_released: boolean; // 발매 여부

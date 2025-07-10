@@ -4,6 +4,7 @@ type SurveyType = 'general' | 'official';
 
 // 설문 생성 1단계 정보 구조 정의
 export type SurveyStep1 = {
+    surveyId?: string;
     survey_title: string; //설문 제목
     youtubeVideoId: string; // 유튜브 영상 ID
     youtubeTitle: string; // 유튜브 영상 제목
@@ -25,6 +26,8 @@ export type SurveyStep1 = {
     reward?: number; // 일반 유저 리워드 (리워드 타입일 때)
     expertReward?: number; // Expert 유저 리워드 (리워드 타입일 때)
     templateSetKey: string; // 선택된 템플릿 키
+    thumbnail_uri?: string; //사용자가 업로드한 썸네일
+    surveyQuestionsRaw?: string; //  수정 모드용
 };
 
 // 설문 생성 2단계 정보 구조 정의

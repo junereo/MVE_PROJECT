@@ -34,7 +34,6 @@ export interface Question {
 export default function SurveyStep2() {
     const router = useRouter();
     const { step1, step2, setStep2, setTemplateSetKey } = useSurveyStore();
-
     const baseCategories = [
         { key: 'step1', label: 'Step 1' },
         { key: 'step2', label: 'Step 2' },
@@ -59,41 +58,113 @@ export default function SurveyStep2() {
     >({});
 
     useEffect(() => {
-        const loadTemplate = async () => {
-            try {
-                const templateId = 1;
-                const { data } = await fetchTemplates(templateId);
-                console.log('템플릿', data);
-
-                const template = data[0]?.question;
-                const parsed: Record<string, Question[]> = {};
-
-                let i = 0;
-                for (const step of ['step1', 'step2', 'step3']) {
-                    parsed[step] = (template[step] || []).map(
-                        (q: RawTemplateQuestion) => ({
-                            id: i++,
-                            category: step,
-                            question_text: q.question_text,
-                            question_type: 'fixed',
-                            type: q.type || 'multiple',
-                            options: Array.isArray(q.options) ? q.options : [],
-                            ...(q.type === 'checkbox'
-                                ? { max_num: q.max_num ?? 1 }
-                                : {}),
-                        }),
+        const loadTemplateOrSurvey = async () => {
+            // 기존 설문 수정인 경우
+            if (step1.surveyId) {
+                try {
+                    const rawQuestions = JSON.parse(
+                        step1.surveyQuestionsRaw || '[]',
                     );
-                }
 
-                setCategoryQuestions(parsed);
-                setTemplateSetKey(JSON.stringify(parsed));
-                setStep2({ template_id: data[0].id });
-            } catch (error) {
-                console.error('템플릿 불러오기 실패:', error);
+                    const templateQs: Question[] = [];
+                    const customQs: Question[] = [];
+
+                    let idCounter = 0;
+                    const categorizedTemplate: Record<string, Question[]> = {};
+                    const categorizedCustom: Record<string, Question[]> = {};
+
+                    for (const q of rawQuestions) {
+                        const base: Question = {
+                            id: idCounter++,
+                            question_text: q.question_text,
+                            question_type:
+                                q.question_type === 'custom'
+                                    ? Question_type.custom
+                                    : Question_type.fixed,
+                            type: q.type,
+                            options: q.options || [],
+                            category: q.category || 'step2',
+                            ...(q.max_num ? { max_num: q.max_num } : {}),
+                        };
+
+                        const target =
+                            q.question_type === 'custom'
+                                ? customQs
+                                : templateQs;
+
+                        target.push(base);
+
+                        if (q.question_type === 'custom') {
+                            if (!categorizedCustom[base.category!]) {
+                                categorizedCustom[base.category!] = [];
+                            }
+                            categorizedCustom[base.category!].push(base);
+                        } else {
+                            if (!categorizedTemplate[base.category!]) {
+                                categorizedTemplate[base.category!] = [];
+                            }
+                            categorizedTemplate[base.category!].push(base);
+                        }
+                    }
+
+                    setCategoryQuestions(categorizedTemplate);
+                    setCustomQuestions(categorizedCustom);
+                    setTemplateSetKey(JSON.stringify(categorizedTemplate));
+                    setStep2({
+                        customQuestions: customQs,
+                        survey_question: step1.surveyQuestionsRaw,
+                        template_id: step2.template_id ?? 1,
+                    });
+
+                    console.log('✅ 설문 수정 로드 완료');
+                } catch (err) {
+                    console.error('❌ 수정 설문 불러오기 실패:', err);
+                }
+            } else {
+                // 새 설문인 경우 템플릿 불러오기
+                try {
+                    const templateId = 1;
+                    const { data } = await fetchTemplates(templateId);
+                    console.log('템플릿', data);
+
+                    const template = data[0]?.question;
+                    const parsed: Record<string, Question[]> = {};
+
+                    let i = 0;
+                    for (const step of ['step1', 'step2', 'step3']) {
+                        parsed[step] = (template[step] || []).map(
+                            (q: RawTemplateQuestion) => ({
+                                id: i++,
+                                category: step,
+                                question_text: q.question_text,
+                                question_type: 'fixed',
+                                type: q.type || 'multiple',
+                                options: Array.isArray(q.options)
+                                    ? q.options
+                                    : [],
+                                ...(q.type === 'checkbox'
+                                    ? { max_num: q.max_num ?? 1 }
+                                    : {}),
+                            }),
+                        );
+                    }
+
+                    setCategoryQuestions(parsed);
+                    setTemplateSetKey(JSON.stringify(parsed));
+                    setStep2({ template_id: data[0].id });
+                } catch (error) {
+                    console.error('템플릿 불러오기 실패:', error);
+                }
             }
         };
-        loadTemplate();
-    }, [setStep2, setTemplateSetKey]);
+
+        loadTemplateOrSurvey();
+    }, [
+        step1.surveyId,
+        step1.surveyQuestionsRaw, // ✅ 의존성 변경
+        setStep2,
+        setTemplateSetKey,
+    ]);
 
     const addCustomQuestion = (stepKey: string) => {
         const defaultType = QuestionTypeEnum.MULTIPLE;
