@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { fetchYoutubeVideos } from '@/lib/youtube';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 type YoutubeVideo = {
     videoId: string;
@@ -80,11 +81,14 @@ export default function YoutubeSearch() {
                                 router.push(`/survey/create/step1?${query}`);
                             }}
                         >
-                            <div className="w-full aspect-video bg-gray-200 overflow-hidden">
-                                <img
+                            <div className="w-full aspect-video bg-gray-200 relative overflow-hidden">
+                                <Image
                                     src={video.thumbnail}
                                     alt={video.title}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 395px"
+                                    priority // optional: for faster loading
                                 />
                             </div>
                             <div className="p-3">

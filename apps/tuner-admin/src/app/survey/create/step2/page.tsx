@@ -164,6 +164,7 @@ export default function SurveyStep2() {
         step1.surveyQuestionsRaw, // ✅ 의존성 변경
         setStep2,
         setTemplateSetKey,
+        step2.template_id,
     ]);
 
     const addCustomQuestion = (stepKey: string) => {

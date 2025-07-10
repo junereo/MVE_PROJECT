@@ -1,10 +1,11 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSurveyStore } from '@/store/useSurveyCreateStore';
 import Dropdown from '../../../components/ui/DropDown';
 import { surveyView } from '@/lib/network/api';
+import Image from 'next/image';
 const SurveyStep1 = () => {
     const genreOptions = [
         '발라드',
@@ -94,13 +95,36 @@ const SurveyStep1 = () => {
         };
 
         setup();
-    }, [id, videoId, title, thumbnail, channelTitle]);
+    }, [id, videoId, title, thumbnail, channelTitle, setStep1]);
+
+    const handleInputChange = useCallback(
+        (field: keyof typeof step1, value: string | number | boolean) => {
+            console.log('💡 변경 필드:', field, value); // 추가
+            if (value !== undefined) {
+                setStep1({ [field]: value });
+            }
+        },
+        [setStep1],
+    );
+
+    const setSurveyPeriod = useCallback(
+        (days: number) => {
+            const today = new Date();
+            const start = today.toISOString().slice(0, 10);
+            const end = new Date(today.getTime() + days * 86400000)
+                .toISOString()
+                .slice(0, 10);
+            handleInputChange('start_at', start);
+            handleInputChange('end_at', end);
+        },
+        [handleInputChange],
+    );
 
     useEffect(() => {
         if (!step1.start_at && !step1.end_at) {
             setSurveyPeriod(7);
         }
-    }, []);
+    }, [step1.start_at, step1.end_at, setSurveyPeriod]);
     const hasRunRef = useRef(false);
 
     useEffect(() => {
@@ -121,27 +145,7 @@ const SurveyStep1 = () => {
 
         console.log('✅ 리셋 수행: fromSearch 없음');
         resetSurvey();
-    }, []);
-
-    const handleInputChange = (
-        field: keyof typeof step1,
-        value: string | number | boolean,
-    ) => {
-        console.log('💡 변경 필드:', field, value); // 추가
-        if (value !== undefined) {
-            setStep1({ [field]: value });
-        }
-    };
-
-    const setSurveyPeriod = (days: number) => {
-        const today = new Date();
-        const start = today.toISOString().slice(0, 10);
-        const end = new Date(today.getTime() + days * 86400000)
-            .toISOString()
-            .slice(0, 10);
-        handleInputChange('start_at', start);
-        handleInputChange('end_at', end);
-    };
+    }, [resetSurvey]);
 
     return (
         <div>
@@ -204,13 +208,16 @@ const SurveyStep1 = () => {
                         <div className="flex-1 flex items-center justify-center">
                             <div className="flex flex-col items-center">
                                 {step1.thumbnail_uri ? (
-                                    <img
-                                        alt="썸네일"
-                                        src={step1.thumbnail_uri}
-                                        className="w-[280px] h-[180px] rounded object-contain border mb-2"
-                                    />
+                                    <div className="w-[280px] h-[180px] relative border mb-2 rounded overflow-hidden bg-white">
+                                        <Image
+                                            alt="썸네일"
+                                            src={step1.thumbnail_uri}
+                                            fill
+                                            className="object-contain"
+                                        />
+                                    </div>
                                 ) : (
-                                    <div className="w-[280px] h-[180px] border-2 border-dashed border-gray-400 rounded flex items-center justify-center">
+                                    <div className="w-[280px] h-[180px] border-2 border-dashed border-gray-400 rounded flex items-center justify-center mb-2">
                                         <span className="text-gray-500">
                                             썸네일 미리보기 없음
                                         </span>

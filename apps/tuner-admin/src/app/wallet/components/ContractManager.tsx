@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 // import { Tabs, Tab } from "@/components/ui/tabs"; // 잘못된 import 제거
 
 const baseUrl = 'http://localhost:4000';

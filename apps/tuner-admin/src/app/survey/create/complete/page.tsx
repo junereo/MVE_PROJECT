@@ -10,6 +10,7 @@ import {
 } from '@/app/survey/create/complete/type';
 import { Question_type, SurveyStatus } from '@/types';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const mapToQuestionTypeEnum = (type: string): QuestionTypeEnum => {
     switch (type?.toLowerCase()) {
@@ -162,15 +163,22 @@ export default function SurveyComplete() {
                         {' '}
                         설문지 생성 완료
                     </h1>
-
                     {/* 유튜브 정보 */}
                     <div className="mb-6">
                         <p className="font-semibold">🎵 {step1.survey_title}</p>
-                        <img
-                            src={step1.thumbnail_uri}
-                            alt="썸네일"
-                            className="w-60 mt-2 rounded"
-                        />
+
+                        {/* 썸네일 이미지 */}
+                        <div className="relative w-60 aspect-video mt-2 mb-2">
+                            <Image
+                                src={step1.thumbnail_uri as string}
+                                alt="썸네일"
+                                fill
+                                className="rounded object-contain"
+                                sizes="240px"
+                                unoptimized
+                            />
+                        </div>
+
                         <p className="text-sm text-gray-600">
                             채널명: {step1.channelTitle}
                         </p>
@@ -189,7 +197,6 @@ export default function SurveyComplete() {
                             )}
                         </ul>
                     </div>
-
                     {/* 해시태그 */}
                     <div className="mb-6">
                         <p className="font-semibold">🏷️ 태그</p>
@@ -204,7 +211,6 @@ export default function SurveyComplete() {
                             ))}
                         </div>
                     </div>
-
                     {/* 전체 문항 미리보기 */}
                     <div className="mb-6">
                         <p className="font-semibold">📋 전체 문항 미리보기</p>
@@ -227,7 +233,6 @@ export default function SurveyComplete() {
                             </div>
                         ))}
                     </div>
-
                     {/* 실제 전송 JSON */}
                     <div className="bg-gray-100 p-4 rounded mb-6 text-sm max-h-[400px] overflow-auto">
                         <p className="font-semibold mb-2">
@@ -237,7 +242,6 @@ export default function SurveyComplete() {
                             {JSON.stringify(serverPayload, null, 2)}
                         </pre>
                     </div>
-
                     {/* 제출 버튼 */}
                     <div className="text-center">
                         <button
