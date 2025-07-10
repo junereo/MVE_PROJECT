@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layouts/Header";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
-// import SurveyWrapper from "../create/components/layouts/SurveyWrapper";
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { useParams } from "next/navigation";
@@ -13,7 +13,6 @@ import { getSurveyById } from "@/features/survey/services/survey";
 import { useEffect, useState } from "react";
 import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import SurveyResult from "./components/SurveyResult";
-import Link from "next/link";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
 
 type SurveyStatus = "upcoming" | "ongoing" | "closed";
@@ -35,6 +34,7 @@ export default function SurveyDetail() {
     const fetch = async () => {
       try {
         const response = await getSurveyById(Number(params.surveyId));
+        console.log("설문 상세", response);
         setSurvey(response);
       } catch (err) {
         console.error("설문 상세 불러오기 실패", err);
@@ -55,10 +55,10 @@ export default function SurveyDetail() {
     type,
     start_at,
     end_at,
-    participantCount,
+    participants,
     reward_amount,
     is_active,
-    release_date,
+    released_date,
   } = survey;
 
   return (
@@ -72,22 +72,30 @@ export default function SurveyDetail() {
             { label: `${survey_title}` },
           ]}
         />
-
         <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-6 shadow-md">
-          <Link href={music_uri} rel="">
+          {music_uri ? (
+            <Link href={music_uri}>
+              <Image
+                src={thumbnail_uri}
+                alt={music_title}
+                fill
+                className="object-cover rounded-xl"
+                sizes="(max-width: 768px) 100vw, 600px"
+              />
+            </Link>
+          ) : (
             <Image
               src={thumbnail_uri}
               alt={music_title}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-xl"
+              fill
+              className="object-cover rounded-xl"
+              sizes="(max-width: 768px) 100vw, 600px"
             />
-          </Link>
+          )}
           <div className="absolute top-3 left-3 px-3 py-1 bg-white/80 text-xs font-medium rounded-full backdrop-blur-sm text-blue-600">
             {type === "official" ? "공식 설문" : "일반 설문"}
           </div>
         </div>
-
         <div className="mb-4 px-1">
           <h1 className="text-[20px] sm:text-[22px] font-bold text-gray-900 leading-snug break-keep">
             {survey_title}
@@ -98,7 +106,7 @@ export default function SurveyDetail() {
           <div className="flex sm:flex-row justify-between items-end gap-y-1">
             <p className="text-sm text-gray-400">ARTIST</p>
             <p className="text-sm text-gray-500">
-              {release_date?.slice(0, 10)} 발매
+              {released_date.slice(0, 10)} 발매
             </p>
           </div>
           <p className="text-lg sm:text-xl font-medium text-gray-800">
@@ -106,7 +114,6 @@ export default function SurveyDetail() {
           </p>
           <p className="text-base sm:text-lg text-gray-600">{music_title}</p>
         </div>
-
         <section className="rounded-2xl border mb-6 border-gray-100 bg-gray-50 px-4 py-5 shadow-sm space-y-4">
           <InfoRow
             label="설문 기간"
@@ -115,7 +122,7 @@ export default function SurveyDetail() {
 
           <InfoRow
             label="참여자 수"
-            value={`${(participantCount ?? 0).toLocaleString()}명`}
+            value={`${participants?.length?.toLocaleString() ?? "0"}명`}
           />
           {type === SurveyTypeEnum.OFFICIAL && (
             <InfoRow
@@ -126,7 +133,7 @@ export default function SurveyDetail() {
           )}
           <InfoRow
             label="상태"
-            value={statusTextMap[is_active]}
+            value={statusTextMap[is_active as SurveyStatus]}
             valueClass={
               is_active === "ongoing"
                 ? "text-green-600"
@@ -136,14 +143,14 @@ export default function SurveyDetail() {
             }
           />
         </section>
-
         {is_active === "closed" && (
           <section className="space-y-6 pt-6 border-t border-gray-100">
             <h1 className="text-xl font-bold text-gray-800 ">설문 결과</h1>
             <p className="text-sm text-gray-500">
               총{" "}
               <span className="text-gray-800 font-semibold">
-                {(participantCount ?? 0).toLocaleString()}명
+                value=
+                {`${participants?.length?.toLocaleString() ?? "0"}명`}
               </span>
               이 참여했어요.
             </p>
@@ -151,7 +158,6 @@ export default function SurveyDetail() {
             <SurveyResult />
           </section>
         )}
-
         {is_active === "ongoing" && user && (
           <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
             <Button
