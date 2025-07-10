@@ -5,6 +5,7 @@ import {
   SurveyType,
   SurveyStatus,
   Survey,
+  Genre,
   Survey_Question,
 } from "@prisma/client";
 // import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
@@ -55,76 +56,68 @@ export const createSurveyParticipant = async ({
   user_id,
   survey_id,
   answers,
+  user_info,
   isSubmit = false,
-  user_info, // 최초 참여시만 들어옴
 }: {
   user_id: number;
   survey_id: number;
-  answers: any;
-  isSubmit?: boolean;
+  answers: any[];
   user_info?: {
-    gender?: boolean;
-    age?: string;
-    genre?: string;
-    job_domain?: boolean;
+    gender?: boolean | null;
+    age?: string | null;
+    genre?: string[] | null;
+    job_domain?: boolean | null;
   };
+  isSubmit?: boolean;
 }) => {
-  // FK & 상태 체크
   const survey = await prisma.survey.findUnique({
     where: { id: survey_id },
     select: { status: true, is_active: true },
   });
-  if (!survey) throw new Error("설문 없음");
-  if (!canParticipateSurvey(survey)) {
-    throw new Error("참여할 수 없는 상태입니다.");
-  }
+  if (!survey) throw new Error("해당 설문이 존재하지 않습니다.");
 
-  // 유저 정보 확인
   const user = await prisma.user.findUnique({
     where: { id: user_id },
-    select: {
-      gender: true,
-      age: true,
-      genre: true,
-      job_domain: true,
-    },
+    select: { gender: true, age: true, genre: true, job_domain: true },
   });
-  if (!user) throw new Error("유저 없음");
+  if (!user) throw new Error("해당 유저가 존재하지 않습니다.");
 
-  const needsProfile =
+  const needsUpdate =
     user.gender === null ||
     user.age === null ||
-    user.genre === null ||
+    !user.genre || user.genre.length === 0 ||
     user.job_domain === null;
 
-  // ✅ 최초라면 user_info로 저장
-  if (needsProfile) {
-    if (!user_info) throw new Error("user_info 필수!");
+  if (needsUpdate) {
+    if (!user_info) throw new Error("최초 참여: user_info 필요!");
+
     await prisma.user.update({
       where: { id: user_id },
       data: {
         gender: user_info.gender,
         age: user_info.age as any,
-        genre: user_info.genre as any,
+        genre: Array.isArray(user_info.genre)
+          ? user_info.genre.map(g => g as Genre) : [],
         job_domain: user_info.job_domain,
       },
     });
   }
 
-  // ✅ 무조건 유저 정보 가져와서 answers에 포함!
-  const finalUserInfo = {
-    gender: user.gender ?? user_info?.gender,
-    age: user.age ?? user_info?.age,
-    genre: user.genre ?? user_info?.genre,
-    job_domain: user.job_domain ?? user_info?.job_domain,
-  };
+  const updatedUser = await prisma.user.findUnique({
+    where: { id: user_id },
+    select: { gender: true, age: true, genre: true, job_domain: true },
+  });
 
   const finalAnswers = {
-    ...answers,
-    user_info: finalUserInfo,
+    answers, // ✅ 반드시 깔끔한 { question_id, answer }[]
+    user_info: {
+      gender: updatedUser?.gender,
+      age: updatedUser?.age,
+      genre: updatedUser?.genre,
+      job_domain: updatedUser?.job_domain,
+    },
   };
 
-  // ✅ 기존 있으면 업데이트
   const existing = await prisma.survey_Participants.findFirst({
     where: { user_id, survey_id },
   });
@@ -150,6 +143,7 @@ export const createSurveyParticipant = async ({
     },
   });
 };
+
 
 
 

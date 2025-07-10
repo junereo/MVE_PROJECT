@@ -12,7 +12,6 @@ import {
   getSurveyById,
   postSurveyAnswer,
 } from "@/features/survey/services/survey";
-import { updateUserInfo } from "@/features/users/services/user";
 import {
   InputTypeEnum,
   QuestionTypeEnum,
@@ -26,8 +25,6 @@ import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 import { formatDefaultAnswers } from "@/features/survey/utils/fotmatAnswers";
-import { userUpdatePayload } from "@/features/users/utils/userUpdatePayload";
-import { UserInfo } from "@/features/users/types/userInfo";
 
 interface Step2Props {
   surveyId: number;
@@ -83,7 +80,6 @@ export default function Step2Question({
     if (step4.questions.length === 0 && step4.customQuestions.length === 0) {
       getSurveyById(surveyId).then((res) => {
         const rawQuestions = res.survey_question;
-        console.log("rawQuestions", rawQuestions);
         if (!Array.isArray(rawQuestions) || rawQuestions.length === 0) {
           console.error("질문이 없습니다.");
           return;
@@ -118,14 +114,6 @@ export default function Step2Question({
     }
   }, [surveyId, step4, setStep4]);
 
-  useEffect(() => {
-    console.log("설문 답변", answers);
-  }, [answers]);
-
-  useEffect(() => {
-    console.log("user.id 확인:", user?.id);
-  }, [user]);
-
   const handlePrev = () => {
     if (tabIndex > 0) {
       setTabIndex((prev) => prev - 1);
@@ -158,30 +146,27 @@ export default function Step2Question({
       ...customQuestions,
     ]);
 
-    const userInfo: UserInfo = {
-      gender,
-      age,
-      genres,
-      jobDomain,
-    };
-    const userPayload = userUpdatePayload(userInfo);
-    const surveyPayload = {
+    const payload: any = {
       user_id: user.id,
       survey_id: surveyId,
       answers: formattedAnswers,
       status: SurveyStatusEnum.COMPLETE,
-      user_info: userPayload,
     };
-    console.log("userPayload", userPayload);
-    console.log("payload", surveyPayload);
+
+    // user_info가 모두 채워져 있을 때만 포함
+    if (gender && age && genres && jobDomain) {
+      payload.user_info = {
+        gender,
+        age,
+        genre: genres, // ✅ 무조건 배열 그대로
+        job_domain: jobDomain,
+      };
+    }
+
+    console.log("[DEBUG] payload:", payload);
 
     try {
-      console.log("dd");
-      const response = await updateUserInfo(Number(user.id), userPayload);
-      console.log("ddd");
-      console.log("기본 정보", response);
-      const res = await postSurveyAnswer(surveyPayload);
-      console.log("설문 참여", res);
+      await postSurveyAnswer(payload);
       setSubmitStatus("success");
       resetAnswers();
       resetUserInfo();
@@ -189,11 +174,9 @@ export default function Step2Question({
     } catch (err) {
       console.error("설문 제출 실패", err);
       setSubmitStatus("error");
-      onNext();
     }
   };
 
-  // 임시저장
   const handleSave = async () => {
     if (!user?.id) {
       console.error("로그인 정보가 없습니다.");
@@ -209,14 +192,24 @@ export default function Step2Question({
       ...customQuestions,
     ]);
 
-    const payload = {
+    const payload: any = {
       user_id: user.id,
       survey_id: surveyId,
-      user_info: { gender, age, genres, jobDomain },
       answers: formattedAnswers,
       status: SurveyStatusEnum.DRAFT,
     };
-    console.log("payload", payload);
+
+    // user_info가 모두 채워져 있을 때만 포함
+    if (gender && age && genres && jobDomain) {
+      payload.user_info = {
+        gender,
+        age,
+        genre: genres,
+        job_domain: jobDomain,
+      };
+    }
+
+    console.log("[DEBUG] 임시저장 payload:", payload);
 
     try {
       await postSurveyAnswer(payload);
@@ -227,9 +220,9 @@ export default function Step2Question({
     } catch (err) {
       console.error("임시저장 실패", err);
       setSubmitStatus("save-error");
-      onNext();
     }
   };
+
 
   return (
     <>
@@ -308,12 +301,12 @@ export default function Step2Question({
           </div>
           <div className="flex items-center">
             <div className="w-[70px] sm:w-[100px]">
-              <Button onClick={handleSave} color="white">
+              <Button onClick={handleSave} color="white" disabled={!isValid || !(gender && age && genres && jobDomain)}>
                 임시저장
               </Button>
             </div>
             <div className="w-[110px] sm:w-[300px]">
-              <Button onClick={handleSubmit} disabled={!isValid} color="blue">
+              <Button onClick={handleSubmit} disabled={!isValid || !(gender && age && genres && jobDomain)} color="blue">
                 설문 참여
               </Button>
             </div>
