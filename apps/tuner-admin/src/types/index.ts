@@ -87,8 +87,6 @@ export interface BackendQuestionPayload {
 }
 
 export interface SurveyQuestionPayload {
-    survey_id: string | number;
-    Survey_question: string;
     question: Record<string, BackendQuestionPayload[]>;
     question_type: Question_type;
     question_order: number;
