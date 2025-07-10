@@ -15,8 +15,8 @@ export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
     thumbnail_uri: selectedVideo?.thumbnail_uri || "",
     music_uri: selectedVideo?.music_uri || "",
 
-    start_at: step1.start_at,
-    end_at: step1.end_at,
+    start_at: step1.start_at ? step1.start_at.toISOString() : "",
+    end_at: step1.end_at ? step1.end_at.toISOString() : "",
 
     survey_title: step2.survey_title,
     is_released: step2.is_released,
@@ -37,6 +37,7 @@ export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
       category: q.category,
       question_type: q.question_type,
       options: q.options ?? [],
+      max_num: q.max_num ?? 1,
     })),
 
     status,

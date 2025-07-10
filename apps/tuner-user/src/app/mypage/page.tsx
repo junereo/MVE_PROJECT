@@ -6,7 +6,7 @@ import SurveyStats from "./components/SurveyStatus";
 import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { getUserInfo } from "@/features/users/services/user";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function MyPage() {
   const { isInitialized } = useAuthGuard();

@@ -3,7 +3,7 @@
 import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
-import Wrapper from "@/components/layouts/Wrapper";
+import PageWrapper from "@/components/layouts/PageWrapper";
 import SurveyList from "./components/ui/SurveyList";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import Link from "next/link";
@@ -13,7 +13,7 @@ export default function Survey() {
   return (
     <>
       <Header />
-      <Wrapper>
+      <PageWrapper>
         <Breadcrumb crumbs={[{ label: "설문 목록" }]} />
         <section className="flex items-end justify-between mb-6">
           <div className="space-y-1">
@@ -34,7 +34,7 @@ export default function Survey() {
         </section>
 
         <SurveyList />
-      </Wrapper>
+      </PageWrapper>
       <BottomNavbar />
       <Footer />
     </>
