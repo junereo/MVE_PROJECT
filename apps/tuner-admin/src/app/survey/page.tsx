@@ -94,7 +94,7 @@ const surveylist = async (): Promise<SurveyItem[]> => {
                     ? SurveyTypeEnum.OFFICIAL
                     : SurveyTypeEnum.GENERAL,
             participantCount: item.participants?.length || 0,
-            reward_amount: item.reward_amount ?? undefined,
+            reward_amount: (item.reward_amount ?? 0) / 1000,
             question_type: QuestionTypeEnum.MULTIPLE,
             creatorRole: item.creator?.role || 'unknown',
         };

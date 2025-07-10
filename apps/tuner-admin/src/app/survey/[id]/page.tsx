@@ -79,11 +79,24 @@ export default function SurveyDetailPage() {
         const fetchSurvey = async () => {
             try {
                 const result = await surveyView(Array.isArray(id) ? id[0] : id);
-                setSurveyData(result.data);
+                const survey = result.data;
 
-                if (result.data?.survey_question) {
+                const normalizedSurvey = {
+                    ...survey,
+                    reward_amount: survey.reward_amount
+                        ? survey.reward_amount / 1000
+                        : 0,
+                    reward: survey.reward ? survey.reward / 1000 : 0,
+                    expert_reward: survey.expert_reward
+                        ? survey.expert_reward / 1000
+                        : 0,
+                };
+
+                setSurveyData(normalizedSurvey);
+
+                if (survey?.survey_question) {
                     const parsed: QuestionItem[] = JSON.parse(
-                        result.data.survey_question,
+                        survey.survey_question,
                     );
                     setFixedQuestions(
                         parsed.filter((q) => q.question_type === 'fixed'),

@@ -10,7 +10,6 @@ const SurveyStep1 = () => {
     const genreOptions = [
         '발라드',
         '힙합',
-        '스윙',
         '댄스',
         '재즈',
         '클래식',

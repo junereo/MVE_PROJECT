@@ -295,6 +295,17 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
       end_at: new Date(body.end_at),
       status: body.status,
       is_active: checkSurveyActive(body.start_at, body.end_at),
+      reward_amount: body.reward_amount,
+      reward: body.reward,
+      expert_reward: body.expert_reward,
+      survey_question: body.survey_question,
+      thumbnail_uri: body.thumbnail_uri,
+      genre: body.genre,
+      type: body.type,
+      music_title: body.music_title,
+      music_uri: body.music_uri,
+      artist: body.artist,
+      is_released: body.is_released,
     },
   });
 
