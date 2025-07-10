@@ -24,36 +24,24 @@ export const createWallet = async (req: Request, res: Response) => {
 // 토큰 생성 관리자 -> 유저
 export const createToken = async (req: Request, res: Response) => {
   const { uid, value } = req.body as { uid: string; value: string };
-  console.log(uid, value);
 
-  const wallet = await metaTransctionService.createWallet(uid);
-  const address = wallet.address;
-  const txMessage = { sender: address, value };
-  const messageString = JSON.stringify(txMessage); // 정확히 이 문자열로 서명해야 함
+  try {
+    const wallet = await metaTransctionService.createWallet(uid);
+    const address = wallet.address;
+    const txMessage = { sender: address, value };
+    const messageString = JSON.stringify(txMessage); // 정확히 이 문자열로 서명해야 함
 
-  const sign = await metaTransctionService.createSign(wallet, messageString);
+    const sign = await metaTransctionService.createSign(wallet, messageString);
+    console.log("txMessage", txMessage); // 132여야 정상
+    console.log("JSON.stringify(txMessage)", JSON.stringify(txMessage)); // 132여야 정상
 
-  const result = await metaTransctionService.createKGTToken(address, value, messageString, sign);
-  console.log("result", result );
+    const result = await metaTransctionService.createKGTToken(address, value, messageString, sign);
 
-
-  // try {
-  //   const wallet = await metaTransctionService.createWallet(uid);
-  //   const address = wallet.address;
-  //   const txMessage = { sender: address, value };
-  //   const messageString = JSON.stringify(txMessage); // 정확히 이 문자열로 서명해야 함
-
-  //   const sign = await metaTransctionService.createSign(wallet, messageString);
-  //   console.log("txMessage", txMessage); // 132여야 정상
-  //   console.log("JSON.stringify(txMessage)", JSON.stringify(txMessage)); // 132여야 정상
-
-  //   const result = await metaTransctionService.createKGTToken(address, value, messageString, sign);
-
-  //   console.log("result", result );
-  //   res.json(result);
-  // } catch (err: any) {
-  //   res.status(500).json({ error: err.message });
-  // }
+    console.log("result", result );
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 // 토큰 조회
@@ -170,6 +158,17 @@ export const revokeTunerToken = async (req: Request, res: Response) => {
   try {
     const result = await metaTransctionService.revokeTunerToken(spender, tokenAddress);
     res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// TunerToken allowance 조회
+export const getAllowance = async (req: Request, res: Response) => {
+  const { owner, spender, tokenAddress } = req.body as { owner: string; spender: string; tokenAddress: string };
+  try {
+    const allowance = await metaTransctionService.getAllowance(owner, spender, tokenAddress);
+    res.json({ allowance });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

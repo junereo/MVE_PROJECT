@@ -1,7 +1,7 @@
 'use client';
 
 import { useSurveyStore } from '@/store/useSurveyCreateStore';
-import { surveyCreate } from '@/lib/network/api';
+import { surveyCreate, surveyPut } from '@/lib/network/api';
 import {
     AllQuestion,
     ParsedTemplateQuestion,
@@ -10,6 +10,7 @@ import {
 } from '@/app/survey/create/complete/type';
 import { Question_type, SurveyStatus } from '@/types';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const mapToQuestionTypeEnum = (type: string): QuestionTypeEnum => {
     switch (type?.toLowerCase()) {
@@ -94,7 +95,7 @@ export default function SurveyComplete() {
         music_uri: step1.url, // 유튜브 URL
         artist: step1.artist,
         release_date: step1.releaseDate, // 발매일 (YYYY-MM-DD 형식)
-        thumbnail_uri: step1.youtubeThumbnail,
+        thumbnail_uri: step1.thumbnail_uri ?? '',
         music_title: step1.title, //음악 제목
         genre: step1.genre,
         start_at: step1.start_at,
@@ -124,20 +125,31 @@ export default function SurveyComplete() {
                     : {}),
             })),
         ),
+        id: step1.surveyId ? Number(step1.surveyId) : undefined, // 설문 수정
     };
     //서버로 전송할 데이터 구조
     const router = useRouter();
     const handleSubmit = async () => {
         try {
             console.log(' 전송 데이터:', serverPayload);
-            const res = await surveyCreate(serverPayload);
-            console.log('서버 응답:', res);
+
+            if (step1.surveyId) {
+                // 수정 (PUT)
+                const id = Number(step1.surveyId);
+                await surveyPut(serverPayload, id);
+                console.log('수정 완료');
+            } else {
+                // 새로 생성 (POST)
+                await surveyCreate(serverPayload);
+                console.log('생성 완료');
+            }
+
+            alert('서버로 보낼 JSON을 콘솔과 화면에 출력했습니다.');
+            resetSurvey();
+            router.push('/survey');
         } catch (error) {
-            console.error('서버 전송 중 오류 발생:', error);
+            console.error('❌ 서버 전송 중 오류 발생:', error);
         }
-        resetSurvey();
-        alert('서버로 보낼 JSON을 콘솔과 화면에 출력했습니다.');
-        router.push('/survey');
     };
 
     return (
@@ -151,15 +163,22 @@ export default function SurveyComplete() {
                         {' '}
                         설문지 생성 완료
                     </h1>
-
                     {/* 유튜브 정보 */}
                     <div className="mb-6">
                         <p className="font-semibold">🎵 {step1.survey_title}</p>
-                        <img
-                            src={step1.youtubeThumbnail}
-                            alt="썸네일"
-                            className="w-60 mt-2 rounded"
-                        />
+
+                        {/* 썸네일 이미지 */}
+                        <div className="relative w-60 aspect-video mt-2 mb-2">
+                            <Image
+                                src={step1.thumbnail_uri as string}
+                                alt="썸네일"
+                                fill
+                                className="rounded object-contain"
+                                sizes="240px"
+                                unoptimized
+                            />
+                        </div>
+
                         <p className="text-sm text-gray-600">
                             채널명: {step1.channelTitle}
                         </p>
@@ -178,7 +197,6 @@ export default function SurveyComplete() {
                             )}
                         </ul>
                     </div>
-
                     {/* 해시태그 */}
                     <div className="mb-6">
                         <p className="font-semibold">🏷️ 태그</p>
@@ -193,7 +211,6 @@ export default function SurveyComplete() {
                             ))}
                         </div>
                     </div>
-
                     {/* 전체 문항 미리보기 */}
                     <div className="mb-6">
                         <p className="font-semibold">📋 전체 문항 미리보기</p>
@@ -216,7 +233,6 @@ export default function SurveyComplete() {
                             </div>
                         ))}
                     </div>
-
                     {/* 실제 전송 JSON */}
                     <div className="bg-gray-100 p-4 rounded mb-6 text-sm max-h-[400px] overflow-auto">
                         <p className="font-semibold mb-2">
@@ -226,7 +242,6 @@ export default function SurveyComplete() {
                             {JSON.stringify(serverPayload, null, 2)}
                         </pre>
                     </div>
-
                     {/* 제출 버튼 */}
                     <div className="text-center">
                         <button

@@ -33,5 +33,5 @@ export const useSessionCheck = () => {
         };
 
         check();
-    }, []);
+    }, [router, setAdmin]);
 };
