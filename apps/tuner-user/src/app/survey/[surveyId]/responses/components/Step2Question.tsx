@@ -26,6 +26,8 @@ import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 import { formatDefaultAnswers } from "@/features/survey/utils/fotmatAnswers";
+import { userUpdatePayload } from "@/features/users/utils/userUpdatePayload";
+import { UserInfo } from "@/features/users/types/userInfo";
 
 interface Step2Props {
   surveyId: number;
@@ -48,8 +50,7 @@ export default function Step2Question({
 }: Step2Props) {
   const { step4, setStep4 } = useSurveyStore();
   const { answers, setAnswer, resetAnswers } = useAnswerStore();
-  const { gender, age, genres, isMusicRelated, resetUserInfo } =
-    useSurveyInfo();
+  const { gender, age, genres, jobDomain, resetUserInfo } = useSurveyInfo();
   const { user } = useAuthStore();
 
   const questions = useMemo(
@@ -78,7 +79,7 @@ export default function Step2Question({
     });
   }, [answers, currentKey, currentQuestions]);
 
-  useEffect(() => 
+  useEffect(() => {
     if (step4.questions.length === 0 && step4.customQuestions.length === 0) {
       getSurveyById(surveyId).then((res) => {
         const rawQuestions = res.survey_question;
@@ -111,7 +112,7 @@ export default function Step2Question({
 
         setStep4({
           questions: fixedQuestions,
-          customQuestions: customQuestions,
+          customQuestions,
         });
       });
     }
@@ -156,17 +157,28 @@ export default function Step2Question({
       ...questions,
       ...customQuestions,
     ]);
-    const userPayload = { user_info: { gender, age, genres, isMusicRelated } };
+
+    const userInfo: UserInfo = {
+      gender,
+      age,
+      genres,
+      jobDomain,
+    };
+    const userPayload = userUpdatePayload(userInfo);
     const surveyPayload = {
       user_id: user.id,
       survey_id: surveyId,
       answers: formattedAnswers,
       status: SurveyStatusEnum.COMPLETE,
+      user_info: userPayload,
     };
+    console.log("userPayload", userPayload);
     console.log("payload", surveyPayload);
 
     try {
+      console.log("dd");
       const response = await updateUserInfo(Number(user.id), userPayload);
+      console.log("ddd");
       console.log("기본 정보", response);
       const res = await postSurveyAnswer(surveyPayload);
       console.log("설문 참여", res);
@@ -200,7 +212,7 @@ export default function Step2Question({
     const payload = {
       user_id: user.id,
       survey_id: surveyId,
-      user_info: { gender, age, genres, isMusicRelated },
+      user_info: { gender, age, genres, jobDomain },
       answers: formattedAnswers,
       status: SurveyStatusEnum.DRAFT,
     };

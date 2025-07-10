@@ -188,7 +188,8 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
       const payload = formatSurveyPayload(SurveyStatusEnum.COMPLETE);
       console.log("payload", payload);
       const res = await createSurvey(payload);
-      const surveyId = res.data.data.id;
+      console.log("생성 완", res);
+      const surveyId = res.data.id;
       setCreatedSurveyId(surveyId);
       console.log("설문 생성", res);
       setSurveySubmitStatus("success");
