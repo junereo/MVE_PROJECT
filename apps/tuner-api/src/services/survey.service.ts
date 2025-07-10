@@ -35,7 +35,7 @@ export const editSurvey = ({
   is_active: SurveyActive;
 }): boolean => {
   if (status === "draft") return true;
-  if (status === "complete" && is_active === "ongoing") return true;
+  if (status === "complete" && is_active === "upcoming") return true;
   return false;
 };
 
@@ -56,11 +56,18 @@ export const createSurveyParticipant = async ({
   survey_id,
   answers,
   isSubmit = false, // false: 임시저장, true: 제출
+  user_info, // 프론트에서 최초 참여 시 받는 정보
 }: {
   user_id: number;
   survey_id: number;
   answers: any;
   isSubmit?: boolean;
+  user_info?: {
+    gender?: boolean;
+    age?: string;
+    genre?: string;
+    job_domain?: boolean;
+  };
 }) => {
   // 참여 가능 상태 확인
   const survey = await prisma.survey.findUnique({
@@ -68,14 +75,54 @@ export const createSurveyParticipant = async ({
     select: { status: true, is_active: true },
   });
 
-  console.log(user_id, survey_id);
-
   if (!survey) throw new Error("설문 없음");
   if (!canParticipateSurvey(survey)) {
     throw new Error("참여할 수 없는 상태입니다.");
   }
 
-  // 기존 참여 내역 확인 (있으면 수정, 없으면 새로 생성)
+  // 현재 유저 정보 확인
+  const user = await prisma.user.findUnique({
+    where: { id: user_id },
+    select: {
+      gender: true,
+      age: true,
+      genre: true,
+      job_domain: true,
+    },
+  });
+
+  if (!user) throw new Error("유저 없음");
+
+  const needsProfile =
+    user.gender === null ||
+    user.age === null ||
+    user.genre === null ||
+    user.job_domain === null;
+
+  if (needsProfile) {
+    if (
+      !user_info ||
+      user_info.gender === undefined ||
+      !user_info.age ||
+      !user_info.genre ||
+      user_info.job_domain === undefined
+    ) {
+      throw new Error("필수 유저 정보 누락 (gender, age, genre, job_domain)");
+    }
+
+    // 4개 필수 정보 업데이트
+    await prisma.user.update({
+      where: { id: user_id },
+      data: {
+        gender: user_info.gender,
+        age: user_info.age as any,
+        genre: user_info.genre as any,
+        job_domain: user_info.job_domain,
+      },
+    });
+  }
+
+  // 기존 참여 내역 있으면 update, 없으면 create
   const existing = await prisma.survey_Participants.findFirst({
     where: { user_id, survey_id },
   });
@@ -91,7 +138,7 @@ export const createSurveyParticipant = async ({
     });
   }
 
-  const result = await prisma.survey_Participants.create({
+  return await prisma.survey_Participants.create({
     data: {
       user_id,
       survey_id,
@@ -100,10 +147,8 @@ export const createSurveyParticipant = async ({
       rewarded: false,
     },
   });
-
-  console.log("existing", result)
-
 };
+
 
 // 설문 타입 유효성 검사
 const isSurveyType = (value: any): value is SurveyType => {
@@ -217,25 +262,24 @@ export const getSurveyListService = async () => {
 
 // 질문지 생성 또는 업데이트
 export const setSurveyQuestion = async ({
-  surveyId,
+  surveyQuestionId,
   questionType,
   question,
   order,
 }: {
-  surveyId: number;
+  surveyQuestionId: number;
   questionType: QuestionType;
   question: object;
   order: number;
 }) => {
   return await prisma.survey_Question.upsert({
-    where: { id: surveyId },
+    where: { id: surveyQuestionId },
     update: {
       question_type: questionType,
       question: question,
       question_order: order,
     },
     create: {
-      survey_id: surveyId,
       question_type: questionType,
       question: question,
       question_order: order,
@@ -259,7 +303,7 @@ export const getSurveyQuestions = async (surveyId: number) => {
   });
 };
 
-// 전체 조회 
+// 전체 조회
 export const getAllSurveyParticipants = async () => {
   return await prisma.survey_Participants.findMany({
     orderBy: { created_at: "desc" },
@@ -276,13 +320,13 @@ export const getAllSurveyParticipants = async () => {
   });
 };
 
-
 // 설문 정보 수정
 export const updateSurveyService = async (surveyId: number, body: any) => {
   const survey = await prisma.survey.findUnique({
     where: { id: surveyId },
     select: { status: true, is_active: true },
   });
+  console.log("서버 확인", survey);
 
   if (!survey) throw new Error("설문 없음");
   if (!editSurvey(survey)) {
@@ -341,7 +385,6 @@ export const getSurveyResult = async (surveyId: number) => {
   });
 };
 
-
 export const getSurveyQuestion = async ({
   surveyId,
   userId,
@@ -362,7 +405,7 @@ export const getSurveyQuestion = async ({
 
   if (!survey) throw new Error("설문 없음");
 
-  // 
+  //
   let groupedQuestions: Record<string, any[]> = {};
 
   if (Array.isArray(survey.survey_question)) {
