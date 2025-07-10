@@ -19,7 +19,7 @@ export interface FixedQuestion {
 
 // 서버로 보낼 전체 페이로드 타입
 interface SurveyQuestionPayload {
-    survey_id: number | string;
+    surveyQuestionId: number | string;
     Survey_question: string;
     question: Record<string, BackendQuestionPayload[]>;
     question_type: Question_type;
@@ -154,12 +154,14 @@ export default function FixedQuestionTemplatePage() {
         try {
             const grouped = groupQuestionsToBackendFormat(questions);
             const payload: SurveyQuestionPayload = {
-                survey_id: questionnaireId,
+                surveyQuestionId: questionnaireId,
                 Survey_question: '고정 질문 템플릿',
                 question: grouped,
                 question_type: Question_type.fixed,
                 question_order: 1,
             };
+            console.log('페이로드', payload);
+
             await createTemplate(payload);
             alert('저장 완료!');
         } catch (error) {
