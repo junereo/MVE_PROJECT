@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import type { WithdrawalRow } from '@/types';
 
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -54,7 +55,7 @@ function TxPoolTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {rows.map((row: any) => (
+                        {rows.map((row: WithdrawalRow) => (
                             <tr key={row.id}>
                                 <td>{row.id}</td>
                                 <td>{row.user_id}</td>
@@ -96,7 +97,6 @@ export default function WalletTabs() {
     const [loading, setLoading] = useState(false);
     const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
     const baseUrl = 'http://localhost:4000';
-    const [showTxPoolTable, setShowTxPoolTable] = useState(false);
 
     const handleRequest = async (
         url: string,
@@ -127,10 +127,18 @@ export default function WalletTabs() {
 
             setResultMessage(msg);
             toast.success(msg);
-        } catch (e: any) {
+        } catch (e: unknown) {
             if (timeoutId) clearTimeout(timeoutId);
             setLoading(false);
-            const errMsg = e?.response?.data?.error || '요청 실패';
+            let errMsg = '요청 실패';
+            if (e instanceof Error) {
+                // AxiosError 타입 추론이 가능한 경우
+                const axiosError = e as {
+                    response?: { data?: { error?: string } };
+                };
+                errMsg =
+                    axiosError?.response?.data?.error || e.message || errMsg;
+            }
             setResultMessage('실패: ' + errMsg);
             toast.error(errMsg);
         }

@@ -212,7 +212,11 @@ export const createSurveyParticipantHandler = async (
       survey_id: parseInt(survey_id),
       answers,
       isSubmit,
+<<<<<<< HEAD
       user_info, // 🟢 무조건 서비스에 넘긴다!
+=======
+      user_info
+>>>>>>> main
     });
 
     res.status(201).json({ success: true, data: newParticipant });
