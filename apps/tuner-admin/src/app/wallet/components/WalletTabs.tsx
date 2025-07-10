@@ -1,8 +1,10 @@
 'use client';
+
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -14,20 +16,46 @@ export default function WalletTabs() {
     const [answers, setAnswers] = useState('');
     const [message, setMessage] = useState('');
     const [activeMainTab, setActiveMainTab] = useState<string>('token');
-    const [activeSubTab] = useState<string>('createWallet');
+    const [resultMessage, setResultMessage] = useState<string>('');
+    const [loading, setLoading] = useState(false);
+    const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
     const baseUrl = 'http://localhost:4000';
 
-    // API 요청 함수
     const handleRequest = async (
         url: string,
         method: 'GET' | 'POST' | 'PUT' | 'DELETE',
         data?: Record<string, unknown>,
     ) => {
+        setResultMessage('');
+        setLoading(true);
+        const tId = setTimeout(() => setLoading(false), 20000);
+        setTimeoutId(tId);
+
         try {
             const res = await axios({ url, method, data });
-            toast.success('성공: ' + (res.data?.message || ''));
+            if (timeoutId) clearTimeout(timeoutId);
+            setLoading(false);
+
+            const { txHash, allowance, token, ...rest } = res.data || {};
+            let msg = '성공';
+            if (txHash) msg += `\nTxHash: ${txHash}`;
+            if (allowance) msg += `\nAllowance: ${allowance}`;
+            if (token) msg += `\nToken: ${token}`;
+
+            for (const k in rest) {
+                if (!['txHash', 'allowance', 'token'].includes(k)) {
+                    msg += `\n${k}: ${rest[k]}`;
+                }
+            }
+
+            setResultMessage(msg);
+            toast.success(msg);
         } catch (e: any) {
-            toast.error(e?.response?.data?.error || '요청 실패');
+            if (timeoutId) clearTimeout(timeoutId);
+            setLoading(false);
+            const errMsg = e?.response?.data?.error || '요청 실패';
+            setResultMessage('실패: ' + errMsg);
+            toast.error(errMsg);
         }
     };
 
@@ -83,7 +111,7 @@ export default function WalletTabs() {
                                 onChange={(e) => setUid(e.target.value)}
                             />
                             <Input
-                                placeholder="Amount"
+                                placeholder="Amount (ETH)"
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
                             />
@@ -95,9 +123,15 @@ export default function WalletTabs() {
                                         { uid, value },
                                     )
                                 }
+                                disabled={loading}
                             >
-                                토큰 생성
+                                {loading ? '실행 중...' : '토큰 생성'}
                             </Button>
+                            {resultMessage && (
+                                <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                                    {resultMessage}
+                                </div>
+                            )}
                         </div>
                     </TabsContent>
 
@@ -116,9 +150,15 @@ export default function WalletTabs() {
                                         'GET',
                                     )
                                 }
+                                disabled={loading}
                             >
-                                토큰 조회
+                                {loading ? '조회 중...' : '토큰 조회'}
                             </Button>
+                            {resultMessage && (
+                                <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                                    {resultMessage}
+                                </div>
+                            )}
                         </div>
                     </TabsContent>
 
@@ -135,7 +175,7 @@ export default function WalletTabs() {
                                 onChange={(e) => setTo(e.target.value)}
                             />
                             <Input
-                                placeholder="Amount"
+                                placeholder="Amount (ETH)"
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
                             />
@@ -144,12 +184,18 @@ export default function WalletTabs() {
                                     handleRequest(
                                         baseUrl + '/contract/wallet/token',
                                         'PUT',
-                                        { uid, to, value: Number(value) },
+                                        { uid, to, value },
                                     )
                                 }
+                                disabled={loading}
                             >
-                                토큰 전송
+                                {loading ? '실행 중...' : '토큰 전송'}
                             </Button>
+                            {resultMessage && (
+                                <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                                    {resultMessage}
+                                </div>
+                            )}
                         </div>
                     </TabsContent>
 
@@ -290,21 +336,40 @@ export default function WalletTabs() {
                                 onChange={(e) => setUid(e.target.value)}
                             />
                             <Input
-                                placeholder="Message"
+                                placeholder="Message (Amount, ETH)"
+                                type="number"
                                 value={message}
-                                onChange={(e) => setMessage(e.target.value)}
+                                onChange={(e) =>
+                                    setMessage(
+                                        e.target.value.replace(/[^0-9.]/g, ''),
+                                    )
+                                }
+                                min={0}
+                                step="any"
                             />
                             <Button
-                                onClick={() =>
+                                onClick={() => {
+                                    if (!message || isNaN(Number(message))) {
+                                        toast.error(
+                                            '숫자만 입력하세요 (ether 단위)',
+                                        );
+                                        return;
+                                    }
                                     handleRequest(
                                         baseUrl + `/contract/tx/sign`,
                                         'POST',
-                                        { message },
-                                    )
-                                }
+                                        { message: message, uid },
+                                    );
+                                }}
+                                disabled={loading}
                             >
-                                TxPool 서명
+                                {loading ? '실행 중...' : 'TxPool 서명'}
                             </Button>
+                            {resultMessage && (
+                                <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                                    {resultMessage}
+                                </div>
+                            )}
                         </div>
                     </TabsContent>
 
@@ -316,9 +381,15 @@ export default function WalletTabs() {
                                     'POST',
                                 )
                             }
+                            disabled={loading}
                         >
-                            TxPool 제출
+                            {loading ? '실행 중...' : 'TxPool 제출'}
                         </Button>
+                        {resultMessage && (
+                            <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                                {resultMessage}
+                            </div>
+                        )}
                     </TabsContent>
 
                     <TabsContent value="clearTxPool">
@@ -329,22 +400,57 @@ export default function WalletTabs() {
                                     'GET',
                                 )
                             }
+                            disabled={loading}
                         >
-                            TxPool 초기화
+                            {loading ? '실행 중...' : 'TxPool 초기화'}
                         </Button>
+                        {resultMessage && (
+                            <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                                {resultMessage}
+                            </div>
+                        )}
                     </TabsContent>
 
                     <TabsContent value="viewTxPool">
                         <Button
-                            onClick={() =>
-                                handleRequest(
-                                    baseUrl + `/contract/tx/pool`,
-                                    'GET',
-                                )
-                            }
+                            onClick={async () => {
+                                setResultMessage('');
+                                setLoading(true);
+                                const tId = setTimeout(
+                                    () => setLoading(false),
+                                    20000,
+                                );
+                                setTimeoutId(tId);
+                                try {
+                                    const res = await axios.get(
+                                        baseUrl + `/contract/tx/pool`,
+                                    );
+                                    if (timeoutId) clearTimeout(timeoutId);
+                                    setLoading(false);
+                                    setResultMessage(
+                                        typeof res.data === 'object'
+                                            ? JSON.stringify(res.data, null, 2)
+                                            : String(res.data),
+                                    );
+                                    toast.success('조회 성공');
+                                } catch (e: any) {
+                                    if (timeoutId) clearTimeout(timeoutId);
+                                    setLoading(false);
+                                    const errMsg =
+                                        e?.response?.data?.error || '요청 실패';
+                                    setResultMessage('실패: ' + errMsg);
+                                    toast.error(errMsg);
+                                }
+                            }}
+                            disabled={loading}
                         >
-                            TxPool 조회
+                            {loading ? '조회 중...' : 'TxPool 조회'}
                         </Button>
+                        {resultMessage && (
+                            <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                                {resultMessage}
+                            </div>
+                        )}
                     </TabsContent>
                 </Tabs>
             </TabsContent>

@@ -342,7 +342,7 @@ export const getSurveyResult = async (surveyId: number) => {
 };
 
 
-export const getSurveyParticipation = async ({
+export const getSurveyQuestion = async ({
   surveyId,
   userId,
 }: {

@@ -7,7 +7,8 @@ import { createWallet,
         sendToken, 
         burnToken,
         approveTunerToken,
-        revokeTunerToken } from "../controllers/metaTransaction.controller";
+        revokeTunerToken,
+        getAllowance } from "../controllers/metaTransaction.controller";
 
 const router: Router = express.Router();
 
@@ -25,5 +26,6 @@ router.delete('/token', burnToken); // 토큰 사용
 
 router.post('/approve', approveTunerToken); // 토큰 approve
 router.post('/revoke', revokeTunerToken); // 토큰 approve 해제
+router.post('/allowance', getAllowance); // allowance 조회
 
 export default router; 
