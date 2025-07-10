@@ -10,15 +10,15 @@ interface UserInfoState extends UserInfo {
 export const useSurveyInfo = create<UserInfoState>()(
   persist(
     (set) => ({
-      gender: "",
+      gender: "남성",
       age: "",
       genres: [],
-      isMusicRelated: "",
+      jobDomain: false,
 
       setUserInfo: (info) => set((prev) => ({ ...prev, ...info })),
       // 상태 초기화
       resetUserInfo: () => {
-        set({ gender: "", age: "", genres: [], isMusicRelated: "" });
+        set({ gender: "남성", age: "", genres: [], jobDomain: false });
 
         // localStorage에서도 제거
         if (typeof window !== "undefined") {

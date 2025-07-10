@@ -4,8 +4,7 @@ import { useUser } from "@/features/auth/hooks/useUser";
 export default function UserProfile() {
   const { data } = useUser();
 
-  if (!data) return <p>로딩 중...</p>;
-  const user = data.data.user;
+  if (!data) return null;
 
   return (
     <div className="bg-white p-4 flex items-center gap-4">
@@ -13,7 +12,7 @@ export default function UserProfile() {
         <UserIcon className="text-gray-400 w-8 h-8" />
       </div>
       <div className="flex-1">
-        <p className="text-m text-gray-500">{user.nickname} 님</p>
+        <p className="text-m text-gray-500">{data.nickname} 님</p>
         <p className="text-sm text-gray-500">일반 회원</p>
       </div>
       <div className="flex flex-col gap-2">
