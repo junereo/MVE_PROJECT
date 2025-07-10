@@ -37,7 +37,7 @@ export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
       category: q.category,
       question_type: q.question_type,
       options: q.options ?? [],
-      max_num: q.max_num ?? "",
+      max_num: q.max_num ?? 1,
     })),
 
     status,
