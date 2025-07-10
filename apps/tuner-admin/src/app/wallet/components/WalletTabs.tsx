@@ -14,7 +14,7 @@ export default function WalletTabs() {
     const [answers, setAnswers] = useState('');
     const [message, setMessage] = useState('');
     const [activeMainTab, setActiveMainTab] = useState<string>('token');
-    const [activeSubTab] = useState<string>('createWallet');
+    // const [activeSubTab] = useState<string>('createWallet');
     const baseUrl = 'http://localhost:4000';
 
     // API 요청 함수
@@ -26,8 +26,13 @@ export default function WalletTabs() {
         try {
             const res = await axios({ url, method, data });
             toast.success('성공: ' + (res.data?.message || ''));
-        } catch (e: any) {
-            toast.error(e?.response?.data?.error || '요청 실패');
+        } catch (e: unknown) {
+            // 내가 수정함
+            if (axios.isAxiosError(e)) {
+                toast.error(e.response?.data?.error || '요청 실패');
+            } else {
+                toast.error('요청 실패');
+            }
         }
     };
 

@@ -136,11 +136,11 @@ export default function SurveyComplete() {
                 // 수정 (PUT)
                 const id = Number(step1.surveyId);
                 await surveyPut(serverPayload, id);
-                console.log('✅ 수정 완료');
+                console.log('수정 완료');
             } else {
                 // 새로 생성 (POST)
                 await surveyCreate(serverPayload);
-                console.log('✅ 생성 완료');
+                console.log('생성 완료');
             }
 
             alert('서버로 보낼 JSON을 콘솔과 화면에 출력했습니다.');
@@ -167,7 +167,7 @@ export default function SurveyComplete() {
                     <div className="mb-6">
                         <p className="font-semibold">🎵 {step1.survey_title}</p>
                         <img
-                            src={step1.youtubeThumbnail}
+                            src={step1.thumbnail_uri}
                             alt="썸네일"
                             className="w-60 mt-2 rounded"
                         />
