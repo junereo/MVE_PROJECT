@@ -2,7 +2,12 @@ import { SurveyTypeEnum, QuestionTypeEnum, InputTypeEnum } from "./enums";
 
 export interface SurveyResponse {
   id: number;
-  create_at: string;
+  created_at: string;
+
+  music_title: string;
+  artist: string;
+  music_uri: string;
+  thumbnail_uri: string;
 
   survey_title: string;
   type: SurveyTypeEnum;
@@ -11,24 +16,27 @@ export interface SurveyResponse {
   is_active: "upcoming" | "ongoing" | "closed";
 
   is_released: boolean;
-  release_date: string;
+  released_date: string;
 
   reward_amount: number;
   reward: number;
   expert_reward: number;
 
-  participantCount: number;
+  participants: {
+    user: {
+      id: number;
+      nickname: string;
+      role: "ordinary" | "expert" | "admin";
+    };
+  }[];
 
-  music_title: string;
-  artist: string;
-  music_uri: string;
-  thumbnail_uri: string;
-
-  survey_custom: {
-    id: number;
-    question_type: QuestionTypeEnum.CUSTOM;
+  survey_question: {
+    id?: number;
+    category: string;
+    question_type: QuestionTypeEnum;
     question_text: string;
     type: InputTypeEnum;
     options: string[];
+    max_num: number | "";
   }[];
 }

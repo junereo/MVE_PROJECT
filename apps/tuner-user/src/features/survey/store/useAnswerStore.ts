@@ -19,8 +19,10 @@ interface SurveyAnswerState {
   ) => void;
   resetAnswers: () => void; // 응답 초기화
 
-  surveySubmitStatus?: "success" | "error"; // 에러 상태 추가
-  setSubmitStatus: (status: "success" | "error") => void;
+  surveySubmitStatus?: "success" | "error" | "saved" | "save-error"; // 에러 상태 추가
+  setSubmitStatus: (
+    status: "success" | "error" | "saved" | "save-error"
+  ) => void;
 }
 
 export const useAnswerStore = create<SurveyAnswerState>((set) => ({

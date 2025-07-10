@@ -11,8 +11,8 @@ export default function AuthInitializer() {
   useEffect(() => {
     const init = async () => {
       try {
-        const res = await getMe(); // 사용자 {id, nickname} 요청
-        setUser(res.data); // 성공 시 setUser에 상태 저장
+        const user = await getMe(); // 사용자 {id, nickname} 요청
+        setUser(user); // 성공 시 setUser에 상태 저장
       } catch {
         setUser(null); // 실패 시 null
       } finally {

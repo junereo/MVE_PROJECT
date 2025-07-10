@@ -35,7 +35,7 @@ export default function Step1Info({
   ];
 
   useEffect(() => {
-    console.log(gender, age, genres, isMusicRelated);
+    console.log("기본 정보", gender, age, genres, isMusicRelated);
   }, [gender, age, genres, isMusicRelated]);
 
   const handleNext = () => {
