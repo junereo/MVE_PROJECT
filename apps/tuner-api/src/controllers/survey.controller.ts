@@ -9,7 +9,7 @@ import {
   getAllSurveyParticipants,
   getSurveyResult,
   createSurveyResult,
-  getSurveyParticipation,
+  getSurveyQuestion,
 
 } from "../services/survey.service";
 import { PrismaClient, QuestionType } from "@prisma/client";
@@ -331,7 +331,7 @@ export const getSurveyResultHandler = async (
   }
 };
 
-export const getSurveyParticipationController = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getSurveyQuestionController = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const surveyId = Number(req.params.surveyId);
     const userId = Number(req.user?.userId);
@@ -341,7 +341,7 @@ export const getSurveyParticipationController = async (req: AuthRequest, res: Re
       return
     }
 
-    const result = await getSurveyParticipation({ surveyId, userId });
+    const result = await getSurveyQuestion({ surveyId, userId });
 
     res.status(200).json({ success: true, data: result });
   } catch (err: any) {

@@ -10,7 +10,7 @@ import {
   createSurveyParticipantHandler,
   getSurveyResultHandler,
   createSurveyResultHandler,
-  getSurveyParticipationController
+  getSurveyQuestionController
 } from "../controllers/survey.controller";
 import { verifyUserOrAdmin } from "../middlewares/survey.middleware";
 
@@ -25,7 +25,7 @@ router.get("/s/:surveyId", getSurvey);
 router.get("/q/:questionnaireId", getSurveyQuestionList);
 router.get("/p", getAllSurveyParticipantsHandler);
 router.get("/r/:surveyId", getSurveyResultHandler);
-router.get("/s/:surveyId/participate", verifyToken, getSurveyParticipationController);
+router.get("/s/:questionId", verifyToken, getSurveyQuestionController);
 
 router.post("/r", verifyToken, createSurveyResultHandler);
 router.post("/p", verifyToken, createSurveyParticipantHandler);
