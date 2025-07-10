@@ -8,6 +8,7 @@ import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
 import { InputTypeEnum } from "@/features/survey/types/enums";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
+import { UserInfo } from "os";
 
 interface Step1Props {
   surveyId: number;
@@ -20,7 +21,7 @@ export default function Step1Info({
   surveyTitle,
   onNext,
 }: Step1Props) {
-  const { gender, age, genres, isMusicRelated, setUserInfo } = useSurveyInfo();
+  const { gender, age, genres, jobDomain, setUserInfo } = useSurveyInfo();
 
   const genreOptions = [
     "발라드",
@@ -35,15 +36,16 @@ export default function Step1Info({
   ];
 
   useEffect(() => {
-    console.log("기본 정보", gender, age, genres, isMusicRelated);
-  }, [gender, age, genres, isMusicRelated]);
+    console.log("기본 정보", gender, age, genres, jobDomain);
+  }, [gender, age, genres, jobDomain]);
 
   const handleNext = () => {
-    setUserInfo({ gender, age, genres, isMusicRelated });
+    setUserInfo({ gender, age, genres, jobDomain });
     onNext();
   };
 
-  const isValid = gender && age && genres.length > 0 && isMusicRelated;
+  const isValid =
+    gender && age && genres.length > 0 && typeof jobDomain === "boolean";
 
   return (
     <>
@@ -67,7 +69,9 @@ export default function Step1Info({
             <QuestionOptions
               options={["남성", "여성"]}
               value={gender}
-              onChange={(val) => setUserInfo({ gender: val as string })}
+              onChange={(val) =>
+                setUserInfo({ gender: val as "남성" | "여성" })
+              }
               type={InputTypeEnum.MULTIPLE}
               layout="horizontal"
             />
@@ -76,9 +80,20 @@ export default function Step1Info({
           <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
             <QuestionText text="연령대" />
             <QuestionOptions
-              options={["10대", "20대", "30대", "40대", "50대 이상"]}
+              options={["10대", "20대", "30대", "40대", "50대", "60대 이상"]}
               value={age}
-              onChange={(val) => setUserInfo({ age: val as string })}
+              onChange={(val) =>
+                setUserInfo({
+                  age: val as
+                    | ""
+                    | "10대"
+                    | "20대"
+                    | "30대"
+                    | "40대"
+                    | "50대"
+                    | "60대 이상",
+                })
+              }
               type={InputTypeEnum.MULTIPLE}
               layout="horizontal"
             />
@@ -101,8 +116,10 @@ export default function Step1Info({
             />
             <QuestionOptions
               options={["예", "아니오"]}
-              value={isMusicRelated}
-              onChange={(val) => setUserInfo({ isMusicRelated: val as string })}
+              value={jobDomain ? "예" : "아니오"}
+              onChange={
+                (val) => setUserInfo({ jobDomain: val === "예" }) // ✅ string → boolean 변환하여 저장
+              }
               type={InputTypeEnum.MULTIPLE}
               layout="horizontal"
             />
