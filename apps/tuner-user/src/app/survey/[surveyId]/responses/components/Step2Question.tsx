@@ -78,7 +78,7 @@ export default function Step2Question({
     });
   }, [answers, currentKey, currentQuestions]);
 
-  useEffect(() => {
+  useEffect(() => 
     if (step4.questions.length === 0 && step4.customQuestions.length === 0) {
       getSurveyById(surveyId).then((res) => {
         const rawQuestions = res.survey_question;
@@ -111,7 +111,7 @@ export default function Step2Question({
 
         setStep4({
           questions: fixedQuestions,
-          customQuestions,
+          customQuestions: customQuestions,
         });
       });
     }

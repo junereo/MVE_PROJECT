@@ -17,6 +17,8 @@ interface ITuner {
     function transferFromWithDecimals(address from, address to, uint256 amount) external;
     function balanceOf(address account) external view returns (uint256);
     function transfer(address to, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool); 
+
 }
 
 contract MetaTransaction is Ownable {
@@ -37,7 +39,7 @@ contract MetaTransaction is Ownable {
         for (uint256 i = 0; i < _address.length; i++) {
             // 서명 검증 식을 여기에 작성할것.
             signTransaction(_address[i], message[i], signature[i]);
-            TunerToken.transfer(_address[i], token[i]);
+            TunerToken.transferFrom(owner(), _address[i], token[i]);
             emit evnet01(_address[i], message[i]);
         }
     }

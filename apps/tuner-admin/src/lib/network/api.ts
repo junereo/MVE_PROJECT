@@ -58,7 +58,13 @@ export const templateView = async () => {
 export const surveyCreate = async (serverPayload: SurveyCreatePayload) => {
     await axiosClient.post('/survey', serverPayload);
 };
-
+//  설문 수정
+export const surveyPut = async (
+    serverPayload: SurveyCreatePayload,
+    id: number,
+) => {
+    await axiosClient.put(`/survey/${id}`, serverPayload);
+};
 // 모든 유저 조회 list
 export const userList = async () => {
     const res = await axiosClient.get('/user');

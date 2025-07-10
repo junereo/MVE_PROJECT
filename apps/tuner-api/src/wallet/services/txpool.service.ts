@@ -11,7 +11,7 @@ dotenv.config();
 
 interface TxMessage {
   sender: string;
-  data: string;
+  value: string;
 }
 
 interface TxPoolItem {
@@ -60,8 +60,10 @@ export class TxPoolService {
 
   async verifyAndAdd(message: string, uid: string): Promise<TxPoolItem> {
     const singer_wallet = await this.metaService.createWallet(uid);
-    const signature = await this.metaService.createSign(singer_wallet, JSON.stringify(message));
-    const txData = { user_id: uid, message : {sender: singer_wallet.address, data: message}, signature };
+    const messageString = JSON.stringify(message); // 정확히 이 문자열로 서명해야 함
+
+    const signature = await this.metaService.createSign(singer_wallet, messageString);
+    const txData = { user_id: uid, message : {sender: singer_wallet.address, value: messageString}, signature };
     this.txpool.push(txData);
     return txData;
   }
@@ -72,14 +74,14 @@ export class TxPoolService {
     const batched = this.txpool.reduce(
       (acc, e) => {
         acc.address.push(e.message.sender);
-        acc.data.push(e.message.data);
+        acc.value.push(e.message.value);
         acc.msg.push(JSON.stringify(e.message));
         acc.sign.push(e.signature);
         return acc;
       },
-      { address: [], data: [], msg: [], sign: [] } as {
+      { address: [], value: [], msg: [], sign: [] } as {
         address: string[];
-        data: string[];
+        value: string[];
         msg: string[];
         sign: string[];
       }
@@ -87,7 +89,7 @@ export class TxPoolService {
 
     const tx = await this.msgSigner.mint(
       batched.address,
-      batched.data,
+      batched.value,
       batched.msg,
       batched.sign
     );
