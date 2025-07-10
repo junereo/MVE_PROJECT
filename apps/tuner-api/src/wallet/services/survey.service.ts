@@ -60,7 +60,8 @@ export class SurveyService {
     if (latest?.ca_survey) {
       contractAddress = latest.ca_survey;
     } else {
-      throw new Error('No contract address (ca_survey) found in TunerContract table');
+      console.error('No contract address (ca_survey) found in TunerContract table');
+      return; // 또는 적절한 fallback 처리
     }
     this.contract = new Contract(contractAddress, surveyABI, this.wallet);
   }

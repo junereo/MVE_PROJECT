@@ -3,7 +3,6 @@ import express, { Router }  from "express";
 import { getTxPool,
         txSign,
         submit,
-        txClear
  } from "../controllers/txpool.controller";
 
 const router: Router = express.Router();
@@ -12,8 +11,6 @@ router.post('/submit', submit ); // tx 처리
 
 router.post('/sign', txSign ); // 클레임
 
-router.get('/pool', getTxPool ); // 풀 조회
-
-router.get('/clear', txClear ); // 풀 초기화
+router.get('/pool', getTxPool);
 
 export default router; 
