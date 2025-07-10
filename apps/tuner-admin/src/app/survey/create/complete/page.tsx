@@ -94,7 +94,7 @@ export default function SurveyComplete() {
         music_uri: step1.url, // 유튜브 URL
         artist: step1.artist,
         release_date: step1.releaseDate, // 발매일 (YYYY-MM-DD 형식)
-        thumbnail_uri: step1.thumbnail_uri,
+        thumbnail_uri: step1.thumbnail_uri ?? '',
         music_title: step1.title, //음악 제목
         genre: step1.genre,
         start_at: step1.start_at,
