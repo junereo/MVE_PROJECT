@@ -13,14 +13,14 @@ interface Step2Props {
 }
 
 const genreOptions = [
-  { value: "Ballad", label: "발라드" },
-  { value: "Hiphop", label: "힙합" },
-  { value: "R&B", label: "R&B" },
-  { value: "Dance", label: "댄스" },
-  { value: "Jazz", label: "재즈" },
-  { value: "Classical", label: "클래식" },
-  { value: "EDM", label: "EDM" },
-  { value: "Korean traditional music", label: "국악" },
+  { value: "ballad", label: "발라드" },
+  { value: "hiphop", label: "힙합" },
+  { value: "rnb", label: "R&B" },
+  { value: "dance", label: "댄스" },
+  { value: "jazz", label: "재즈" },
+  { value: "classical", label: "클래식" },
+  { value: "edm", label: "EDM" },
+  { value: "gukak", label: "국악" },
   { value: "rock", label: "락" },
 ];
 

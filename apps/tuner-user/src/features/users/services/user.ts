@@ -1,4 +1,5 @@
 import axios from "@/lib/network/axios";
+import { UserUpdatePayload } from "../types/userInfo";
 
 // 내 정보 요청
 export const getUserInfo = async () => {
@@ -7,8 +8,11 @@ export const getUserInfo = async () => {
 };
 
 // // 내 정보 수정
-export const updateUserInfo = async (userId: number, data: {}) => {
-  const response = await axios.put(`/users/${userId}`, data);
+export const updateUserInfo = async (
+  userId: number,
+  payload: UserUpdatePayload
+) => {
+  const response = await axios.put(`/user/${userId}`, payload);
   return response; // nickname, phone_number, simple_passwoard
 };
 
