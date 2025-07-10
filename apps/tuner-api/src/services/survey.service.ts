@@ -55,8 +55,8 @@ export const createSurveyParticipant = async ({
   user_id,
   survey_id,
   answers,
-  isSubmit = false, // false: 임시저장, true: 제출
-  user_info, // 프론트에서 최초 참여 시 받는 정보
+  isSubmit = false,
+  user_info, // 최초 참여시만 들어옴
 }: {
   user_id: number;
   survey_id: number;
@@ -69,18 +69,17 @@ export const createSurveyParticipant = async ({
     job_domain?: boolean;
   };
 }) => {
-  // 참여 가능 상태 확인
+  // FK & 상태 체크
   const survey = await prisma.survey.findUnique({
     where: { id: survey_id },
     select: { status: true, is_active: true },
   });
-
   if (!survey) throw new Error("설문 없음");
   if (!canParticipateSurvey(survey)) {
     throw new Error("참여할 수 없는 상태입니다.");
   }
 
-  // 현재 유저 정보 확인
+  // 유저 정보 확인
   const user = await prisma.user.findUnique({
     where: { id: user_id },
     select: {
@@ -90,7 +89,6 @@ export const createSurveyParticipant = async ({
       job_domain: true,
     },
   });
-
   if (!user) throw new Error("유저 없음");
 
   const needsProfile =
@@ -99,18 +97,9 @@ export const createSurveyParticipant = async ({
     user.genre === null ||
     user.job_domain === null;
 
+  // ✅ 최초라면 user_info로 저장
   if (needsProfile) {
-    if (
-      !user_info ||
-      user_info.gender === undefined ||
-      !user_info.age ||
-      !user_info.genre ||
-      user_info.job_domain === undefined
-    ) {
-      throw new Error("필수 유저 정보 누락 (gender, age, genre, job_domain)");
-    }
-
-    // 4개 필수 정보 업데이트
+    if (!user_info) throw new Error("user_info 필수!");
     await prisma.user.update({
       where: { id: user_id },
       data: {
@@ -122,7 +111,20 @@ export const createSurveyParticipant = async ({
     });
   }
 
-  // 기존 참여 내역 있으면 update, 없으면 create
+  // ✅ 무조건 유저 정보 가져와서 answers에 포함!
+  const finalUserInfo = {
+    gender: user.gender ?? user_info?.gender,
+    age: user.age ?? user_info?.age,
+    genre: user.genre ?? user_info?.genre,
+    job_domain: user.job_domain ?? user_info?.job_domain,
+  };
+
+  const finalAnswers = {
+    ...answers,
+    user_info: finalUserInfo,
+  };
+
+  // ✅ 기존 있으면 업데이트
   const existing = await prisma.survey_Participants.findFirst({
     where: { user_id, survey_id },
   });
@@ -131,7 +133,7 @@ export const createSurveyParticipant = async ({
     return await prisma.survey_Participants.update({
       where: { id: existing.id },
       data: {
-        answers,
+        answers: finalAnswers,
         status: isSubmit ? "complete" : "draft",
         rewarded: false,
       },
@@ -142,12 +144,13 @@ export const createSurveyParticipant = async ({
     data: {
       user_id,
       survey_id,
-      answers,
+      answers: finalAnswers,
       status: isSubmit ? "complete" : "draft",
       rewarded: false,
     },
   });
 };
+
 
 
 // 설문 타입 유효성 검사
