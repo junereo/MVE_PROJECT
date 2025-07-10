@@ -1,4 +1,5 @@
 import axios from "@/lib/network/axios";
+import { UserUpdatePayload } from "../types/userInfo";
 
 // 내 정보 요청
 export const getUserInfo = async () => {
@@ -7,10 +8,13 @@ export const getUserInfo = async () => {
 };
 
 // // 내 정보 수정
-// export const updateUSerInfo = async (data: {}) => {
-//   const response = await axios.put("/users/me", data);
-//   return response; // nickname, phone_number, simple_passwoard
-// };
+export const updateUserInfo = async (
+  userId: number,
+  payload: UserUpdatePayload
+) => {
+  const response = await axios.put(`/user/${userId}`, payload);
+  return response; // nickname, phone_number, simple_passwoard
+};
 
 // 설문 참여 내역
 export const getUserParticipations = async () => {
