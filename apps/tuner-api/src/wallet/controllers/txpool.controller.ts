@@ -19,16 +19,22 @@ const txPoolService = new TxPoolService(metaTransctionService);
 await txPoolService.init(); // provider, wallet, contract 초기화
 
 // 1. txpool 조회
-export const getTxPool = (req: Request, res: Response) => {
-  const pool = txPoolService.getPool();
-  res.status(200).json(pool);
+// apps/tuner-api/src/wallet/controllers/txpool.controller.ts
+
+export const getTxPool = async (req: Request, res: Response) => {
+
+  try {
+    const { status } = req.query;
+    console.log("status", status)
+    const pool = await txPoolService.getPoolByStatus(status as string);
+    res.status(200).json(pool);
+  } catch (err) {
+    res.status(500).json({ error: 'TxPool 조회 실패', details: (err as any).message });
+  }
 };
-
 // 2. message 를 트랜잭션으로 변환 및 pool에 저장
-export const txSign = async(req: Request, res: Response) => {
+export const txSign = async(req: Request, res: Response):Promise<void> => {
   const { message, uid } = req.body;
-  // const { userId } = (req as AuthRequest).user!;
-
 
   if (!message) {
     res.status(400).json({ error: 'Missing message' });
@@ -36,6 +42,8 @@ export const txSign = async(req: Request, res: Response) => {
   }
 
   const isValid = await txPoolService.verifyAndAdd(message, String(uid));
+  console.log(isValid)
+
 
   if (!isValid) {
     res.status(401).json({ error: 'failed to txpool' });
@@ -66,10 +74,4 @@ export const submit = async (req: Request, res: Response) => {
     console.error('TxPool processing error:', err);
     res.status(500).json({ error: 'Failed to process txpool', details: err.message });
   }
-};
-
-// 4. txpool 수동 초기화
-export const txClear =  (req: Request, res: Response) => {
-  const txTotalNum = txPoolService.clear();
-  res.status(200).json({ status: `${txTotalNum} TxPool cleared` });
 };

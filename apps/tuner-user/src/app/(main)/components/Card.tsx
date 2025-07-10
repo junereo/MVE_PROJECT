@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import { useEffect, useState } from "react";
 import { getSurveyList } from "@/features/survey/services/survey";
+import { SurveyTypeEnum } from "@/features/survey/types/enums";
 
 export default function Card({
   status,
@@ -40,7 +41,24 @@ export default function Card({
     fetchSurveys();
   }, [status]);
 
-  return (
+  return surveys.length === 0 ? (
+    <div className="flex flex-col items-center justify-center py-20 text-gray-400 w-full col-span-2">
+      <Image
+        src="/images/empty-survey.png"
+        alt="설문 없음"
+        width={96}
+        height={96}
+        className="mb-4"
+      />
+      <p className="text-sm">
+        {status === "ongoing"
+          ? "진행중인 설문이 없습니다."
+          : status === "closed"
+          ? "종료된 설문이 없습니다."
+          : "설문이 없습니다."}
+      </p>
+    </div>
+  ) : (
     <div className="grid grid-cols-2 gap-4">
       {surveys.slice(0, 4).map((item) => (
         <div
@@ -62,9 +80,11 @@ export default function Card({
               <p className="text-base font-semibold text-gray-900 truncate w-[calc(100%-60px)]">
                 {item.survey_title}
               </p>
-              <p className="flex-shrink-0 text-xs sm:text-sm text-orange-500 font-medium text-right">
-                🎁 {item.reward_amount}
-              </p>
+              {item.type === SurveyTypeEnum.OFFICIAL && (
+                <p className="flex-shrink-0 text-xs sm:text-sm text-orange-500 font-medium text-right">
+                  🎁 {item.reward_amount / 1000}
+                </p>
+              )}
             </div>
             <p className="text-sm text-gray-500 truncate">
               {item.artist} - {item.music_title}

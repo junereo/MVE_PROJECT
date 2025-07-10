@@ -6,7 +6,7 @@ import { SurveySubmitPayload } from "../types/answer";
 // 설문 생성
 export const createSurvey = async (payload: SurveyPayload) => {
   const response = await axios.post("/survey", payload);
-  return response;
+  return response.data;
 };
 
 // 전체 설문 목록
@@ -23,13 +23,13 @@ export const getSurveyById = async (
   surveyId: number
 ): Promise<SurveyResponse> => {
   const response = await axios.get(`/survey/s/${surveyId}`);
-  const data = response.data.data;
+  return response.data.data;
 
-  return {
-    ...data,
-    participantCount: data.participants?.length ?? 0,
-    release_date: data.release_date ?? "미정",
-  };
+  // return {
+  //   ...data,
+  //   participantCount: data.participants?.length ?? 0,
+  //   release_date: data.release_date ?? "미정",
+  // };
 };
 
 // 설문 질문 불러오기 / id=1 고정질문
