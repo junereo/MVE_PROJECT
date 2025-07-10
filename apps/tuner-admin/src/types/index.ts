@@ -119,6 +119,15 @@ export interface SurveyData {
     created_at: string;
     updated_at: string;
     questions: number;
+    // 내가 수정함
+    surveyResponses: {
+        user_id: number;
+        gender?: string;
+        age?: number;
+        scores?: Record<string, number>;
+        templateAnswers?: Record<string, string | string[]>;
+        customAnswers?: Record<string, string | string[]>;
+    }[];
     creator: {
         id: number;
         nickname: string;

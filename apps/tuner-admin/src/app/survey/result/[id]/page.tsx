@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 
 interface CustomQuestionOption {
     option: string;
@@ -40,15 +41,19 @@ export default function SurveyResultPage() {
     return (
         <div className="max-w-4xl mx-auto p-6">
             <h1 className="text-2xl font-bold mb-4">
-                🎵 {result.youtubeTitle} 설문 결과
+                🎵 {result.youtubeTitle}설문 결과
             </h1>
 
-            {/* 유튜브 썸네일 */}
-            <img
-                src={result.thumbnail}
-                alt="썸네일"
-                className="w-60 rounded mb-4"
-            />
+            {/* 썸네일 이미지 */}
+            <div className="relative w-full max-w-[395px] aspect-video mb-4">
+                <Image
+                    src={result.thumbnail}
+                    alt="썸네일"
+                    fill
+                    className="object-cover rounded"
+                    sizes="(max-width: 768px) 100vw, 395px"
+                />
+            </div>
 
             {/* 기본 평가 점수 */}
             <h2 className="text-lg font-semibold mb-2">📊 기본 평가 점수</h2>
