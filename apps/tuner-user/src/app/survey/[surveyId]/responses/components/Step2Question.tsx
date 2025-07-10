@@ -78,7 +78,7 @@ export default function Step2Question({
   useEffect(() => {
     if (step4.questions.length === 0) {
       fetchSurveyQuestions(surveyId).then((res) => {
-        console.log("📦 fetchSurveyQuestions response:", res.data); // 👈 이거 찍어봐
+        console.log("fetchSurveyQuestions response:", res.data);
 
         const data = res.data?.[0];
         const questions = data?.question;
@@ -114,7 +114,7 @@ export default function Step2Question({
         setStep4({
           ...step4,
           questions: fixedQuestions,
-          customQuestions,
+          customQuestions: customQuestions,
         });
       });
     }

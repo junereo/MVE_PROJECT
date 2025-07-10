@@ -9,8 +9,7 @@ import {
   getAllSurveyParticipants,
   getSurveyResult,
   createSurveyResult,
-  getSurveyParticipation,
-
+  getSurveyQuestion,
 } from "../services/survey.service";
 import { PrismaClient, QuestionType } from "@prisma/client";
 const prisma = new PrismaClient();
@@ -64,19 +63,19 @@ export const createSurveyQuestionHandler = async (
 ) => {
   try {
     const {
-      survey_id,
+      surveyQuestionId,
       question_type,
       question,
       question_order,
     }: {
-      survey_id: number;
+      surveyQuestionId: number;
       question_type: QuestionType;
       question: object;
       question_order: number;
     } = req.body;
 
     const surveyQuestion = await setSurveyQuestion({
-      surveyId: survey_id,
+      surveyQuestionId: surveyQuestionId,
       questionType: question_type,
       question,
       order: question_order,
@@ -134,7 +133,7 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // 특정 설문 상세 조회 
+    // 특정 설문 상세 조회
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
       include: {
@@ -168,7 +167,6 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
       .json({ message: "설문 조회 중 오류 발생", error: err.message });
   }
 };
-
 
 export const getSurveyQuestionList = async (
   req: Request,
@@ -209,7 +207,6 @@ export const createSurveyParticipantHandler = async (
         .json({ message: "user_id, survey_id, answers는 필수입니다." });
       return;
     }
-
 
     const newParticipant = await createSurveyParticipant({
       user_id: parseInt(user_id),
@@ -285,7 +282,6 @@ export const createSurveyResultHandler = async (
       reward_claimed,
     } = req.body;
 
-
     const result = await createSurveyResult({
       survey_id,
       survey_statistics,
@@ -331,17 +327,20 @@ export const getSurveyResultHandler = async (
   }
 };
 
-export const getSurveyParticipationController = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getSurveyQuestionController = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
   try {
     const surveyId = Number(req.params.surveyId);
     const userId = Number(req.user?.userId);
 
     if (isNaN(surveyId) || isNaN(userId)) {
       res.status(400).json({ message: "잘못된 요청" });
-      return
+      return;
     }
 
-    const result = await getSurveyParticipation({ surveyId, userId });
+    const result = await getSurveyQuestion({ surveyId, userId });
 
     res.status(200).json({ success: true, data: result });
   } catch (err: any) {

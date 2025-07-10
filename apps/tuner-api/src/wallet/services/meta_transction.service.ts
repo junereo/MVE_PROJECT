@@ -7,6 +7,7 @@ import  {
   keccak256,
   toUtf8Bytes,
   formatUnits,
+  parseUnits,
   BigNumberish,
   getBytes,
   MaxUint256,
@@ -67,18 +68,18 @@ export class MetaTransctionService {
   }
 
   async createKGTToken(address: string, value: string, msg: any, sign: string) {
-    // 모든 인자를 배열로 변환
+    // 모든 인자를 배열로 변환 (value는 ether 단위 → wei 변환)
     const addresses = [address];
-    const values = [BigInt(value)]; // 또는 Number(value)
+    const values = [ethers.parseUnits(value, 18)];
     const messages = [msg];
     const signatures = [getBytes(sign)]; // 👈 이것이 핵심
   
     const signerFromSig = ethers.verifyMessage(msg, sign);
-    console.log("🔍 signer from sig:", signerFromSig);
-    console.log("🧾 expected sender :", address);
+    // console.log("🔍 signer from sig:", signerFromSig);
+    // console.log("🧾 expected sender :", address);
 
     const { hash: txHash } = await this.msgSigner.mint(
-      address, value, JSON.stringify(msg), sign
+      addresses, values, messages, signatures
     );
   
     const tx = await this.provider.getTransaction(txHash);
@@ -148,10 +149,12 @@ export class MetaTransctionService {
    * TunerToken에 approve (owner → MetaTransaction)
    */
   async approveTunerToken(spender: string, tokenAddress: string, amount: string = MaxUint256.toString()) {
+    // amount를 ether(소수점) 단위로 받아서 wei로 변환
+    const amountWei = parseUnits(amount, 18).toString();
     const abi = ["function approve(address spender, uint256 amount) public returns (bool)"];
     const tunerToken = new Contract(tokenAddress, abi, this.wallet);
 
-    const tx = await tunerToken.approve(spender, amount);
+    const tx = await tunerToken.approve(spender, amountWei);
     await tx.wait();
 
     return { txHash: tx.hash, approved: amount };
@@ -168,6 +171,17 @@ export class MetaTransctionService {
     await tx.wait();
 
     return { txHash: tx.hash, revoked: true };
+  }
+
+  /**
+   * owner가 spender에게 위임한 토큰 allowance 조회
+   */
+  async getAllowance(owner: string, spender: string, tokenAddress: string) {
+    const abi = ["function allowance(address owner, address spender) public view returns (uint256)"];
+    const tunerToken = new Contract(tokenAddress, abi, this.provider);
+    const allowance = await tunerToken.allowance(owner, spender);
+    // 18자리 ether 단위로 변환
+    return ethers.formatUnits(allowance, 18);
   }
 
 }

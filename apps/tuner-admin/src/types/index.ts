@@ -87,8 +87,6 @@ export interface BackendQuestionPayload {
 }
 
 export interface SurveyQuestionPayload {
-    survey_id: string | number;
-    Survey_question: string;
     question: Record<string, BackendQuestionPayload[]>;
     question_type: Question_type;
     question_order: number;
@@ -119,6 +117,15 @@ export interface SurveyData {
     created_at: string;
     updated_at: string;
     questions: number;
+    // 내가 수정함
+    surveyResponses: {
+        user_id: number;
+        gender?: string;
+        age?: number;
+        scores?: Record<string, number>;
+        templateAnswers?: Record<string, string | string[]>;
+        customAnswers?: Record<string, string | string[]>;
+    }[];
     creator: {
         id: number;
         nickname: string;

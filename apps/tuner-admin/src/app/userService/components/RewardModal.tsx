@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 interface RewardModalProps {
     isOpen: boolean;
@@ -24,6 +24,11 @@ export default function RewardModal({
             handleClose();
         }
     };
+    // 닫기 시 상태 초기화 포함
+    const handleClose = useCallback(() => {
+        setAmount('');
+        onClose();
+    }, [onClose]);
 
     // ESC 누르면 닫기
     useEffect(() => {
@@ -32,13 +37,7 @@ export default function RewardModal({
         };
         if (isOpen) document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen]);
-
-    // 닫기 시 상태 초기화 포함
-    const handleClose = () => {
-        setAmount('');
-        onClose();
-    };
+    }, [handleClose, isOpen]);
 
     const handleConfirm = () => {
         if (typeof amount === 'number' && amount > 0) {
