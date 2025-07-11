@@ -6,19 +6,19 @@ const prisma = new PrismaClient();
 export async function buildUserRelationOperations(userId: number, data: any) {
   const ops: any[] = [];
 
-  if (data.oauths) {
+  if (Array.isArray(data.oauths) && data.oauths.length > 0) {
     ops.push(
       ...buildRelationOps(prisma.user_Oauth, 'userId', userId, data.oauths)
     );
   }
 
-  if (data.transaction) {
+  if (Array.isArray(data.transaction) && data.transaction.length > 0) {
     ops.push(
       ...buildRelationOps(prisma.transaction, 'user_id', userId, data.transaction)
     );
   }
 
-  if (data.withdrawalRequest) {
+  if (Array.isArray(data.withdrawalRequest) && data.withdrawalRequest.length > 0) {
     ops.push(
       ...buildRelationOps(prisma.withdrawalRequest, 'user_id', userId, data.withdrawalRequest)
     );
@@ -26,3 +26,4 @@ export async function buildUserRelationOperations(userId: number, data: any) {
 
   return ops;
 }
+

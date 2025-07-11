@@ -4,6 +4,7 @@ export interface SurveyResponse {
   user_id?: number;
 
   id: number;
+  user_id: number;
   created_at: string;
 
   music_title: string;
