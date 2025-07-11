@@ -9,7 +9,7 @@ type Props = {
   surveyTitle: string;
   period: string;
   status: "예정" | "진행중" | "종료";
-  surveyType: SurveyTypeEnum;
+  surveyType?: SurveyTypeEnum;
   participants: number;
   reward?: number;
   onClick?: () => void;

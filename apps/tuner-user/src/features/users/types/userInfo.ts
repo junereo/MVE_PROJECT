@@ -1,18 +1,32 @@
+import { GenreKey } from "../constants/userInfoMap";
+
 export type UserRole = "ordinary" | "expert";
 
 export interface UserSurveyInfo {
-  gender: "남성" | "여성";
+  gender: "남성" | "여성" | "";
   age: "" | "10대" | "20대" | "30대" | "40대" | "50대" | "60대 이상";
-  genres: string[];
-  jobDomain: boolean;
+  genre: GenreKey | "";
+  jobDomain: boolean | undefined;
 }
 
 // 백엔드 전송용
 export interface UserUpdatePayload {
   gender: boolean;
   age: "teen" | "twenties" | "thirties" | "forties" | "fifties" | "sixties";
-  genre: string;
+  genre: GenreKey;
   job_domain: boolean;
+}
+
+// 기본 프로필 수정
+export interface UserProfileUpdatePayload {
+  nickname?: string;
+  phone_number?: string;
+  email?: string;
+}
+
+// 간편비밀번호 수정
+export interface WalletUpdatePayload {
+  simple_password: string;
 }
 
 export interface UserProfileProps {

@@ -21,6 +21,7 @@ const Dropdown = ({ options, selected, onSelect }: DropdownProps) => {
   return (
     <div className="relative inline-block text-left w-full">
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="z-10 mt-2 w-full px-4 py-2 bg-white border rounded-md shadow-sm hover:bg-gray-100"
       >

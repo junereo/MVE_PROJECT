@@ -1,4 +1,3 @@
-import type { UserInfo } from "@/features/users/types/userInfo";
 import { InputTypeEnum, SurveyStatusEnum } from "./enums";
 
 export type Answer = string | string[];

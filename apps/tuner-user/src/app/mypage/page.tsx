@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import UserProfile from "./components/UserProfile";
 import WalletInfo from "./components/WalletInfo";
 import SurveyStats from "./components/SurveyStats";
@@ -10,8 +11,11 @@ import { getUserInfo } from "@/features/users/services/user";
 import { useEffect } from "react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useUserStore } from "@/features/users/store/useUserStore";
+import { getMySurveyAnswer } from "@/features/users/services/survey";
+import { surveyParticipationStats } from "@/features/users/utils/surveyParticipationStats";
 
 export default function MyPage() {
+  const router = useRouter();
   const { isInitialized } = useAuthGuard();
   const { user } = useAuthStore();
   const { userInfo, setUserInfo } = useUserStore();
@@ -21,7 +25,9 @@ export default function MyPage() {
       if (user?.id) {
         const res = await getUserInfo(Number(user.id));
         console.log("내 정보", res);
-        setUserInfo(res.data); // ✅ Zustand에 저장
+        const data = await getMySurveyAnswer();
+        console.log("참여 설문", data);
+        setUserInfo(res.data);
       }
     };
     fetchUser();
@@ -37,11 +43,21 @@ export default function MyPage() {
 
       <SurveyStats
         title="설문 생성 내역"
-        stats={surveyStats(userInfo.surveys)}
+        stats={surveyStats(userInfo.surveys).map((item) => ({
+          label: item.label,
+          value: item.count,
+        }))}
+        onClick={() => router.push("/mypage/mySurvey")}
       />
       <SurveyStats
         title="설문 참여 내역"
-        stats={surveyStats(userInfo.surveyResponses)}
+        stats={surveyParticipationStats(userInfo.surveyResponses).map(
+          (item) => ({
+            label: item.label,
+            value: item.count,
+          })
+        )}
+        onClick={() => router.push("/mypage/participantsSurvey")}
       />
     </div>
   );
