@@ -201,6 +201,8 @@ export const createSurveyParticipantHandler = async (
     const { survey_id, answers, isSubmit } = req.body;
     const user_id = req.user?.userId;
 
+    
+
     if (!user_id || !survey_id || !answers) {
       res
         .status(400)
@@ -215,6 +217,7 @@ export const createSurveyParticipantHandler = async (
       isSubmit,
     });
 
+    console.log(newParticipant);
     res.status(201).json({ success: true, data: newParticipant });
   } catch (err: any) {
     console.error("설문 응답 생성 오류:", err);
