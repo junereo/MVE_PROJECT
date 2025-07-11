@@ -36,7 +36,7 @@ export default function QuestionOptions({
         ? selected.filter((v) => v !== opt)
         : [...selected, opt];
 
-      // ✅ 선택 제한 조건: 새 항목 선택 + max 초과일 때 막기
+      // 선택 제한 조건: 새 항목 선택 + max 초과일 때 막기
       if (!alreadySelected && maxSelect && selected.length >= maxSelect) {
         return;
       }

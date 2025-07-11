@@ -30,16 +30,13 @@ export const genreMap = {
   jazz: "재즈",
   classical: "클래식",
   hiphop: "힙합",
-  electronic: "일렉트로닉",
-  country: "컨트리",
-  reggae: "레게",
-  blues: "블루스",
-  folk: "포크",
   ballad: "발라드",
   rnb: "R&B",
   gukak: "국악",
   ccm: "CCM",
   edm: "EDM",
+  trot: "트로트",
+  dance: "댄스",
 } as const;
 export type GenreKey = keyof typeof genreMap;
 
