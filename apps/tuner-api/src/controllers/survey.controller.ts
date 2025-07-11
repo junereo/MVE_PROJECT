@@ -198,32 +198,34 @@ export const createSurveyParticipantHandler = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { survey_id, answers, isSubmit, user_info } = req.body;
+    const { survey_id, answers, isSubmit } = req.body;
     const user_id = req.user?.userId;
 
+
+
     if (!user_id || !survey_id || !answers) {
-      res.status(400).json({ message: "user_id, survey_id, answers는 필수입니다." });
+      res
+        .status(400)
+        .json({ message: "user_id, survey_id, answers는 필수입니다." });
       return;
     }
 
-    // ✅ 최초 참여라면 user_info 필수로 받음
     const newParticipant = await createSurveyParticipant({
       user_id: parseInt(user_id),
       survey_id: parseInt(survey_id),
       answers,
       isSubmit,
-      user_info, // 🟢 무조건 서비스에 넘긴다!
     });
 
+    console.log(newParticipant);
     res.status(201).json({ success: true, data: newParticipant });
   } catch (err: any) {
     console.error("설문 응답 생성 오류:", err);
     res
       .status(500)
-      .json({ success: false, message: err.message || "응답 생성 실패" });
+      .json({ success: false, message: "응답 생성 실패", error: err.message });
   }
 };
-
 
 // GET /survey-participants
 export const getAllSurveyParticipantsHandler = async (

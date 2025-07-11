@@ -5,7 +5,6 @@ import {
   SurveyType,
   SurveyStatus,
   Survey,
-  Genre,
   Survey_Question,
 } from "@prisma/client";
 // import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
@@ -61,14 +60,14 @@ export const createSurveyParticipant = async ({
 }: {
   user_id: number;
   survey_id: number;
-  answers: any[];
-  user_info?: {
-    gender?: boolean | null;
-    age?: string | null;
-    genre?: string[] | null;
-    job_domain?: boolean | null;
-  };
+  answers: any;
   isSubmit?: boolean;
+  user_info?: {
+    gender?: boolean;
+    age?: string;
+    genre?: string;
+    job_domain?: boolean;
+  };
 }) => {
   // 참여 가능 상태 확인
   const survey = await prisma.survey.findUnique({
@@ -84,15 +83,20 @@ export const createSurveyParticipant = async ({
   // 현재 유저 정보 확인
   const user = await prisma.user.findUnique({
     where: { id: user_id },
-    select: { gender: true, age: true, genre: true, job_domain: true },
+    select: {
+      gender: true,
+      age: true,
+      genre: true,
+      job_domain: true,
+    },
   });
 
   if (!user) throw new Error("유저 없음");
 
-  const needsUpdate =
+  const needsProfile =
     user.gender === null ||
     user.age === null ||
-    !user.genre || user.genre.length === 0 ||
+    user.genre === null ||
     user.job_domain === null;
 
   if (needsProfile) {
@@ -112,8 +116,7 @@ export const createSurveyParticipant = async ({
       data: {
         gender: user_info.gender,
         age: user_info.age as any,
-        genre: Array.isArray(user_info.genre)
-          ? user_info.genre.map(g => g as Genre) : [],
+        genre: user_info.genre as any,
         job_domain: user_info.job_domain,
       },
     });
@@ -128,7 +131,7 @@ export const createSurveyParticipant = async ({
     return await prisma.survey_Participants.update({
       where: { id: existing.id },
       data: {
-        answers: finalAnswers,
+        answers,
         status: isSubmit ? "complete" : "draft",
         rewarded: false,
       },
@@ -139,7 +142,7 @@ export const createSurveyParticipant = async ({
     data: {
       user_id,
       survey_id,
-      answers: finalAnswers,
+      answers,
       status: isSubmit ? "complete" : "draft",
       rewarded: false,
     },

@@ -1,8 +1,5 @@
-import { PrismaClient, AgeGroup, Genre } from '@prisma/client';
 import { Request, Response } from 'express';
 import * as userService from '../services/user.service';
-
-const prisma = new PrismaClient();
 
 export const createUser = async (req: Request, res: Response) => {
   const newUser = await userService.createUser(req.body);
@@ -19,17 +16,9 @@ export const getUserById = async (req: Request, res: Response) => {
   res.json(user);
 };
 
-export const updateUser = async (id: number, data: any): Promise<void> => {
-  await prisma.user.update({
-    where: { id },
-    data: {
-      gender: !!data.gender,
-      age: data.age as AgeGroup,
-      genre: Array.isArray(data.genre) ? data.genre as Genre[] : [data.genre] as Genre[],
-      job_domain: !!data.job_domain,
-    },
-  });
-  return
+export const updateUser = async (req: Request, res: Response) => {
+  const updatedUser = await userService.updateUser(+req.params.id, req.body);
+  res.json(updatedUser);
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
