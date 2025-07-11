@@ -13,7 +13,7 @@ import { useAuthStore } from "@/features/auth/store/authStore";
 import { useUserStore } from "@/features/users/store/useUserStore";
 
 export default function MyPage() {
-  const router = useRouter(); // ✅ 변경된 부분
+  const router = useRouter();
   const { isInitialized } = useAuthGuard();
   const { user } = useAuthStore();
   const { userInfo, setUserInfo } = useUserStore();
@@ -51,7 +51,7 @@ export default function MyPage() {
           label: item.label,
           value: item.count,
         }))}
-        onClick={() => router.push("/mypage/mySurvey")}
+        onClick={() => router.push("/mypage/participantsSurvey")}
       />
     </div>
   );

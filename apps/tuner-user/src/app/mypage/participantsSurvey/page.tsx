@@ -4,9 +4,8 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { useUserStore } from "@/features/users/store/useUserStore";
-import MySurveyList from "./components/MySurveyList";
 
-export default function MySurvey() {
+export default function ParticipantsSurvey() {
   const { userInfo } = useUserStore();
 
   return (
@@ -14,13 +13,13 @@ export default function MySurvey() {
       <Breadcrumb
         crumbs={[
           { label: "마이페이지", href: "/mypage" },
-          { label: "설문 생성 내역" },
+          { label: "설문 참여 내역" },
         ]}
       />
       <section className="flex items-end justify-between mb-6">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-gray-900">내 설문 목록</h1>
-          <p className="text-sm text-gray-500">생성한 설문들을 확인해보세요.</p>
+          <h1 className="text-2xl font-bold text-gray-900">참여 설문 목록</h1>
+          <p className="text-sm text-gray-500">참여한 설문들을 확인해보세요.</p>
         </div>
 
         <Link
@@ -35,9 +34,8 @@ export default function MySurvey() {
 
       <section className="space-y-3 pb-8">
         {userInfo?.surveys?.length === 0 && (
-          <p className="text-sm text-gray-500">생성한 설문이 없습니다.</p>
+          <p className="text-sm text-gray-500">참여한 설문이 없습니다.</p>
         )}
-        <MySurveyList userId={userInfo?.id} />
       </section>
     </>
   );
