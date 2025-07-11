@@ -1,7 +1,8 @@
-import { Wallet, ArrowDown } from "lucide-react";
 import Link from "next/link";
+import { WalletInfoProps } from "@/features/users/types/userInfo";
+import { Wallet, ArrowDown } from "lucide-react";
 
-export default function WalletInfo() {
+export default function WalletInfo({ address }: WalletInfoProps) {
   return (
     <div className="bg-white p-4 space-y-2">
       <div className="flex items-center gap-2">
@@ -9,7 +10,7 @@ export default function WalletInfo() {
         <h3 className="text-sm font-semibold text-gray-700">지갑 정보</h3>
       </div>
       <p className="text-sm text-gray-600">
-        주소: <span className="font-mono text-gray-800">0x123...abcd</span>
+        주소: <span className="font-mono text-gray-800">{address}</span>
       </p>
       <p className="text-sm text-gray-600">
         잔액: <span className="text-gray-800 font-medium">3.21 ETH</span>

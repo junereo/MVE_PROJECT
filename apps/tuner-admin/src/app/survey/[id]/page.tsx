@@ -95,9 +95,7 @@ export default function SurveyDetailPage() {
                 setSurveyData(normalizedSurvey);
 
                 if (survey?.survey_question) {
-                    const parsed: QuestionItem[] = JSON.parse(
-                        survey.survey_question,
-                    );
+                    const parsed: QuestionItem[] = survey.survey_question;
                     setFixedQuestions(
                         parsed.filter((q) => q.question_type === 'fixed'),
                     );

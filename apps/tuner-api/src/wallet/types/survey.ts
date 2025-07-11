@@ -11,7 +11,7 @@ export interface SurveyStep1 extends SurveyStep2 {
   updated_at?: string; // 마지막 수정일
   isReleased: boolean; // 발매 여부
   releaseDate: string; // 발매일
-  genre: string; // 장르
+  genre: string[]; // 장르
   respondent: string[]; // 응답자 (응답자 ID로 수정 필요)
   start_at: string; // 설문 시작일 (start_at 으로 수정 )
   end_at: string; // 설문 종료일 (end_at 으로 수정)
@@ -21,8 +21,8 @@ export interface SurveyStep1 extends SurveyStep2 {
   reward?: number; // 일반 유저 리워드 (리워드 타입일 때)
   expertReward?: number; // Expert 유저 리워드 (리워드 타입일 때)
   value: string;
-  totalNumber : string;
-  totalReward : string;
+  totalNumber: string;
+  totalReward: string;
 }
 
 export interface SurveyStep2 {

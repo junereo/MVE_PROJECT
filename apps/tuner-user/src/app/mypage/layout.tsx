@@ -9,13 +9,11 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
-      <body>
-        <Header />
-        <Wrapper>{children}</Wrapper>
-        <BottomNavbar />
-        <Footer />
-      </body>
-    </html>
+    <>
+      <Header />
+      <Wrapper>{children}</Wrapper>
+      <BottomNavbar />
+      <Footer />
+    </>
   );
 }
