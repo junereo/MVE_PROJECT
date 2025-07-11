@@ -21,7 +21,7 @@ export default function MyPage() {
       if (user?.id) {
         const res = await getUserInfo(Number(user.id));
         console.log("내 정보", res);
-        setUserInfo(res.data); // ✅ Zustand에 저장
+        setUserInfo(res.data); // Zustand에 저장
       }
     };
     fetchUser();

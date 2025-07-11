@@ -8,6 +8,7 @@ interface Props {
   optionClassName?: string;
   layout?: "vertical" | "horizontal";
   disabled?: boolean;
+  label?: string;
 }
 
 export default function QuestionOptions({
@@ -18,6 +19,7 @@ export default function QuestionOptions({
   optionClassName = "",
   layout = "vertical",
   disabled = false,
+  label,
 }: Props) {
   const isMulti = type === InputTypeEnum.CHECKBOX;
 
@@ -47,12 +49,13 @@ export default function QuestionOptions({
           : value === opt;
 
         return (
-          <button
-            key={opt}
-            type="button"
-            disabled={disabled}
-            onClick={() => handleClick(opt)}
-            className={`
+          <>
+            <button
+              key={opt}
+              type="button"
+              disabled={disabled}
+              onClick={() => handleClick(opt)}
+              className={`
               px-4 py-2 text-sm rounded-xl border transition-all
               ${
                 isSelected
@@ -66,9 +69,10 @@ export default function QuestionOptions({
               }
               ${optionClassName}
             `}
-          >
-            {opt}
-          </button>
+            >
+              {opt}
+            </button>
+          </>
         );
       })}
     </div>

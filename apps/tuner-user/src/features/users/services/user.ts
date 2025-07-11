@@ -1,5 +1,9 @@
 import axios from "@/lib/network/axios";
-import { UserUpdatePayload } from "../types/userInfo";
+import {
+  UserProfileUpdatePayload,
+  UserUpdatePayload,
+  WalletUpdatePayload,
+} from "../types/userInfo";
 
 // 내 정보 요청
 export const getUserInfo = async (userId: number) => {
@@ -8,9 +12,13 @@ export const getUserInfo = async (userId: number) => {
 };
 
 // // 내 정보 수정
+export type CombinedUserUpdatePayload = Partial<
+  UserUpdatePayload & UserProfileUpdatePayload & WalletUpdatePayload
+>;
+
 export const updateUserInfo = async (
   userId: number,
-  payload: UserUpdatePayload
+  payload: CombinedUserUpdatePayload
 ) => {
   const response = await axios.put(`/user/${userId}`, payload);
   return response; // nickname, phone_number, simple_passwoard

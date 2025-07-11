@@ -15,6 +15,18 @@ export interface UserUpdatePayload {
   job_domain: boolean;
 }
 
+// 기본 프로필 수정
+export interface UserProfileUpdatePayload {
+  nickname?: string;
+  phone_number?: string;
+  email?: string;
+}
+
+// 간편비밀번호 수정
+export interface WalletUpdatePayload {
+  simple_password: string;
+}
+
 export interface UserProfileProps {
   nickname: string;
   role: UserRole;
