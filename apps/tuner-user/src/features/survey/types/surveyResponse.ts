@@ -2,6 +2,7 @@ import { SurveyTypeEnum, QuestionTypeEnum, InputTypeEnum } from "./enums";
 
 export interface SurveyResponse {
   id: number;
+  user_id: number
   created_at: string;
 
   music_title: string;

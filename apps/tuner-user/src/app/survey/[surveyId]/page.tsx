@@ -168,6 +168,16 @@ export default function SurveyDetail() {
             </Button>
           </div>
         )}
+        {is_active === "upcoming" && user && String(user.id) === String(survey.user_id) && (
+          <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
+            <Button
+              color="yellow"
+              onClick={() => router.push(`/survey/${id}/edit`)}
+            >
+              설문 수정하기
+            </Button>
+          </div>
+        )}
       </div>
       <BottomNavbar />
     </>
