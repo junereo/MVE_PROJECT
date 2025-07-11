@@ -1,4 +1,6 @@
-export interface UserInfo {
+export type UserRole = "ordinary" | "expert";
+
+export interface UserSurveyInfo {
   gender: "남성" | "여성";
   age: "" | "10대" | "20대" | "30대" | "40대" | "50대" | "60대 이상";
   genres: string[];
@@ -11,4 +13,31 @@ export interface UserUpdatePayload {
   age: "teen" | "twenties" | "thirties" | "forties" | "fifties" | "sixties";
   genre: string;
   job_domain: boolean;
+}
+
+export interface UserProfileProps {
+  nickname: string;
+  role: UserRole;
+}
+
+export interface WalletInfoProps {
+  address: string | null;
+}
+
+// 마이페이지 전체 사용자 정보용
+export interface FullUserInfo {
+  id: number;
+  nickname: string;
+  email: string;
+  role: UserRole;
+  wallet_address: string | null;
+  genre: string;
+  age: string;
+  gender: boolean;
+  job_domain: boolean;
+  surveys: any[];
+  surveyResponses: any[];
+  phone_number: string;
+  simple_password: string;
+  balance: number;
 }
