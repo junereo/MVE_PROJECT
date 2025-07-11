@@ -121,7 +121,7 @@ model User {
   nickname        String // 유저는 닉네임 / 관리자는 실명 
   gender          Boolean? // true=남자, false=여자
   age             AgeGroup? // enum
-  genre           Genre?
+  genre           Genre[]
   job_domain      Boolean? // 음악전공/종사자 여부
   balance         Int       @default(0)
   wallet_address  String?
