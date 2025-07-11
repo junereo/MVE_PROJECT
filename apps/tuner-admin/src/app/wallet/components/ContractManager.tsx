@@ -289,8 +289,16 @@ export default function ContractManager() {
                     `✅ 위임 승인 성공!\nTxHash: ${res.data.txHash}`,
                 );
             }
-        } catch (e: any) {
-            const msg = e?.response?.data?.error || '실패';
+        } catch (e: unknown) {
+            let msg = '실패';
+
+            if (typeof e === 'object' && e !== null && 'response' in e) {
+                const err = e as { response?: { data?: { error?: string } } };
+                msg = err.response?.data?.error || msg;
+            } else if (e instanceof Error) {
+                msg = e.message;
+            }
+
             toast.error(msg);
             setResultMessage(`❌ 실패: ${msg}`);
         } finally {
@@ -325,10 +333,17 @@ export default function ContractManager() {
                 },
             );
             setAllowanceResult(res.data.allowance);
-        } catch (e: any) {
-            setAllowanceResult(
-                '조회 실패: ' + (e?.response?.data?.error || ''),
-            );
+        } catch (e: unknown) {
+            let errorMessage = '';
+
+            if (typeof e === 'object' && e !== null && 'response' in e) {
+                const err = e as { response?: { data?: { error?: string } } };
+                errorMessage = err.response?.data?.error || '';
+            } else if (e instanceof Error) {
+                errorMessage = e.message;
+            }
+
+            setAllowanceResult('조회 실패: ' + errorMessage);
         } finally {
             if (allowanceTimeoutId) clearTimeout(allowanceTimeoutId);
             setAllowanceLoading(false);
