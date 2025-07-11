@@ -173,16 +173,14 @@ export default function Step2Question({
     console.log("payload", surveyPayload);
 
     try {
-      console.log("dd");
       const response = await updateUserInfo(Number(user.id), userPayload);
-      console.log("ddd");
       console.log("기본 정보", response);
       const res = await postSurveyAnswer(surveyPayload);
       console.log("설문 참여", res);
       setSubmitStatus("success");
       resetAnswers();
       resetUserInfo();
-      onNext();
+      onNext(); // 여기서 에러 터지는 것 같음
     } catch (err) {
       console.error("설문 제출 실패", err);
       setSubmitStatus("error");

@@ -2,8 +2,8 @@ import axios from "@/lib/network/axios";
 import { UserUpdatePayload } from "../types/userInfo";
 
 // 내 정보 요청
-export const getUserInfo = async () => {
-  const response = await axios.get("/user");
+export const getUserInfo = async (userId: number) => {
+  const response = await axios.get(`/user/${userId}`);
   return response; // nickname, email, simple_password, level, wallet_Address, balance
 };
 
