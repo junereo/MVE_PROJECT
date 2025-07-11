@@ -10,13 +10,12 @@ import {
   createSurveyParticipantHandler,
   getSurveyResultHandler,
   createSurveyResultHandler,
-  getSurveyQuestionController
+  getSurveyQuestionController,
+  getMySurvey,
 } from "../controllers/survey.controller";
 import { verifyUserOrAdmin } from "../middlewares/survey.middleware";
 
-import {
-  verifyToken,
-} from "../middlewares/auth.middleware";
+import { verifyToken } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
@@ -26,6 +25,7 @@ router.get("/q/:questionnaireId", getSurveyQuestionList);
 router.get("/p", getAllSurveyParticipantsHandler);
 router.get("/r/:surveyId", getSurveyResultHandler);
 router.get("/s/:questionId", verifyToken, getSurveyQuestionController);
+router.get("/s", verifyToken, getMySurvey);
 
 router.post("/r", verifyToken, createSurveyResultHandler);
 router.post("/p", verifyToken, createSurveyParticipantHandler);
