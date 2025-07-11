@@ -1,6 +1,7 @@
-import { PrismaClient, UserRole } from '@prisma/client';
-import { buildUserRelationOperations } from './user.relation.service';
-import { hashPassword } from '../utils/auth.utils';
+
+import { PrismaClient, UserRole } from "@prisma/client";
+import { buildUserRelationOperations } from "./user.relation.service";
+import { hashPassword } from "../utils/auth.utils"; // 너네 해시 함수 경로 맞게 바꿔
 
 const prisma = new PrismaClient();
 
@@ -101,6 +102,10 @@ export const updateUser = async (id: number, data: any) => {
 
   if (data.password) {
     updateData.password = await hashPassword(data.password);
+  }
+
+  if (data.simple_password !== undefined) {
+    updateData.simple_password = data.simple_password;
   }
 
   const basicUpdate = prisma.user.update({
