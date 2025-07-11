@@ -198,10 +198,8 @@ export const createSurveyParticipantHandler = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { survey_id, answers, isSubmit } = req.body;
+    const { survey_id, answers, isSubmit, user_info } = req.body;
     const user_id = req.user?.userId;
-
-
 
     if (!user_id || !survey_id || !answers) {
       res
@@ -215,6 +213,7 @@ export const createSurveyParticipantHandler = async (
       survey_id: parseInt(survey_id),
       answers,
       isSubmit,
+      user_info
     });
 
     console.log(newParticipant);

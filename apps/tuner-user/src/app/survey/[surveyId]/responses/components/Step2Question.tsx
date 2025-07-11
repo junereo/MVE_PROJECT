@@ -49,7 +49,7 @@ export default function Step2Question({
   onNext,
 }: Step2Props) {
   const { step4, setStep4 } = useSurveyStore();
-  const { answers, setAnswer, resetAnswers } = useAnswerStore();
+  const { answers, setAnswer, resetAnswers, setSubmitStatus } = useAnswerStore();
   const { gender, age, genres, jobDomain, resetUserInfo } = useSurveyInfo();
   const { user } = useAuthStore();
 
@@ -60,9 +60,6 @@ export default function Step2Question({
 
   const [tabIndex, setTabIndex] = useState(0);
   const currentKey = baseCategories[tabIndex]?.key ?? "";
-  const [submitStatus, setSubmitStatus] = useState<
-    "success" | "error" | "saved" | "save-error" | null
-  >(null);
 
   const currentQuestions = useMemo(
     () => questions.filter((q) => q.category === currentKey),
