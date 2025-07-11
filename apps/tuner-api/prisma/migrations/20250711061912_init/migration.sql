@@ -2,9 +2,6 @@
 CREATE TYPE "UserRole" AS ENUM ('superadmin', 'admin', 'ordinary', 'expert');
 
 -- CreateEnum
-CREATE TYPE "Gender" AS ENUM ('male', 'female');
-
--- CreateEnum
 CREATE TYPE "AgeGroup" AS ENUM ('teen', 'twenties', 'thirties', 'forties', 'fifties', 'sixties');
 
 -- CreateEnum
@@ -43,7 +40,7 @@ CREATE TABLE "User" (
     "nickname" TEXT NOT NULL,
     "gender" BOOLEAN,
     "age" "AgeGroup",
-    "genre" "Genre",
+    "genre" "Genre"[] DEFAULT ARRAY[]::"Genre"[],
     "job_domain" BOOLEAN,
     "balance" INTEGER NOT NULL DEFAULT 0,
     "wallet_address" TEXT,
@@ -159,6 +156,8 @@ CREATE TABLE "WithdrawalRequest" (
     "user_id" INTEGER NOT NULL,
     "amount" INTEGER NOT NULL,
     "txhash" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "signature" TEXT NOT NULL,
     "status" "WithdrawalStatus" NOT NULL DEFAULT 'pending',
     "requested_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

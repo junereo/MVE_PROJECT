@@ -4,7 +4,11 @@ import * as withdrawalService from '../services/withdrawal.service';
 export const requestWithdrawal = async (req: Request, res: Response) => {
   const { user_id, amount, txhash, status } = req.body;
   try {
-    const result = await withdrawalService.createWithdrawalRequest({ user_id, amount, txhash, status });
+    const result = await withdrawalService.createWithdrawalRequest({
+      user_id, amount, txhash, status,
+      message: '',
+      signature: ''
+    });
     res.status(201).json({ success: true, data: result });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });

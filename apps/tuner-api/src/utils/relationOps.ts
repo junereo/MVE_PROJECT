@@ -25,7 +25,7 @@ export function buildRelationOps<T>(
         return model.create({
           data: {
             ...data,
-            [userIdKey]: userId,
+            [userIdKey]: userId, // FK 강제 주입
           },
         });
 
@@ -36,6 +36,7 @@ export function buildRelationOps<T>(
         return model.update({
           where: id ? { id } : where,
           data,
+          // ⚠️ include X — 안전!
         });
 
       case 'delete':
