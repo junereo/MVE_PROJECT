@@ -2,6 +2,7 @@ import type {
   UserSurveyInfo,
   UserUpdatePayload,
 } from "@/features/users/types/userInfo";
+import { GenreKey } from "../constants/userInfoMap";
 
 const ageGroupMap: Record<UserSurveyInfo["age"], UserUpdatePayload["age"]> = {
   "10대": "teen",
@@ -13,24 +14,9 @@ const ageGroupMap: Record<UserSurveyInfo["age"], UserUpdatePayload["age"]> = {
   "": "twenties",
 };
 
-const genreMap: Record<string, string> = {
-  힙합: "hiphop",
-  발라드: "ballad",
-  댄스: "dance",
-  "R&B": "rnb",
-  락: "rock",
-  트로트: "trot",
-  팝: "pop",
-  국악: "gukak",
-  CCM: "ccm",
-  EDM: "edm",
-  클래식: "classical",
-  재즈: "jazz",
-};
-
 export const userUpdatePayload = (info: UserSurveyInfo): UserUpdatePayload => ({
   gender: info.gender === "여성",
   age: ageGroupMap[info.age],
-  genre: info.genres.map((g) => genreMap[g] || "pop"),
-  job_domain: info.jobDomain,
+  genre: info.genre as GenreKey,
+  job_domain: info.jobDomain!,
 });

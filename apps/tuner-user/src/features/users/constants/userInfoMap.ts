@@ -35,5 +35,18 @@ export const genreMap = {
   reggae: "레게",
   blues: "블루스",
   folk: "포크",
+  ballad: "발라드",
+  rnb: "R&B",
+  gukak: "국악",
+  ccm: "CCM",
+  edm: "EDM",
 } as const;
 export type GenreKey = keyof typeof genreMap;
+
+export const reverseGenreMap = Object.entries(genreMap).reduce(
+  (acc, [key, label]) => {
+    acc[label] = key as GenreKey;
+    return acc;
+  },
+  {} as Record<string, GenreKey>
+);

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { UserSurveyInfo } from "../types/userInfo";
+import { GenreKey } from "../constants/userInfoMap";
 
 interface UserInfoState extends UserSurveyInfo {
   setUserInfo: (info: Partial<UserSurveyInfo>) => void;
@@ -12,13 +13,13 @@ export const useSurveyInfo = create<UserInfoState>()(
     (set) => ({
       gender: "남성",
       age: "",
-      genres: [],
+      genre: "",
       jobDomain: false,
 
       setUserInfo: (info) => set((prev) => ({ ...prev, ...info })),
       // 상태 초기화
       resetUserInfo: () => {
-        set({ gender: "남성", age: "", genres: [], jobDomain: false });
+        set({ gender: "남성", age: "", genre: "", jobDomain: false });
 
         // localStorage에서도 제거
         if (typeof window !== "undefined") {

@@ -51,7 +51,7 @@ export default function Step2Question({
   const { step4, setStep4 } = useSurveyStore();
   const { answers, setAnswer, resetAnswers, setSubmitStatus } =
     useAnswerStore();
-  const { gender, age, genres, jobDomain, resetUserInfo } = useSurveyInfo();
+  const { gender, age, genre, jobDomain, resetUserInfo } = useSurveyInfo();
   const { user } = useAuthStore();
 
   const questions = useMemo(
@@ -159,7 +159,7 @@ export default function Step2Question({
     const userInfo: UserSurveyInfo = {
       gender,
       age,
-      genres,
+      genre,
       jobDomain,
     };
     const userPayload = userUpdatePayload(userInfo);
@@ -208,7 +208,7 @@ export default function Step2Question({
     const payload = {
       user_id: user.id,
       survey_id: surveyId,
-      user_info: { gender, age, genres, jobDomain },
+      user_info: { gender, age, genre, jobDomain },
       answers: formattedAnswers,
       status: SurveyStatusEnum.DRAFT,
     };
@@ -273,6 +273,7 @@ export default function Step2Question({
                   options={q.options ?? []}
                   value={saved}
                   type={q.type}
+                  maxSelect={q.max_num}
                   onChange={(val) => setAnswer(currentKey, q.id, val)}
                   layout="horizontal"
                 />
