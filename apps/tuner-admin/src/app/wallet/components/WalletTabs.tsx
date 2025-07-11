@@ -1,12 +1,89 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import type { WithdrawalRow } from '@/types';
 
 import axios from 'axios';
 import { toast } from 'sonner';
+
+function TxPoolTable() {
+    const [status, setStatus] = useState('all');
+    const [rows, setRows] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const fetchPool = async (status: string = 'all') => {
+        setLoading(true);
+        const res = await axios.get(
+            `http://localhost:4000/contract/tx/pool?status=${status}`,
+        );
+        setRows(res.data);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchPool(status || 'all');
+    }, [status]);
+
+    return (
+        <div>
+            <div className="mb-2">
+                <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value || 'all')}
+                >
+                    <option value="all">전체</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+            {loading ? (
+                <div>로딩 중...</div>
+            ) : (
+                <table className="min-w-full border text-xs">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>UID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>TxHash</th>
+                            <th>Requested At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows.map((row: WithdrawalRow) => (
+                            <tr key={row.id}>
+                                <td>{row.id}</td>
+                                <td>{row.user_id}</td>
+                                <td>{row.amount}</td>
+                                <td>{row.status}</td>
+                                <td
+                                    style={{
+                                        maxWidth: 120,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    {row.txhash}
+                                </td>
+                                <td>
+                                    {new Date(
+                                        row.requested_at,
+                                    ).toLocaleString()}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
+    );
+}
 
 export default function WalletTabs() {
     const [uid, setUid] = useState('');
@@ -50,10 +127,18 @@ export default function WalletTabs() {
 
             setResultMessage(msg);
             toast.success(msg);
-        } catch (e: any) {
+        } catch (e: unknown) {
             if (timeoutId) clearTimeout(timeoutId);
             setLoading(false);
-            const errMsg = e?.response?.data?.error || '요청 실패';
+            let errMsg = '요청 실패';
+            if (e instanceof Error) {
+                // AxiosError 타입 추론이 가능한 경우
+                const axiosError = e as {
+                    response?: { data?: { error?: string } };
+                };
+                errMsg =
+                    axiosError?.response?.data?.error || e.message || errMsg;
+            }
             setResultMessage('실패: ' + errMsg);
             toast.error(errMsg);
         }
@@ -129,7 +214,9 @@ export default function WalletTabs() {
                             </Button>
                             {resultMessage && (
                                 <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
-                                    {resultMessage}
+                                    {resultMessage.length > 100
+                                        ? resultMessage.slice(0, 100) + '...'
+                                        : resultMessage}
                                 </div>
                             )}
                         </div>
@@ -156,7 +243,9 @@ export default function WalletTabs() {
                             </Button>
                             {resultMessage && (
                                 <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
-                                    {resultMessage}
+                                    {resultMessage.length > 100
+                                        ? resultMessage.slice(0, 100) + '...'
+                                        : resultMessage}
                                 </div>
                             )}
                         </div>
@@ -193,7 +282,9 @@ export default function WalletTabs() {
                             </Button>
                             {resultMessage && (
                                 <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
-                                    {resultMessage}
+                                    {resultMessage.length > 100
+                                        ? resultMessage.slice(0, 100) + '...'
+                                        : resultMessage}
                                 </div>
                             )}
                         </div>
@@ -412,45 +503,7 @@ export default function WalletTabs() {
                     </TabsContent>
 
                     <TabsContent value="viewTxPool">
-                        <Button
-                            onClick={async () => {
-                                setResultMessage('');
-                                setLoading(true);
-                                const tId = setTimeout(
-                                    () => setLoading(false),
-                                    20000,
-                                );
-                                setTimeoutId(tId);
-                                try {
-                                    const res = await axios.get(
-                                        baseUrl + `/contract/tx/pool`,
-                                    );
-                                    if (timeoutId) clearTimeout(timeoutId);
-                                    setLoading(false);
-                                    setResultMessage(
-                                        typeof res.data === 'object'
-                                            ? JSON.stringify(res.data, null, 2)
-                                            : String(res.data),
-                                    );
-                                    toast.success('조회 성공');
-                                } catch (e: any) {
-                                    if (timeoutId) clearTimeout(timeoutId);
-                                    setLoading(false);
-                                    const errMsg =
-                                        e?.response?.data?.error || '요청 실패';
-                                    setResultMessage('실패: ' + errMsg);
-                                    toast.error(errMsg);
-                                }
-                            }}
-                            disabled={loading}
-                        >
-                            {loading ? '조회 중...' : 'TxPool 조회'}
-                        </Button>
-                        {resultMessage && (
-                            <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
-                                {resultMessage}
-                            </div>
-                        )}
+                        <TxPoolTable />
                     </TabsContent>
                 </Tabs>
             </TabsContent>

@@ -53,9 +53,8 @@ export class MetaTransctionService {
     if (latest?.ca_transac) {
       contractAddress = latest.ca_transac;
     } else {
-      throw new Error(
-        "No contract address (ca_transac) found in TunerContract table"
-      );
+      console.error('No contract address (ca_transac) found in TunerContract table');
+      return; // 또는 적절한 fallback 처리
     }
 
     this.contract = new Contract(
@@ -72,11 +71,7 @@ export class MetaTransctionService {
     const addresses = [address];
     const values = [ethers.parseUnits(value, 18)];
     const messages = [msg];
-    const signatures = [getBytes(sign)]; // 👈 이것이 핵심
-  
-    const signerFromSig = ethers.verifyMessage(msg, sign);
-    // console.log("🔍 signer from sig:", signerFromSig);
-    // console.log("🧾 expected sender :", address);
+    const signatures = [getBytes(sign)];
 
     const { hash: txHash } = await this.msgSigner.mint(
       addresses, values, messages, signatures
