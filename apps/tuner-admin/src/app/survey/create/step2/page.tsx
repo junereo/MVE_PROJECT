@@ -12,6 +12,15 @@ import { fetchTemplates, surveyCreate } from '@/lib/network/api';
 import { QuestionTypeEnum } from '@/app/survey/create/complete/type';
 import { Question_type, SurveyStatus } from '@/types';
 
+export type SurveyQuestion = {
+    question_text: string;
+    type: string;
+    category: string;
+    question_type: string;
+    max_num: string;
+    options: string[];
+};
+
 interface RawTemplateQuestion {
     question_text: string;
     question_type: string;
@@ -62,9 +71,7 @@ export default function SurveyStep2() {
             // 기존 설문 수정인 경우
             if (step1.surveyId) {
                 try {
-                    const rawQuestions = JSON.parse(
-                        step1.surveyQuestionsRaw || '[]',
-                    );
+                    const rawQuestions = step1.surveyQuestionsRaw;
 
                     const templateQs: Question[] = [];
                     const customQs: Question[] = [];
@@ -73,7 +80,7 @@ export default function SurveyStep2() {
                     const categorizedTemplate: Record<string, Question[]> = {};
                     const categorizedCustom: Record<string, Question[]> = {};
 
-                    for (const q of rawQuestions) {
+                    for (const q of rawQuestions ?? []) {
                         const base: Question = {
                             id: idCounter++,
                             question_text: q.question_text,
@@ -81,10 +88,17 @@ export default function SurveyStep2() {
                                 q.question_type === 'custom'
                                     ? Question_type.custom
                                     : Question_type.fixed,
-                            type: q.type,
+                            type: q.type as QuestionTypeEnum,
                             options: q.options || [],
                             category: q.category || 'step2',
-                            ...(q.max_num ? { max_num: q.max_num } : {}),
+                            ...(q.max_num !== undefined
+                                ? {
+                                      max_num:
+                                          typeof q.max_num === 'string'
+                                              ? Number(q.max_num)
+                                              : q.max_num,
+                                  }
+                                : {}),
                         };
 
                         const target =
@@ -385,23 +399,21 @@ export default function SurveyStep2() {
             question_type: 'fixed' as Question_type,
             is_released: step1.isReleased,
             status: SurveyStatus.draft,
-            survey_question: JSON.stringify(
-                allQuestions.map((q) => {
-                    const question = q as Question & { max_num?: number };
+            survey_question: allQuestions.map((q) => {
+                const question = q as Question & { max_num?: number };
 
-                    return {
-                        question_text: question.question_text,
-                        type: question.type,
-                        question_type: String(question.question_type),
-                        options: question.options,
-                        category: question.category,
-                        ...(question.type === QuestionTypeEnum.CHECKBOX &&
-                        question.max_num
-                            ? { max_num: question.max_num }
-                            : {}),
-                    };
-                }),
-            ),
+                return {
+                    question_text: question.question_text,
+                    type: question.type,
+                    question_type: String(question.question_type),
+                    options: question.options,
+                    category: question.category,
+                    ...(question.type === QuestionTypeEnum.CHECKBOX &&
+                    question.max_num
+                        ? { max_num: question.max_num }
+                        : {}),
+                };
+            }),
         };
 
         try {
@@ -469,7 +481,7 @@ export default function SurveyStep2() {
 
         setStep2({
             customQuestions: validCustom,
-            survey_question: JSON.stringify(allQuestions),
+            survey_question: allQuestions,
         });
 
         router.push('/survey/create/complete');

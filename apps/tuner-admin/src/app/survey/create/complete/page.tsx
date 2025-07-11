@@ -113,18 +113,16 @@ export default function SurveyComplete() {
         // tags: step2.tags, // 해시태그
 
         // 모든 질문
-        survey_question: JSON.stringify(
-            allQuestionsRaw.map((q) => ({
-                question_text: q.question_text,
-                type: q.type,
-                question_type: String(q.question_type),
-                options: q.options,
-                category: q.category,
-                ...(q.type === QuestionTypeEnum.CHECKBOX && q.max_num
-                    ? { max_num: q.max_num }
-                    : {}),
-            })),
-        ),
+        survey_question: allQuestionsRaw.map((q) => ({
+            question_text: q.question_text,
+            type: q.type,
+            question_type: String(q.question_type),
+            options: q.options,
+            category: q.category,
+            ...(q.type === QuestionTypeEnum.CHECKBOX && q.max_num
+                ? { max_num: q.max_num }
+                : {}),
+        })),
         id: step1.surveyId ? Number(step1.surveyId) : undefined, // 설문 수정
     };
     //서버로 전송할 데이터 구조
