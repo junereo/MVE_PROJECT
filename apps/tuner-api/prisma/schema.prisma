@@ -20,15 +20,6 @@ enum Gender {
   female // false
 }
 
-enum AgeGroup {
-  teen // 10대
-  twenties // 20대
-  thirties // 30대
-  forties // 40대
-  fifties // 50대
-  sixties // 60대
-}
-
 enum Genre {
   hiphop
   ballad
@@ -42,6 +33,15 @@ enum Genre {
   edm
   classical
   jazz
+}
+
+enum AgeGroup {
+  teen // 10대
+  twenties // 20대
+  thirties // 30대
+  forties // 40대
+  fifties // 50대
+  sixties // 60대
 }
 
 enum OAuthProvider {
