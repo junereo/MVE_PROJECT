@@ -15,7 +15,7 @@ const statusTextMap: Record<SurveyResponse["is_active"], string> = {
 const statusList = ["all", "upcoming", "ongoing", "closed"] as const;
 type Status = (typeof statusList)[number];
 
-export default function SurveyList() {
+export default function MySurveyList({ userId }: { userId?: number }) {
   const router = useRouter();
   const [status, setStatus] = useState<Status>("all");
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
@@ -34,7 +34,9 @@ export default function SurveyList() {
           status === "all"
             ? sorted
             : sorted.filter(
-                (item: SurveyResponse) => item.is_active === status
+                (item: SurveyResponse) =>
+                  item.is_active === status &&
+                  (!userId || item.user_id === userId)
               );
         setSurveys(filtered);
       } catch (e) {
@@ -64,25 +66,31 @@ export default function SurveyList() {
         ))}
       </div>
 
-      {surveys.map((item) => (
-        <List
-          key={item.id}
-          onClick={() => router.push(`/survey/${item.id}`)}
-          image={item.thumbnail_uri}
-          artist={item.artist}
-          title={item.music_title}
-          surveyTitle={item.survey_title}
-          period={`${item.start_at
-            .slice(2, 10)
-            .replace(/-/g, ".")} - ${item.end_at
-            .slice(2, 10)
-            .replace(/-/g, ".")}`}
-          status={statusTextMap[item.is_active] as "예정" | "진행중" | "종료"}
-          surveyType={item.type}
-          participants={item.participants?.length || 0}
-          reward={item.reward_amount}
-        />
-      ))}
+      {surveys.length === 0 ? (
+        <p className="text-center text-sm text-gray-500">
+          생성한 설문이 없습니다.
+        </p>
+      ) : (
+        surveys.map((item) => (
+          <List
+            key={item.id}
+            onClick={() => router.push(`/survey/${item.id}`)}
+            image={item.thumbnail_uri}
+            artist={item.artist}
+            title={item.music_title}
+            surveyTitle={item.survey_title}
+            period={`${item.start_at
+              .slice(2, 10)
+              .replace(/-/g, ".")} - ${item.end_at
+              .slice(2, 10)
+              .replace(/-/g, ".")}`}
+            status={statusTextMap[item.is_active] as "예정" | "진행중" | "종료"}
+            surveyType={item.type}
+            participants={item.participants?.length || 0}
+            reward={item.reward_amount}
+          />
+        ))
+      )}
     </div>
   );
 }

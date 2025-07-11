@@ -8,7 +8,17 @@ import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
 import { InputTypeEnum } from "@/features/survey/types/enums";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
-import { UserInfo } from "os";
+import { useUserStore } from "@/features/users/store/useUserStore";
+import {
+  AgeKey,
+  ageMap,
+  GenderKey,
+  genderMap,
+  GenreKey,
+  genreMap,
+  reverseGenreMap,
+} from "@/features/users/constants/userInfoMap";
+import { UserSurveyInfo } from "@/features/users/types/userInfo";
 
 interface Step1Props {
   surveyId: number;
@@ -16,36 +26,51 @@ interface Step1Props {
   onNext: () => void;
 }
 
+const mapUserInfo = (userInfo: any): UserSurveyInfo => {
+  return {
+    gender: genderMap[userInfo.gender as GenderKey] ?? "",
+    age: ageMap[userInfo.age as AgeKey] ?? "",
+    genre: (userInfo.genre as GenreKey) ?? "",
+    jobDomain:
+      userInfo.job_domain === null || userInfo.job_domain === undefined
+        ? undefined
+        : !!userInfo.job_domain,
+  };
+};
+
 export default function Step1Info({
   surveyId,
   surveyTitle,
   onNext,
 }: Step1Props) {
-  const { gender, age, genres, jobDomain, setUserInfo } = useSurveyInfo();
+  const { userInfo } = useUserStore();
+  const { gender, age, genre, jobDomain, setUserInfo } = useSurveyInfo();
 
-  const genreOptions = [
-    "발라드",
-    "힙합",
-    "R&B",
-    "락",
-    "댄스",
-    "재즈",
-    "클래식",
-    "EDM",
-    "국악",
-  ];
+  const genreOptions = Object.values(genreMap);
 
   useEffect(() => {
-    console.log("기본 정보", gender, age, genres, jobDomain);
-  }, [gender, age, genres, jobDomain]);
+    console.log("userInfo", userInfo);
+    if (userInfo) {
+      const uiInfo = mapUserInfo(userInfo);
+      setUserInfo(uiInfo);
+    }
+  }, [userInfo]);
 
   const handleNext = () => {
-    setUserInfo({ gender, age, genres, jobDomain });
+    setUserInfo({ gender, age, genre, jobDomain });
     onNext();
   };
 
-  const isValid =
-    gender && age && genres.length > 0 && typeof jobDomain === "boolean";
+  useEffect(() => {
+    console.log("설문 기본 정보 상태 변경됨", {
+      gender,
+      age,
+      genre,
+      jobDomain,
+    });
+  }, [gender, age, genre, jobDomain]);
+
+  const isValid = gender && age && genre && typeof jobDomain === "boolean";
 
   return (
     <>
@@ -100,12 +125,15 @@ export default function Step1Info({
           </section>
 
           <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
-            <QuestionText text="좋아하는 장르 (복수선택)" />
+            <QuestionText text="좋아하는 장르" />
             <QuestionOptions
               options={genreOptions}
-              value={genres}
-              onChange={(val) => setUserInfo({ genres: val as string[] })}
-              type={InputTypeEnum.CHECKBOX}
+              value={genreMap[genre as GenreKey] ?? ""}
+              onChange={(val) => {
+                const label = Array.isArray(val) ? val[0] : val;
+                setUserInfo({ genre: reverseGenreMap[label] ?? "" }); // 라벨 → key 변환
+              }}
+              type={InputTypeEnum.MULTIPLE}
               layout="horizontal"
             />
           </section>
@@ -116,10 +144,8 @@ export default function Step1Info({
             />
             <QuestionOptions
               options={["예", "아니오"]}
-              value={jobDomain ? "예" : "아니오"}
-              onChange={
-                (val) => setUserInfo({ jobDomain: val === "예" }) // ✅ string → boolean 변환하여 저장
-              }
+              value={jobDomain === undefined ? "" : jobDomain ? "예" : "아니오"}
+              onChange={(val) => setUserInfo({ jobDomain: val === "예" })}
               type={InputTypeEnum.MULTIPLE}
               layout="horizontal"
             />
