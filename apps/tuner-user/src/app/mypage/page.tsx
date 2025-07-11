@@ -11,6 +11,8 @@ import { getUserInfo } from "@/features/users/services/user";
 import { useEffect } from "react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useUserStore } from "@/features/users/store/useUserStore";
+import { getMySurveyAnswer } from "@/features/users/services/survey";
+import { surveyParticipationStats } from "@/features/users/utils/surveyParticipationStats";
 
 export default function MyPage() {
   const router = useRouter();
@@ -23,6 +25,8 @@ export default function MyPage() {
       if (user?.id) {
         const res = await getUserInfo(Number(user.id));
         console.log("내 정보", res);
+        const data = await getMySurveyAnswer();
+        console.log("참여 설문", data);
         setUserInfo(res.data);
       }
     };
@@ -47,10 +51,12 @@ export default function MyPage() {
       />
       <SurveyStats
         title="설문 참여 내역"
-        stats={surveyStats(userInfo.surveys).map((item) => ({
-          label: item.label,
-          value: item.count,
-        }))}
+        stats={surveyParticipationStats(userInfo.surveyResponses).map(
+          (item) => ({
+            label: item.label,
+            value: item.count,
+          })
+        )}
         onClick={() => router.push("/mypage/participantsSurvey")}
       />
     </div>
