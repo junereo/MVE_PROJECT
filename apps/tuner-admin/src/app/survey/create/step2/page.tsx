@@ -409,6 +409,7 @@ export default function SurveyStep2() {
             console.log(res);
 
             alert('임시 저장 완료!');
+            router.push('/survey');
         } catch (error) {
             console.error('임시 저장 오류:', error);
             alert('임시 저장 실패');

@@ -133,3 +133,16 @@ export interface SurveyData {
     };
     result: unknown;
 }
+
+export type WithdrawalStatus = 'pending' | 'completed' | 'failed';
+
+export interface WithdrawalRow {
+    id: number;
+    user_id: number;
+    amount: number;
+    txhash: string;
+    message: string;
+    signature: string;
+    status: WithdrawalStatus;
+    requested_at: string; // 또는 Date (API 응답 타입에 따라)
+}

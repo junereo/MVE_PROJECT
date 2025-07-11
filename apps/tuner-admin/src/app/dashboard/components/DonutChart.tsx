@@ -1,15 +1,15 @@
 import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
 
-const data = [
-    { name: 'Survey A', value: 400 },
-    { name: 'Survey B', value: 300 },
-    { name: 'Survey C', value: 300 },
-    { name: 'Survey D', value: 200 },
-];
+interface DonutChartProps {
+    data: {
+        name: string;
+        value: number;
+    }[];
+}
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+export const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-export const DonutChart = () => (
+export const DonutChart = ({ data }: DonutChartProps) => (
     <PieChart width={300} height={300}>
         <Pie
             data={data}

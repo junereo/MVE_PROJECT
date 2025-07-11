@@ -198,7 +198,7 @@ export const createSurveyParticipantHandler = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { survey_id, answers, isSubmit } = req.body;
+    const { survey_id, answers, isSubmit, user_info } = req.body;
     const user_id = req.user?.userId;
 
     if (!user_id || !survey_id || !answers) {
@@ -213,8 +213,10 @@ export const createSurveyParticipantHandler = async (
       survey_id: parseInt(survey_id),
       answers,
       isSubmit,
+      user_info
     });
 
+    console.log(newParticipant);
     res.status(201).json({ success: true, data: newParticipant });
   } catch (err: any) {
     console.error("설문 응답 생성 오류:", err);

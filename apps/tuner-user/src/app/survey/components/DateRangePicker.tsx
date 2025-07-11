@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React from "react";
 
 interface DateRangePickerProps {
   label?: string;
@@ -9,7 +9,12 @@ interface DateRangePickerProps {
   onChange: (start: Date | null, end: Date | null) => void;
 }
 
-const formatDate = (date: Date) => date.toISOString().split("T")[0];
+const formatDate = (date: Date): string => date.toISOString().split("T")[0];
+
+const parseDate = (value: string): Date | null => {
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? null : date;
+};
 
 export default function DateRangePicker({
   label,
@@ -18,39 +23,14 @@ export default function DateRangePicker({
   onChange,
 }: DateRangePickerProps) {
   const todayStr = formatDate(new Date());
-  const [start, setStart] = useState<string>(
-    startDate ? formatDate(startDate) : todayStr
-  );
-  const [end, setEnd] = useState<string>(
-    endDate ? formatDate(endDate) : todayStr
-  );
-
-  useEffect(() => {
-    // 최초 로드 시 디폴트 설정
-    if (!startDate && !endDate) {
-      const today = new Date();
-      onChange(today, today);
-    }
-  }, []);
 
   const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const newStart = value ? new Date(value) : null;
-
-    if (newStart && newStart < new Date(todayStr)) return; // 과거 금지
-    setStart(value);
-    onChange(
-      newStart,
-      endDate && newStart && endDate < newStart ? newStart : endDate
-    );
+    const newStart = parseDate(e.target.value);
+    onChange(newStart, endDate);
   };
 
   const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const newEnd = value ? new Date(value) : null;
-
-    if (!startDate || (newEnd && newEnd < startDate)) return; // 시작일보다 과거 금지
-    setEnd(value);
+    const newEnd = parseDate(e.target.value);
     onChange(startDate, newEnd);
   };
 
@@ -58,9 +38,6 @@ export default function DateRangePicker({
     const newStart = new Date();
     const newEnd = new Date();
     newEnd.setDate(newEnd.getDate() + days);
-
-    setStart(formatDate(newStart));
-    setEnd(formatDate(newEnd));
     onChange(newStart, newEnd);
   };
 
@@ -87,15 +64,15 @@ export default function DateRangePicker({
         <input
           type="date"
           min={todayStr}
-          value={start}
+          value={startDate ? formatDate(startDate) : ""}
           onChange={handleStartChange}
           className="border rounded px-3 py-2 text-sm w-full"
         />
         <span className="text-gray-500 text-sm">~</span>
         <input
           type="date"
-          min={start}
-          value={end}
+          min={startDate ? formatDate(startDate) : todayStr}
+          value={endDate ? formatDate(endDate) : ""}
           onChange={handleEndChange}
           className="border rounded px-3 py-2 text-sm w-full"
         />

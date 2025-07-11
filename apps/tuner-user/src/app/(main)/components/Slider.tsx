@@ -35,7 +35,20 @@ export default function Slider() {
     fetchSurveys();
   }, []);
 
-  return (
+  return surveys.length === 0 ? (
+    <div className="overflow-hidden">
+      <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden shadow-md bg-gray-100 flex flex-col items-center justify-center text-gray-400">
+        <Image
+          src="/images/empty-survey.png"
+          alt="설문 없음"
+          width={64}
+          height={64}
+          className="mb-3 opacity-70"
+        />
+        <p className="text-sm text-center">진행중인 설문이 없습니다.</p>
+      </div>
+    </div>
+  ) : (
     <div className="overflow-hidden">
       <Swiper
         modules={[Autoplay]}

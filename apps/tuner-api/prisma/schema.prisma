@@ -15,11 +15,6 @@ enum UserRole {
   expert
 }
 
-enum Gender {
-  male //true
-  female // false
-}
-
 enum AgeGroup {
   teen // 10대
   twenties // 20대
@@ -121,7 +116,7 @@ model User {
   nickname        String // 유저는 닉네임 / 관리자는 실명 
   gender          Boolean? // true=남자, false=여자
   age             AgeGroup? // enum
-  genre           Genre?
+  genre           Genre[]   @default([])
   job_domain      Boolean? // 음악전공/종사자 여부
   balance         Int       @default(0)
   wallet_address  String?
@@ -232,6 +227,8 @@ model WithdrawalRequest {
   user_id      Int
   amount       Int
   txhash       String
+  message      String
+  signature    String
   status       WithdrawalStatus @default(pending) //   pending // 대기중 completed // 완료failed //실패
   requested_at DateTime         @default(now())
   user         User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
