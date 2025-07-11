@@ -9,6 +9,12 @@ export const createSurvey = async (payload: SurveyPayload) => {
   return response.data;
 };
 
+// 설문 수정
+export const updateSurvey = async (payload: SurveyPayload, surveyId: number) => {
+  const response = await axios.put(`/survey/${surveyId}`, payload);
+  return response.data;
+};
+
 // 전체 설문 목록
 export const getSurveyList = async (): Promise<{
   success: boolean;
