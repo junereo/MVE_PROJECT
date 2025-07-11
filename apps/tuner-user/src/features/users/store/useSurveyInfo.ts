@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { UserInfo } from "../types/userInfo";
+import type { UserSurveyInfo } from "../types/userInfo";
 
-interface UserInfoState extends UserInfo {
-  setUserInfo: (info: Partial<UserInfo>) => void;
+interface UserInfoState extends UserSurveyInfo {
+  setUserInfo: (info: Partial<UserSurveyInfo>) => void;
   resetUserInfo: () => void;
 }
 

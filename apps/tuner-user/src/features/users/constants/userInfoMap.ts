@@ -2,7 +2,7 @@
 export const genderMap = {
   true: "남성",
   false: "여성",
-};
+} as const;
 export type GenderKey = keyof typeof genderMap;
 
 // 나이
@@ -13,14 +13,14 @@ export const ageMap = {
   forties: "40대",
   fifties: "50대",
   sixties: "60대 이상",
-};
+} as const;
 export type AgeKey = keyof typeof ageMap;
 
 // 회원등급
 export const roleMap = {
   ordinary: "일반 회원",
   expert: "전문가 회원",
-};
+} as const;
 export type RoleKey = keyof typeof roleMap;
 
 // 장르
@@ -35,5 +35,5 @@ export const genreMap = {
   reggae: "레게",
   blues: "블루스",
   folk: "포크",
-};
+} as const;
 export type GenreKey = keyof typeof genreMap;

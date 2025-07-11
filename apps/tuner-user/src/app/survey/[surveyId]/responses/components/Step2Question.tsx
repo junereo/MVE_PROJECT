@@ -27,7 +27,7 @@ import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 import { formatDefaultAnswers } from "@/features/survey/utils/fotmatAnswers";
 import { userUpdatePayload } from "@/features/users/utils/userUpdatePayload";
-import { UserInfo } from "@/features/users/types/userInfo";
+import { UserSurveyInfo } from "@/features/users/types/userInfo";
 
 interface Step2Props {
   surveyId: number;
@@ -49,7 +49,8 @@ export default function Step2Question({
   onNext,
 }: Step2Props) {
   const { step4, setStep4 } = useSurveyStore();
-  const { answers, setAnswer, resetAnswers, setSubmitStatus } = useAnswerStore();
+  const { answers, setAnswer, resetAnswers, setSubmitStatus } =
+    useAnswerStore();
   const { gender, age, genres, jobDomain, resetUserInfo } = useSurveyInfo();
   const { user } = useAuthStore();
 
@@ -155,7 +156,7 @@ export default function Step2Question({
       ...customQuestions,
     ]);
 
-    const userInfo: UserInfo = {
+    const userInfo: UserSurveyInfo = {
       gender,
       age,
       genres,

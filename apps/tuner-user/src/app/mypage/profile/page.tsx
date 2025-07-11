@@ -59,14 +59,25 @@ export default function ProfilePage() {
           <ProfileRow
             label="성별"
             value={
-              genderMap[(user.gender === true ? "true" : "false") as GenderKey]
+              user.gender === undefined || user.gender === null
+                ? ""
+                : genderMap[(user.gender ? "true" : "false") as GenderKey]
             }
           />
-          <ProfileRow label="연령대" value={ageMap[user.age as AgeKey]} />
+          <ProfileRow
+            label="연령대"
+            value={user.age ? ageMap[user.age as AgeKey] : ""}
+          />
           <ProfileRow label="좋아하는 장르" value={user.genre} />
           <ProfileRow
             label="음악 관련 직무"
-            value={user.job_domain ? "예" : "아니오"}
+            value={
+              user.job_domain === undefined || user.job_domain === null
+                ? ""
+                : user.job_domain
+                ? "예"
+                : "아니오"
+            }
           />
         </ProfileSection>
       </div>

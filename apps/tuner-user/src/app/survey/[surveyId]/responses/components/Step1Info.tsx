@@ -8,7 +8,16 @@ import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
 import { InputTypeEnum } from "@/features/survey/types/enums";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
-import { UserInfo } from "os";
+import { useUserStore } from "@/features/users/store/useUserStore";
+import {
+  AgeKey,
+  ageMap,
+  GenderKey,
+  genderMap,
+  GenreKey,
+  genreMap,
+} from "@/features/users/constants/userInfoMap";
+import { UserSurveyInfo } from "@/features/users/types/userInfo";
 
 interface Step1Props {
   surveyId: number;
@@ -16,11 +25,23 @@ interface Step1Props {
   onNext: () => void;
 }
 
+const mapUserInfo = (userInfo: any): UserSurveyInfo => {
+  return {
+    gender: genderMap[userInfo.gender as GenderKey] ?? "",
+    age: ageMap[userInfo.age as AgeKey] ?? "",
+    genres: userInfo.genre
+      ? [genreMap[userInfo.genre as GenreKey] ?? userInfo.genre]
+      : [],
+    jobDomain: !!userInfo.job_domain,
+  };
+};
+
 export default function Step1Info({
   surveyId,
   surveyTitle,
   onNext,
 }: Step1Props) {
+  const { userInfo } = useUserStore();
   const { gender, age, genres, jobDomain, setUserInfo } = useSurveyInfo();
 
   const genreOptions = [
@@ -36,13 +57,26 @@ export default function Step1Info({
   ];
 
   useEffect(() => {
-    console.log("기본 정보", gender, age, genres, jobDomain);
-  }, [gender, age, genres, jobDomain]);
+    console.log("userInfo", userInfo);
+    if (userInfo) {
+      const uiInfo = mapUserInfo(userInfo);
+      setUserInfo(uiInfo);
+    }
+  }, [userInfo]);
 
   const handleNext = () => {
     setUserInfo({ gender, age, genres, jobDomain });
     onNext();
   };
+
+  useEffect(() => {
+    console.log("설문 기본 정보 상태 변경됨", {
+      gender,
+      age,
+      genres,
+      jobDomain,
+    });
+  }, [gender, age, genres, jobDomain]);
 
   const isValid =
     gender && age && genres.length > 0 && typeof jobDomain === "boolean";

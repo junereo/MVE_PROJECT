@@ -1,9 +1,9 @@
 import type {
-  UserInfo,
+  UserSurveyInfo,
   UserUpdatePayload,
 } from "@/features/users/types/userInfo";
 
-const ageGroupMap: Record<UserInfo["age"], UserUpdatePayload["age"]> = {
+const ageGroupMap: Record<UserSurveyInfo["age"], UserUpdatePayload["age"]> = {
   "10대": "teen",
   "20대": "twenties",
   "30대": "thirties",
@@ -28,9 +28,9 @@ const genreMap: Record<string, string> = {
   재즈: "jazz",
 };
 
-export const userUpdatePayload = (info: UserInfo): UserUpdatePayload => ({
+export const userUpdatePayload = (info: UserSurveyInfo): UserUpdatePayload => ({
   gender: info.gender === "여성",
   age: ageGroupMap[info.age],
-  genre: genreMap[info.genres[0]] || "pop",
+  genre: info.genres.map((g) => genreMap[g] || "pop"),
   job_domain: info.jobDomain,
 });
