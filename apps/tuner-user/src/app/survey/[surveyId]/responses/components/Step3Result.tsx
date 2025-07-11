@@ -10,7 +10,7 @@ interface Step3Props {
   surveyId: number;
 }
 
-type StatusKey = "success" | "error";
+type StatusKey = "success" | "error" | "saved" | "save-error";
 
 interface StatusUI {
   image: string;
@@ -33,6 +33,19 @@ const getStatusUI = (status: StatusKey, surveyId: number): StatusUI =>
       image: "/images/x.png",
       title: "설문 제출 실패",
       message: "문제가 발생했습니다. 다시 시도해 주세요.",
+      buttonText: "뒤로 가기",
+    },
+    saved: {
+      image: "/images/check.png",
+      title: "임시저장 완료",
+      message: "설문이 임시저장되었습니다.",
+      buttonText: "설문 보기",
+      link: `/survey/${surveyId}`,
+    },
+    "save-error": {
+      image: "/images/x.png",
+      title: "임시저장 실패",
+      message: "임시저장 중 문제가 발생했습니다. 다시 시도해 주세요.",
       buttonText: "뒤로 가기",
     },
   }[status]);
