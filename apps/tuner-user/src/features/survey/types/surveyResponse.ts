@@ -1,6 +1,8 @@
 import { SurveyTypeEnum, QuestionTypeEnum, InputTypeEnum } from "./enums";
 
 export interface SurveyResponse {
+  user_id?: number;
+
   id: number;
   created_at: string;
 
@@ -22,7 +24,7 @@ export interface SurveyResponse {
   reward: number;
   expert_reward: number;
 
-  participants: {
+  participants?: {
     user: {
       id: number;
       nickname: string;
