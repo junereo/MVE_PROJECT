@@ -7,6 +7,8 @@ export const createWithdrawalRequest = async (data: {
   amount: number;
   txhash: string;
   status: WithdrawalStatus;
+  message: string;
+  signature: string;
 }) => {
   return prisma.withdrawalRequest.create({ data });
 };

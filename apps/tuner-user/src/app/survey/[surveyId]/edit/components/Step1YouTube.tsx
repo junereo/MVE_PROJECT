@@ -2,20 +2,21 @@
 
 import Link from "next/link";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
-import YoutubeSearchBox from "../../components/YoutubeSearchBox";
 import Button from "@/components/ui/Button";
-import DateRangePicker from "../../components/DateRangePicker";
+import DateRangePicker from "../../../components/DateRangePicker";
 import { useState } from "react";
+import YoutubeSearchBox from "@/app/survey/components/YoutubeSearchBox";
 
 interface Step1Props {
   onNext: () => void;
 }
 
 export default function Step1YouTube({ onNext }: Step1Props) {
-  const { selectedVideo, step1, setStep1 } = useSurveyStore();
+  const { selectedVideo, setSelectedVideo, step1, setStep1 } = useSurveyStore();
 
-  const { start_at, end_at } = step1;
+  const { start_at, end_at, video } = step1;
 
+  const [showMusicUri, setShowMusicUri] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const isDateValid = (start: Date | null, end: Date | null): boolean => {
@@ -30,7 +31,10 @@ export default function Step1YouTube({ onNext }: Step1Props) {
 
   const handleNext = () => {
     if (!selectedVideo) {
-      setError("유튜브 영상을 선택해주세요.");
+      setSelectedVideo(video);
+      if (!video) {
+        setError("유튜브 영상을 선택해주세요.");
+      }
       return;
     }
 
@@ -40,7 +44,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
     }
 
     if (!isDateValid(start_at, end_at)) {
-      setError("종료일은 시작일보다 빠를 수 없습니다.");
+      setError("종료일은 시작일보다는 빠를 수 없습니다.");
       return;
     }
 
@@ -63,7 +67,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
           </Link>
         </button>
         <h1 className="flex-1 text-center text-base sm:text-lg font-bold text-gray-900">
-          설문 생성
+          설문 수정
         </h1>
       </header>
 
@@ -73,9 +77,10 @@ export default function Step1YouTube({ onNext }: Step1Props) {
         </h2>
 
         <YoutubeSearchBox
-          music_uri={undefined}
+          music_uri={!selectedVideo ? video?.music_uri : undefined}
           editMode={true}
-          showMusicUri={false}
+          showMusicUri={showMusicUri}
+          setShowMusicUri={setShowMusicUri}
         />
 
         <DateRangePicker
