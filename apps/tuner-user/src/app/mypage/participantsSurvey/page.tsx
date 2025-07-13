@@ -34,10 +34,7 @@ export default function ParticipantsSurvey() {
       </section>
 
       <section className="space-y-3 pb-8">
-        {userInfo?.surveys?.length === 0 && (
-          <p className="text-sm text-gray-500">참여한 설문이 없습니다.</p>
-        )}
-        <ParticipantsList userId={userInfo?.id} />
+        <ParticipantsList />
       </section>
     </>
   );
