@@ -25,6 +25,14 @@ export interface SurveyResponse {
   expert_reward: number;
 
   participants?: {
+    id: number;
+    survey_id: number;
+    user_id: number;
+    status: "draft" | "complete";
+    rewarded: boolean;
+    answers: any[];
+    created_at: string;
+    updated_at: string;
     user: {
       id: number;
       nickname: string;

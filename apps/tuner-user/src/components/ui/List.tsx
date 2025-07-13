@@ -69,9 +69,13 @@ export default function List({
         >
           {status}
         </span>
-        <p className="text-[11px] sm:text-xs text-gray-600 whitespace-nowrap">
-          {participants}명 참여
-        </p>
+
+        {participants && participants > 0 && (
+          <p className="text-[11px] sm:text-xs text-gray-600 whitespace-nowrap">
+            {participants}명 참여
+          </p>
+        )}
+
         {reward !== undefined && surveyType === SurveyTypeEnum.OFFICIAL && (
           <p className="text-xs sm:text-sm text-orange-500 font-medium">
             🎁 {reward / 1000} STK
