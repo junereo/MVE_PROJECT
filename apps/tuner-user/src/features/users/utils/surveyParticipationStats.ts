@@ -19,7 +19,7 @@ export function surveyParticipationStats(responses: MySurveyAnswer[]) {
 
   return [
     { label: "전체", count: total },
-    { label: "임시저장", count: draft },
-    { label: "답변 완료", count: complete },
+    { label: "답변 완료", count: draft },
+    { label: "임시 저장", count: complete },
   ];
 }
