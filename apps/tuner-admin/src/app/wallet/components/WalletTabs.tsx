@@ -8,6 +8,7 @@ import type { WithdrawalRow } from '@/types';
 
 import axios from 'axios';
 import { toast } from 'sonner';
+import axiosClient from '@/lib/network/axios';
 
 function TxPoolTable() {
     const [status, setStatus] = useState('all');
@@ -16,11 +17,16 @@ function TxPoolTable() {
 
     const fetchPool = async (status: string = 'all') => {
         setLoading(true);
-        const res = await axios.get(
-            `http://localhost:4000/contract/tx/pool?status=${status}`,
-        );
-        setRows(res.data);
-        setLoading(false);
+        try {
+            const res = await axiosClient.get(
+                `/contract/tx/pool?status=${status}`,
+            );
+            setRows(res.data);
+        } catch (error) {
+            console.error('데이터 가져오기 실패:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -96,7 +102,7 @@ export default function WalletTabs() {
     const [resultMessage, setResultMessage] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-    const baseUrl = 'http://localhost:4000';
+    const baseUrl = process.env.NEXT_PUBLIC_BACK_API_URL;
 
     const handleRequest = async (
         url: string,
