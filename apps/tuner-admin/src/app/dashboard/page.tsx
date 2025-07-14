@@ -7,7 +7,9 @@ import RewardLineChart from './components/Recjarts';
 import SummaryCard from './components/SummaryCard';
 import { surveyList, participantList } from '@/lib/network/api';
 import { SurveyTypeEnum } from '../survey/create/complete/type';
+
 import { useRouter } from 'next/navigation';
+import axiosClient from '@/lib/network/axios';
 interface Survey {
     id: number;
     survey_title: string;
@@ -30,19 +32,33 @@ interface Participant {
     survey_id: number;
 }
 
+interface WithdrawalRow {
+    id: number;
+    user_id: number;
+    amount: number;
+    status: 'pending' | 'completed' | 'failed';
+    txhash: string;
+    requested_at: string;
+}
+
 const Dashboard = () => {
     useSessionCheck();
 
     const [surveys, setSurveys] = useState<Survey[]>([]);
     const [participants, setParticipants] = useState<Participant[]>([]);
-
+    const [withdrawals, setWithdrawals] = useState<WithdrawalRow[]>([]);
     useEffect(() => {
         const fetchData = async () => {
             const surveyRes = await surveyList();
             const participantRes = await participantList();
+            const withdrawalRes = await axiosClient.get(
+                '/contract/tx/pool?status=all',
+            );
+            console.log('출금 요청 데이터', withdrawalRes);
 
             setSurveys(surveyRes.data);
             setParticipants(participantRes.data);
+            setWithdrawals(withdrawalRes.data);
         };
         fetchData();
     }, []);
@@ -250,6 +266,55 @@ const Dashboard = () => {
                                     </td>
                                     <td className="border px-2 py-1">
                                         {survey.creator?.role || 'unknown'}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {/* 출금 요청 리스트 */}
+                <div className="bg-white rounded-xl shadow p-4 mt-6">
+                    <h2 className="text-lg font-semibold mb-2">
+                        출금 요청 리스트
+                    </h2>
+                    <table className="w-full text-sm text-center border">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="border px-2 py-1">ID</th>
+                                <th className="border px-2 py-1">UserId</th>
+                                <th className="border px-2 py-1">Amount</th>
+                                <th className="border px-2 py-1">Status</th>
+                                <th className="border px-2 py-1">TxHash</th>
+                                <th className="border px-2 py-1">
+                                    Requested At
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {withdrawals.map((row) => (
+                                <tr key={row.id}>
+                                    <td className="border px-2 py-1">
+                                        {row.id}
+                                    </td>
+                                    <td className="border px-2 py-1">
+                                        {row.user_id}
+                                    </td>
+                                    <td className="border px-2 py-1">
+                                        {row.amount}
+                                    </td>
+                                    <td className="border px-2 py-1">
+                                        {row.status}
+                                    </td>
+                                    <td
+                                        className="border px-2 py-1 truncate max-w-[160px]"
+                                        title={row.txhash}
+                                    >
+                                        {row.txhash || '-'}
+                                    </td>
+                                    <td className="border px-2 py-1">
+                                        {new Date(
+                                            row.requested_at,
+                                        ).toLocaleString()}
                                     </td>
                                 </tr>
                             ))}
