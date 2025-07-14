@@ -11,7 +11,8 @@ import {
   createSurveyResult,
   getSurveyQuestion,
 } from "../services/survey.service";
-import { PrismaClient, QuestionType } from "@prisma/client";
+import { calculateSurveyResult } from "../services/survey.result.service"
+import { PrismaClient, QuestionType, SurveyStatus } from "@prisma/client";
 const prisma = new PrismaClient();
 
 interface AuthRequest extends Request {
@@ -29,7 +30,7 @@ interface AuthRequest extends Request {
 
 export const createSurveyHandler = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.userId as string; // 사용자 ID를 가져옵니다.
+    const userId = req.user?.userId as string;
     //const userId = parseInt(req.body.user_id);
     const user_Id = parseInt(userId);
     const data = req.body;
@@ -198,33 +199,35 @@ export const createSurveyParticipantHandler = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { survey_id, answers, isSubmit, user_info } = req.body;
+    const { survey_id, answers, status, user_info } = req.body;
     const user_id = req.user?.userId;
 
     if (!user_id || !survey_id || !answers) {
-      res
-        .status(400)
-        .json({ message: "user_id, survey_id, answers는 필수입니다." });
+      res.status(400).json({ message: "user_id, survey_id, answers는 필수입니다." });
       return;
+    }
+
+    let surveyStatus: SurveyStatus = SurveyStatus.draft;
+    if (status === "complete") {
+      surveyStatus = SurveyStatus.complete;
     }
 
     const newParticipant = await createSurveyParticipant({
       user_id: parseInt(user_id),
       survey_id: parseInt(survey_id),
       answers,
-      isSubmit,
-      user_info
+      status: surveyStatus,
+      user_info,
     });
 
     console.log(newParticipant);
     res.status(201).json({ success: true, data: newParticipant });
   } catch (err: any) {
     console.error("설문 응답 생성 오류:", err);
-    res
-      .status(500)
-      .json({ success: false, message: "응답 생성 실패", error: err.message });
+    res.status(500).json({ success: false, message: "응답 생성 실패", error: err.message });
   }
 };
+
 
 // GET /survey-participants
 export const getAllSurveyParticipantsHandler = async (
@@ -382,6 +385,23 @@ export const getMySurvey = async (req: AuthRequest, res: Response) => {
       message: "내 설문 참여 내역 조회 실패",
       error: err.message,
     });
+  }
+};
+
+export const calculateSurveyResultHandler = async (req: Request, res: Response) => {
+  const surveyId = Number(req.params.surveyId);
+
+  if (isNaN(surveyId)) {
+    res.status(400).json({ message: "잘못된 surveyId" });
+    return;
+  }
+
+  try {
+    const result = await calculateSurveyResult(surveyId); // 계산 함수가 반환값 리턴하도록 수정
+    res.status(200).json({ success: true, message: "통계 계산 완료", data: result });
+  } catch (err: any) {
+    console.error("[SURVEY_RESULT] 오류:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 

@@ -56,19 +56,19 @@ export const createSurveyParticipant = async ({
   user_id,
   survey_id,
   answers,
+  status,
   user_info,
-  isSubmit = false,
 }: {
   user_id: number;
   survey_id: number;
   answers: any[];
+  status?: SurveyStatus;
   user_info?: {
     gender?: boolean | null;
     age?: string | null;
     genre?: string[] | null;
     job_domain?: boolean | null;
   };
-  isSubmit?: boolean;
 }) => {
   const survey = await prisma.survey.findUnique({
     where: { id: survey_id },
@@ -128,7 +128,7 @@ export const createSurveyParticipant = async ({
       where: { id: existing.id },
       data: {
         answers: finalAnswers,
-        status: isSubmit ? "complete" : "draft",
+        status: status ?? "draft",
         rewarded: false,
       },
     });
@@ -139,7 +139,7 @@ export const createSurveyParticipant = async ({
       user_id,
       survey_id,
       answers: finalAnswers,
-      status: isSubmit ? "complete" : "draft",
+      status: status ?? "draft",
       rewarded: false,
     },
   });
