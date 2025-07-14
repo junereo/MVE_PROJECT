@@ -9,13 +9,13 @@ export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
 
   const allQuestions = [...step4.questions, ...step4.customQuestions];
 
-  console.log(step1)
+  console.log(step1);
 
   return {
-    artist: selectedVideo?.artist ||  "",
-    music_title: selectedVideo?.music_title ||  "",
-    thumbnail_uri: selectedVideo?.thumbnail_uri ||  "",
-    music_uri: selectedVideo?.music_uri ||  "",
+    artist: selectedVideo?.artist || "",
+    music_title: selectedVideo?.music_title || "",
+    thumbnail_uri: selectedVideo?.thumbnail_uri || "",
+    music_uri: selectedVideo?.music_uri || "",
 
     start_at: step1.start_at ? step1.start_at.toISOString() : "",
     end_at: step1.end_at ? step1.end_at.toISOString() : "",

@@ -1,3 +1,4 @@
+import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import { GenreKey } from "../constants/userInfoMap";
 
 export type UserRole = "ordinary" | "expert";
@@ -49,8 +50,8 @@ export interface FullUserInfo {
   age: string;
   gender: boolean;
   job_domain: boolean;
-  surveys: any[];
-  surveyResponses: any[];
+  surveys: SurveyResponse[];
+  surveyResponses: SurveyResponse[];
   phone_number: string;
   simple_password: string;
   balance: number;

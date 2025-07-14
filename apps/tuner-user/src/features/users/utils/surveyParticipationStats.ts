@@ -1,4 +1,6 @@
-export function surveyParticipationStats(responses: any[]) {
+import type { MySurveyAnswer } from "../types/MySurveyAnswer";
+
+export function surveyParticipationStats(responses: MySurveyAnswer[]) {
   if (!Array.isArray(responses)) {
     console.warn(
       "surveyParticipationStats: responses가 배열이 아닙니다.",

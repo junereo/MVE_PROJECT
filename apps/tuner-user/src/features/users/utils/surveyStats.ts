@@ -1,6 +1,7 @@
+import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import { Stat } from "../types/survey";
 
-export function surveyStats(surveys: any[]): Stat[] {
+export function surveyStats(surveys: SurveyResponse[]): Stat[] {
   const total = surveys.length;
   const upcoming = surveys.filter((s) => s.is_active === "upcoming").length;
   const ongoing = surveys.filter((s) => s.is_active === "ongoing").length;

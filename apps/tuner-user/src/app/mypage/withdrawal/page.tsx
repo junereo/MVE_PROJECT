@@ -32,7 +32,7 @@ export default function Reward() {
     fetchUser();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const numericAmount = parseFloat(amount);
@@ -66,7 +66,7 @@ export default function Reward() {
         color: "blue",
       });
       setAmount("");
-    } catch (err: any) {
+    } catch (err) {
       console.error("출금 요청 실패:", err);
 
       setModalContent({

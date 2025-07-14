@@ -1,3 +1,4 @@
+import { FormattedAnswer } from "./answer";
 import { SurveyTypeEnum, QuestionTypeEnum, InputTypeEnum } from "./enums";
 
 export interface SurveyResponse {
@@ -10,6 +11,8 @@ export interface SurveyResponse {
   artist: string;
   music_uri: string;
   thumbnail_uri: string;
+
+  genre?: string;
 
   survey_title: string;
   type: SurveyTypeEnum;
@@ -30,7 +33,7 @@ export interface SurveyResponse {
     user_id: number;
     status: "draft" | "complete";
     rewarded: boolean;
-    answers: any[];
+    answers: FormattedAnswer[];
     created_at: string;
     updated_at: string;
     user: {

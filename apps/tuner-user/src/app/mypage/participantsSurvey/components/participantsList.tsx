@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getMySurveyAnswer } from "@/features/users/services/survey";
-import List from "@/components/ui/List";
+
 import { useSurveyAnswerStore } from "@/features/users/store/useSurveyAnswerStore";
-import type { MySurveyAnswer } from "@/features/users/types/MySurveyAnswer";
+
+import List from "@/components/ui/List";
 
 const statusTextMap = {
   draft: "임시저장",

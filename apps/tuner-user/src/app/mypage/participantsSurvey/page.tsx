@@ -3,12 +3,9 @@
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { useUserStore } from "@/features/users/store/useUserStore";
 import ParticipantsList from "./components/participantsList";
 
 export default function ParticipantsSurvey() {
-  const { userInfo } = useUserStore();
-
   return (
     <>
       <Breadcrumb
