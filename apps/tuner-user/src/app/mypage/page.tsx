@@ -48,7 +48,7 @@ export default function MyPage() {
     <div className="bg-gray-100 space-y-2">
       <Breadcrumb crumbs={[{ label: "마이페이지" }]} />
       <UserProfile nickname={userInfo.nickname} role={userInfo.role} />
-      <WalletInfo address={userInfo.wallet_address} />
+      <WalletInfo balance={userInfo.balance} />
 
       <SurveyStats
         title="설문 생성 내역"
