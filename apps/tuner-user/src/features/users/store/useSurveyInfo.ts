@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { UserSurveyInfo } from "../types/userInfo";
-import { GenreKey } from "../constants/userInfoMap";
 
 interface UserInfoState extends UserSurveyInfo {
   setUserInfo: (info: Partial<UserSurveyInfo>) => void;

@@ -90,9 +90,11 @@ export default function Step2Question({
         const fixedQuestions: Questions[] = [];
         const customQuestions: Questions[] = [];
 
-        rawQuestions.forEach((q, index) => {
+        let idCounter = 0;
+
+        rawQuestions.forEach((q) => {
           const question = {
-            id: index,
+            id: idCounter++,
             category: q.category ?? "step1",
             question_text: q.question_text,
             type: q.type,

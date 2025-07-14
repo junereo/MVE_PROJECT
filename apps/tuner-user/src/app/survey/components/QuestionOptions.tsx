@@ -21,7 +21,6 @@ export default function QuestionOptions({
   optionClassName = "",
   layout = "vertical",
   disabled = false,
-  label,
 }: Props) {
   const isMulti = type === InputTypeEnum.CHECKBOX;
 

@@ -18,7 +18,7 @@ export default function WalletInfo({ address }: WalletInfoProps) {
       <div className="flex justify-end">
         <button className="px-4 py-1 text-sm flex items-center gap-1 border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 transition">
           <ArrowDown className="w-4 h-4" />
-          <Link href="/mypage/reward">출금하기</Link>
+          <Link href="/mypage/withdrawal">출금하기</Link>
         </button>
       </div>
     </div>

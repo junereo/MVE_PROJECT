@@ -44,7 +44,7 @@ export default function MySurveyList({ userId }: { userId?: number }) {
       }
     };
     fetch();
-  }, [status]);
+  }, [status, userId]);
 
   return (
     <div className="space-y-4 max-w-[700px] mx-auto">
