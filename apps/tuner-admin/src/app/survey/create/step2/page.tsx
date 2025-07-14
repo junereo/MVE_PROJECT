@@ -481,73 +481,100 @@ export default function SurveyStep2() {
                 Survey create Step2
             </div>
             <div className="p-6">
-                <div className="w-[50%] min-h-[800px] pb-[20px] rounded-xl max-w-[485px] md:max-w-3xl bg-white px-4 sm:px-6 md:px-8">
-                    <SurveyTabs
-                        tabs={allTabs}
-                        current={tabIndex}
-                        setTab={setTabIndex}
-                    />
-                    <h1 className="text-lg md:text-2xl font-bold mb-4 pt-[30px]">
-                        🎵 {step1.survey_title}
-                    </h1>
+                <div className="flex justify-center">
+                    <div className="w-full max-w-5xl">
+                        <div className="p-8 w-full rounded-2xl bg-white shadow space-y-8">
+                            <SurveyTabs
+                                tabs={allTabs}
+                                current={tabIndex}
+                                setTab={setTabIndex}
+                            />
+                            <h1 className="text-lg md:text-2xl font-bold mb-4 pt-[30px]">
+                                🎵 {step1.survey_title}
+                            </h1>
 
-                    {(categoryQuestions[currentTab.key] || []).map((q) => (
-                        <div key={q.id} className="mb-6 border p-4 rounded">
-                            <p className="font-medium mb-1">
-                                {q.question_text}
-                            </p>
-                            {q.options.map((opt, i) => (
-                                <div key={i} className="text-sm text-gray-600">
-                                    ⦿ {opt}
-                                </div>
-                            ))}
+                            {(categoryQuestions[currentTab.key] || []).map(
+                                (q) => (
+                                    <div
+                                        key={q.id}
+                                        className="mb-6 border p-4 rounded"
+                                    >
+                                        <p className="font-medium mb-1">
+                                            {q.question_text}
+                                        </p>
+                                        {q.options.map((opt, i) => (
+                                            <div
+                                                key={i}
+                                                className="text-sm text-gray-600"
+                                            >
+                                                ⦿ {opt}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ),
+                            )}
+
+                            <SurveyCustomForm
+                                typeOptions={typeOptions}
+                                questions={
+                                    customQuestions[currentTab.key] || []
+                                }
+                                onAdd={() => addCustomQuestion(currentTab.key)}
+                                onChangeText={(i, text) =>
+                                    handleChangeCustomText(
+                                        currentTab.key,
+                                        i,
+                                        text,
+                                    )
+                                }
+                                onChangeType={(i, type) =>
+                                    handleChangeType(currentTab.key, i, type)
+                                }
+                                onChangeOption={(qi, oi, val) =>
+                                    handleChangeOption(
+                                        currentTab.key,
+                                        qi,
+                                        oi,
+                                        val,
+                                    )
+                                }
+                                onAddOption={(qi) =>
+                                    handleAddOption(currentTab.key, qi)
+                                }
+                                onRemove={(id) =>
+                                    removeCustomQuestion(currentTab.key, id)
+                                }
+                                onChangeMaxNum={(index, value) =>
+                                    handleChangeMaxNum(
+                                        currentTab.key,
+                                        index,
+                                        value,
+                                    )
+                                }
+                                onRemoveOption={(qi, oi) =>
+                                    handleRemoveOption(currentTab.key, qi, oi)
+                                }
+                            />
+
+                            <SurveyNavigation
+                                tabIndex={tabIndex}
+                                totalTabs={allTabs.length}
+                                onPrev={() =>
+                                    setTabIndex((prev) => Math.max(0, prev - 1))
+                                }
+                                onNext={() =>
+                                    setTabIndex((prev) =>
+                                        Math.min(allTabs.length - 1, prev + 1),
+                                    )
+                                }
+                            />
+
+                            <SurveyActions
+                                onTempSave={handleTempSave}
+                                onComplete={handleComplete}
+                            />
                         </div>
-                    ))}
-
-                    <SurveyCustomForm
-                        typeOptions={typeOptions}
-                        questions={customQuestions[currentTab.key] || []}
-                        onAdd={() => addCustomQuestion(currentTab.key)}
-                        onChangeText={(i, text) =>
-                            handleChangeCustomText(currentTab.key, i, text)
-                        }
-                        onChangeType={(i, type) =>
-                            handleChangeType(currentTab.key, i, type)
-                        }
-                        onChangeOption={(qi, oi, val) =>
-                            handleChangeOption(currentTab.key, qi, oi, val)
-                        }
-                        onAddOption={(qi) =>
-                            handleAddOption(currentTab.key, qi)
-                        }
-                        onRemove={(id) =>
-                            removeCustomQuestion(currentTab.key, id)
-                        }
-                        onChangeMaxNum={(index, value) =>
-                            handleChangeMaxNum(currentTab.key, index, value)
-                        }
-                        onRemoveOption={(qi, oi) =>
-                            handleRemoveOption(currentTab.key, qi, oi)
-                        }
-                    />
-
-                    <SurveyNavigation
-                        tabIndex={tabIndex}
-                        totalTabs={allTabs.length}
-                        onPrev={() =>
-                            setTabIndex((prev) => Math.max(0, prev - 1))
-                        }
-                        onNext={() =>
-                            setTabIndex((prev) =>
-                                Math.min(allTabs.length - 1, prev + 1),
-                            )
-                        }
-                    />
-
-                    <SurveyActions
-                        onTempSave={handleTempSave}
-                        onComplete={handleComplete}
-                    />
+                    </div>
                 </div>
             </div>
         </div>
