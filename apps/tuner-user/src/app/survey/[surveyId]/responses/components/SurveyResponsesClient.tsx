@@ -18,11 +18,11 @@ export default function SurveyResponsesClient({
   surveyTitle,
 }: SurveyResponsesClientProps) {
   const { isInitialized } = useAuthGuard();
-  const { Funnel, setStep, currentStep } = useFunnel<Step>("step1");
+  const { Funnel, setStep } = useFunnel<Step>("step1");
   if (!isInitialized) return null;
 
   return (
-    <div className="mx-auto py-8">
+    <>
       <Funnel>
         <Funnel.Step name="step1">
           <Step1Info
@@ -43,10 +43,6 @@ export default function SurveyResponsesClient({
           <Step3Result surveyId={surveyId} onPrev={() => setStep("step2")} />
         </Funnel.Step>
       </Funnel>
-
-      <p className="text-center text-sm text-gray-400">
-        현재 단계: {currentStep}
-      </p>
-    </div>
+    </>
   );
 }

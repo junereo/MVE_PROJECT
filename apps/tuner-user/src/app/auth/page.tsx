@@ -2,10 +2,10 @@ import LoginForm from "./components/LoginForm";
 import KakaoLoginButton from "./components/KakaoLoginButton";
 import GoogleLoginButton from "./components/GoogleLoginButton";
 
-export default function auth() {
+export default function Auth() {
   return (
-    <div>
-      <h1 className="text-center font-bold text-2xl pt-10 pb-1 text-blue-600">
+    <div className="sm:pt-[150px]">
+      <h1 className="text-center font-bold text-2xl pb-1 text-blue-600">
         TUNER
       </h1>
       <div className="max-w-[350px] w-full mx-auto mt-10 mb-10">

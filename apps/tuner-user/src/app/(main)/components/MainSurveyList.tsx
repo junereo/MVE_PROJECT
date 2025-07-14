@@ -52,7 +52,7 @@ export default function MainSurveyList({
   }, [status]);
 
   return surveys.length === 0 ? (
-    <div className="flex flex-col items-center justify-center py-20 text-gray-400 w-full col-span-2">
+    <div className="flex flex-col items-center justify-center pt-10 text-gray-400 w-full col-span-2">
       <Image
         src="/images/empty-survey.png"
         alt="설문 없음"
@@ -61,11 +61,7 @@ export default function MainSurveyList({
         className="mb-4"
       />
       <p className="text-sm">
-        {status === "ongoing"
-          ? "진행중인 설문이 없습니다."
-          : status === "closed"
-          ? "종료된 설문이 없습니다."
-          : "설문이 없습니다."}
+        {status === "closed" ? "종료된 설문이 없습니다." : "설문이 없습니다."}
       </p>
     </div>
   ) : (

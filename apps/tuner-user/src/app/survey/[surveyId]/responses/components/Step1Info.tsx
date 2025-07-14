@@ -79,7 +79,7 @@ export default function Step1Info({
         <h1 className="font-bold text-lg text-center flex-1">설문 참여</h1>
       </header>
 
-      <div className="space-y-4 min-h-screen">
+      <div className="space-y-4">
         <Breadcrumb
           crumbs={[
             { label: "설문", href: "/survey" },
