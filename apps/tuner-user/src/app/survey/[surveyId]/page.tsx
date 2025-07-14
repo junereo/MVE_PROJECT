@@ -166,7 +166,7 @@ export default function SurveyDetail() {
         {is_active === "ongoing" && user && (
           <>
             {myParticipation ? (
-              myParticipation.status === "complete" ? (
+              myParticipation.status === "draft" ? (
                 // 참여 완료
                 <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] mx-auto">
                   <Button color="white">이미 참여한 설문입니다.</Button>
