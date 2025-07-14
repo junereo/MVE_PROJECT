@@ -12,6 +12,15 @@ import { fetchTemplates, surveyCreate } from '@/lib/network/api';
 import { QuestionTypeEnum } from '@/app/survey/create/complete/type';
 import { Question_type, SurveyStatus } from '@/types';
 
+export type SurveyQuestion = {
+    question_text: string;
+    type: string;
+    category: string;
+    question_type: string;
+    max_num: string;
+    options: string[];
+};
+
 interface RawTemplateQuestion {
     question_text: string;
     question_type: string;
@@ -62,9 +71,7 @@ export default function SurveyStep2() {
             // 기존 설문 수정인 경우
             if (step1.surveyId) {
                 try {
-                    const rawQuestions = JSON.parse(
-                        step1.surveyQuestionsRaw || '[]',
-                    );
+                    const rawQuestions = step1.surveyQuestionsRaw;
 
                     const templateQs: Question[] = [];
                     const customQs: Question[] = [];
@@ -73,7 +80,7 @@ export default function SurveyStep2() {
                     const categorizedTemplate: Record<string, Question[]> = {};
                     const categorizedCustom: Record<string, Question[]> = {};
 
-                    for (const q of rawQuestions) {
+                    for (const q of rawQuestions ?? []) {
                         const base: Question = {
                             id: idCounter++,
                             question_text: q.question_text,
@@ -81,10 +88,17 @@ export default function SurveyStep2() {
                                 q.question_type === 'custom'
                                     ? Question_type.custom
                                     : Question_type.fixed,
-                            type: q.type,
+                            type: q.type as QuestionTypeEnum,
                             options: q.options || [],
                             category: q.category || 'step2',
-                            ...(q.max_num ? { max_num: q.max_num } : {}),
+                            ...(q.max_num !== undefined
+                                ? {
+                                      max_num:
+                                          typeof q.max_num === 'string'
+                                              ? Number(q.max_num)
+                                              : q.max_num,
+                                  }
+                                : {}),
                         };
 
                         const target =
@@ -385,23 +399,21 @@ export default function SurveyStep2() {
             question_type: 'fixed' as Question_type,
             is_released: step1.isReleased,
             status: SurveyStatus.draft,
-            survey_question: JSON.stringify(
-                allQuestions.map((q) => {
-                    const question = q as Question & { max_num?: number };
+            survey_question: allQuestions.map((q) => {
+                const question = q as Question & { max_num?: number };
 
-                    return {
-                        question_text: question.question_text,
-                        type: question.type,
-                        question_type: String(question.question_type),
-                        options: question.options,
-                        category: question.category,
-                        ...(question.type === QuestionTypeEnum.CHECKBOX &&
-                        question.max_num
-                            ? { max_num: question.max_num }
-                            : {}),
-                    };
-                }),
-            ),
+                return {
+                    question_text: question.question_text,
+                    type: question.type,
+                    question_type: String(question.question_type),
+                    options: question.options,
+                    category: question.category,
+                    ...(question.type === QuestionTypeEnum.CHECKBOX &&
+                    question.max_num
+                        ? { max_num: question.max_num }
+                        : {}),
+                };
+            }),
         };
 
         try {
@@ -469,7 +481,7 @@ export default function SurveyStep2() {
 
         setStep2({
             customQuestions: validCustom,
-            survey_question: JSON.stringify(allQuestions),
+            survey_question: allQuestions,
         });
 
         router.push('/survey/create/complete');
@@ -481,73 +493,100 @@ export default function SurveyStep2() {
                 Survey create Step2
             </div>
             <div className="p-6">
-                <div className="w-[50%] min-h-[800px] pb-[20px] rounded-xl max-w-[485px] md:max-w-3xl bg-white px-4 sm:px-6 md:px-8">
-                    <SurveyTabs
-                        tabs={allTabs}
-                        current={tabIndex}
-                        setTab={setTabIndex}
-                    />
-                    <h1 className="text-lg md:text-2xl font-bold mb-4 pt-[30px]">
-                        🎵 {step1.survey_title}
-                    </h1>
+                <div className="flex justify-center">
+                    <div className="w-full max-w-5xl">
+                        <div className="p-8 w-full rounded-2xl bg-white shadow space-y-8">
+                            <SurveyTabs
+                                tabs={allTabs}
+                                current={tabIndex}
+                                setTab={setTabIndex}
+                            />
+                            <h1 className="text-lg md:text-2xl font-bold mb-4 pt-[30px]">
+                                🎵 {step1.survey_title}
+                            </h1>
 
-                    {(categoryQuestions[currentTab.key] || []).map((q) => (
-                        <div key={q.id} className="mb-6 border p-4 rounded">
-                            <p className="font-medium mb-1">
-                                {q.question_text}
-                            </p>
-                            {q.options.map((opt, i) => (
-                                <div key={i} className="text-sm text-gray-600">
-                                    ⦿ {opt}
-                                </div>
-                            ))}
+                            {(categoryQuestions[currentTab.key] || []).map(
+                                (q) => (
+                                    <div
+                                        key={q.id}
+                                        className="mb-6 border p-4 rounded"
+                                    >
+                                        <p className="font-medium mb-1">
+                                            {q.question_text}
+                                        </p>
+                                        {q.options.map((opt, i) => (
+                                            <div
+                                                key={i}
+                                                className="text-sm text-gray-600"
+                                            >
+                                                ⦿ {opt}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ),
+                            )}
+
+                            <SurveyCustomForm
+                                typeOptions={typeOptions}
+                                questions={
+                                    customQuestions[currentTab.key] || []
+                                }
+                                onAdd={() => addCustomQuestion(currentTab.key)}
+                                onChangeText={(i, text) =>
+                                    handleChangeCustomText(
+                                        currentTab.key,
+                                        i,
+                                        text,
+                                    )
+                                }
+                                onChangeType={(i, type) =>
+                                    handleChangeType(currentTab.key, i, type)
+                                }
+                                onChangeOption={(qi, oi, val) =>
+                                    handleChangeOption(
+                                        currentTab.key,
+                                        qi,
+                                        oi,
+                                        val,
+                                    )
+                                }
+                                onAddOption={(qi) =>
+                                    handleAddOption(currentTab.key, qi)
+                                }
+                                onRemove={(id) =>
+                                    removeCustomQuestion(currentTab.key, id)
+                                }
+                                onChangeMaxNum={(index, value) =>
+                                    handleChangeMaxNum(
+                                        currentTab.key,
+                                        index,
+                                        value,
+                                    )
+                                }
+                                onRemoveOption={(qi, oi) =>
+                                    handleRemoveOption(currentTab.key, qi, oi)
+                                }
+                            />
+
+                            <SurveyNavigation
+                                tabIndex={tabIndex}
+                                totalTabs={allTabs.length}
+                                onPrev={() =>
+                                    setTabIndex((prev) => Math.max(0, prev - 1))
+                                }
+                                onNext={() =>
+                                    setTabIndex((prev) =>
+                                        Math.min(allTabs.length - 1, prev + 1),
+                                    )
+                                }
+                            />
+
+                            <SurveyActions
+                                onTempSave={handleTempSave}
+                                onComplete={handleComplete}
+                            />
                         </div>
-                    ))}
-
-                    <SurveyCustomForm
-                        typeOptions={typeOptions}
-                        questions={customQuestions[currentTab.key] || []}
-                        onAdd={() => addCustomQuestion(currentTab.key)}
-                        onChangeText={(i, text) =>
-                            handleChangeCustomText(currentTab.key, i, text)
-                        }
-                        onChangeType={(i, type) =>
-                            handleChangeType(currentTab.key, i, type)
-                        }
-                        onChangeOption={(qi, oi, val) =>
-                            handleChangeOption(currentTab.key, qi, oi, val)
-                        }
-                        onAddOption={(qi) =>
-                            handleAddOption(currentTab.key, qi)
-                        }
-                        onRemove={(id) =>
-                            removeCustomQuestion(currentTab.key, id)
-                        }
-                        onChangeMaxNum={(index, value) =>
-                            handleChangeMaxNum(currentTab.key, index, value)
-                        }
-                        onRemoveOption={(qi, oi) =>
-                            handleRemoveOption(currentTab.key, qi, oi)
-                        }
-                    />
-
-                    <SurveyNavigation
-                        tabIndex={tabIndex}
-                        totalTabs={allTabs.length}
-                        onPrev={() =>
-                            setTabIndex((prev) => Math.max(0, prev - 1))
-                        }
-                        onNext={() =>
-                            setTabIndex((prev) =>
-                                Math.min(allTabs.length - 1, prev + 1),
-                            )
-                        }
-                    />
-
-                    <SurveyActions
-                        onTempSave={handleTempSave}
-                        onComplete={handleComplete}
-                    />
+                    </div>
                 </div>
             </div>
         </div>

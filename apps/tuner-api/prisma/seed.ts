@@ -1,6 +1,6 @@
 /**
  * prisma/s.admin.seed.ts
- * 실행: npx tsx prisma/s.admin.seed.ts
+ * 실행: npx tsx prisma/seed.ts
  */
 
 import { PrismaClient } from '@prisma/client';
