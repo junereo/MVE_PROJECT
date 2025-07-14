@@ -198,7 +198,7 @@ export const createSurveyParticipantHandler = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { survey_id, answers, isSubmit } = req.body;
+    const { survey_id, answers, isSubmit, user_info } = req.body;
     const user_id = req.user?.userId;
 
     if (!user_id || !survey_id || !answers) {
@@ -213,8 +213,10 @@ export const createSurveyParticipantHandler = async (
       survey_id: parseInt(survey_id),
       answers,
       isSubmit,
+      user_info
     });
 
+    console.log(newParticipant);
     res.status(201).json({ success: true, data: newParticipant });
   } catch (err: any) {
     console.error("설문 응답 생성 오류:", err);
@@ -348,3 +350,38 @@ export const getSurveyQuestionController = async (
     res.status(500).json({ message: err.message || "서버 오류" });
   }
 };
+
+// 사용자 1명의 설문 참여 내역 조회
+export const getMySurvey = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = Number(req.user?.userId);
+
+    if (isNaN(userId)) {
+      res.status(401).json({ success: false, message: "로그인이 필요합니다." });
+      return;
+    }
+
+    const participations = await prisma.survey_Participants.findMany({
+      where: { user_id: userId },
+      include: {
+        survey: {
+          include: {
+            creator: { select: { id: true, nickname: true } },
+            result: true,
+          },
+        },
+      },
+      orderBy: { created_at: "desc" },
+    });
+
+    res.status(200).json({ success: true, data: participations });
+  } catch (err: any) {
+    console.error("내 설문 참여 내역 조회 실패:", err);
+    res.status(500).json({
+      success: false,
+      message: "내 설문 참여 내역 조회 실패",
+      error: err.message,
+    });
+  }
+};
+

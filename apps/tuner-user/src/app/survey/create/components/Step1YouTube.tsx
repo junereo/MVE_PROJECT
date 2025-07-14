@@ -72,7 +72,11 @@ export default function Step1YouTube({ onNext }: Step1Props) {
           Step 1 : 유튜브
         </h2>
 
-        <YoutubeSearchBox />
+        <YoutubeSearchBox
+          music_uri={undefined}
+          editMode={true}
+          showMusicUri={false}
+        />
 
         <DateRangePicker
           label="설문 기간"

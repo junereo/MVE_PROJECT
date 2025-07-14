@@ -27,6 +27,7 @@ export default function MainSurveyList({
     const fetchSurveys = async () => {
       try {
         const res = await getSurveyList();
+        console.log("설문정보", res.data);
         const sorted = res.data.sort((a: SurveyResponse, b: SurveyResponse) => {
           return (
             new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
@@ -68,7 +69,7 @@ export default function MainSurveyList({
             statusTextMap[item.is_active as keyof typeof statusTextMap] ??
             "종료"
           }
-          participants={item.survey_custom?.length || 0}
+          participants={item.participants?.length ?? 0}
           reward={item.reward_amount}
         />
       ))}
