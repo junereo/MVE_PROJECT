@@ -10,7 +10,10 @@ export const createSurvey = async (payload: SurveyPayload) => {
 };
 
 // 설문 수정
-export const updateSurvey = async (payload: SurveyPayload, surveyId: number) => {
+export const updateSurvey = async (
+  payload: SurveyPayload,
+  surveyId: number
+) => {
   const response = await axios.put(`/survey/${surveyId}`, payload);
   return response.data;
 };
