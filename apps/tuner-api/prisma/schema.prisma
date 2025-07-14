@@ -116,7 +116,7 @@ model User {
   nickname        String // 유저는 닉네임 / 관리자는 실명 
   gender          Boolean? // true=남자, false=여자
   age             AgeGroup? // enum
-  genre           Genre[]   @default([])
+  genre           Genre?   
   job_domain      Boolean? // 음악전공/종사자 여부
   balance         Int       @default(0)
   wallet_address  String?
@@ -194,8 +194,9 @@ model Survey_Participants {
   rewarded   Boolean      @default(false)
   created_at DateTime     @default(now())
   updated_at DateTime     @updatedAt
-  user       User?        @relation(fields: [user_id], references: [id], onDelete: SetNull)
-  survey     Survey       @relation(fields: [survey_id], references: [id])
+
+  user   User?  @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  survey Survey @relation(fields: [survey_id], references: [id])
 }
 
 model Survey_Result {
