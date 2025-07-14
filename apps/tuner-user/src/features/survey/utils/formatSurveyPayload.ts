@@ -14,7 +14,7 @@ export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
   return {
     artist: selectedVideo?.artist || "",
     music_title: selectedVideo?.music_title || "",
-    thumbnail_uri: selectedVideo?.thumbnail_uri || "",
+    thumbnail_uri: step1.thumbnail_uri || "",
     music_uri: selectedVideo?.music_uri || "",
 
     start_at: step1.start_at ? step1.start_at.toISOString() : "",
