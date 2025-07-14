@@ -8,8 +8,8 @@ import { useSurveyAnswerStore } from "@/features/users/store/useSurveyAnswerStor
 import List from "@/components/ui/List";
 
 const statusTextMap = {
-  draft: "임시저장",
-  complete: "제출",
+  draft: "제출",
+  complete: "임시저장",
 } as const;
 
 const statusList = ["all", "draft", "complete"] as const;
@@ -53,7 +53,7 @@ export default function ParticipantsList() {
       <div className="flex items-center justify-between mt-4 mb-2 px-1">
         <h2 className="text-lg font-semibold text-gray-800">설문 참여 내역</h2>
         <span className="text-sm text-gray-500">
-          제출 {completeCount}건 | 임시저장 {draftCount}건
+          임시저장 {completeCount}건 | 제출 {draftCount}건
         </span>
       </div>
 
