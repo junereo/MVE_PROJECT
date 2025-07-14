@@ -61,6 +61,10 @@ export default function SurveyDetail() {
     released_date,
   } = survey;
 
+  const myParticipation = participants?.find(
+    (p) => String(p.user.id) === String(user?.id)
+  );
+
   return (
     <>
       <Header />
@@ -158,26 +162,47 @@ export default function SurveyDetail() {
             <SurveyResult />
           </section>
         )}
+
         {is_active === "ongoing" && user && (
-          <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
-            <Button
-              color="blue"
-              onClick={() => router.push(`/survey/${id}/responses`)}
-            >
-              설문 참여하기
-            </Button>
-          </div>
+          <>
+            {myParticipation ? (
+              myParticipation.status === "draft" ? (
+                // 참여 완료
+                <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] mx-auto">
+                  <Button color="white">이미 참여한 설문입니다.</Button>
+                </div>
+              ) : (
+                // 응답 임시 저장 (draft)
+                <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] mx-auto">
+                  <Button color="blue">설문 응답 수정</Button>
+                </div>
+              )
+            ) : (
+              // 참여 전
+              <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] mx-auto">
+                <Button
+                  color="blue"
+                  onClick={() => router.push(`/survey/${id}/responses`)}
+                >
+                  설문 참여하기
+                </Button>
+              </div>
+            )}
+          </>
         )}
-        {is_active === "upcoming" && user && String(user.id) === String(survey.user_id) && (
-          <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
-            <Button
-              color="yellow"
-              onClick={() => router.push(`/survey/${id}/edit`)}
-            >
-              설문 수정하기
-            </Button>
-          </div>
-        )}
+
+        {is_active === "upcoming" &&
+          user &&
+          String(user.id) === String(survey.user_id) && (
+            <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
+              <Button
+                color="yellow"
+                onClick={() => router.push(`/survey/${id}/edit`)}
+              >
+                설문 수정하기
+              </Button>
+            </div>
+          )}
       </div>
       <BottomNavbar />
     </>

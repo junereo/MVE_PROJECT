@@ -95,9 +95,9 @@ export default function MemberEditForm() {
         <FormInput
           label="이름"
           value={nickname}
-          onChange={(val) => {
-            setNickname(val);
-            setNicknameError(validateSignupField("nickname", val, {} as any));
+          onChange={(value) => {
+            setNickname(value);
+            setNicknameError(validateSignupField("nickname", value));
           }}
           error={nicknameError}
         />
@@ -105,9 +105,9 @@ export default function MemberEditForm() {
         <FormInput
           label="휴대전화번호"
           value={phone}
-          onChange={(val) => {
-            setPhone(val);
-            setPhoneError(validateSignupField("phone_number", val, {} as any));
+          onChange={(value) => {
+            setPhone(value);
+            setPhoneError(validateSignupField("phone_number", value));
           }}
           error={phoneError}
           type="tel"
@@ -117,9 +117,9 @@ export default function MemberEditForm() {
         <FormInput
           label="이메일"
           value={email}
-          onChange={(val) => {
-            setEmail(val);
-            setEmailError(validateSignupField("email", val, {} as any));
+          onChange={(value) => {
+            setEmail(value);
+            setEmailError(validateSignupField("email", value));
           }}
           error={emailError}
           type="email"

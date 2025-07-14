@@ -18,7 +18,7 @@ import {
   genreMap,
   reverseGenreMap,
 } from "@/features/users/constants/userInfoMap";
-import { UserSurveyInfo } from "@/features/users/types/userInfo";
+import { FullUserInfo, UserSurveyInfo } from "@/features/users/types/userInfo";
 
 interface Step1Props {
   surveyId: number;
@@ -26,9 +26,9 @@ interface Step1Props {
   onNext: () => void;
 }
 
-const mapUserInfo = (userInfo: any): UserSurveyInfo => {
+const mapUserInfo = (userInfo: FullUserInfo): UserSurveyInfo => {
   return {
-    gender: genderMap[userInfo.gender as GenderKey] ?? "",
+    gender: genderMap[String(userInfo.gender) as GenderKey] ?? "",
     age: ageMap[userInfo.age as AgeKey] ?? "",
     genre: (userInfo.genre as GenreKey) ?? "",
     jobDomain:
@@ -54,7 +54,7 @@ export default function Step1Info({
       const uiInfo = mapUserInfo(userInfo);
       setUserInfo(uiInfo);
     }
-  }, [userInfo]);
+  }, [userInfo, setUserInfo]);
 
   const handleNext = () => {
     setUserInfo({ gender, age, genre, jobDomain });
