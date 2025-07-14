@@ -26,12 +26,11 @@ app.use(
     origin: [
       "https://tunemate.store",
       "https://admin.tunemate.store",
-      "http://localhost:3001",
+      "http://localhost:3000",
     ],
     credentials: true,
   })
 );
-
 
 // 미들웨어 설정
 app.use(cookieParser());

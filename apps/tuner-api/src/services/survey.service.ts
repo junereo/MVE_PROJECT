@@ -153,9 +153,6 @@ export const createSurveyParticipant = async ({
   });
 };
 
-
-
-
 // 설문 타입 유효성 검사
 const isSurveyType = (value: any): value is SurveyType => {
   return Object.values(SurveyType).includes(value);
