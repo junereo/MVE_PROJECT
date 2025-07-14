@@ -191,7 +191,7 @@ model Survey_Participants {
   survey_id  Int
   answers    Json
   status     SurveyStatus @default(draft)
-  rewarded   Boolean      @default(false)
+  rewarded   Int      @default(0) // 0: 미지급, 1 이상: 지급
   created_at DateTime     @default(now())
   updated_at DateTime     @updatedAt
 

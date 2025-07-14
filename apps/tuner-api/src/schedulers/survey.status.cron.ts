@@ -5,9 +5,10 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 // 매 분마다 실행
-cron.schedule('* * * * *', async () => {
+cron.schedule('*/10 * * * * *', async () => {
   const now = new Date()
-  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000)
+  const kstNow1 = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const kstNow = new Date(kstNow1.getTime() + 24 * 60 * 60 * 1000 * 7);
 
   console.log(`[CRON] 실행 시간: ${kstNow.toISOString()}`)
 
@@ -40,10 +41,11 @@ cron.schedule('* * * * *', async () => {
 
       // 설문 참여자 조회 
       const participants = await prisma.survey_Participants.findMany({
-        where: { survey_id: survey.id, rewarded: false },
+        where: { survey_id: survey.id},
         select: {
           id: true,
           user_id: true,
+          rewarded: true,
           user: {
             select: {
               id: true,
@@ -56,10 +58,7 @@ cron.schedule('* * * * *', async () => {
 
       for (const participant of participants) {
         if (!participant.user || participant.user_id == null) continue;
-        const isExpert = participant.user.badge_issued_at != null;
-        const rewardAmount = isExpert
-          ? survey.expert_reward ?? 0
-          : survey.reward ?? 0
+        const rewardAmount = participant.rewarded ?? 0;
 
         if (rewardAmount > 0) {
           // 트랜잭션 기록
@@ -83,11 +82,11 @@ cron.schedule('* * * * *', async () => {
           // 참여자 리워드 상태 변경
           await prisma.survey_Participants.update({
             where: { id: participant.id },
-            data: { rewarded: true },
+            data: { rewarded: 0 },
           })
 
           console.log(
-            `리워드 지급 완료: user_id=${participant.user_id}, role=${participant.user?.role}, amount=${rewardAmount}`
+            `리워드 지급 완료: user_id=${participant.user_id}, role=${participant.user ? participant.user.role : 'unknown'}, amount=${rewardAmount}`
           )
         }
       }
