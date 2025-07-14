@@ -27,8 +27,8 @@ export default function Header() {
         <>
             <div
                 className="
-        fixed top-0 left-[7%] right-[1%] h-[64px] z-30 rounded-lg border shadow
-        bg-[#EBEBEB] flex justify-between items-center px-6 shadow
+        fixed top-0 left-[9%] right-[1%] h-[64px] z-30 rounded-lg border shadow
+        bg-[#EBEBEB] flex justify-between items-center px-6 shadow w-[90%]
       "
             >
                 <div className="p-botext-xl font-bold text-gray-800">
