@@ -1,10 +1,6 @@
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {};
-
-// module.exports = nextConfig;
 // next.config.mjs
+
 const nextConfig = {
-    // 설정 내용
     images: {
         domains: [
             'example.com',
@@ -14,6 +10,7 @@ const nextConfig = {
             'www.youtube.com',
         ],
     },
+    output: 'standalone',
 };
 
 export default nextConfig;
