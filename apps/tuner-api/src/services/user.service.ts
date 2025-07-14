@@ -87,6 +87,8 @@ export const getUserById = async (id: number) => {
 };
 
 export const updateUser = async (id: number, data: any) => {
+
+  console.log("Updating user with data:", data);
   let updateData: any = {
     email: data.email,
     phone_number: data.phone_number,
