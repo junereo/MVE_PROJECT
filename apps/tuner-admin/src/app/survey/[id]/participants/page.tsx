@@ -1,10 +1,9 @@
 // /app/survey/[id]/participants/page.tsx
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { surveyView } from '@/lib/network/api';
-
 interface Participant {
     id: number;
     user: {
@@ -18,6 +17,7 @@ interface Participant {
 
 export default function SurveyParticipantsPage() {
     const { id } = useParams();
+    const router = useRouter();
     const [participants, setParticipants] = useState<Participant[]>([]);
     const [, setSurveyTitle] = useState('');
     const [filter, setFilter] = useState('전체');
@@ -33,6 +33,7 @@ export default function SurveyParticipantsPage() {
                 const result = await surveyView(Array.isArray(id) ? id[0] : id);
                 const rawParticipants = result.data
                     .participants as Participant[];
+                console.log('참여자 데이터', rawParticipants);
 
                 const enriched = rawParticipants.map((p) => ({
                     ...p,
@@ -93,9 +94,18 @@ export default function SurveyParticipantsPage() {
                         <th className="border px-2 py-1">리워드</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {pageData.map((p) => (
-                        <tr key={p.user.id} className="hover:bg-gray-50">
+                        <tr
+                            key={p.user.id}
+                            className="hover:bg-gray-100 cursor-pointer"
+                            onClick={() =>
+                                router.push(
+                                    `/survey/${id}/participants/${p.user.id}`,
+                                )
+                            }
+                        >
                             <td className="border px-2 py-1">{p.user.id}</td>
                             <td className="border px-2 py-1">
                                 {p.user.nickname}

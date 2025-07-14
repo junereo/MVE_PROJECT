@@ -113,6 +113,7 @@ export default function WalletTabs() {
         setLoading(true);
         const tId = setTimeout(() => setLoading(false), 20000);
         setTimeoutId(tId);
+        console.log('지갑생성', tId);
 
         try {
             const res = await axios({ url, method, data });
