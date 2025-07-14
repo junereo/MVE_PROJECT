@@ -4,9 +4,10 @@ import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import axiosClient from '@/lib/network/axios';
 // import { Tabs, Tab } from "@/components/ui/tabs"; // 잘못된 import 제거
 
-const baseUrl = 'http://localhost:4000';
+const baseUrl = process.env.NEXT_PUBLIC_BACK_API_URL;
 
 // 컨트랙트 주소 검증 함수
 const validateContractAddress = (address: string): boolean => {
@@ -85,7 +86,7 @@ export default function ContractManager() {
 
     const fetchContract = async () => {
         try {
-            const res = await axios.get(baseUrl + '/contract/ca');
+            const res = await axiosClient.get('/contract/ca');
             const data = res.data?.result || res.data?.data || res.data;
             setCaToken(data.ca_token || '');
             setCaBadge(data.ca_badge || '');
