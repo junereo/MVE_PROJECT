@@ -100,32 +100,38 @@ export default function Reward() {
         />
       )}
 
-      <div>
-        {/* 지갑 주소 삭제 */}
-        <div className="bg-white shadow-sm p-5 space-y-3">
-          <div className="flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-blue-600" />
-            <h2 className="text-base font-semibold text-gray-800">지갑 정보</h2>
+      <div className="bg-white shadow-sm p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Wallet className="w-5 h-5 text-blue-600" />
+          <h2 className="text-base font-semibold text-gray-800">잔액</h2>
+        </div>
+        <div className="grid grid-flow-col grid-row-2 gap-4 text-center">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-gray-600">포인트</p>
+            <p className="text-gray-800 font-medium ">
+              {balance || 0}{" "}
+              <span className="text-blue-600 font-bold">포인트</span>
+            </p>
           </div>
-          <p className="text-sm text-gray-500">
-            주소: <span className="font-mono text-gray-700">0x1234...abcd</span>
-          </p>
-          <p className="text-sm text-gray-500">
-            잔액:{" "}
-            <span className="text-blue-600 font-bold">{balance} TUNER</span>
-          </p>
+          <div className="flex flex-col gap-3 border-l border-l-gray-200">
+            <p className="text-sm text-gray-600">TUNER</p>
+            <p className="font-medium text-gray-800">
+              10 <span className="text-blue-600 font-bold">TUNER</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white shadow-sm p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <ArrowDown className="w-5 h-5 text-green-500" />
+          <h2 className="text-base font-semibold text-gray-800">출금 신청</h2>
         </div>
 
-        {/* 출금 신청 카드 */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-sm p-5 space-y-4"
+          className="flex flex-col gap-5 max-w-[768px] sm:max-w-[640px] xs:max-w-[485px]"
         >
-          <div className="flex items-center gap-2">
-            <ArrowDown className="w-5 h-5 text-green-500" />
-            <h2 className="text-base font-semibold text-gray-800">출금 신청</h2>
-          </div>
-
           <Input
             label="출금 금액 (ETH)"
             name="reward"

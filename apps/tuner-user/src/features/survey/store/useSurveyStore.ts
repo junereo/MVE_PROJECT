@@ -18,6 +18,7 @@ export type SelectedVideo = {
 // Step1YouTube
 export interface SurveyStep1 {
   video: SelectedVideo | null;
+  thumbnail_uri?: string;
   start_at: Date | null;
   end_at: Date | null;
 }
@@ -89,6 +90,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
 
   step1: {
     video: null,
+    thumbnail_uri: "",
     start_at: null,
     end_at: null,
   },
@@ -172,6 +174,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
       selectedVideo: null,
       step1: {
         video: null,
+        thumbnail_uri: "",
         start_at: null,
         end_at: null,
       },

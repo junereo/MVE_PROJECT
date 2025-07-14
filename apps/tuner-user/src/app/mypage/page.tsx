@@ -9,6 +9,7 @@ import { useSurveyAnswerStore } from "@/features/users/store/useSurveyAnswerStor
 
 import { getUserInfo } from "@/features/users/services/user";
 import { getMySurveyAnswer } from "@/features/users/services/survey";
+import { getUserWithdrawals } from "@/features/withdrawal/services/withdrawal";
 
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import UserProfile from "./components/UserProfile";
@@ -31,6 +32,8 @@ export default function MyPage() {
         const res = await getUserInfo(Number(user.id));
         const data = await getMySurveyAnswer();
         console.log("참여 설문 응답 결과", data.data);
+        const result = await getUserWithdrawals(Number(user.id));
+        console.log("출금 내역", result);
         setUserInfo(res.data);
         setAnswers(data.data);
       }
