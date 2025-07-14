@@ -3,7 +3,7 @@ export const genderMap = {
   true: "남성",
   false: "여성",
 } as const;
-export type GenderKey = keyof typeof genderMap;
+export type GenderKey = "true" | "false";
 
 // 나이
 export const ageMap = {

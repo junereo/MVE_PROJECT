@@ -39,7 +39,10 @@ enum Genre {
   jazz
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> efc95eb16ef283ae980a14fa4662ec8dc644c1a6
 enum OAuthProvider {
   kakao
   google

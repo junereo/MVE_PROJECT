@@ -4,7 +4,7 @@ import { SignupFormData, SignupFormErrors } from "../types";
 export const validateSignupField = (
   field: keyof SignupFormData,
   value: string,
-  formData: SignupFormData
+  formData?: Partial<SignupFormData>
 ): string => {
   switch (field) {
     case "email":
@@ -18,7 +18,9 @@ export const validateSignupField = (
         ? ""
         : "비밀번호는 8자 이상 문자, 숫자를 포함해주세요.";
     case "confirmPassword":
-      return value === formData.password ? "" : "비밀번호가 일치하지 않습니다.";
+      return value === formData?.password
+        ? ""
+        : "비밀번호가 일치하지 않습니다.";
     case "nickname":
       return value.length > 1
         ? ""
