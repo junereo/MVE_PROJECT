@@ -31,7 +31,7 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
     if (step3.expert_reward) {
       setExpertReward(String(step3.expert_reward / 1000));
     }
-  }, []);
+  }, [step3.reward_amount, step3.reward, step3.expert_reward]);
 
   useEffect(() => {
     if (surveyType === SurveyTypeEnum.GENERAL) {

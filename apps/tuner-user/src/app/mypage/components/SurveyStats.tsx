@@ -1,5 +1,3 @@
-import { Stat } from "@/features/users/types/survey";
-
 interface Props {
   title: string;
   stats: { label: string; value: number }[];
