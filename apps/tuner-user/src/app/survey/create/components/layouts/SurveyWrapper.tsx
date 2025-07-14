@@ -4,7 +4,7 @@ export default function SurveyWrapper({
   children: React.ReactNode;
 }) {
   return (
-    <main className="pt-[80px] pb-[80px] w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto px-4">
+    <main className="pt-[80px] pb-[80px] w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto px-4 min-h-[calc(100dvh-180px)]">
       {children}
     </main>
   );

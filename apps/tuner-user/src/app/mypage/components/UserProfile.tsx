@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const roleMap = {
   ordinary: "일반 회원",
-  expert: "EXPORT 회원",
+  expert: "EXPERT 회원",
 } as const;
 
 export default function UserProfile({ nickname, role }: UserProfileProps) {
