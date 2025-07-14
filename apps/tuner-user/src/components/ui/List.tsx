@@ -72,7 +72,7 @@ export default function List({
 
         {participants && participants > 0 && (
           <p className="text-[11px] sm:text-xs text-gray-600 whitespace-nowrap">
-            {participants}명 참여
+            {participants ?? 0}명 참여
           </p>
         )}
 

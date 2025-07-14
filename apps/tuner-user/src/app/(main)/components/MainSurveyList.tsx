@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSurveyList } from "@/features/survey/services/survey";
@@ -50,7 +51,24 @@ export default function MainSurveyList({
     fetchSurveys();
   }, [status]);
 
-  return (
+  return surveys.length === 0 ? (
+    <div className="flex flex-col items-center justify-center py-20 text-gray-400 w-full col-span-2">
+      <Image
+        src="/images/empty-survey.png"
+        alt="설문 없음"
+        width={96}
+        height={96}
+        className="mb-4"
+      />
+      <p className="text-sm">
+        {status === "ongoing"
+          ? "진행중인 설문이 없습니다."
+          : status === "closed"
+          ? "종료된 설문이 없습니다."
+          : "설문이 없습니다."}
+      </p>
+    </div>
+  ) : (
     <div className="flex flex-col gap-3">
       {surveys.slice(0, 6).map((item) => (
         <List
