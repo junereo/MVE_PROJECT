@@ -35,8 +35,8 @@ export interface UserProfileProps {
   role: UserRole;
 }
 
-export interface WalletInfoProps {
-  address: string | null;
+export interface withdrawalProps {
+  balance: number;
 }
 
 // 마이페이지 전체 사용자 정보용
