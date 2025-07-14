@@ -185,188 +185,211 @@ export default function FixedQuestionTemplatePage() {
                 fixedQuestion
             </div>
             <div className="p-6">
-                <div className="p-6 w-full rounded-xl bg-white max-w-4xl shadow space-y-8">
-                    <div className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
-                        고정 질문 템플릿 관리
-                    </div>
+                <div className="flex justify-center">
+                    <div className="w-full max-w-5xl">
+                        <div className="p-8 w-full rounded-2xl bg-white shadow space-y-8">
+                            <div className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
+                                고정 질문 템플릿 관리
+                            </div>
 
-                    <div className="flex items-center mb-6 gap-2">
-                        <label className="font-semibold text-gray-700">
-                            Questionnaire ID:
-                        </label>
-                        <input
-                            type="number"
-                            className="border rounded px-2 py-1 w-24"
-                            value={questionnaireId}
-                            onChange={(e) =>
-                                setQuestionnaireId(Number(e.target.value))
-                            }
-                            min={1}
-                        />
-                    </div>
+                            <div className="flex items-center mb-6 gap-2">
+                                <label className="font-semibold text-gray-700">
+                                    Questionnaire ID:
+                                </label>
+                                <input
+                                    type="number"
+                                    className="border rounded px-2 py-1 w-24"
+                                    value={questionnaireId}
+                                    onChange={(e) =>
+                                        setQuestionnaireId(
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                    min={1}
+                                />
+                            </div>
 
-                    {questions.map((q, idx) => (
-                        <div
-                            key={idx}
-                            className="mb-8 border p-4 rounded-lg bg-white shadow-sm"
-                        >
-                            {/* 질문 상단: 번호 + 드롭다운 + 삭제 버튼 */}
-                            <div className="flex justify-between items-start mb-3">
-                                <div className="font-semibold text-sm text-gray-800">
-                                    질문 {idx + 1}
-                                </div>
+                            {questions.map((q, idx) => (
+                                <div
+                                    key={idx}
+                                    className="mb-8 border p-4 rounded-lg bg-white shadow-sm"
+                                >
+                                    {/* 질문 상단: 번호 + 드롭다운 + 삭제 버튼 */}
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="font-semibold text-sm text-gray-800">
+                                            질문 {idx + 1}
+                                        </div>
 
-                                <div className="flex items-center gap-2">
-                                    {/* 질문 유형 드롭다운 */}
-                                    <Dropdown
-                                        options={[
-                                            '객관식',
-                                            '체크박스',
-                                            '주관식',
-                                        ]}
-                                        selected={
-                                            q.type === QuestionTypeEnum.CHECKBOX
-                                                ? '체크박스'
-                                                : q.type ===
-                                                  QuestionTypeEnum.SUBJECTIVE
-                                                ? '주관식'
-                                                : '객관식'
+                                        <div className="flex items-center gap-2">
+                                            {/* 질문 유형 드롭다운 */}
+                                            <Dropdown
+                                                options={[
+                                                    '객관식',
+                                                    '체크박스',
+                                                    '주관식',
+                                                ]}
+                                                selected={
+                                                    q.type ===
+                                                    QuestionTypeEnum.CHECKBOX
+                                                        ? '체크박스'
+                                                        : q.type ===
+                                                          QuestionTypeEnum.SUBJECTIVE
+                                                        ? '주관식'
+                                                        : '객관식'
+                                                }
+                                                onSelect={(label) => {
+                                                    const type =
+                                                        label === '체크박스'
+                                                            ? QuestionTypeEnum.CHECKBOX
+                                                            : label === '주관식'
+                                                            ? QuestionTypeEnum.SUBJECTIVE
+                                                            : QuestionTypeEnum.MULTIPLE;
+                                                    handleChange(
+                                                        idx,
+                                                        'type',
+                                                        type,
+                                                    );
+                                                }}
+                                            />
+
+                                            {/* 삭제 버튼 */}
+                                            <button
+                                                onClick={() =>
+                                                    removeQuestion(idx)
+                                                }
+                                                className="text-sm text-red-500 hover:underline"
+                                            >
+                                                삭제
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* 카테고리 라벨 + 인풋 */}
+                                    <label className="block text-sm font-semibold mb-1 text-gray-700">
+                                        카테고리
+                                    </label>
+                                    <input
+                                        className="border p-2 rounded w-full text-base mb-3"
+                                        value={q.category}
+                                        onChange={(e) =>
+                                            handleChange(
+                                                idx,
+                                                'category',
+                                                e.target.value,
+                                            )
                                         }
-                                        onSelect={(label) => {
-                                            const type =
-                                                label === '체크박스'
-                                                    ? QuestionTypeEnum.CHECKBOX
-                                                    : label === '주관식'
-                                                    ? QuestionTypeEnum.SUBJECTIVE
-                                                    : QuestionTypeEnum.MULTIPLE;
-                                            handleChange(idx, 'type', type);
-                                        }}
+                                        placeholder="예: step1"
                                     />
 
-                                    {/* 삭제 버튼 */}
-                                    <button
-                                        onClick={() => removeQuestion(idx)}
-                                        className="text-sm text-red-500 hover:underline"
-                                    >
-                                        삭제
-                                    </button>
+                                    {/* 설문 제목 라벨 + 인풋 */}
+                                    <label className="block text-sm font-semibold mb-1 text-gray-700">
+                                        설문 제목
+                                    </label>
+                                    <input
+                                        className="border p-2 rounded w-full text-base mb-3"
+                                        value={q.question_text}
+                                        onChange={(e) =>
+                                            handleChange(
+                                                idx,
+                                                'question_text',
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="예: 이 음원에 대한 첫인상은 어땠나요?"
+                                    />
+
+                                    {/* 선택지 입력 */}
+                                    <div className="ml-2 mt-1 space-y-2">
+                                        {q.options.map((opt, oIdx) => (
+                                            <div
+                                                key={oIdx}
+                                                className="flex items-center gap-2"
+                                            >
+                                                <input
+                                                    className="border p-2 rounded text-base flex-1"
+                                                    value={opt}
+                                                    onChange={(e) =>
+                                                        handleOptionChange(
+                                                            idx,
+                                                            oIdx,
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder={`선택지 ${
+                                                        oIdx + 1
+                                                    }`}
+                                                />
+                                                <button
+                                                    className="text-xs text-red-400 hover:underline"
+                                                    onClick={() =>
+                                                        removeOption(idx, oIdx)
+                                                    }
+                                                >
+                                                    옵션 삭제
+                                                </button>
+                                            </div>
+                                        ))}
+
+                                        {/* + 선택지 추가 버튼 */}
+                                        {(q.type ===
+                                            QuestionTypeEnum.MULTIPLE ||
+                                            q.type ===
+                                                QuestionTypeEnum.CHECKBOX) && (
+                                            <button
+                                                className="text-xs text-blue-500 hover:underline"
+                                                onClick={() => addOption(idx)}
+                                            >
+                                                + 선택지 추가
+                                            </button>
+                                        )}
+
+                                        {/* 체크박스일 경우: 최대 선택 수 드롭다운 (선택지 하단에 위치) */}
+                                        {q.type ===
+                                            QuestionTypeEnum.CHECKBOX && (
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <label className="text-sm text-gray-600">
+                                                    최대 선택 수:
+                                                </label>
+                                                <Dropdown
+                                                    options={Array.from(
+                                                        {
+                                                            length: q.options
+                                                                .length,
+                                                        },
+                                                        (_, i) => String(i + 1),
+                                                    )}
+                                                    selected={String(
+                                                        q.max_num || 1,
+                                                    )}
+                                                    onSelect={(val) =>
+                                                        handleMaxNumChange(
+                                                            idx,
+                                                            Number(val),
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
 
-                            {/* 카테고리 라벨 + 인풋 */}
-                            <label className="block text-sm font-semibold mb-1 text-gray-700">
-                                카테고리
-                            </label>
-                            <input
-                                className="border p-2 rounded w-full text-base mb-3"
-                                value={q.category}
-                                onChange={(e) =>
-                                    handleChange(
-                                        idx,
-                                        'category',
-                                        e.target.value,
-                                    )
-                                }
-                                placeholder="예: step1"
-                            />
+                            <button
+                                className="w-full bg-gray-200 py-2 rounded mb-4 font-semibold hover:bg-gray-300"
+                                onClick={addQuestion}
+                            >
+                                + 질문 추가
+                            </button>
 
-                            {/* 설문 제목 라벨 + 인풋 */}
-                            <label className="block text-sm font-semibold mb-1 text-gray-700">
-                                설문 제목
-                            </label>
-                            <input
-                                className="border p-2 rounded w-full text-base mb-3"
-                                value={q.question_text}
-                                onChange={(e) =>
-                                    handleChange(
-                                        idx,
-                                        'question_text',
-                                        e.target.value,
-                                    )
-                                }
-                                placeholder="예: 이 음원에 대한 첫인상은 어땠나요?"
-                            />
-
-                            {/* 선택지 입력 */}
-                            <div className="ml-2 mt-1 space-y-2">
-                                {q.options.map((opt, oIdx) => (
-                                    <div
-                                        key={oIdx}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <input
-                                            className="border p-2 rounded text-base flex-1"
-                                            value={opt}
-                                            onChange={(e) =>
-                                                handleOptionChange(
-                                                    idx,
-                                                    oIdx,
-                                                    e.target.value,
-                                                )
-                                            }
-                                            placeholder={`선택지 ${oIdx + 1}`}
-                                        />
-                                        <button
-                                            className="text-xs text-red-400 hover:underline"
-                                            onClick={() =>
-                                                removeOption(idx, oIdx)
-                                            }
-                                        >
-                                            옵션 삭제
-                                        </button>
-                                    </div>
-                                ))}
-
-                                {/* + 선택지 추가 버튼 */}
-                                {(q.type === QuestionTypeEnum.MULTIPLE ||
-                                    q.type === QuestionTypeEnum.CHECKBOX) && (
-                                    <button
-                                        className="text-xs text-blue-500 hover:underline"
-                                        onClick={() => addOption(idx)}
-                                    >
-                                        + 선택지 추가
-                                    </button>
-                                )}
-
-                                {/* 체크박스일 경우: 최대 선택 수 드롭다운 (선택지 하단에 위치) */}
-                                {q.type === QuestionTypeEnum.CHECKBOX && (
-                                    <div className="flex items-center gap-2 mt-2">
-                                        <label className="text-sm text-gray-600">
-                                            최대 선택 수:
-                                        </label>
-                                        <Dropdown
-                                            options={Array.from(
-                                                { length: q.options.length },
-                                                (_, i) => String(i + 1),
-                                            )}
-                                            selected={String(q.max_num || 1)}
-                                            onSelect={(val) =>
-                                                handleMaxNumChange(
-                                                    idx,
-                                                    Number(val),
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                )}
-                            </div>
+                            <button
+                                onClick={save}
+                                disabled={loading}
+                                className="w-full bg-blue-600 text-white py-3 rounded-md font-bold text-lg hover:bg-blue-700 transition disabled:opacity-50 shadow"
+                            >
+                                {loading ? '저장 중...' : '템플릿 저장하기'}
+                            </button>
                         </div>
-                    ))}
-
-                    <button
-                        className="w-full bg-gray-200 py-2 rounded mb-4 font-semibold hover:bg-gray-300"
-                        onClick={addQuestion}
-                    >
-                        + 질문 추가
-                    </button>
-
-                    <button
-                        onClick={save}
-                        disabled={loading}
-                        className="w-full bg-blue-600 text-white py-3 rounded-md font-bold text-lg hover:bg-blue-700 transition disabled:opacity-50 shadow"
-                    >
-                        {loading ? '저장 중...' : '템플릿 저장하기'}
-                    </button>
+                    </div>
                 </div>
             </div>
         </div>

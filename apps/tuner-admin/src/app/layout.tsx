@@ -33,14 +33,12 @@ export default function RootLayout({
                         className={`w-full min-h-screen h-full ${
                             isLoginPage
                                 ? 'bg-[#DEDEDE] flex justify-center items-center'
-                                : 'pt-[63px] pl-[22px] bg-[#DEDEDE]'
+                                : 'pt-[63px] pl-[9%] bg-[#DEDEDE]'
                         }`}
                     >
                         <div
                             className={
-                                isLoginPage
-                                    ? 'w-full max-w-xl'
-                                    : 'ml-[72px] lg:ml-[6%] w-[93%]'
+                                isLoginPage ? 'w-full max-w-xl' : 'w-[99%]'
                             }
                         >
                             <div

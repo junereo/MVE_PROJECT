@@ -2,6 +2,16 @@ import { create } from 'zustand';
 
 type SurveyType = 'general' | 'official';
 
+export type SurveyQuestion = {
+    id?: number;
+    question_text: string;
+    type: string;
+    category: string;
+    question_type: string;
+    max_num?: string;
+    options: string[];
+};
+
 // 설문 생성 1단계 정보 구조 정의
 export type SurveyStep1 = {
     surveyId?: string;
@@ -27,7 +37,7 @@ export type SurveyStep1 = {
     expertReward?: number; // Expert 유저 리워드 (리워드 타입일 때)
     templateSetKey: string; // 선택된 템플릿 키
     thumbnail_uri?: string; //사용자가 업로드한 썸네일
-    surveyQuestionsRaw?: string; //  수정 모드용
+    surveyQuestionsRaw?: SurveyQuestion[]; //  수정 모드용
 };
 
 // 설문 생성 2단계 정보 구조 정의
@@ -52,7 +62,7 @@ type SurveyStep2 = {
         type: string;
     }[];
     categoryQuestions: Record<string, unknown[]>; // 템플릿에서 자동 주입된 기본 설문 문항들
-    survey_question?: string;
+    survey_question?: SurveyQuestion[];
 };
 
 // 상태 구조 정의
