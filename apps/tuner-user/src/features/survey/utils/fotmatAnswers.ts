@@ -8,7 +8,7 @@ export const formatDefaultAnswers = (
   return questions.map((q) => {
     // category 기반으로 상태에서 answer 추출
     const step = q.category;
-    const answer = answers[step]?.[questions.indexOf(q)] ?? null;
+    const answer = answers[step]?.[q.id] ?? null;
 
     return {
       id: q.id,
