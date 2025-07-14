@@ -1,4 +1,3 @@
-
 import { PrismaClient, UserRole } from "@prisma/client";
 import { buildUserRelationOperations } from "./user.relation.service";
 import { hashPassword } from "../utils/auth.utils"; // 너네 해시 함수 경로 맞게 바꿔
@@ -88,6 +87,8 @@ export const getUserById = async (id: number) => {
 };
 
 export const updateUser = async (id: number, data: any) => {
+
+  console.log("Updating user with data:", data);
   let updateData: any = {
     email: data.email,
     phone_number: data.phone_number,

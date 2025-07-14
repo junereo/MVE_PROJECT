@@ -166,20 +166,20 @@ export default function SurveyDetail() {
         {is_active === "ongoing" && user && (
           <>
             {myParticipation ? (
-              myParticipation.status === "draft" ? (
+              myParticipation.status === "complete" ? (
                 // 참여 완료
-                <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] mx-auto">
+                <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
                   <Button color="white">이미 참여한 설문입니다.</Button>
                 </div>
               ) : (
                 // 응답 임시 저장 (draft)
-                <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] mx-auto">
+                <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full  max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
                   <Button color="blue">설문 응답 수정</Button>
                 </div>
               )
             ) : (
               // 참여 전
-              <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] mx-auto">
+              <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full  max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
                 <Button
                   color="blue"
                   onClick={() => router.push(`/survey/${id}/responses`)}
