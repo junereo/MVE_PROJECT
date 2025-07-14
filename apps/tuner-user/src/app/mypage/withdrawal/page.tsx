@@ -133,10 +133,10 @@ export default function Reward() {
           className="flex flex-col gap-5 max-w-[768px] sm:max-w-[640px] xs:max-w-[485px]"
         >
           <Input
-            label="출금 금액 (ETH)"
+            label="출금 금액 (포인트)"
             name="reward"
             type="text"
-            placeholder="예: 1.5"
+            placeholder="예: 1.5 포인트"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
