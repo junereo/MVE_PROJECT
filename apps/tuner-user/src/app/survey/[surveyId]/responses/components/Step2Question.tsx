@@ -92,7 +92,7 @@ export default function Step2Question({
 
         let idCounter = 0;
 
-        rawQuestions.forEach((q, index) => {
+        rawQuestions.forEach((q) => {
           const question = {
             id: idCounter++,
             category: q.category ?? "step1",
