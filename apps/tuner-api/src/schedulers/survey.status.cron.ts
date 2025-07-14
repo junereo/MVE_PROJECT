@@ -1,8 +1,13 @@
 // src/schedulers/surveyStatusCron.ts
 import cron from 'node-cron'
 import { PrismaClient } from '@prisma/client'
+import { SurveyService } from '../wallet/services/survey.service';
+import { MetaTransctionService } from '../wallet/services/meta_transction.service';
 
 const prisma = new PrismaClient()
+
+const metaService = new MetaTransctionService();
+const surveyService = new SurveyService(metaService);
 
 // 매 분마다 실행
 cron.schedule('*/10 * * * * *', async () => {
@@ -46,6 +51,7 @@ cron.schedule('*/10 * * * * *', async () => {
           id: true,
           user_id: true,
           rewarded: true,
+          answers: true,
           user: {
             select: {
               id: true,
@@ -85,11 +91,43 @@ cron.schedule('*/10 * * * * *', async () => {
             data: { rewarded: 0 },
           })
 
+          // IPFS 업로드 및 Survey_Result metadata_ipfs 업데이트
+          let metadata_ipfs = 'failed';
+          try {
+            // surveyService가 초기화되어 있고 contract, wallet, provider가 모두 준비된 경우만 실행
+            if (
+              surveyService &&
+              surveyService['contract'] &&
+              surveyService['wallet'] &&
+              surveyService['provider']
+            ) {
+              // 설문 응답 데이터 준비 (예시: participant.answers)
+              const ipfsResult = await surveyService.submitSurveyAndMint(
+                String(participant.user_id),
+                String(survey.id),
+                JSON.stringify(survey)
+              );
+              if (ipfsResult && ipfsResult.metadataUri) {
+                metadata_ipfs = ipfsResult.metadataUri;
+              }
+            }
+          } catch (e) {
+            console.error('IPFS 업로드 실패:', e);
+            metadata_ipfs = 'failed';
+          }
+          // Survey_Result 테이블 업데이트
+          await prisma.survey_Result.updateMany({
+            where: { survey_id: survey.id },
+            data: { metadata_ipfs },
+          });
+
           console.log(
             `리워드 지급 완료: user_id=${participant.user_id}, role=${participant.user ? participant.user.role : 'unknown'}, amount=${rewardAmount}`
           )
         }
       }
+
+      
     }
 
     if (toOngoing.count > 0 || closedSurveys.length > 0) {
