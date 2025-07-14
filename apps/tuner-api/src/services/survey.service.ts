@@ -96,8 +96,9 @@ export const createSurveyParticipant = async ({
       data: {
         gender: user_info.gender,
         age: user_info.age as any,
-        genre: Array.isArray(user_info.genre)
-          ? user_info.genre.map(g => g as Genre) : [],
+        genre: Array.isArray(user_info.genre) && user_info.genre.length > 0
+          ? user_info.genre[0] as Genre
+          : null,
         job_domain: user_info.job_domain,
       },
     });
@@ -109,7 +110,7 @@ export const createSurveyParticipant = async ({
   });
 
   const finalAnswers = {
-    answers, // ✅ 반드시 깔끔한 { question_id, answer }[]
+    answers,
     user_info: {
       gender: updatedUser?.gender,
       age: updatedUser?.age,

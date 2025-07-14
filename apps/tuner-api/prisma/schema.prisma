@@ -194,8 +194,9 @@ model Survey_Participants {
   rewarded   Boolean      @default(false)
   created_at DateTime     @default(now())
   updated_at DateTime     @updatedAt
-  user       User?        @relation(fields: [user_id], references: [id], onDelete: SetNull)
-  survey     Survey       @relation(fields: [survey_id], references: [id])
+
+  user   User?  @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  survey Survey @relation(fields: [survey_id], references: [id])
 }
 
 model Survey_Result {

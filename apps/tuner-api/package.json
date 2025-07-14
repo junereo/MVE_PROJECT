@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsup 'src/**/*.ts' --format esm",
+    "build": "tsup 'src/**/*.ts' --format esm --external dotenv",
     "start": "node dist/server.js",
     "lint": "eslint 'src/**/*.{ts,js}'",
     "format": "prettier --write 'src/**/*.{ts,js,json}'",
