@@ -40,7 +40,7 @@ CREATE TABLE "User" (
     "nickname" TEXT NOT NULL,
     "gender" BOOLEAN,
     "age" "AgeGroup",
-    "genre" "Genre"[] DEFAULT ARRAY[]::"Genre"[],
+    "genre" "Genre",
     "job_domain" BOOLEAN,
     "balance" INTEGER NOT NULL DEFAULT 0,
     "wallet_address" TEXT,

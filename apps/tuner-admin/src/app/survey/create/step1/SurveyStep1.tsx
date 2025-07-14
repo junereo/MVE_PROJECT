@@ -347,6 +347,9 @@ const SurveyStep1 = () => {
                                             EDM: 'edm',
                                             국악: 'gukak',
                                             락: 'rock',
+                                            팝: 'pop',
+                                            트로트: 'trot',
+                                            ccm: 'ccm',
                                         };
                                         handleInputChange(
                                             'genre',

@@ -2,9 +2,6 @@
 CREATE TYPE "UserRole" AS ENUM ('superadmin', 'admin', 'ordinary', 'expert');
 
 -- CreateEnum
-CREATE TYPE "Gender" AS ENUM ('male', 'female');
-
--- CreateEnum
 CREATE TYPE "AgeGroup" AS ENUM ('teen', 'twenties', 'thirties', 'forties', 'fifties', 'sixties');
 
 -- CreateEnum
