@@ -116,7 +116,7 @@ CREATE TABLE "Survey_Participants" (
     "survey_id" INTEGER NOT NULL,
     "answers" JSONB NOT NULL,
     "status" "SurveyStatus" NOT NULL DEFAULT 'draft',
-    "rewarded" BOOLEAN NOT NULL DEFAULT false,
+    "rewarded" INTEGER NOT NULL DEFAULT 0,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
