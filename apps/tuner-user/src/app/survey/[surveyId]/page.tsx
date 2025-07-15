@@ -159,7 +159,7 @@ export default function SurveyDetail() {
               이 참여했어요.
             </p>
 
-            <SurveyResult />
+            <SurveyResult surveyId={id} />
           </section>
         )}
 
