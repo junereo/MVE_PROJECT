@@ -271,7 +271,8 @@ export const resetPasswordRequest = async (req: Request, res: Response) => {
   const email = req.body?.email;
 
   if (!email) {
-    return res.status(400).json({ message: "이메일을 입력해주세요." });
+    res.status(400).json({ message: "이메일을 입력해주세요." });
+    return;
   }
 
   const user = await prisma.user.findUnique({
@@ -279,7 +280,8 @@ export const resetPasswordRequest = async (req: Request, res: Response) => {
   });
 
   if (!user) {
-    return res.status(404).json({ message: "존재하지 않는 이메일입니다." });
+    res.status(404).json({ message: "존재하지 않는 이메일입니다." });
+    return
   }
   // 1) JWT 발급
   const token = jwt.sign(
@@ -295,7 +297,8 @@ export const resetPasswordRequest = async (req: Request, res: Response) => {
   const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
   await sendResetPasswordEmail(user.email, resetLink);
 
-  return res.json({ success: true, message: "재설정 링크가 전송되었습니다." });
+  res.json({ success: true, message: "재설정 링크가 전송되었습니다." });
+  return
 };
 
 // 비밀번호 재설정 실행
@@ -309,7 +312,8 @@ export const resetPassword = async (req: Request, res: Response) => {
     // Redis에서 토큰이 유효한지 확인
     const userId = await redisClient.get(`reset:${token}`);
     if (!userId) {
-      return res.status(400).json({ message: "유효하지 않거나 만료된 링크입니다." });
+      res.status(400).json({ message: "유효하지 않거나 만료된 링크입니다." });
+      return;
     }
 
     // 비밀번호 해시 후 DB 업데이트
@@ -323,8 +327,10 @@ export const resetPassword = async (req: Request, res: Response) => {
     // Redis에서 토큰 삭제
     await redisClient.del(`reset:${token}`);
 
-    return res.json({ success: true, message: "비밀번호가 재설정되었습니다." });
+     res.json({ success: true, message: "비밀번호가 재설정되었습니다." });
+     return;
   } catch (error) {
-    return res.status(400).json({ message: "유효하지 않거나 만료된 링크입니다." });
+     res.status(400).json({ message: "유효하지 않거나 만료된 링크입니다." });
+     return;
   }
 };
