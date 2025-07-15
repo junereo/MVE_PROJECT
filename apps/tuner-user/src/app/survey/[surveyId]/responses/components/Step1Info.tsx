@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+
+import { getUserInfo } from "@/features/users/services/user";
+import { useAuthStore } from "@/features/auth/store/authStore";
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { useEffect } from "react";
@@ -43,18 +46,26 @@ export default function Step1Info({
   surveyTitle,
   onNext,
 }: Step1Props) {
-  const { userInfo } = useUserStore();
+  const { user } = useAuthStore();
   const { gender, age, genre, jobDomain, setUserInfo } = useSurveyInfo();
 
   const genreOptions = Object.values(genreMap);
 
   useEffect(() => {
-    console.log("userInfo", userInfo);
-    if (userInfo) {
-      const uiInfo = mapUserInfo(userInfo);
-      setUserInfo(uiInfo);
-    }
-  }, [userInfo, setUserInfo]);
+    const fetchUserInfo = async () => {
+      try {
+        if (!user?.id) return;
+        const data = await getUserInfo(Number(user.id));
+        console.log("설문 참여 시 기본 정보", data.data);
+        const uiInfo = mapUserInfo(data.data);
+        setUserInfo(uiInfo); // ← 여기서 최신 정보 세팅
+      } catch (err) {
+        console.error("유저 정보 불러오기 실패", err);
+      }
+    };
+
+    fetchUserInfo();
+  }, [setUserInfo]);
 
   const handleNext = () => {
     setUserInfo({ gender, age, genre, jobDomain });
