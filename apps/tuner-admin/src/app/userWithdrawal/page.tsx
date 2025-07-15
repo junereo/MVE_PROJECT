@@ -1,9 +1,3 @@
-// 주요 수정사항 반영 완료:
-// 1. 드롭다운 순서 변경: 상태(status) 필터가 앞에, 역할(role) 필터가 뒤에 위치
-// 2. 정렬 버튼 제거, 두 번째 드롭다운이 시간 정렬로 변경됨
-// 3. 시간 포맷 YYYY-MM-DD HH:mm:ss 형태로 보기 좋게 변경
-// 4. 검색은 email, user_id 기준으로 변경
-
 'use client';
 
 import { useEffect, useState } from 'react';

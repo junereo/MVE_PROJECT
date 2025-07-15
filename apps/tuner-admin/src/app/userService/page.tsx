@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { userList } from '@/lib/network/api';
+import { userList, userReward } from '@/lib/network/api';
 import Dropdown from '@/app/components/ui/DropDown';
 import RankChangeModal from './components/RankChaingeModal';
 import RewardModal from './components/RewardModal';
@@ -22,6 +22,7 @@ interface ServerUser {
     role: 'superadmin' | 'admin' | 'ordinary';
     balance: number;
     badge_issued_at: string | null;
+    rewardLeft?: number;
 }
 export default function AdminUserPage() {
     const { user } = useSessionStore();
@@ -41,27 +42,77 @@ export default function AdminUserPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const usersPerPage = 15;
 
+    // useEffect(() => {
+    //     const fetchUsers = async () => {
+    //         try {
+    //             const { data } = await userList();
+    //             console.log(data);
+
+    //             const mappedUsers: User[] = data.map((user: ServerUser) => ({
+    //                 id: user.id,
+    //                 nickname: user.nickname,
+    //                 email: user.email,
+    //                 role: user.badge_issued_at
+    //                     ? 'expert'
+    //                     : user.role === 'ordinary'
+    //                     ? 'ordinary'
+    //                     : user.role,
+    //                 rewardLeft: user.balance ?? 0,
+    //             }));
+
+    //             setUsers(mappedUsers);
+    //         } catch (err) {
+    //             console.error('유저 목록 불러오기 실패:', err);
+    //         }
+    //     };
+
+    //     fetchUsers();
+    // }, []);
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const { data } = await userList();
-                console.log(data);
 
-                const mappedUsers: User[] = data.map((user: ServerUser) => ({
-                    id: user.id,
-                    nickname: user.nickname,
-                    email: user.email,
-                    role: user.badge_issued_at
-                        ? 'expert'
-                        : user.role === 'ordinary'
-                        ? 'ordinary'
-                        : user.role,
-                    rewardLeft: user.balance ?? 0,
-                }));
+                // 모든 유저에 대해 병렬로 token 가져오기
+                const usersWithToken = await Promise.all(
+                    data.map(async (user: ServerUser) => {
+                        try {
+                            const tokenResponse = await userReward(user.id);
+                            return {
+                                id: user.id,
+                                nickname: user.nickname,
+                                email: user.email,
+                                role: user.badge_issued_at
+                                    ? 'expert'
+                                    : user.role === 'ordinary'
+                                    ? 'ordinary'
+                                    : user.role,
+                                rewardLeft: tokenResponse.data.token ?? 0,
+                            };
+                        } catch (error) {
+                            console.error(
+                                `❌ 유저 ID ${user.id} 토큰 조회 실패`,
+                                error,
+                            );
+                            return {
+                                id: user.id,
+                                nickname: user.nickname,
+                                email: user.email,
+                                role: user.badge_issued_at
+                                    ? 'expert'
+                                    : user.role === 'ordinary'
+                                    ? 'ordinary'
+                                    : user.role,
+                                rewardLeft: 0, // 실패 시 0으로 fallback
+                            };
+                        }
+                    }),
+                );
 
-                setUsers(mappedUsers);
+                setUsers(usersWithToken);
             } catch (err) {
-                console.error('유저 목록 불러오기 실패:', err);
+                console.error('❌ 유저 목록 불러오기 실패:', err);
             }
         };
 
@@ -87,10 +138,10 @@ export default function AdminUserPage() {
     );
     const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-    const handleRewardClick = (id: number, nickname: string) => {
-        setSelectedUser({ id, nickname });
-        setRewardModalOpen(true);
-    };
+    // const handleRewardClick = (id: number, nickname: string) => {
+    //     setSelectedUser({ id, nickname });
+    //     setRewardModalOpen(true);
+    // };
     const handleConfirmReward = (amount: number) => {
         if (selectedUser) {
             console.log(
@@ -242,7 +293,7 @@ export default function AdminUserPage() {
                                     등급
                                 </th>
                                 <th className="border px-2 py-1 w-[120px]">
-                                    리워드 잔량
+                                    MVE 리워드 잔량
                                 </th>
                                 <th className="border px-2 py-1 w-[160px]">
                                     관리
@@ -256,7 +307,7 @@ export default function AdminUserPage() {
                                     className="hover:bg-blue-50 cursor-pointer"
                                     onClick={() =>
                                         router.push(`/userService/${user.id}`)
-                                    } // 🔥 여기가 핵심!
+                                    }
                                 >
                                     <td className="border px-2 py-1">
                                         {user.id}
@@ -277,7 +328,7 @@ export default function AdminUserPage() {
                                         {user.role}
                                     </td>
                                     <td className="border px-2 py-1">
-                                        {user.rewardLeft} STK
+                                        {user.rewardLeft} MVE
                                     </td>
                                     <td
                                         className="border px-2 py-1 space-x-2"
@@ -294,7 +345,7 @@ export default function AdminUserPage() {
                                         >
                                             등급 변경
                                         </button>
-                                        <button
+                                        {/* <button
                                             className="bg-blue-500 px-2 py-1 rounded text-white text-xs"
                                             onClick={() =>
                                                 handleRewardClick(
@@ -303,8 +354,8 @@ export default function AdminUserPage() {
                                                 )
                                             }
                                         >
-                                            리워드 지급
-                                        </button>
+                                            포인트 지급
+                                        </button> */}
                                     </td>
                                 </tr>
                             ))}

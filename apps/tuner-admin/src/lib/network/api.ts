@@ -108,3 +108,8 @@ export const fetchFixedQuestions = async (
     const response = await axiosClient.get(`/survey/q/${questionnaireId}`);
     return response.data;
 };
+
+export const userReward = async (id: number) => {
+    const response = await axiosClient.get(`/contract/wallet/token/${id}`);
+    return response;
+};
