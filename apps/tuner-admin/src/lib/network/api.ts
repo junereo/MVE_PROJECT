@@ -48,6 +48,12 @@ export const surveyView = async (id: number | string) => {
 
     return res.data;
 };
+// 설문 데이터
+export const surveyData = async (id: number | string) => {
+    const res = await axiosClient.get(`/survey/r/${id}`);
+
+    return res.data;
+};
 // 설문 참여자 리스트
 export const participantList = async () => {
     const res = await axiosClient.get(`/survey/p`);
