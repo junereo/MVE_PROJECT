@@ -158,40 +158,45 @@ export const createSurvey = async ({
   try {
     if (!userId) throw new Error("유저 필요");
 
-    // 타입 검사
     if (!Object.values(SurveyType).includes(body.type)) {
       throw new Error(`잘못된 설문 타입: ${body.type}`);
     }
-
     const kstNow = DateTime.now().setZone("Asia/Seoul");
-
     const startDate = body.start_at ? new Date(body.start_at) : kstNow.toJSDate();
 
-    const endDate = kstNow.endOf("day").toJSDate();
+    let endDate: Date;
 
-    if (startDate >= endDate) {
-      throw new Error("종료일은 시작일 이후여야 합니다.");
+    if (body.end_at) {
+      endDate = new Date(body.end_at);
+    } else {
+      const kstEndOfToday = kstNow.endOf("day");
+      endDate = kstEndOfToday.toJSDate();
     }
 
-    const releasedDate = body.released_date
-      ? new Date(body.released_date)
-      : kstNow.toJSDate();
+    if (startDate >= endDate) {
+      console.log(`start_at >= end_at => 보정 적용`);
+      const kstSafe = DateTime.fromJSDate(startDate).plus({ minutes: 1 });
+      endDate = kstSafe.toJSDate();
+    }
+
+    console.log("startDate:", startDate.toISOString());
+    console.log("endDate:", endDate.toISOString());
 
     return await prisma.$transaction(async (tx) => {
       const survey = await tx.survey.create({
         data: {
           user_id: userId,
+          start_at: startDate,
+          end_at: endDate,
           survey_title: body.survey_title ?? "",
           music_title: body.music_title ?? "",
           artist: body.artist ?? "",
           music_uri: body.music_uri ?? "",
           thumbnail_uri: body.thumbnail_uri ?? "",
           genre: body.genre ?? null,
-          is_released: !!body.is_released,
-          released_date: releasedDate,
           type: body.type,
-          start_at: startDate,
-          end_at: endDate,
+          is_released: !!body.is_released,
+          released_date: new Date(),
           is_active: checkSurveyActive(startDate, endDate),
           status: body.status ?? "draft",
           reward: body.reward ?? 0,
