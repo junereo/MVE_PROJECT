@@ -8,6 +8,8 @@ import {
   Genre,
   Survey_Question,
 } from "@prisma/client";
+import { AnswerItem } from "../types/survey.types";
+import { calculateSurveyResult } from "./survey.result.service";
 // import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
 
 const prisma = new PrismaClient();
@@ -41,17 +43,6 @@ export const editSurvey = ({
 };
 
 // 설문참여 가능 여부
-export const canParticipateSurvey = ({
-  status,
-  is_active,
-}: {
-  status: SurveyStatus;
-  is_active: SurveyActive;
-}): boolean => {
-  return status === "complete" && is_active === "ongoing";
-};
-
-// 참여 저장 (임시저장/제출)
 export const createSurveyParticipant = async ({
   user_id,
   survey_id,
@@ -61,7 +52,7 @@ export const createSurveyParticipant = async ({
 }: {
   user_id: number;
   survey_id: number;
-  answers: any[];
+  answers: AnswerItem[];
   status?: SurveyStatus;
   user_info?: {
     gender?: boolean | null;
@@ -104,21 +95,6 @@ export const createSurveyParticipant = async ({
     });
   }
 
-  const updatedUser = await prisma.user.findUnique({
-    where: { id: user_id },
-    select: { gender: true, age: true, genre: true, job_domain: true },
-  });
-
-  const finalAnswers = {
-    answers,
-    user_info: {
-      gender: updatedUser?.gender,
-      age: updatedUser?.age,
-      genre: updatedUser?.genre,
-      job_domain: updatedUser?.job_domain,
-    },
-  };
-
   const existing = await prisma.survey_Participants.findFirst({
     where: { user_id, survey_id },
   });
@@ -127,7 +103,7 @@ export const createSurveyParticipant = async ({
     return await prisma.survey_Participants.update({
       where: { id: existing.id },
       data: {
-        answers: finalAnswers,
+        answers,
         status: status ?? "draft",
         rewarded: false,
       },
@@ -138,15 +114,12 @@ export const createSurveyParticipant = async ({
     data: {
       user_id,
       survey_id,
-      answers: finalAnswers,
+      answers,
       status: status ?? "draft",
       rewarded: false,
     },
   });
 };
-
-
-
 
 // 설문 타입 유효성 검사
 const isSurveyType = (value: any): value is SurveyType => {
@@ -324,12 +297,7 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
     where: { id: surveyId },
     select: { status: true, is_active: true },
   });
-  console.log("서버 확인", survey);
-
   if (!survey) throw new Error("설문 없음");
-  if (!editSurvey(survey)) {
-    throw new Error("설문이 종료되어 수정할 수 없습니다.");
-  }
 
   const updatedSurvey = await prisma.survey.update({
     where: { id: surveyId },
@@ -338,12 +306,18 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
       start_at: new Date(body.start_at),
       end_at: new Date(body.end_at),
       status: body.status,
-      is_active: checkSurveyActive(body.start_at, body.end_at),
+      is_active: body.is_active,
     },
   });
 
+  // 종료 상태라면 자동으로 통계 계산
+  if (body.status === "complete" || body.is_active === "closed") {
+    await calculateSurveyResult(surveyId);
+  }
+
   return updatedSurvey;
 };
+
 
 export const createSurveyResult = async ({
   survey_id,
@@ -428,4 +402,27 @@ export const getSurveyQuestion = async ({
       participant,
     },
   ];
+};
+
+export const updateSurveyResponse = async ({
+  userId,
+  surveyId,
+  answers,
+}: {
+  userId: number;
+  surveyId: number;
+  answers: any;
+}) => {
+  const updated = await prisma.survey_Participants.updateMany({
+    where: {
+      user_id: userId,
+      survey_id: surveyId,
+    },
+    data: {
+      answers: answers,
+      status: SurveyStatus.complete,
+    },
+  });
+
+  return updated;
 };
