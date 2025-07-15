@@ -9,7 +9,6 @@ export default function MainLayout({
 }>) {
   return (
     <>
-      <Header />
       <Wrapper>{children}</Wrapper>
       <BottomNavbar />
     </>

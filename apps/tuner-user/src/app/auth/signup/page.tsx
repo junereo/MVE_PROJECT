@@ -1,16 +1,15 @@
 import SignupForm from "./components/SignupForm";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import SearchHeader from "@/components/layouts/SearchHeader";
 
 export default function Signup() {
   return (
-    <div>
+    <>
+      <SearchHeader />
       <Breadcrumb crumbs={[{ label: "회원가입" }]} />
-      <div className="sm:pt-[100px]">
-        <div className="flex items-center justify-center font-bold text-2xl pt-1 pb-1 text-blue-600">
-          TUNER
-        </div>
+      <div>
         <SignupForm />
       </div>
-    </div>
+    </>
   );
 }
