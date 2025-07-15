@@ -88,7 +88,7 @@ export default function UserDetailPage() {
     return (
         <div>
             <div className="w-full text-black text-2xl py-3 font-bold">
-                UserView
+                유저 상세
             </div>
             <div className="p-6 space-y-6">
                 <div className="bg-white shadow rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

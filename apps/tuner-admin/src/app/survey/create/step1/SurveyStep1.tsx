@@ -149,7 +149,7 @@ const SurveyStep1 = () => {
     return (
         <div>
             <div className="w-full font-bold text-black text-2xl py-3">
-                Survey create Step1
+                설문 만들기 Step1
             </div>
             <div className="p-6">
                 <div className="flex justify-center">

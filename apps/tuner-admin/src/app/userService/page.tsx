@@ -123,7 +123,7 @@ export default function AdminUserPage() {
     return (
         <div>
             <div className="w-full text-black text-2xl py-3 font-bold">
-                UserListTable
+                유저 관리
             </div>
             <div className="p-6">
                 <div className="bg-white p-4 rounded-xl shadow mb-6 text-sm flex flex-wrap gap-4">

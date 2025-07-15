@@ -1,3 +1,9 @@
+// 주요 수정사항 반영 완료:
+// 1. 드롭다운 순서 변경: 상태(status) 필터가 앞에, 역할(role) 필터가 뒤에 위치
+// 2. 정렬 버튼 제거, 두 번째 드롭다운이 시간 정렬로 변경됨
+// 3. 시간 포맷 YYYY-MM-DD HH:mm:ss 형태로 보기 좋게 변경
+// 4. 검색은 email, user_id 기준으로 변경
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -5,7 +11,8 @@ import axiosClient from '@/lib/network/axios';
 import Dropdown from '@/app/components/ui/DropDown';
 import RewardModal from '../userService/components/RewardModal';
 import { useSessionStore } from '@/store/useAuthmeStore';
-
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 interface User {
     id: number;
     user_id: number;
@@ -26,6 +33,14 @@ interface ServerUser {
     balance: number;
     badge_issued_at: string | null;
 }
+interface PoolItem {
+    id: number;
+    user_id: number;
+    txhash?: string;
+    amount?: number;
+    requested_at?: string;
+    status?: 'pending' | 'completed' | 'failed';
+}
 
 export default function UserWithdrawal() {
     const { user } = useSessionStore();
@@ -35,45 +50,44 @@ export default function UserWithdrawal() {
     const [selectedUser, setSelectedUser] = useState<{
         id: number;
         nickname: string;
+        amount: number;
     } | null>(null);
     const [rewardModalOpen, setRewardModalOpen] = useState(false);
     const [statusFilter, setStatusFilter] = useState('전체');
-    const [roleFilter, setRoleFilter] = useState('전체');
     const [currentPage, setCurrentPage] = useState(1);
     const usersPerPage = 15;
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                // 1. 유저 목록 가져오기
                 const userRes = await axiosClient.get('/user');
                 const userMap = new Map<number, ServerUser>(
                     userRes.data.map((u: ServerUser) => [u.id, u]),
                 );
 
-                // 2. 출금 요청 목록 가져오기
                 const poolRes = await axiosClient.get(
                     '/contract/tx/pool?status=all',
                 );
 
-                // 3. 출금 정보 + 유저 정보 병합
-                const mergedData: User[] = poolRes.data.map((item: any) => {
-                    const userInfo = userMap.get(item.user_id);
-
-                    return {
-                        id: item.id,
-                        user_id: item.user_id,
-                        email: userInfo?.email ?? '',
-                        nickname: userInfo?.nickname ?? '-',
-                        role: userInfo?.badge_issued_at
-                            ? 'expert'
-                            : userInfo?.role ?? '-',
-                        rewardLeft: userInfo?.balance ?? 0,
-                        txhash: item.txhash ?? '',
-                        amount: item.amount ?? 0,
-                        requested_at: item.requested_at ?? '',
-                        status: item.status ?? 'pending',
-                    };
-                });
+                const mergedData: User[] = poolRes.data.map(
+                    (item: PoolItem) => {
+                        const userInfo = userMap.get(item.user_id);
+                        return {
+                            id: item.id,
+                            user_id: item.user_id,
+                            email: userInfo?.email ?? '',
+                            nickname: userInfo?.nickname ?? '-',
+                            role: userInfo?.badge_issued_at
+                                ? 'expert'
+                                : userInfo?.role ?? '-',
+                            rewardLeft: userInfo?.balance ?? 0,
+                            txhash: item.txhash ?? '',
+                            amount: item.amount ?? 0,
+                            requested_at: item.requested_at ?? '',
+                            status: item.status ?? 'pending',
+                        };
+                    },
+                );
 
                 setUsers(mergedData);
             } catch (err) {
@@ -86,13 +100,21 @@ export default function UserWithdrawal() {
 
     const filteredUsers = users
         .filter((user) => {
+            const query = searchQuery.trim();
+
+            const isNumberQuery = /^\d+$/.test(query); // 숫자만 입력된 경우
+
             const queryMatch =
-                (user.email?.includes(searchQuery) ?? false) ||
-                (user.txhash?.includes(searchQuery) ?? false);
-            const roleMatch = roleFilter === '전체' || user.role === roleFilter;
+                query === ''
+                    ? true
+                    : isNumberQuery
+                    ? user.user_id.toString() === query
+                    : user.email.toLowerCase().includes(query.toLowerCase());
+
             const statusMatch =
                 statusFilter === '전체' || user.status === statusFilter;
-            return queryMatch && roleMatch && statusMatch;
+
+            return queryMatch && statusMatch;
         })
         .sort((a, b) =>
             sortNewestFirst
@@ -106,11 +128,15 @@ export default function UserWithdrawal() {
         (currentPage - 1) * usersPerPage,
         currentPage * usersPerPage,
     );
-
     const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-    const handleRewardClick = (id: number, nickname: string) => {
-        setSelectedUser({ id, nickname });
+    const handleRewardClick = (
+        id: number,
+        nickname: string,
+        amount: number,
+    ) => {
+        console.log('선택한 유저:', { id, nickname, amount });
+        setSelectedUser({ id, nickname, amount });
         setRewardModalOpen(true);
     };
 
@@ -124,9 +150,28 @@ export default function UserWithdrawal() {
         }
     };
 
+    const formatDate = (iso: string) => {
+        const date = new Date(iso);
+        return `${date.getFullYear()}-${(date.getMonth() + 1)
+            .toString()
+            .padStart(2, '0')}-${date
+            .getDate()
+            .toString()
+            .padStart(2, '0')} ${date
+            .getHours()
+            .toString()
+            .padStart(2, '0')}:${date
+            .getMinutes()
+            .toString()
+            .padStart(2, '0')}:${date
+            .getSeconds()
+            .toString()
+            .padStart(2, '0')}`;
+    };
+
     return (
         <div className="p-6">
-            <div className="text-2xl font-bold mb-4">User Withdrawal</div>
+            <div className="text-2xl font-bold mb-4">출금 관리</div>
 
             <div className="bg-white p-4 rounded-xl shadow mb-6 text-sm flex flex-wrap gap-4">
                 <div>
@@ -146,7 +191,7 @@ export default function UserWithdrawal() {
             <div className="flex flex-wrap items-center gap-2 mb-4 w-full">
                 <input
                     type="text"
-                    placeholder="이메일 또는 TxHash 검색"
+                    placeholder="User ID (숫자) 또는 이메일 검색"
                     value={searchQuery}
                     onChange={(e) => {
                         setSearchQuery(e.target.value);
@@ -155,33 +200,37 @@ export default function UserWithdrawal() {
                     className="border min-w-[500px] rounded px-3 py-2 text-sm"
                 />
 
-                <button
-                    onClick={() => {
-                        setSortNewestFirst((prev) => !prev);
-                        setCurrentPage(1);
-                    }}
-                    className="text-blue-600 border border-gray-300 px-3 py-2 rounded text-sm"
-                >
-                    {sortNewestFirst ? '▼ 최신순' : '▲ 오래된순'}
-                </button>
-
-                <Dropdown
-                    options={[
-                        '전체',
-                        'superadmin',
-                        'admin',
-                        'ordinary',
-                        'expert',
-                    ]}
-                    selected={roleFilter}
-                    onSelect={(val) => setRoleFilter(val)}
-                />
-
                 <Dropdown
                     options={['전체', 'pending', 'completed', 'failed']}
                     selected={statusFilter}
-                    onSelect={(val) => setStatusFilter(val)}
+                    onSelect={(val) => {
+                        setStatusFilter(val);
+                        setCurrentPage(1);
+                    }}
                 />
+
+                <Dropdown
+                    options={['최신순', '오래된순']}
+                    selected={sortNewestFirst ? '최신순' : '오래된순'}
+                    onSelect={(val) => {
+                        setSortNewestFirst(val === '최신순');
+                        setCurrentPage(1);
+                    }}
+                />
+                <Button
+                    className="bg-green-500 text-white hover:bg-green-600 ml-auto"
+                    onClick={async () => {
+                        try {
+                            await axiosClient.post('/contract/tx/submit');
+                            toast.success('전체 리워드 지급 완료!');
+                        } catch (error) {
+                            console.error('전체 지급 실패:', error);
+                            toast.error('전체 지급에 실패했습니다.');
+                        }
+                    }}
+                >
+                    리워드 전체 지급
+                </Button>
             </div>
 
             <div className="bg-white rounded-xl shadow p-4 w-full">
@@ -218,7 +267,7 @@ export default function UserWithdrawal() {
                                     {user.txhash}
                                 </td>
                                 <td className="border px-2 py-1">
-                                    {user.requested_at}
+                                    {formatDate(user.requested_at)}
                                 </td>
                                 <td className="border px-2 py-1">
                                     <button
@@ -227,6 +276,7 @@ export default function UserWithdrawal() {
                                             handleRewardClick(
                                                 user.id,
                                                 user.nickname,
+                                                user.amount,
                                             )
                                         }
                                     >
@@ -259,8 +309,10 @@ export default function UserWithdrawal() {
 
             {selectedUser && (
                 <RewardModal
+                    key={selectedUser.id}
                     isOpen={rewardModalOpen}
                     userNickname={selectedUser.nickname}
+                    defaultAmount={selectedUser.amount}
                     onClose={() => setRewardModalOpen(false)}
                     onConfirm={handleConfirmReward}
                 />

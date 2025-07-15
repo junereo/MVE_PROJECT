@@ -168,7 +168,7 @@ export default function SurveyListPage() {
     return (
         <div>
             <div className="w-full text-black text-2xl py-3 font-bold">
-                Survey List
+                설문 리스트
             </div>
             <div className="p-6">
                 {/* 검색 + 필터 + 설문 만들기 버튼 */}
