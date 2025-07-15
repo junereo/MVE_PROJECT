@@ -10,19 +10,19 @@ import {
 } from "@prisma/client";
 import { AnswerItem } from "../types/survey.types";
 import { calculateSurveyResult } from "./survey.result.service";
+import { DateTime } from "luxon";
 // import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
 
 const prisma = new PrismaClient();
 
 // 상태 계산 (한국시간 기준)
-const checkSurveyActive = (
+export const checkSurveyActive = (
   _start: Date | string,
   _end: Date | string
 ): SurveyActive => {
-  const now = new Date();
-  const start = new Date(_start);
-  const end = new Date(_end);
-  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const kstNow = DateTime.now().setZone("Asia/Seoul");
+  const start = DateTime.fromJSDate(new Date(_start)).setZone("Asia/Seoul");
+  const end = DateTime.fromJSDate(new Date(_end)).setZone("Asia/Seoul");
 
   if (kstNow < start) return "upcoming";
   if (kstNow >= start && kstNow <= end) return "ongoing";
@@ -69,7 +69,14 @@ export const createSurveyParticipant = async ({
 
   const user = await prisma.user.findUnique({
     where: { id: user_id },
-    select: { gender: true, age: true, genre: true, job_domain: true, role: true, badge_issued_at: true },
+    select: {
+      gender: true,
+      age: true,
+      genre: true,
+      job_domain: true,
+      role: true,
+      badge_issued_at: true,
+    },
   });
   if (!user) throw new Error("해당 유저가 존재하지 않습니다.");
 
@@ -107,12 +114,17 @@ export const createSurveyParticipant = async ({
     rewardAmount = survey.reward ?? 0;
   }
 
+  let participantStatus: SurveyStatus = SurveyStatus.draft;
+  if (status === SurveyStatus.complete) {
+    participantStatus = SurveyStatus.complete;
+  }
+
   if (existing) {
     return await prisma.survey_Participants.update({
       where: { id: existing.id },
       data: {
         answers,
-        status: status ?? "draft",
+        status: participantStatus,
         rewarded: rewardAmount,
       },
     });
@@ -123,11 +135,12 @@ export const createSurveyParticipant = async ({
       user_id,
       survey_id,
       answers,
-      status: status ?? "draft",
+      status: participantStatus,
       rewarded: rewardAmount,
     },
   });
 };
+
 
 // 설문 타입 유효성 검사
 const isSurveyType = (value: any): value is SurveyType => {
@@ -144,51 +157,48 @@ export const createSurvey = async ({
 }) => {
   try {
     if (!userId) throw new Error("유저 필요");
-    if (!isSurveyType(body.type)) {
+
+    // 타입 검사
+    if (!Object.values(SurveyType).includes(body.type)) {
       throw new Error(`잘못된 설문 타입: ${body.type}`);
     }
 
-    const surveyType = body.type as SurveyType;
-    const startDate = new Date(body.start_at);
-    const endDate = new Date(body.end_at);
+    const kstNow = DateTime.now().setZone("Asia/Seoul");
+
+    const startDate = body.start_at ? new Date(body.start_at) : kstNow.toJSDate();
+
+    const endDate = kstNow.endOf("day").toJSDate();
+
+    if (startDate >= endDate) {
+      throw new Error("종료일은 시작일 이후여야 합니다.");
+    }
+
     const releasedDate = body.released_date
       ? new Date(body.released_date)
-      : new Date();
-
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      throw new Error("유효하지 않은 시작일 또는 종료일입니다.");
-    }
-    if (isNaN(releasedDate.getTime())) {
-      throw new Error("유효하지 않은 발매일입니다.");
-    }
+      : kstNow.toJSDate();
 
     return await prisma.$transaction(async (tx) => {
-      const survey: Survey = await tx.survey.create({
+      const survey = await tx.survey.create({
         data: {
           user_id: userId,
-          music_title: body.music_title ?? null,
-          artist: body.artist ?? null,
-          music_uri: body.music_uri ?? null,
-          thumbnail_uri: body.thumbnail_uri ?? null,
+          survey_title: body.survey_title ?? "",
+          music_title: body.music_title ?? "",
+          artist: body.artist ?? "",
+          music_uri: body.music_uri ?? "",
+          thumbnail_uri: body.thumbnail_uri ?? "",
           genre: body.genre ?? null,
           is_released: !!body.is_released,
           released_date: releasedDate,
-          type: surveyType,
+          type: body.type,
           start_at: startDate,
           end_at: endDate,
           is_active: checkSurveyActive(startDate, endDate),
-          survey_title: body.survey_title ?? "",
-          survey_question: body.survey_question ?? [],
           status: body.status ?? "draft",
           reward: body.reward ?? 0,
           expert_reward: body.expert_reward ?? 0,
           reward_amount: body.reward_amount ?? 0,
           questions: body.questions ?? 0,
-          ...(surveyType === SurveyType.official && {
-            reward: body.reward,
-            expert_reward: body.expert_reward,
-            reward_amount: body.reward_amount,
-          }),
+          survey_question: body.survey_question ?? [],
         },
       });
       // //  고정 질문 삽입
@@ -231,13 +241,33 @@ export const createSurvey = async ({
 
 //  설문 불러오기
 export const getSurveyListService = async () => {
-  return await prisma.survey.findMany({
+  const surveys = await prisma.survey.findMany({
     include: {
       creator: { select: { id: true } },
     },
     orderBy: { start_at: "desc" },
   });
+
+  const kstNow = DateTime.now().setZone("Asia/Seoul");
+
+  // 상태 동기화
+  for (const survey of surveys) {
+    const start = DateTime.fromJSDate(new Date(survey.start_at)).setZone("Asia/Seoul");
+    const end = DateTime.fromJSDate(new Date(survey.end_at)).setZone("Asia/Seoul");
+
+    const newState = checkSurveyActive(start.toJSDate(), end.toJSDate());
+
+    if (survey.is_active !== newState) {
+      await prisma.survey.update({
+        where: { id: survey.id },
+        data: { is_active: newState },
+      });
+    }
+  }
+
+  return surveys;
 };
+
 
 // 질문지 생성 또는 업데이트
 export const setSurveyQuestion = async ({
@@ -307,19 +337,27 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
   });
   if (!survey) throw new Error("설문 없음");
 
+  const kstNow = DateTime.now().setZone("Asia/Seoul");
+
+  const start_at = body.start_at ? new Date(body.start_at) : kstNow.toJSDate();
+  const end_at = kstNow.endOf("day").toJSDate();
+
+  if (start_at >= end_at) {
+    throw new Error("종료일은 시작일 이후여야 합니다.");
+  }
+
   const updatedSurvey = await prisma.survey.update({
     where: { id: surveyId },
     data: {
-      survey_title: body.survey_title,
-      start_at: new Date(body.start_at),
-      end_at: new Date(body.end_at),
-      status: body.status,
-      is_active: body.is_active,
+      survey_title: body.survey_title ?? "",
+      start_at,
+      end_at,
+      status: body.status ?? survey.status,
+      is_active: checkSurveyActive(start_at, end_at),
     },
   });
 
-  // 종료 상태라면 자동으로 통계 계산
-  if (body.status === "complete" || body.is_active === "closed") {
+  if (updatedSurvey.status === "complete" || updatedSurvey.is_active === "closed") {
     await calculateSurveyResult(surveyId);
   }
 
@@ -416,10 +454,12 @@ export const updateSurveyResponse = async ({
   userId,
   surveyId,
   answers,
+  status = SurveyStatus.draft,
 }: {
   userId: number;
   surveyId: number;
   answers: any;
+  status?: SurveyStatus;
 }) => {
   const updated = await prisma.survey_Participants.updateMany({
     where: {
@@ -428,7 +468,7 @@ export const updateSurveyResponse = async ({
     },
     data: {
       answers: answers,
-      status: SurveyStatus.complete,
+      status: status,
     },
   });
 
