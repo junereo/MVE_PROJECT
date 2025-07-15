@@ -94,6 +94,12 @@ export class MetaTransctionService {
     return Math.floor(Number(formatted));
   }
 
+  async setKGTBadge(address: string, badgeId: number = 0): Promise<string> {
+    const tx = await this.msgSigner.manualMintBadge(address, badgeId);
+    await tx.wait();
+    return tx.hash;
+  }
+
   async useKGTToken(
     address: string,
     value: BigNumberish,
