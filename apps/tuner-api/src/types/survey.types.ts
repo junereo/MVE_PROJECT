@@ -14,4 +14,10 @@ export interface Question {
     question_type: string;
     options?: string[];
     required: boolean;
-} 
+}
+
+export type AnswerItem = {
+    id: number;
+    type: "multiple" | "checkbox" | "subjective";
+    answer: string | string[] | number;
+};
