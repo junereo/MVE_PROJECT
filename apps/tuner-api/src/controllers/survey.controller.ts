@@ -198,7 +198,7 @@ export const getSurveyQuestionList = async (
 export const createSurveyParticipantHandler = async (
   req: AuthRequest,
   res: Response
-): Promise<void> => {
+) => {
   try {
     const { survey_id, answers, status, user_info } = req.body;
     const user_id = req.user?.userId;
@@ -208,20 +208,14 @@ export const createSurveyParticipantHandler = async (
       return;
     }
 
-    let surveyStatus: SurveyStatus = SurveyStatus.draft;
-    if (status === "complete") {
-      surveyStatus = SurveyStatus.complete;
-    }
-
     const newParticipant = await createSurveyParticipant({
       user_id: parseInt(user_id),
       survey_id: parseInt(survey_id),
       answers,
-      status: surveyStatus,
+      status,
       user_info,
     });
 
-    console.log(newParticipant);
     res.status(201).json({ success: true, data: newParticipant });
   } catch (err: any) {
     console.error("설문 응답 생성 오류:", err);
@@ -310,13 +304,15 @@ export const getSurveyResultHandler = async (req: Request, res: Response) => {
   try {
     const surveyId = Number(req.params.surveyId);
     if (isNaN(surveyId)) {
-      return res.status(400).json({ success: false, message: "잘못된 surveyId" });
+      res.status(400).json({ success: false, message: "잘못된 surveyId" });
+      return;
     }
 
     const result = await getSurveyResult(surveyId);
 
     if (!result) {
-      return res.status(404).json({ success: false, message: "통계 결과 없음" });
+      res.status(404).json({ success: false, message: "통계 결과 없음" });
+      return;
     }
 
     res.status(200).json({ success: true, data: result });
@@ -383,48 +379,54 @@ export const getMySurvey = async (req: AuthRequest, res: Response) => {
 };
 
 export const calculateSurveyResultHandler = async (req: Request, res: Response) => {
+  
   try {
     const surveyId = Number(req.params.surveyId);
+    console.log("surveyId:", surveyId);
     if (isNaN(surveyId)) {
-      return res.status(400).json({ success: false, message: "잘못된 surveyId" });
+      res.status(400).json({ success: false, message: "잘못된 surveyId" });
+      return;
     }
 
     const result = await calculateSurveyResult(surveyId);
 
-    res.status(200).json({ success: true, message: "통계 계산 완료", data: result });
+    res.status(200).json({ success: true, message: `${req.params.surveyId} 통계 계산 완료`, data: result });
   } catch (err: any) {
     console.error("[calculateSurveyResultHandler]", err);
-    res.status(500).json({ success: false, message: "통계 계산 실패", error: err.message });
+    res.status(500).json({ success: false, message: `${req.params.surveyId} 통계 계산 실패`, error: err.message });
   }
 };
 
 export const updateSurveyResponseHandler = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
-    const { surveyId, answers } = req.body;
+    const { surveyId, answers, status } = req.body;
 
     if (!userId || !surveyId || !answers) {
-      return res.status(400).json({ success: false, message: '필수 파라미터 누락' });
+      res.status(400).json({ success: false, message: '필수 파라미터 누락' });
+      return;
     }
 
     const result = await updateSurveyResponse({
       userId: Number(userId),
       surveyId: Number(surveyId),
       answers,
+      status: status || SurveyStatus.draft,
     });
 
     if (result.count === 0) {
-      return res.status(404).json({ success: false, message: '참여자 정보 없음' });
+      res.status(404).json({ success: false, message: '참여자 정보 없음' });
+      return
     }
 
-    return res.json({
+    res.json({
       success: true,
       message: '설문 응답 수정 완료!',
       updatedCount: result.count,
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: '서버 오류', error });
+    res.status(500).json({ success: false, message: '서버 오류', error });
+    return;
   }
 };
-
