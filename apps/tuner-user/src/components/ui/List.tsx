@@ -8,7 +8,7 @@ type Props = {
   title: string;
   surveyTitle: string;
   period: string;
-  status: "예정" | "진행중" | "종료" | "임시저장" | "제출";
+  status: "예정" | "진행중" | "종료" | "임시저장" | "참여완료";
   surveyType?: SurveyTypeEnum;
   participants?: number;
   reward?: number;
@@ -20,7 +20,7 @@ const statusColorMap = {
   진행중: "bg-green-100 text-green-700",
   종료: "bg-gray-100 text-gray-500",
   임시저장: "bg-gray-100 text-gray-500",
-  제출: "bg-blue-100 text-blue-600",
+  참여완료: "bg-blue-100 text-blue-600",
 };
 
 export default function List({

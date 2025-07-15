@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layouts/Header";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
@@ -78,7 +77,7 @@ export default function SurveyDetail() {
         />
         <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-6 shadow-md">
           {music_uri ? (
-            <Link href={music_uri}>
+            <a href={music_uri} target="_blank" rel="noopener noreferrer">
               <Image
                 src={thumbnail_uri}
                 alt={music_title}
@@ -86,7 +85,7 @@ export default function SurveyDetail() {
                 className="object-cover rounded-xl"
                 sizes="(max-width: 768px) 100vw, 600px"
               />
-            </Link>
+            </a>
           ) : (
             <Image
               src={thumbnail_uri}
@@ -153,8 +152,7 @@ export default function SurveyDetail() {
             <p className="text-sm text-gray-500">
               총{" "}
               <span className="text-gray-800 font-semibold">
-                value=
-                {`${participants?.length?.toLocaleString() ?? "0"}명`}
+                {`${participants?.length?.toLocaleString() ?? 0}명`}
               </span>
               이 참여했어요.
             </p>
