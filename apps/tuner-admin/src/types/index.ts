@@ -117,6 +117,7 @@ export interface SurveyData {
     created_at: string;
     updated_at: string;
     questions: number;
+    participants?: string;
     // 내가 수정함
     surveyResponses: {
         user_id: number;

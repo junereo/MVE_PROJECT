@@ -72,6 +72,20 @@ export const getAddressBadge = async (req: Request, res: Response) => {
   }
 };
 
+// 뱃지 조회
+export const setAddressBadge = async (req: Request, res: Response) => {
+  const { uid } = req.params;
+  try {
+    const wallet = await metaTransctionService.createWallet(uid);
+    const address = wallet.address;
+    const token = (await metaTransctionService.setKGTBadge(address)).toString();
+
+    res.json({ token });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // 토큰 전송
 export const sendToken = async (req: Request, res: Response) => {
   const { uid, to, value } = req.body as {

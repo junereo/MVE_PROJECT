@@ -12,8 +12,8 @@ const surveyService = new SurveyService(metaService);
 // 매 분마다 실행
 cron.schedule('*/10 * * * * *', async () => {
   const now = new Date()
-  const kstNow1 = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  const kstNow = new Date(kstNow1.getTime() + 24 * 60 * 60 * 1000 * 7);
+  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  //const kstNow = new Date(kstNow1.getTime() + 24 * 60 * 60 * 1000 * 7);
 
   console.log(`[CRON] 실행 시간: ${kstNow.toISOString()}`)
 
