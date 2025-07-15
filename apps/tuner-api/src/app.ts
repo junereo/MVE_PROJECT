@@ -5,7 +5,8 @@ import {
   authRoutes,
   surveyRoutes,
   transaction,
-  withdrawal
+  withdrawal,
+  settingRoutes
 } from "./routes/index";
 import routerWallet from "./wallet/routers/index";
 import cookieParser from "cookie-parser";
@@ -45,6 +46,8 @@ app.use("/withdraw", withdrawal);
 app.use("/transac", transaction);
 app.use("/admin", adminRoutes);
 app.use("/contract", routerWallet);
+app.use('/admin/settings', settingRoutes);
+
 
 // 기본 라우트
 app.get("/", (req, res) => {
