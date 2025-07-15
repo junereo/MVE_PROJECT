@@ -62,7 +62,7 @@ app.get('/super', async (req, res) => {
 
     if (existing) {
       res.status(200).json({ message: '관리자가 이미 존재합니다.', user: existing });
-      return ;
+      return;
     }
 
     const hashedPassword = await bcrypt.hash('test1234', 10);
