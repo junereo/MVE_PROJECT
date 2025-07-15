@@ -188,4 +188,17 @@ export const getAllowance = async (req: Request, res: Response) => {
   }
 };
 
+
+
+export const getCirculatingSupplyController = async (req: Request, res: Response) => {
+  const { tokenAddress } = req.query as { tokenAddress: string };
+
+  try {
+    const result = await metaTransctionService.getCirculatingSupply(tokenAddress);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 export default router;
