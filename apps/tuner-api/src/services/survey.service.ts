@@ -63,13 +63,13 @@ export const createSurveyParticipant = async ({
 }) => {
   const survey = await prisma.survey.findUnique({
     where: { id: survey_id },
-    select: { status: true, is_active: true },
+    select: { status: true, is_active: true, reward: true, expert_reward: true },
   });
   if (!survey) throw new Error("해당 설문이 존재하지 않습니다.");
 
   const user = await prisma.user.findUnique({
     where: { id: user_id },
-    select: { gender: true, age: true, genre: true, job_domain: true },
+    select: { gender: true, age: true, genre: true, job_domain: true, role: true, badge_issued_at: true },
   });
   if (!user) throw new Error("해당 유저가 존재하지 않습니다.");
 
@@ -99,13 +99,21 @@ export const createSurveyParticipant = async ({
     where: { user_id, survey_id },
   });
 
+  // 지급 리워드 결정
+  let rewardAmount = 0;
+  if (user.role === 'expert') {
+    rewardAmount = survey.expert_reward ?? 0;
+  } else if (user.role === 'ordinary') {
+    rewardAmount = survey.reward ?? 0;
+  }
+
   if (existing) {
     return await prisma.survey_Participants.update({
       where: { id: existing.id },
       data: {
         answers,
         status: status ?? "draft",
-        rewarded: false,
+        rewarded: rewardAmount,
       },
     });
   }
@@ -116,7 +124,7 @@ export const createSurveyParticipant = async ({
       survey_id,
       answers,
       status: status ?? "draft",
-      rewarded: false,
+      rewarded: rewardAmount,
     },
   });
 };

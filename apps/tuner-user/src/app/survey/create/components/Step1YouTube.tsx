@@ -6,6 +6,7 @@ import YoutubeSearchBox from "../../components/YoutubeSearchBox";
 import Button from "@/components/ui/Button";
 import DateRangePicker from "../../components/DateRangePicker";
 import { useState } from "react";
+import ThumbnailUploader from "../../components/ThumbnailUploader";
 
 interface Step1Props {
   onNext: () => void;
@@ -77,6 +78,8 @@ export default function Step1YouTube({ onNext }: Step1Props) {
           editMode={true}
           showMusicUri={false}
         />
+
+        <ThumbnailUploader />
 
         <DateRangePicker
           label="설문 기간"

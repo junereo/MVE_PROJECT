@@ -70,9 +70,14 @@ export default function List({
           {status}
         </span>
 
-        {participants && participants > 0 && (
+        {participants !== undefined && participants > 0 && (
           <p className="text-[11px] sm:text-xs text-gray-600 whitespace-nowrap">
             {participants}명 참여
+          </p>
+        )}
+        {participants === 0 && (
+          <p className="text-[11px] sm:text-xs text-gray-600 whitespace-nowrap">
+            0명 참여
           </p>
         )}
 

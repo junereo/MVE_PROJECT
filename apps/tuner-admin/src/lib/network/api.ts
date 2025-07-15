@@ -103,7 +103,7 @@ export const templatePut = async () => {
 
 // fixedQuestions 템플릿 불러오기 (서버에서)
 export const fetchFixedQuestions = async (
-    questionnaireId: number | string = 1,
+    questionnaireId: number | string = 2,
 ) => {
     const response = await axiosClient.get(`/survey/q/${questionnaireId}`);
     return response.data;
