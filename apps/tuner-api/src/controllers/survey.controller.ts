@@ -198,7 +198,7 @@ export const getSurveyQuestionList = async (
 export const createSurveyParticipantHandler = async (
   req: AuthRequest,
   res: Response
-): Promise<void> => {
+) => {
   try {
     const { survey_id, answers, status, user_info } = req.body;
     const user_id = req.user?.userId;
@@ -208,20 +208,14 @@ export const createSurveyParticipantHandler = async (
       return;
     }
 
-    let surveyStatus: SurveyStatus = SurveyStatus.draft;
-    if (status === "complete") {
-      surveyStatus = SurveyStatus.complete;
-    }
-
     const newParticipant = await createSurveyParticipant({
       user_id: parseInt(user_id),
       survey_id: parseInt(survey_id),
       answers,
-      status: surveyStatus,
+      status,
       user_info,
     });
 
-    console.log(newParticipant);
     res.status(201).json({ success: true, data: newParticipant });
   } catch (err: any) {
     console.error("설문 응답 생성 오류:", err);
@@ -406,7 +400,7 @@ export const calculateSurveyResultHandler = async (req: Request, res: Response) 
 export const updateSurveyResponseHandler = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
-    const { surveyId, answers } = req.body;
+    const { surveyId, answers, status } = req.body;
 
     if (!userId || !surveyId || !answers) {
       res.status(400).json({ success: false, message: '필수 파라미터 누락' });
@@ -417,6 +411,7 @@ export const updateSurveyResponseHandler = async (req: AuthRequest, res: Respons
       userId: Number(userId),
       surveyId: Number(surveyId),
       answers,
+      status: status || SurveyStatus.draft,
     });
 
     if (result.count === 0) {
@@ -435,4 +430,3 @@ export const updateSurveyResponseHandler = async (req: AuthRequest, res: Respons
     return;
   }
 };
-
