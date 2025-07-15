@@ -62,7 +62,7 @@ export default function SurveyList() {
   }, [status, submitStatus]);
 
   return (
-    <div className="space-y-4 max-w-[700px] mx-auto">
+    <div className="space-y-4 min-h-[600px] max-w-[700px] mx-auto">
       <div className="flex justify-around border-b pb-2">
         {statusList.map((s) => (
           <button
@@ -80,56 +80,57 @@ export default function SurveyList() {
           </button>
         ))}
       </div>
-
-      {surveys.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-gray-400 w-full col-span-2">
-          <Image
-            src="/images/empty-survey.png"
-            alt="설문 없음"
-            width={96}
-            height={96}
-            className="mb-4"
-          />
-          <p className="text-sm">
-            {status === "ongoing"
-              ? "진행중인 설문이 없습니다."
-              : status === "closed"
-              ? "종료된 설문이 없습니다."
-              : status === "upcoming"
-              ? "예정된 설문이 없습니다."
-              : "설문이 없습니다."}
-          </p>
-        </div>
-      ) : (
-        <>
-          {paginatedSurveys.map((item) => (
-            <List
-              key={item.id}
-              onClick={() => router.push(`/survey/${item.id}`)}
-              image={item.thumbnail_uri}
-              artist={item.artist}
-              title={item.music_title}
-              surveyTitle={item.survey_title}
-              period={`${item.start_at
-                .slice(2, 10)
-                .replace(/-/g, ".")} - ${item.end_at
-                .slice(2, 10)
-                .replace(/-/g, ".")}`}
-              status={
-                statusTextMap[item.is_active] as "예정" | "진행중" | "종료"
-              }
-              surveyType={item.type}
-              participants={item.participants?.length}
-              reward={item.reward_amount}
+      <div className="flex-1">
+        {surveys.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400 w-full col-span-2">
+            <Image
+              src="/images/empty-survey.png"
+              alt="설문 없음"
+              width={96}
+              height={96}
+              className="mb-4"
             />
-          ))}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        </>
-      )}
+            <p className="text-sm">
+              {status === "ongoing"
+                ? "진행중인 설문이 없습니다."
+                : status === "closed"
+                ? "종료된 설문이 없습니다."
+                : status === "upcoming"
+                ? "예정된 설문이 없습니다."
+                : "설문이 없습니다."}
+            </p>
+          </div>
+        ) : (
+          <>
+            {paginatedSurveys.map((item) => (
+              <List
+                key={item.id}
+                onClick={() => router.push(`/survey/${item.id}`)}
+                image={item.thumbnail_uri}
+                artist={item.artist}
+                title={item.music_title}
+                surveyTitle={item.survey_title}
+                period={`${item.start_at
+                  .slice(2, 10)
+                  .replace(/-/g, ".")} - ${item.end_at
+                  .slice(2, 10)
+                  .replace(/-/g, ".")}`}
+                status={
+                  statusTextMap[item.is_active] as "예정" | "진행중" | "종료"
+                }
+                surveyType={item.type}
+                participants={item.participants?.length}
+                reward={item.reward_amount}
+              />
+            ))}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }
