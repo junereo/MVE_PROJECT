@@ -18,8 +18,10 @@ const statusTextMap: Record<
 
 export default function MainSurveyList({
   status,
+  submitStatus,
 }: {
   status: "all" | "ongoing" | "closed";
+  submitStatus: "draft" | "complete";
 }) {
   const router = useRouter();
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
@@ -36,10 +38,11 @@ export default function MainSurveyList({
         });
 
         const filtered: SurveyResponse[] =
-          status === "all"
-            ? sorted
+          submitStatus === "complete" && status === "all"
+            ? sorted.filter((item) => item.status === "complete")
             : sorted.filter(
-                (item: SurveyResponse) => item.is_active === status
+                (item) =>
+                  item.status === submitStatus && item.is_active === status
               );
 
         setSurveys(filtered);

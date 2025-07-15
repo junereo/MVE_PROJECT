@@ -27,6 +27,8 @@ export interface SurveyResponse {
   reward: number;
   expert_reward: number;
 
+  status: "draft" | "complete";
+
   participants?: {
     id: number;
     survey_id: number;
