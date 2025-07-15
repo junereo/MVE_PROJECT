@@ -19,6 +19,9 @@ type Status = (typeof statusList)[number];
 export default function SurveyList() {
   const router = useRouter();
   const [status, setStatus] = useState<Status>("all");
+  const [submitStatus, setSubmitStatus] = useState<"draft" | "complete">(
+    "complete"
+  ); // 설문 제출 상태 (완료만 보기)
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
 
   useEffect(() => {
@@ -31,19 +34,23 @@ export default function SurveyList() {
             new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
           );
         });
-        const filtered =
-          status === "all"
-            ? sorted
+
+        const filtered: SurveyResponse[] =
+          submitStatus === "complete" && status === "all"
+            ? sorted.filter((item) => item.status === "complete")
             : sorted.filter(
-                (item: SurveyResponse) => item.is_active === status
+                (item) =>
+                  item.status === submitStatus && item.is_active === status
               );
+
         setSurveys(filtered);
       } catch (e) {
         console.error("리스트 불러오기 실패", e);
       }
     };
+
     fetch();
-  }, [status]);
+  }, [status, submitStatus]);
 
   return (
     <div className="space-y-4 max-w-[700px] mx-auto">

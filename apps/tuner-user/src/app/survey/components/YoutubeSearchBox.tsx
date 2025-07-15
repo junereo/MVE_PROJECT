@@ -66,8 +66,8 @@ export default function YoutubeSearchBox({
         )}
         <div className="flex gap-2">
           <input
-            className="border p-2 flex-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="검색어 입력"
+            className="border p-2 pl-4 flex-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="youtube 제목 또는 URL 주소를 입력해주세요."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
