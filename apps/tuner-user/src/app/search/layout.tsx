@@ -1,9 +1,9 @@
 import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
-import Wrapper from "@/components/layouts/Wrapper";
+import PageWrapper from "@/components/layouts/PageWrapper";
 
-export default function MypageLayout({
+export default function SearchLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -11,7 +11,7 @@ export default function MypageLayout({
   return (
     <>
       <Header />
-      <Wrapper>{children}</Wrapper>
+      <PageWrapper>{children}</PageWrapper>
       <BottomNavbar />
       <Footer />
     </>

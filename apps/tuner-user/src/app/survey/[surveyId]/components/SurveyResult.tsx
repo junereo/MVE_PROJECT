@@ -1,10 +1,12 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+
 import SummaryCard from "./SummaryCard";
 import { GroupResult } from "@/features/survey/types/surveyResultPayload";
 import { SummaryStats } from "@/features/survey/types/surveyResultPayload";
 import TrendHighlight from "./TrendHighlight";
 import ParticipantStats from "./ParticipantStats";
 import GroupedResponses from "./GroupedResponses";
+import { getSurveyResult } from "@/features/survey/services/survey";
 
 const mockSummary: SummaryStats = {
   "작품성 평균": 4.6,
@@ -33,7 +35,7 @@ const mockGroupStats: GroupResult[] = [
   },
 ];
 
-export default function SurveyResult() {
+export default function SurveyResult({ surveyId }: { surveyId: number }) {
   const summary = mockSummary;
   const groupStats = mockGroupStats;
 
@@ -44,6 +46,20 @@ export default function SurveyResult() {
       return acc;
     }, {});
   }, [groupStats]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const res = await getSurveyResult(surveyId);
+        console.log("설문 결과", res);
+      } catch (err) {
+        console.error("설문 결과 불러오기 실패", err);
+      } finally {
+      }
+    };
+
+    fetch();
+  }, [surveyId]);
 
   return (
     <div className="flex flex-col gap-6">
