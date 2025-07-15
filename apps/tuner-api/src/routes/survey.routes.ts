@@ -21,13 +21,13 @@ import { verifyToken } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
-// router.get("/list", getSurveyList);
-// router.get("/s/:surveyId", getSurvey);
-// router.get("/q/:questionnaireId", getSurveyQuestionList);
-// router.get("/p", getAllSurveyParticipantsHandler);
-// router.get("/r/:surveyId", getSurveyResultHandler);
-// router.get("/s/:questionId", verifyToken, getSurveyQuestionController);
-// router.get("/s", verifyToken, getMySurvey);
+router.get("/list", getSurveyList);
+router.get("/s/:surveyId", getSurvey);
+router.get("/q/:questionnaireId", getSurveyQuestionList);
+router.get("/p", getAllSurveyParticipantsHandler);
+router.get("/r/:surveyId", getSurveyResultHandler);
+router.get("/s/:questionId", verifyToken, getSurveyQuestionController);
+router.get("/s", verifyToken, getMySurvey);
 
 router.post("/r", verifyToken, createSurveyResultHandler);
 router.post("/p", verifyToken, createSurveyParticipantHandler);
