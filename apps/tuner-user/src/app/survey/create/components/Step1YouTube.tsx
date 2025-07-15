@@ -69,7 +69,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
       </header>
 
       <div className="space-y-4">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-16">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-10">
           Step 1 : 유튜브
         </h2>
 
