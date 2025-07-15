@@ -9,7 +9,7 @@ export function surveyParticipationStats(responses: MySurveyAnswer[]) {
     return [
       { label: "전체", count: 0 },
       { label: "임시저장", count: 0 },
-      { label: "답변 완료", count: 0 },
+      { label: "참여완료", count: 0 },
     ];
   }
 
@@ -19,7 +19,7 @@ export function surveyParticipationStats(responses: MySurveyAnswer[]) {
 
   return [
     { label: "전체", count: total },
-    { label: "답변 완료", count: draft },
-    { label: "임시 저장", count: complete },
+    { label: "임시저장", count: draft },
+    { label: "참여완료", count: complete },
   ];
 }
