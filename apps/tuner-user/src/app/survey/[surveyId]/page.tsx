@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import SurveyResult from "./components/SurveyResult";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
+import { UserUpdatePayload } from "@/features/users/types/userInfo";
 
 type SurveyStatus = "upcoming" | "ongoing" | "closed";
 
@@ -173,7 +174,22 @@ export default function SurveyDetail() {
               ) : (
                 // 응답 임시 저장 (draft)
                 <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full  max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
-                  <Button color="blue">설문 응답 수정</Button>
+                  <Button
+                    color="yellow"
+                    onClick={() => {
+                      sessionStorage.setItem(
+                        "editResponseData",
+                        JSON.stringify({
+                          surveyId: id,
+                          answers: myParticipation.answers,
+                          surveyTitle: survey.survey_title,
+                        })
+                      );
+                      router.push(`/survey/${id}/editResponse`);
+                    }}
+                  >
+                    설문 응답 수정
+                  </Button>
                 </div>
               )
             ) : (

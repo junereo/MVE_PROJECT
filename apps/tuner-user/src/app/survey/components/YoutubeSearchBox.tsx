@@ -66,8 +66,8 @@ export default function YoutubeSearchBox({
         )}
         <div className="flex gap-2">
           <input
-            className="border p-2 pl-4 flex-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="youtube 제목 또는 URL 주소를 입력해주세요."
+            className="border p-2 pl-5 flex-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="YOUTUBE 제목 또는 URL 주소를 입력해주세요."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -80,7 +80,34 @@ export default function YoutubeSearchBox({
           </button>
         </div>
 
-        {selectedVideo ? (
+        {videos.length > 0 ? (
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            {videos.map((video) => (
+              <div
+                key={video.artist + video.music_title}
+                className="cursor-pointer border p-2 rounded"
+                onClick={() => {
+                  setSelectedVideo(video);
+                  setStep1({
+                    ...step1,
+                    video,
+                    thumbnail_uri: video.thumbnail_uri,
+                  });
+                  setVideos([]);
+                }}
+              >
+                <Image
+                  src={video.thumbnail_uri}
+                  alt={video.music_title}
+                  className="w-full h-[140px] object-cover rounded"
+                  width={140}
+                  height={140}
+                />
+                <p className="mt-2 text-sm line-clamp-2">{video.music_title}</p>
+              </div>
+            ))}
+          </div>
+        ) : selectedVideo ? (
           <div className="space-y-2 mt-4">
             <iframe
               src={toEmbedUrl(selectedVideo.select_url)}
@@ -115,33 +142,6 @@ export default function YoutubeSearchBox({
             >
               ← 다시 선택하기
             </button>
-          </div>
-        ) : Array.isArray(videos) && videos.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 mt-2">
-            {videos.map((video) => (
-              <div
-                key={video.artist + video.music_title}
-                className="cursor-pointer border p-2 rounded"
-                onClick={() => {
-                  setSelectedVideo(video);
-                  setStep1({
-                    ...step1,
-                    video,
-                    thumbnail_uri: video.thumbnail_uri,
-                  }); // step1도 함께 업데이트
-                  setVideos([]);
-                }}
-              >
-                <Image
-                  src={video.thumbnail_uri}
-                  alt={video.music_title}
-                  className="w-full h-[140px] object-cover rounded"
-                  width={140}
-                  height={140}
-                />
-                <p className="mt-2 text-sm line-clamp-2">{video.music_title}</p>
-              </div>
-            ))}
           </div>
         ) : null}
       </div>
