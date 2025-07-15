@@ -185,4 +185,26 @@ export class MetaTransctionService {
     return ethers.formatUnits(allowance, 18);
   }
 
+  async getCirculatingSupply(tokenAddress: string) {
+    const erc20Abi = [
+      "function totalSupply() view returns (uint256)",
+      "function decimals() view returns (uint8)"
+    ];
+
+    // this.provider를 사용하여 provider 참조
+    const provider = this.provider; 
+    if (!provider) {
+      throw new Error("Provider is not initialized. Please call init() first.");
+    }
+
+    const tunerToken = new Contract(tokenAddress, erc20Abi, this.wallet);
+
+    const total = await tunerToken.totalSupply();
+    const decimals = await tunerToken.decimals();
+
+    return {
+      totalSupply: ethers.formatUnits(total, decimals),
+    };
+  }
+
 }
