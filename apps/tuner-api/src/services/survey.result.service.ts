@@ -1,11 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { JsonObject } from "@prisma/client/runtime/library";
+import { AnswerItem } from "../types/survey.types";
 
 const prisma = new PrismaClient();
 
 export const calculateSurveyResult = async (surveyId: number) => {
     try {
-        // 참여자 불러오기 (참여자 + 유저 정보)
         const participants = await prisma.survey_Participants.findMany({
             where: { survey_id: surveyId, status: "complete" },
             select: {
@@ -26,16 +25,30 @@ export const calculateSurveyResult = async (surveyId: number) => {
             return null;
         }
 
-        // 그룹별 집계 컨테이너
         const statsByGroup: Record<string, any> = {};
 
+        // GLOBAL 버킷 초기화
+        statsByGroup['GLOBAL'] = {
+            totalScores: {},
+            countScores: {},
+            choiceCounts: {},
+            freeAnswers: {},
+            count: 0,
+        };
+
         participants.forEach(({ answers, user }) => {
-            if (!answers || typeof answers !== "object") return;
+            let parsedAnswers: AnswerItem[] = [];
 
-            const parsedAnswers = answers as JsonObject;
+            if (Array.isArray(answers)) {
+                parsedAnswers = answers as AnswerItem[];
+            } else if (answers && Array.isArray((answers as any).answers)) {
+                parsedAnswers = (answers as any).answers as AnswerItem[];
+            } else {
+                console.warn("유효한 answers 구조 아님:", answers);
+                return;
+            }
 
-            // 그룹 키: 성별 + 연령대
-            const groupKey = `gender_${user?.gender}_age_${user?.age}`;
+            const groupKey = `gender_${user?.gender ?? "unknown"}_age_${user?.age ?? "unknown"}_job_${user?.job_domain ?? "unknown"}`;
 
             if (!statsByGroup[groupKey]) {
                 statsByGroup[groupKey] = {
@@ -48,56 +61,102 @@ export const calculateSurveyResult = async (surveyId: number) => {
             }
 
             const group = statsByGroup[groupKey];
-            group.count += 1;
+            const global = statsByGroup['GLOBAL'];
 
-            const submittedAnswers = (parsedAnswers.answers as any[]) || [];
+            [group, global].forEach(bucket => {
+                bucket.count += 1;
 
-            submittedAnswers.forEach((item: any) => {
-                const questionId = item.id;
-                const answer = item.answer;
+                parsedAnswers.forEach(({ id, type, answer }) => {
+                    switch (type) {
+                        case "multiple":
+                            if (typeof answer === "string") {
+                                const key = `${id}-${answer}`;
+                                bucket.choiceCounts[key] = (bucket.choiceCounts[key] || 0) + 1;
+                            }
+                            break;
 
-                if (typeof answer === "number") {
-                    group.totalScores[questionId] = (group.totalScores[questionId] || 0) + answer;
-                    group.countScores[questionId] = (group.countScores[questionId] || 0) + 1;
-                } else if (Array.isArray(answer)) {
-                    answer.forEach((option: string) => {
-                        const key = `${questionId}-${option}`;
-                        group.choiceCounts[key] = (group.choiceCounts[key] || 0) + 1;
-                    });
-                } else if (typeof answer === "string") {
-                    if (!group.freeAnswers[questionId]) group.freeAnswers[questionId] = [];
-                    group.freeAnswers[questionId].push(answer);
-                }
-            });
+                        case "checkbox":
+                            if (Array.isArray(answer)) {
+                                answer.forEach(option => {
+                                    const key = `${id}-${option}`;
+                                    bucket.choiceCounts[key] = (bucket.choiceCounts[key] || 0) + 1;
+                                });
+                            }
+                            break;
 
-            if (parsedAnswers.user_info) {
-                Object.entries(parsedAnswers.user_info as Record<string, any>).forEach(
-                    ([key, value]) => {
-                        if (!group.freeAnswers[key]) group.freeAnswers[key] = [];
-                        group.freeAnswers[key].push(value);
+                        case "subjective":
+                            if (typeof answer === "string") {
+                                if (!bucket.freeAnswers[id]) bucket.freeAnswers[id] = [];
+                                bucket.freeAnswers[id].push(answer);
+                            }
+                            break;
+
+                        default:
+                            if (typeof answer === "number") {
+                                bucket.totalScores[id] = (bucket.totalScores[id] || 0) + answer;
+                                bucket.countScores[id] = (bucket.countScores[id] || 0) + 1;
+                            }
+                            break;
                     }
-                );
-            }
+                });
+            });
         });
 
-        // 그룹별 평균 계산
-        const survey_statistics: Record<string, any> = {};
+        const survey_statistics: Record<string, any> = { groups: {} };
 
-        Object.entries(statsByGroup).forEach(([groupKey, group]) => {
+        // 그룹별 평균 & 퍼센트
+        Object.entries(statsByGroup).forEach(([groupKey, bucket]) => {
+            if (groupKey === 'GLOBAL') return;
+
             const averages: Record<string, number> = {};
-            Object.keys(group.totalScores).forEach(questionId => {
-                averages[questionId] = group.totalScores[questionId] / group.countScores[questionId];
+            Object.keys(bucket.totalScores).forEach(qid => {
+                averages[qid] = bucket.totalScores[qid] / bucket.countScores[qid];
             });
 
-            survey_statistics[groupKey] = {
+            const choicePercentages: Record<string, number> = {};
+            Object.entries(bucket.choiceCounts as Record<string, number>).forEach(([key, count]) => {
+                choicePercentages[key] = Math.round((count / bucket.count) * 1000) / 10;
+            });
+
+            survey_statistics.groups[groupKey] = {
                 averages,
-                choiceCounts: group.choiceCounts,
-                freeAnswers: group.freeAnswers,
-                respondents: group.count,
+                choiceCounts: bucket.choiceCounts,
+                choicePercentages,
+                freeAnswers: bucket.freeAnswers,
+                respondents: bucket.count,
             };
         });
 
-        // Survey_Result upsert
+        //  GLOBAL
+        const global = statsByGroup['GLOBAL'];
+        const globalAverages: Record<string, number> = {};
+        Object.keys(global.totalScores).forEach(qid => {
+            globalAverages[qid] = global.totalScores[qid] / global.countScores[qid];
+        });
+
+        const globalChoicePercentages: Record<string, number> = {};
+        Object.entries(global.choiceCounts as Record<string, number>).forEach(([key, count]) => {
+            globalChoicePercentages[key] = Math.round((count / global.count) * 1000) / 10;
+        });
+
+        const topChoices = (Object.entries(global.choiceCounts) as [string, number][])
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([key, count]) => ({
+                key,
+                count,
+                percentage: Math.round((count / global.count) * 1000) / 10,
+            }));
+
+        survey_statistics.global = {
+            averages: globalAverages,
+            choiceCounts: global.choiceCounts,
+            choicePercentages: globalChoicePercentages,
+            topChoices,
+            freeAnswers: global.freeAnswers,
+            respondents: global.count,
+        };
+
         const result = await prisma.survey_Result.upsert({
             where: { survey_id: surveyId },
             update: {
@@ -116,6 +175,7 @@ export const calculateSurveyResult = async (surveyId: number) => {
 
         console.log(`[SURVEY_RESULT] 계산 완료: surveyId=${surveyId}`);
         return result;
+
     } catch (err) {
         console.error(`[SURVEY_RESULT] 오류:`, err);
         throw err;
