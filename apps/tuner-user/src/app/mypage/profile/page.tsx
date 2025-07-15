@@ -46,7 +46,7 @@ export default function ProfilePage() {
         <ProfileSection
           title="간편 비밀번호 설정"
           actionLabel="설정"
-          onActionClick={() => router.push("/mypage/profile/wallet")}
+          onActionClick={() => router.push("/mypage/profile/password")}
         >
           <ProfileRow label="간편 비밀번호" value="******" />
         </ProfileSection>

@@ -20,7 +20,9 @@ export default function Slider() {
         const res = await getSurveyList();
 
         const ongoing = res.data
-          .filter((item) => item.is_active === "ongoing")
+          .filter(
+            (item) => item.is_active === "ongoing" && item.status === "complete"
+          )
           .sort(
             (a, b) =>
               new Date(b.start_at).getTime() - new Date(a.start_at).getTime()

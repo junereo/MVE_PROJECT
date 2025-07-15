@@ -56,6 +56,7 @@ export default function SurveyDetail() {
     end_at,
     participants,
     reward_amount,
+    status,
     is_active,
     released_date,
   } = survey;
@@ -189,7 +190,8 @@ export default function SurveyDetail() {
           </>
         )}
 
-        {is_active === "upcoming" &&
+        {(is_active === "upcoming" || status === "draft") &&
+          user &&
           user &&
           String(user.id) === String(survey.user_id) && (
             <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
