@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Menubar from "./Menubar";
 import Image from "next/image";
+import SearchInput from "../ui/SearchInput";
 
 export default function Header() {
   const [MenubarOpen, setMenubarOpen] = useState(false);
@@ -17,15 +18,7 @@ export default function Header() {
           </Link>
         </div>
         <nav className="flex items-center gap-4">
-          <Link href="/search" aria-label="Search">
-            <Image
-              src="/images/search.png"
-              alt="search icon"
-              width={20}
-              height={20}
-              className="opacity-80 hover:opacity-100 transition"
-            />
-          </Link>
+          <SearchInput />
           <button
             onClick={() => setMenubarOpen(true)}
             aria-label="Open menu"
