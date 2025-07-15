@@ -4,8 +4,10 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSurveyList } from "@/features/survey/services/survey";
-import List from "@/components/ui/List";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
+import List from "@/components/ui/List";
+import { usePagination } from "@/features/survey/hooks/usePagination";
+import Pagination from "@/components/ui/Pagination";
 
 const statusTextMap: Record<SurveyResponse["is_active"], string> = {
   upcoming: "예정",
@@ -23,6 +25,13 @@ export default function SurveyList() {
     "complete"
   ); // 설문 제출 상태 (완료만 보기)
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
+
+  const {
+    currentPage,
+    totalPages,
+    currentData: paginatedSurveys,
+    setCurrentPage,
+  } = usePagination(surveys, 6); // 한 페이지당 6개
 
   useEffect(() => {
     const fetch = async () => {
@@ -92,25 +101,34 @@ export default function SurveyList() {
           </p>
         </div>
       ) : (
-        surveys.map((item) => (
-          <List
-            key={item.id}
-            onClick={() => router.push(`/survey/${item.id}`)}
-            image={item.thumbnail_uri}
-            artist={item.artist}
-            title={item.music_title}
-            surveyTitle={item.survey_title}
-            period={`${item.start_at
-              .slice(2, 10)
-              .replace(/-/g, ".")} - ${item.end_at
-              .slice(2, 10)
-              .replace(/-/g, ".")}`}
-            status={statusTextMap[item.is_active] as "예정" | "진행중" | "종료"}
-            surveyType={item.type}
-            participants={item.participants?.length}
-            reward={item.reward_amount}
+        <>
+          {paginatedSurveys.map((item) => (
+            <List
+              key={item.id}
+              onClick={() => router.push(`/survey/${item.id}`)}
+              image={item.thumbnail_uri}
+              artist={item.artist}
+              title={item.music_title}
+              surveyTitle={item.survey_title}
+              period={`${item.start_at
+                .slice(2, 10)
+                .replace(/-/g, ".")} - ${item.end_at
+                .slice(2, 10)
+                .replace(/-/g, ".")}`}
+              status={
+                statusTextMap[item.is_active] as "예정" | "진행중" | "종료"
+              }
+              surveyType={item.type}
+              participants={item.participants?.length}
+              reward={item.reward_amount}
+            />
+          ))}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
-        ))
+        </>
       )}
     </div>
   );
