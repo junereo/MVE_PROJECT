@@ -9,7 +9,9 @@ import { createWallet,
         burnToken,
         approveTunerToken,
         revokeTunerToken,
-        getAllowance } from "../controllers/metaTransaction.controller";
+        getAllowance,
+        getCirculatingSupplyController 
+} from "../controllers/metaTransaction.controller";
 
 const router: Router = express.Router();
 
@@ -23,5 +25,6 @@ router.delete('/token', burnToken); // 토큰 사용
 router.post('/approve', approveTunerToken); // 토큰 approve
 router.post('/revoke', revokeTunerToken); // 토큰 approve 해제
 router.post('/allowance', getAllowance); // allowance 조회
+router.get('/supply', getCirculatingSupplyController); // 유통량 조회
 
 export default router; 

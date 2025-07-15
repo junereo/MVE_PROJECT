@@ -46,7 +46,7 @@ app.use("/withdraw", withdrawal);
 app.use("/transac", transaction);
 app.use("/admin", adminRoutes);
 app.use("/contract", routerWallet);
-app.use('/admin/settings', settingRoutes);
+app.use('/settings', settingRoutes);
 
 
 // 기본 라우트
@@ -62,7 +62,7 @@ app.get('/super', async (req, res) => {
 
     if (existing) {
       res.status(200).json({ message: '관리자가 이미 존재합니다.', user: existing });
-      return ;
+      return;
     }
 
     const hashedPassword = await bcrypt.hash('test1234', 10);

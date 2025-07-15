@@ -8,6 +8,10 @@ import {
   deleteAccount,
   deleteAdminAccount,
   logout,
+  checkEmailDuplicate,
+  findUserId,
+  resetPasswordRequest,
+  resetPassword,
 } from "../controllers/auth.controller";
 import {
   validateRegister,
@@ -23,7 +27,13 @@ router.post("/me", verifyToken, getUserController);
 router.post("/login", validateLogin, emaillogin);
 router.get("/oauth/:provider", oauthCallbackController, validateOAuthRequest);
 router.get('/google/callback', googleCallbackController);
+
 router.post("/logout", logout);
+router.post("/checkemail", checkEmailDuplicate);
+router.post("/findid", findUserId);
+router.post("/pwrequest", resetPasswordRequest);
+router.post("/resetpw", resetPassword);
+
 router.delete("/delete", verifyToken, deleteAccount);
 router.delete("/delete", verifyToken, deleteAdminAccount);
 
