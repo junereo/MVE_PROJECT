@@ -11,7 +11,7 @@ const prisma = new PrismaClient()
 const metaService = new MetaTransctionService()
 const surveyService = new SurveyService(metaService)
 
-cron.schedule('*/10 * * * * *', async () => {
+cron.schedule('* * * * *', async () => {
   const kstNow = DateTime.now().setZone('Asia/Seoul')
   console.log(`[CRON] 실행 시간: ${kstNow.toISO()}`)
 
