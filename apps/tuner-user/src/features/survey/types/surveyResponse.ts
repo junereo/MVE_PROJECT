@@ -1,3 +1,4 @@
+import { GenreKey } from "@/features/users/constants/userInfoMap";
 import { FormattedAnswer } from "./answer";
 import { SurveyTypeEnum, QuestionTypeEnum, InputTypeEnum } from "./enums";
 

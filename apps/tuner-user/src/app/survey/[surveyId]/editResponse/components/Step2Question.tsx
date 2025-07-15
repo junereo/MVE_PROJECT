@@ -28,10 +28,12 @@ import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 import { formatDefaultAnswers } from "@/features/survey/utils/fotmatAnswers";
 import { userUpdatePayload } from "@/features/users/utils/userUpdatePayload";
 import { UserSurveyInfo } from "@/features/users/types/userInfo";
+import { AnswerItem } from "@/features/users/types/updateSurveyResponse";
 
 interface Step2Props {
   surveyId: number;
   surveyTitle: string;
+  submitAnswers: AnswerItem[];
   onPrev: () => void;
   onNext: () => void;
 }
@@ -45,6 +47,7 @@ const baseCategories = [
 export default function Step2Question({
   surveyId,
   surveyTitle,
+  submitAnswers,
   onPrev,
   onNext,
 }: Step2Props) {
@@ -119,6 +122,21 @@ export default function Step2Question({
   }, [surveyId, step4, setStep4]);
 
   useEffect(() => {
+    if (submitAnswers?.length && questions.length) {
+      submitAnswers.forEach((ans) => {
+        const question = questions.find((q) => q.id === ans.id);
+        if (!question) return;
+        const category = question.category;
+        const validAnswer =
+          typeof ans.answer === "string" || Array.isArray(ans.answer)
+            ? ans.answer
+            : String(ans.answer); // 숫자 등도 문자열로 안전 처리
+        setAnswer(category, question.id, validAnswer);
+      });
+    }
+  }, [submitAnswers, questions]);
+
+  useEffect(() => {
     console.log("설문 답변", answers);
   }, [answers]);
 
@@ -180,6 +198,7 @@ export default function Step2Question({
       console.log("기본 정보", response);
       const res = await postSurveyAnswer(surveyPayload);
       console.log("설문 참여", res);
+      sessionStorage.removeItem("editResponseData");
       setSubmitStatus("success");
       resetAnswers();
       resetUserInfo();
@@ -218,6 +237,7 @@ export default function Step2Question({
 
     try {
       await postSurveyAnswer(payload);
+      sessionStorage.removeItem("editResponseData");
       setSubmitStatus("saved");
       resetAnswers();
       resetUserInfo();
@@ -307,7 +327,7 @@ export default function Step2Question({
           </div>
           <div className="flex items-center">
             <div className="w-[70px] sm:w-[100px]">
-              <Button onClick={handleSave} disabled={!isValid} color="white">
+              <Button onClick={handleSave} color="white">
                 임시저장
               </Button>
             </div>
