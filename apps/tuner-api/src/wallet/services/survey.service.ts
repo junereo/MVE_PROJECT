@@ -67,9 +67,19 @@ export class SurveyService {
   }
 
   // ✅ submitSurveyAndMint (서베이 응답 + NFT 민팅)
-  async submitSurveyAndMint(uid: string, surveyId: string, answers: string): Promise<any> {
-    const message = { surveyId, uid, answers };
+  async submitSurveyAndMint(uid: string, surveyId: string, data: string): Promise<any> {
+    const message = { surveyId, uid, data };
 
+    
+    const result = await ipfs.add(JSON.stringify(data), {
+      cidVersion: 1,
+      hashAlg: 'sha2-256',
+      rawLeaves: true
+    });
+
+    // 3. Pin 고정
+    await ipfs.pin.add(result.cid);
+    
     // 1. 메타데이터 구성 및 IPFS 업로드
     const metadata = {
       name: `Survey ${surveyId}`,
@@ -78,8 +88,11 @@ export class SurveyService {
         { trait_type: "UID", value: uid },
         { trait_type: "Survey", value: surveyId },
         { trait_type: "Completed At", value: new Date().toISOString() }
-      ]
+      ],
+      datainfo: `ipfs://${result.cid.toString()}` // 설문 응답 데이터
     };
+
+
 
     const metadataUri = await this.uploadToIPFS(metadata);
 

@@ -20,15 +20,15 @@ await surveyService.init();
 
 // ✅ 1. 설문 제출 및 즉시 NFT 발행
 export const submitSurvey = async (req: Request, res: Response) => {
-  const { uid, surveyId, answers } = req.body;
+  const { uid, surveyId, data } = req.body;
 
-  if (!uid || !surveyId || !answers) {
+  if (!uid || !surveyId || !data) {
     res.status(400).json({ error: 'uid, surveyId, answers are required' });
     return;
   }
 
   try {
-    const result = await surveyService.submitSurveyAndMint(uid, surveyId, answers);
+    const result = await surveyService.submitSurveyAndMint(uid, surveyId, data);
     res.status(200).json(result);
   } catch (err: any) {
     console.error('❌ submitSurveyAndMint failed:', err);
