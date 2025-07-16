@@ -277,14 +277,25 @@ export default function SurveyDetailPage() {
                                     <>
                                         <p>
                                             💰 총 리워드:{' '}
-                                            {surveyData.reward_amount} MVE
+                                            {surveyData.reward_amount.toLocaleString()}{' '}
+                                            MVE
                                         </p>
                                         <p>
-                                            지급 완료: 0 MVE / 잔여:{' '}
-                                            {surveyData.reward_amount} MVE
+                                            지급 완료:{' '}
+                                            {(
+                                                surveyData.reward_amount -
+                                                surveyData.rest_amount / 1000
+                                            ).toLocaleString()}{' '}
+                                            MVE / 잔여:{' '}
+                                            {(
+                                                surveyData.rest_amount / 1000
+                                            ).toLocaleString()}{' '}
+                                            MVE
                                             <br />
-                                            일반 유저: {surveyData.reward} MVE /
-                                            Expert: {surveyData.expert_reward}{' '}
+                                            일반 유저:{' '}
+                                            {surveyData.reward.toLocaleString()}{' '}
+                                            MVE / Expert:{' '}
+                                            {surveyData.expert_reward.toLocaleString()}{' '}
                                             MVE
                                         </p>
                                     </>

@@ -80,9 +80,7 @@ export default function UserWithdrawal() {
                             tokenAddress: tokenAddress,
                         },
                     );
-                    console.log(rewardRes);
-                    rewardLeft = rewardRes.data.token ?? 0;
-                    console.log('🧪 owner rewardLeft:', rewardLeft);
+                    rewardLeft = rewardRes.data.allowance ?? 0;
                 } catch (e) {
                     console.error('❌ 오너 리워드 조회 실패:', e);
                 }

@@ -7,6 +7,7 @@ import RankChangeModal from './components/RankChaingeModal';
 import RewardModal from './components/RewardModal';
 import { useSessionStore } from '@/store/useAuthmeStore';
 import { useRouter } from 'next/navigation';
+import axiosClient from '@/lib/network/axios';
 
 interface User {
     id: number;
@@ -40,6 +41,7 @@ export default function AdminUserPage() {
         nickname: string;
     } | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [ownerRewardLeft, setOwnerRewardLeft] = useState<number>(0);
     const usersPerPage = 15;
 
     // useEffect(() => {
@@ -70,53 +72,66 @@ export default function AdminUserPage() {
     // }, []);
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchData = async () => {
             try {
-                const { data } = await userList();
+                // 1. 유저 리스트
+                const { data: userListData } = await userList();
 
-                // 모든 유저에 대해 병렬로 token 가져오기
-                const usersWithToken = await Promise.all(
-                    data.map(async (user: ServerUser) => {
+                // 2. 각 유저별 보유 리워드 조회
+                const usersWithReward = await Promise.all(
+                    userListData.map(async (u: ServerUser): Promise<User> => {
                         try {
-                            const tokenResponse = await userReward(user.id);
+                            const res = await userReward(u.id);
                             return {
-                                id: user.id,
-                                nickname: user.nickname,
-                                email: user.email,
-                                role: user.badge_issued_at
-                                    ? 'expert'
-                                    : user.role === 'ordinary'
-                                    ? 'ordinary'
-                                    : user.role,
-                                rewardLeft: tokenResponse.data.token ?? 0,
+                                id: u.id,
+                                nickname: u.nickname,
+                                email: u.email,
+                                role: u.badge_issued_at ? 'expert' : u.role,
+                                rewardLeft: res.data.token ?? 0,
                             };
-                        } catch (error) {
+                        } catch (e) {
                             console.error(
-                                `❌ 유저 ID ${user.id} 토큰 조회 실패`,
-                                error,
+                                `❌ 유저 ${u.id} 보유 리워드 조회 실패`,
+                                e,
                             );
                             return {
-                                id: user.id,
-                                nickname: user.nickname,
-                                email: user.email,
-                                role: user.badge_issued_at
-                                    ? 'expert'
-                                    : user.role === 'ordinary'
-                                    ? 'ordinary'
-                                    : user.role,
-                                rewardLeft: 0, // 실패 시 0으로 fallback
+                                id: u.id,
+                                nickname: u.nickname,
+                                email: u.email,
+                                role: u.badge_issued_at ? 'expert' : u.role,
+                                rewardLeft: 0,
                             };
                         }
                     }),
                 );
 
-                setUsers(usersWithToken);
+                setUsers(usersWithReward);
+
+                // 3. 오너 출금 가능 리워드 (allowance)
+                const caRes = await axiosClient.get('/contract/ca');
+                const spender = caRes.data.ca_transac;
+                const tokenAddress = caRes.data.ca_token;
+
+                try {
+                    const rewardRes = await axiosClient.post(
+                        '/contract/wallet/allowance',
+                        {
+                            owner: 'owner',
+                            spender,
+                            tokenAddress,
+                        },
+                    );
+                    setOwnerRewardLeft(rewardRes.data.allowance ?? 0);
+                } catch (e) {
+                    console.error('❌ 오너 allowance 조회 실패:', e);
+                    setOwnerRewardLeft(0);
+                }
             } catch (err) {
-                console.error('❌ 유저 목록 불러오기 실패:', err);
+                console.error('❌ 전체 유저 및 오너 리워드 조회 실패:', err);
             }
         };
 
-        fetchUsers();
+        fetchData();
     }, []);
 
     const filteredUsers = users
@@ -232,14 +247,11 @@ export default function AdminUserPage() {
                     <div>
                         출금 가능 리워드:{' '}
                         <span className="font-semibold">
-                            {users
-                                .find((u) => u.id === 1)
-                                ?.rewardLeft?.toLocaleString() ?? 0}{' '}
-                            MVE
+                            {ownerRewardLeft.toLocaleString()} MVE
                         </span>
                     </div>
                     <div>
-                        전체 리워드 총합:{' '}
+                        배포된 전체 리워드 총합:{' '}
                         <span className="font-semibold">
                             {users.reduce((acc, user) => {
                                 const reward = Number(user.rewardLeft);

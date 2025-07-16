@@ -122,6 +122,7 @@ export interface SurveyData {
     updated_at: string;
     questions: number;
     participants?: string;
+    rest_amount: number;
     // 내가 수정함
     surveyResponses: {
         user_id: number;
