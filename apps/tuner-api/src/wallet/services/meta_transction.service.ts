@@ -175,11 +175,11 @@ export class MetaTransctionService {
   }
 
   /**
-   * owner가 spender에게 위임한 토큰 allowance 조회
+   * owner가 spender에게 위임한 토큰 allowance 조회 owner면 wallet에서 주소 읽어옴
    */
   async getAllowance(owner: string, spender: string, tokenAddress: string) {
     let ownerAddress = owner;
-    if(owner === "owner"){
+    if(ownerAddress === "owner"){
       ownerAddress = this.wallet.address;
     }
     const abi = ["function allowance(address owner, address spender) public view returns (uint256)"];
