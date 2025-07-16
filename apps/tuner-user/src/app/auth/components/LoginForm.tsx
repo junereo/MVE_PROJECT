@@ -133,12 +133,17 @@ export default function LoginForm() {
           <Button type="submit" color="blue">
             로그인
           </Button>
-          <Link
-            href="/auth/signup"
-            className="text-center text-blue-400 hover:underline mt-2 mb-2"
-          >
-            아직 계정이 없으신가요? 회원가입
-          </Link>
+          <div className="flex justify-center gap-6 text-sm text-blue-500 mt-2">
+            <Link href="/auth/find-password" className="hover:underline">
+              비밀번호 찾기
+            </Link>
+            <Link href="/auth/find-id" className="hover:underline">
+              이메일 찾기
+            </Link>
+            <Link href="/auth/signup" className="hover:underline">
+              회원가입
+            </Link>
+          </div>
         </form>
       </div>
     </>
