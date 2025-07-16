@@ -99,7 +99,7 @@ const Dashboard = () => {
 
     return (
         <>
-            <div className="text-2xl font-bold py-3">Dashboard</div>
+            <div className="text-2xl font-bold py-3">대시 보드</div>
             <div className="p-6 space-y-6">
                 {/* 상단 요약 카드 */}
                 <div className="flex gap-5">
@@ -258,7 +258,7 @@ const Dashboard = () => {
                                                     : 'bg-green-100 text-green-700'
                                             }`}
                                         >
-                                            {survey.reward_amount / 1000} STK
+                                            {survey.reward_amount / 1000} MVE
                                         </span>
                                     </td>
                                     <td className="border px-2 py-1">

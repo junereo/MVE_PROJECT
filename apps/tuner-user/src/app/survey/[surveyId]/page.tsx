@@ -123,7 +123,7 @@ export default function SurveyDetail() {
           {type === SurveyTypeEnum.OFFICIAL && (
             <InfoRow
               label="리워드"
-              value={`🎁 ${reward_amount / 1000} STK`}
+              value={`🎁 ${reward_amount / 1000} MVE`}
               valueClass="text-orange-500"
             />
           )}
