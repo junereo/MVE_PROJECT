@@ -230,7 +230,7 @@ export default function SurveyListPage() {
                                 {survey.surveyType === 'official' &&
                                     survey.reward_amount && (
                                         <span className="ml-2 text-blue-600 font-medium">
-                                            🎁 {survey.reward_amount} STK
+                                            🎁 {survey.reward_amount} MVE
                                         </span>
                                     )}
                             </p>

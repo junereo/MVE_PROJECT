@@ -88,14 +88,14 @@ export default function UserDetailPage() {
     return (
         <div>
             <div className="w-full text-black text-2xl py-3 font-bold">
-                UserView
+                유저 상세
             </div>
             <div className="p-6 space-y-6">
                 <div className="bg-white shadow rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     <Info title="닉네임" value={user.nickname} />
                     <Info title="이메일" value={user.email} />
                     <Info title="등급" value={user.role} />
-                    <Info title="잔여 리워드" value={`${user.balance} STK`} />
+                    <Info title="잔여 리워드" value={`${user.balance} MVE`} />
                     <Info
                         title="설문 생성 수"
                         value={`${user.surveys.length} 개`}
@@ -217,7 +217,7 @@ export default function UserDetailPage() {
                                                     : 'bg-green-100 text-green-700'
                                             }`}
                                         >
-                                            {survey.reward_amount} STK
+                                            {survey.reward_amount} MVE
                                         </span>
                                     </td>
                                     <td className="border px-2 py-1">
