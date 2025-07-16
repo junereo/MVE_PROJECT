@@ -12,9 +12,14 @@ import {
 import { AnswerItem } from "../types/survey.types";
 import { calculateSurveyResult } from "./survey.result.service";
 import { DateTime } from "luxon";
+import { SurveyService } from '../wallet/services/survey.service'
+import { MetaTransctionService } from '../wallet/services/meta_transction.service'
+
 // import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
 
 const prisma = new PrismaClient();
+const metaService = new MetaTransctionService()
+const surveyService = new SurveyService(metaService)
 
 // 상태 계산 (한국시간 기준)
 export const checkSurveyActive = (
@@ -500,4 +505,83 @@ export const updateSurveyResponse = async ({
   });
 
   return updated;
+};
+
+
+export const terminateSurvey = async (
+    surveyId: number
+  ) => {
+  const survey = await prisma.survey.update({
+              where: { id: surveyId },
+              data: { is_active: "closed" },
+            })
+
+  const participants = await prisma.survey_Participants.findMany({
+    where: { survey_id: surveyId },
+    select: {
+      id: true,
+      user_id: true,
+      rewarded: true,
+      user: {
+        select: {
+          id: true,
+          role: true,
+        },
+      },
+    },
+  })
+
+  // 참여자 병렬 처리
+  await Promise.all(
+    participants.map(async (participant) => {
+      if (!participant.user_id || !participant.user) return
+
+      const rewardAmount = participant.rewarded ?? 0
+      if (rewardAmount <= 0) return
+
+      await prisma.transaction.create({
+        data: {
+          user_id: participant.user_id,
+          type: 'DEPOSIT',
+          amount: rewardAmount,
+          memo: `설문 참여 리워드 (설문 ID: ${surveyId})`,
+        },
+      })
+
+      await prisma.user.update({
+        where: { id: participant.user_id },
+        data: {
+          balance: { increment: rewardAmount },
+        },
+      })
+
+      await prisma.survey_Participants.update({
+        where: { id: participant.id },
+        data: { rewarded: 0 },
+      })
+
+      let metadata_ipfs = 'failed'
+      try {
+        const ipfsResult = await surveyService.submitSurveyAndMint(
+          String(participant.user_id),
+          String(surveyId),
+          JSON.stringify(survey)
+        )
+        if (ipfsResult?.metadataUri) {
+          metadata_ipfs = ipfsResult.metadataUri
+        }
+      } catch (e) {
+        console.error('[CRON] IPFS 업로드 실패:', e)
+      }
+
+      await prisma.survey_Result.updateMany({
+        where: { survey_id: surveyId },
+        data: { metadata_ipfs },
+      })
+
+      console.log(
+        `[CRON] 지급 완료: user_id=${participant.user_id}, amount=${rewardAmount}, metadata_ipfs=${metadata_ipfs}`
+      )
+    })
+  )   
 };

@@ -13,7 +13,8 @@ import {
   getSurveyQuestionController,
   getMySurvey,
   calculateSurveyResultHandler,
-  updateSurveyResponseHandler
+  updateSurveyResponseHandler,
+  terminateSurveyHandler
 } from "../controllers/survey.controller";
 import { verifyUserOrAdmin } from "../middlewares/survey.middleware";
 
@@ -26,7 +27,7 @@ router.get("/s/:surveyId", getSurvey);
 router.get("/q/:questionnaireId", getSurveyQuestionList);
 router.get("/p", getAllSurveyParticipantsHandler);
 router.get("/r/:surveyId", getSurveyResultHandler);
-router.get("/s/:questionId", verifyToken, getSurveyQuestionController);
+// router.get("/s/:questionId", verifyToken, getSurveyQuestionController);
 router.get("/s", verifyToken, getMySurvey);
 
 router.post("/r", verifyToken, createSurveyResultHandler);
@@ -39,6 +40,7 @@ router.post("/c/:surveyId", verifyUserOrAdmin, verifyToken, calculateSurveyResul
 // router.put('/:surveyId/responses');
 router.put("/:surveyId", updateSurvey);
 router.patch("/r", verifyToken, updateSurveyResponseHandler);
+router.put("/t/:surveyId", verifyUserOrAdmin, verifyToken, terminateSurveyHandler);
 
 export default router;
 
