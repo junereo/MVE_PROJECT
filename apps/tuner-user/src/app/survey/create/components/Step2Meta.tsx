@@ -66,7 +66,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
       </header>
 
       <div className="space-y-4">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-16">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-10">
           Step 2 : 음원 정보
         </h2>
 
@@ -77,7 +77,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
           maxLength={30}
           onChange={(e) => setSurveyTitle(e.target.value)}
         />
-        <div className="space-y-2">
+        <div className="space-y-2 pt-3 pb-3">
           <div className="text-sm font-medium">음원 상태</div>
           <div className="flex gap-2">
             <Button
@@ -94,7 +94,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
             </Button>
           </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 pb-3">
           <div className="text-sm font-medium">음악 장르</div>
           <Dropdown
             options={genreOptions.map((g) => g.label)}

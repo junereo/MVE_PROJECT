@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 
 export const sendResetPasswordEmail = async (to: string, link: string) => {
   const transporter = nodemailer.createTransport({
-    service: "Gmail", // 네가 쓰는 SMTP에 맞게 바꿔도 됨
+    service: "Gmail", // 쓰는 SMTP에 맞게 바꿔도 됨
     auth: {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,

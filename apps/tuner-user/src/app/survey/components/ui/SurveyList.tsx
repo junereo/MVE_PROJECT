@@ -4,8 +4,11 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSurveyList } from "@/features/survey/services/survey";
-import List from "@/components/ui/List";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
+import { usePagination } from "@/features/survey/hooks/usePagination";
+import List from "@/components/ui/List";
+import Pagination from "@/components/ui/Pagination";
+import SortToggle from "@/components/ui/SortToggle";
 
 const statusTextMap: Record<SurveyResponse["is_active"], string> = {
   upcoming: "예정",
@@ -19,35 +22,65 @@ type Status = (typeof statusList)[number];
 export default function SurveyList() {
   const router = useRouter();
   const [status, setStatus] = useState<Status>("all");
+  const [submitStatus, setSubmitStatus] = useState<"draft" | "complete">(
+    "complete"
+  ); // 설문 제출 상태 (완료만 보기)
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
+  const [sortOption, setSortOption] = useState<
+    "latest" | "oldest" | "participants"
+  >("latest");
+
+  const {
+    currentPage,
+    totalPages,
+    currentData: paginatedSurveys,
+    setCurrentPage,
+  } = usePagination(surveys, 6); // 한 페이지당 6개
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const res = await getSurveyList();
 
-        const sorted = res.data.sort((a: SurveyResponse, b: SurveyResponse) => {
-          return (
-            new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
-          );
-        });
-        const filtered =
-          status === "all"
-            ? sorted
-            : sorted.filter(
-                (item: SurveyResponse) => item.is_active === status
+        const filtered: SurveyResponse[] =
+          submitStatus === "complete" && status === "all"
+            ? res.data.filter((item) => item.status === "complete")
+            : res.data.filter(
+                (item) =>
+                  item.status === submitStatus && item.is_active === status
               );
-        setSurveys(filtered);
+
+        const sorted = filtered.sort((a, b) => {
+          if (sortOption === "latest") {
+            return (
+              new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
+            );
+          }
+          if (sortOption === "oldest") {
+            return (
+              new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
+            );
+          }
+          if (sortOption === "participants") {
+            return (
+              (b.participants?.length || 0) - (a.participants?.length || 0)
+            );
+          }
+          return 0;
+        });
+
+        setSurveys(sorted);
       } catch (e) {
         console.error("리스트 불러오기 실패", e);
       }
     };
+
     fetch();
-  }, [status]);
+  }, [status, submitStatus, sortOption]);
 
   return (
-    <div className="space-y-4 max-w-[700px] mx-auto">
-      <div className="flex justify-around border-b pb-2">
+    <div className="space-y-4 min-h-[calc(100vh-100px)] max-w-[700px] mx-auto relative pb-16">
+      <div className="flex justify-around border-b pb-2 mb-4">
         {statusList.map((s) => (
           <button
             key={s}
@@ -64,6 +97,15 @@ export default function SurveyList() {
           </button>
         ))}
       </div>
+      <SortToggle
+        options={[
+          { label: "최신순", value: "latest" },
+          { label: "오래된순", value: "oldest" },
+          { label: "인기순", value: "participants" },
+        ]}
+        value={sortOption}
+        onChange={setSortOption}
+      />
 
       {surveys.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-gray-400 w-full col-span-2">
@@ -85,7 +127,7 @@ export default function SurveyList() {
           </p>
         </div>
       ) : (
-        surveys.map((item) => (
+        paginatedSurveys.map((item) => (
           <List
             key={item.id}
             onClick={() => router.push(`/survey/${item.id}`)}
@@ -105,6 +147,14 @@ export default function SurveyList() {
           />
         ))
       )}
+
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </div>
   );
 }

@@ -59,7 +59,7 @@ export default function Step5Result({ onPrev }: Step6Props) {
       : ui.link;
 
   return (
-    <div className="flex justify-center px-4">
+    <div className="flex justify-center px-4 sm:pt-[150px]">
       <div className="bg-white w-full max-w-[485px] py-10 text-center flex flex-col justify-center items-center gap-10">
         <Image
           src={ui.image}
