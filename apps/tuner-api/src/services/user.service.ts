@@ -4,6 +4,7 @@ import { hashPassword } from "../utils/auth.utils"; // 너네 해시 함수 경�
 
 const prisma = new PrismaClient();
 
+// User Service
 export const createUser = async (data: any) => {
   const hashedPassword = await hashPassword(data.password);
 
@@ -37,6 +38,7 @@ export const createUser = async (data: any) => {
   });
 };
 
+// Get all users
 export const getUsers = async () => {
   return prisma.user.findMany({
     select: {
@@ -62,6 +64,7 @@ export const getUsers = async () => {
   });
 };
 
+// Get user by ID
 export const getUserById = async (id: number) => {
   return prisma.user.findUnique({
     where: { id },
@@ -88,6 +91,7 @@ export const getUserById = async (id: number) => {
   });
 };
 
+// Update user by ID
 export const updateUser = async (id: number, data: any) => {
 
   console.log("Updating user with data:", data);
@@ -144,6 +148,7 @@ export const updateUser = async (id: number, data: any) => {
   });
 };
 
+// Delete user by ID
 export const deleteUser = async (id: number) => {
   return prisma.user.delete({
     where: { id },
