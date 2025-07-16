@@ -29,7 +29,7 @@ const Dropdown = ({ options, selected, onSelect }: DropdownProps) => {
       </button>
 
       {isOpen && (
-        <ul className="absolute z-10 mt-2 w-full bg-white border rounded-md shadow-md">
+        <ul className="absolute left-0 right-0 z-50 mt-2 max-h-60 overflow-y-auto bg-white border rounded-md shadow-md">
           {options.map((option) => (
             <li
               key={option}

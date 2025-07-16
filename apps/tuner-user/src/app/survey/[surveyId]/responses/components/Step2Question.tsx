@@ -60,7 +60,10 @@ export default function Step2Question({
   );
 
   const [tabIndex, setTabIndex] = useState(0);
+  const [showErrors, setShowErrors] = useState(false);
+
   const currentKey = baseCategories[tabIndex]?.key ?? "";
+  const currentAnswers = answers[currentKey] || {};
 
   const currentQuestions = useMemo(
     () => questions.filter((q) => q.category === currentKey),
@@ -68,20 +71,32 @@ export default function Step2Question({
   );
 
   const isValid = useMemo(() => {
-    const currentAnswers = answers[currentKey] || {};
     return currentQuestions.every((q) => {
       const val = currentAnswers[q.id];
       return Array.isArray(val)
         ? val.length > 0
         : val !== undefined && val !== "";
     });
-  }, [answers, currentKey, currentQuestions]);
+  }, [currentAnswers, currentQuestions]);
+
+  const invalidQuestions = useMemo(() => {
+    return currentQuestions.filter((q) => {
+      const val = currentAnswers[q.id];
+      return Array.isArray(val) ? val.length === 0 : !val;
+    });
+  }, [currentAnswers, currentQuestions]);
+
+  const invalidMap = useMemo(() => {
+    return invalidQuestions.reduce((acc, q) => {
+      acc[q.id] = true;
+      return acc;
+    }, {} as Record<number, boolean>);
+  }, [invalidQuestions]);
 
   useEffect(() => {
     if (step4.questions.length === 0 && step4.customQuestions.length === 0) {
       getSurveyById(surveyId).then((res) => {
         const rawQuestions = res.survey_question;
-        console.log("rawQuestions", rawQuestions);
         if (!Array.isArray(rawQuestions) || rawQuestions.length === 0) {
           console.error("질문이 없습니다.");
           return;
@@ -110,41 +125,28 @@ export default function Step2Question({
           }
         });
 
-        setStep4({
-          questions: fixedQuestions,
-          customQuestions,
-        });
+        setStep4({ questions: fixedQuestions, customQuestions });
       });
     }
   }, [surveyId, step4, setStep4]);
 
-  useEffect(() => {
-    console.log("설문 답변", answers);
-  }, [answers]);
-
-  useEffect(() => {
-    console.log("user.id 확인:", user?.id);
-  }, [user]);
-
   const handlePrev = () => {
-    if (tabIndex > 0) {
-      setTabIndex((prev) => prev - 1);
-    } else {
-      onPrev();
-    }
+    if (tabIndex > 0) setTabIndex((prev) => prev - 1);
+    else onPrev();
   };
 
   const handleNext = () => {
-    if (tabIndex < baseCategories.length - 1) {
-      setTabIndex((prev) => prev + 1);
-    } else {
-      onNext();
+    if (!isValid) {
+      setShowErrors(true);
+      return;
     }
+    setShowErrors(false);
+    if (tabIndex < baseCategories.length - 1) setTabIndex((prev) => prev + 1);
+    else onNext();
   };
 
   const handleSubmit = async () => {
     if (!user?.id) {
-      console.error("로그인 정보가 없습니다.");
       setSubmitStatus("error");
       return;
     }
@@ -152,19 +154,11 @@ export default function Step2Question({
     const {
       step4: { questions, customQuestions },
     } = useSurveyStore.getState();
-
     const formattedAnswers = formatDefaultAnswers(answers, [
       ...questions,
       ...customQuestions,
     ]);
-
-    const userInfo: UserSurveyInfo = {
-      gender,
-      age,
-      genre,
-      jobDomain,
-    };
-    const userPayload = userUpdatePayload(userInfo);
+    const userPayload = userUpdatePayload({ gender, age, genre, jobDomain });
     const surveyPayload = {
       user_id: user.id,
       survey_id: surveyId,
@@ -172,18 +166,14 @@ export default function Step2Question({
       status: SurveyStatusEnum.COMPLETE,
       user_info: userPayload,
     };
-    console.log("userPayload", userPayload);
-    console.log("payload", surveyPayload);
 
     try {
-      const response = await updateUserInfo(Number(user.id), userPayload);
-      console.log("기본 정보", response);
-      const res = await postSurveyAnswer(surveyPayload);
-      console.log("설문 참여", res);
+      await updateUserInfo(Number(user.id), userPayload);
+      await postSurveyAnswer(surveyPayload);
       setSubmitStatus("success");
       resetAnswers();
       resetUserInfo();
-      onNext(); // 여기서 에러 터지는 것 같음
+      onNext();
     } catch (err) {
       console.error("설문 제출 실패", err);
       setSubmitStatus("error");
@@ -191,10 +181,8 @@ export default function Step2Question({
     }
   };
 
-  // 임시저장
   const handleSave = async () => {
     if (!user?.id) {
-      console.error("로그인 정보가 없습니다.");
       setSubmitStatus("error");
       return;
     }
@@ -206,7 +194,6 @@ export default function Step2Question({
       ...questions,
       ...customQuestions,
     ]);
-
     const payload = {
       user_id: user.id,
       survey_id: surveyId,
@@ -214,7 +201,6 @@ export default function Step2Question({
       answers: formattedAnswers,
       status: SurveyStatusEnum.DRAFT,
     };
-    console.log("payload", payload);
 
     try {
       await postSurveyAnswer(payload);
@@ -233,7 +219,7 @@ export default function Step2Question({
     <>
       <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
         <button onClick={handlePrev}>←</button>
-        <h1 className="font-bold text-lg text-center flex-1">설문 참여</h1>
+        <h1 className="font-bold text-lg text-center flex-1">{surveyTitle}</h1>
       </header>
 
       <div className="space-y-4">
@@ -241,7 +227,7 @@ export default function Step2Question({
           crumbs={[
             { label: "설문", href: "/survey" },
             { label: surveyTitle, href: `/survey/${surveyId}` },
-            { label: "기본 설문" },
+            { label: "설문" },
           ]}
         />
 
@@ -256,7 +242,6 @@ export default function Step2Question({
             | string
             | string[]
             | undefined;
-
           return (
             <div
               key={q.id}
@@ -265,46 +250,53 @@ export default function Step2Question({
               <QuestionText text={`Q${idx + 1}. ${q.question_text}`} />
 
               {q.type === InputTypeEnum.SUBJECTIVE ? (
-                <QuestionSubjective
-                  name={`question-${q.id}`}
-                  value={typeof saved === "string" ? saved : ""}
-                  onChange={(val) => setAnswer(currentKey, q.id, val)}
-                />
+                <>
+                  <QuestionSubjective
+                    name={`question-${q.id}`}
+                    value={typeof saved === "string" ? saved : ""}
+                    onChange={(val) => setAnswer(currentKey, q.id, val)}
+                  />
+                  {showErrors && invalidMap[q.id] && (
+                    <p className="text-red-500 text-sm mt-1">
+                      답변을 입력해주세요.
+                    </p>
+                  )}
+                </>
               ) : (
-                <QuestionOptions
-                  options={q.options ?? []}
-                  value={saved}
-                  type={q.type}
-                  maxSelect={q.max_num}
-                  onChange={(val) => setAnswer(currentKey, q.id, val)}
-                  layout="horizontal"
-                />
+                <>
+                  <QuestionOptions
+                    options={q.options ?? []}
+                    value={saved}
+                    type={q.type}
+                    maxSelect={q.max_num}
+                    onChange={(val) => setAnswer(currentKey, q.id, val)}
+                    layout="horizontal"
+                  />
+                  {showErrors && invalidMap[q.id] && (
+                    <p className="text-red-500 text-sm mt-1">
+                      답변을 선택해주세요.
+                    </p>
+                  )}
+                </>
               )}
             </div>
           );
         })}
       </div>
 
-      {tabIndex < baseCategories.length - 1 ? (
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
-          <div className="w-[140px] sm:w-[200px]">
-            <Button onClick={handlePrev} color="white">
-              이전
-            </Button>
-          </div>
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
+        <div className="w-[140px] sm:w-[200px]">
+          <Button onClick={handlePrev} color="white">
+            이전
+          </Button>
+        </div>
+        {tabIndex < baseCategories.length - 1 ? (
           <div className="w-[180px] sm:w-[400px]">
-            <Button onClick={handleNext} disabled={!isValid} color="blue">
+            <Button onClick={handleNext} color="blue">
               다음
             </Button>
           </div>
-        </div>
-      ) : (
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
-          <div className="w-[140px] sm:w-[200px]">
-            <Button onClick={handlePrev} color="white">
-              이전
-            </Button>
-          </div>
+        ) : (
           <div className="flex items-center">
             <div className="w-[70px] sm:w-[100px]">
               <Button onClick={handleSave} disabled={!isValid} color="white">
@@ -317,8 +309,8 @@ export default function Step2Question({
               </Button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }

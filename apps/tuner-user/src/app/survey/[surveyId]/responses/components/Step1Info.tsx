@@ -11,7 +11,6 @@ import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
 import { InputTypeEnum } from "@/features/survey/types/enums";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
-import { useUserStore } from "@/features/users/store/useUserStore";
 import {
   AgeKey,
   ageMap,
@@ -87,7 +86,7 @@ export default function Step1Info({
     <>
       <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
         <Link href={`/survey/${surveyId}`}>←</Link>
-        <h1 className="font-bold text-lg text-center flex-1">설문 참여</h1>
+        <h1 className="font-bold text-lg text-center flex-1">{surveyTitle}</h1>
       </header>
 
       <div className="space-y-4">
