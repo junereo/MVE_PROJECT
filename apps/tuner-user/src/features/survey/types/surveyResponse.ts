@@ -1,3 +1,4 @@
+import { GenreKey } from "@/features/users/constants/userInfoMap";
 import { FormattedAnswer } from "./answer";
 import { SurveyTypeEnum, QuestionTypeEnum, InputTypeEnum } from "./enums";
 
@@ -26,6 +27,14 @@ export interface SurveyResponse {
   reward_amount: number;
   reward: number;
   expert_reward: number;
+
+  status: "draft" | "complete";
+
+  creator: {
+    id: number;
+    nickname: string;
+    role: "ordinary" | "expert" | "admin";
+  };
 
   participants?: {
     id: number;

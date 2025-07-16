@@ -12,18 +12,19 @@ export default function QuestionSubjective({
   disabled = false,
 }: Props) {
   return (
-    <textarea
+    <input
+      type="text"
       name={name}
-      className="w-full min-h-[100px] px-4 p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-      placeholder="여기에 답변을 입력해 주세요."
       value={value}
+      placeholder="여기에 답변을 입력해주세요."
       onChange={(e) => {
         if (!disabled && onChange) {
           onChange(e.target.value);
         }
       }}
       disabled={disabled}
-      maxLength={300}
+      maxLength={40}
+      className="w-full border-b border-gray-300 px-1 py-2 text-sm focus:outline-none focus:border-blue-500 disabled:bg-transparent disabled:text-gray-400"
     />
   );
 }

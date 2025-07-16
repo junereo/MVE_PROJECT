@@ -228,7 +228,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
       </header>
 
       <div className="space-y-4">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-16">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-10">
           Step 4 : 기본 설문
         </h2>
 
