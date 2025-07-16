@@ -25,9 +25,7 @@ interface Participant {
         role: string;
     };
     reward: number;
-    answers: {
-        answers: AnswerItem[];
-    };
+    answers: AnswerItem[];
 }
 
 export default function ParticipantDetailPage() {
@@ -39,9 +37,11 @@ export default function ParticipantDetailPage() {
         const fetchData = async () => {
             if (!id || !userId) return;
             const result = await surveyView(Array.isArray(id) ? id[0] : id);
+            console.log(result);
 
             const surveyQs: SurveyQuestion[] = result.data.survey_question;
             setSurveyQuestions(surveyQs);
+            console.log('참여자', result.data.participants);
 
             const p = result.data.participants.find(
                 (item: {
@@ -51,6 +51,8 @@ export default function ParticipantDetailPage() {
                     answers: { answers: Omit<AnswerItem, 'question_type'>[] };
                 }) => String(item.user_id) === String(userId),
             );
+            console.log('이건 p여', p);
+
             if (!p) return;
 
             const reward =
@@ -59,7 +61,7 @@ export default function ParticipantDetailPage() {
                     : result.data.reward;
 
             const enrichedAnswers: AnswerItem[] = (
-                p.answers.answers as Omit<AnswerItem, 'question_type'>[]
+                p.answers as Omit<AnswerItem, 'question_type'>[]
             ).map((a) => {
                 const match = surveyQs.find(
                     (q) => q.question_text === a.question_text,
@@ -78,7 +80,7 @@ export default function ParticipantDetailPage() {
             setParticipant({
                 user: p.user,
                 reward,
-                answers: { answers: enrichedAnswers },
+                answers: enrichedAnswers,
             });
         };
 
@@ -87,11 +89,11 @@ export default function ParticipantDetailPage() {
 
     if (!participant) return <div className="p-6">로딩 중...</div>;
 
-    const fixedAnswers = participant.answers.answers.filter(
+    const fixedAnswers = participant.answers.filter(
         (q) => q.question_type === Question_type.fixed,
     );
 
-    const customAnswers = participant.answers.answers.filter(
+    const customAnswers = participant.answers.filter(
         (q) => q.question_type === Question_type.custom,
     );
 

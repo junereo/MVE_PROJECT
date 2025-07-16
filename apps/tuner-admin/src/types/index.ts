@@ -91,6 +91,10 @@ export interface SurveyQuestionPayload {
     question_type: Question_type;
     question_order: number;
 }
+export interface SettingsPayload {
+    key: string;
+    value: string | number | boolean | object | null;
+}
 // types/survey.ts
 
 // 설문 상세 get 데이터

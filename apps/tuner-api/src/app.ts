@@ -46,7 +46,7 @@ app.use("/withdraw", withdrawal);
 app.use("/transac", transaction);
 app.use("/admin", adminRoutes);
 app.use("/contract", routerWallet);
-app.use("/admin/settings", settingRoutes);
+app.use("/settings", settingRoutes);
 
 // 기본 라우트
 app.get("/", (req, res) => {

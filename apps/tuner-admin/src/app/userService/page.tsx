@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { userList, userReward } from '@/lib/network/api';
+import { settings, userList, userReward, userExpert } from '@/lib/network/api';
 import Dropdown from '@/app/components/ui/DropDown';
 import RankChangeModal from './components/RankChaingeModal';
 import RewardModal from './components/RewardModal';
@@ -157,18 +157,70 @@ export default function AdminUserPage() {
         setRankModalOpen(true);
     };
 
-    const handleConfirmRankChange = () => {
+    const handleConfirmRankChange = async () => {
         if (selectedUser) {
-            console.log(
-                `${selectedUser.nickname} (ID: ${selectedUser.id}) 등급을 Expert로 변경`,
-            );
-            setRankModalOpen(false);
-            setSelectedUser(null);
+            try {
+                const userToUpdate = users.find(
+                    (u) => u.id === selectedUser.id,
+                );
+                console.log(userToUpdate);
+
+                if (
+                    userToUpdate?.role === 'admin' ||
+                    userToUpdate?.role === 'superadmin'
+                ) {
+                    alert('admin 및 superadmin의 등급은 변경할 수 없습니다.');
+                    return;
+                }
+
+                await userExpert(userToUpdate!.id, {
+                    ...userToUpdate,
+                    role: 'expert',
+                });
+                alert(
+                    `${
+                        userToUpdate!.nickname
+                    }의 등급이 Expert로 변경되었습니다.`,
+                );
+
+                // 사용자 목록 갱신
+                const { data } = await userList();
+
+                const mappedUsers = data.map((user: ServerUser) => ({
+                    id: user.id,
+                    nickname: user.nickname,
+                    email: user.email,
+                    role: user.badge_issued_at
+                        ? 'expert'
+                        : user.role === 'ordinary'
+                        ? 'ordinary'
+                        : user.role,
+                    rewardLeft: user.balance ?? 0,
+                }));
+                setUsers(mappedUsers);
+
+                setRankModalOpen(false);
+                setSelectedUser(null);
+            } catch (error) {
+                console.error('❌ 등급 변경 실패:', error);
+                alert('등급 변경 중 오류가 발생했습니다.');
+            }
         }
     };
 
-    const handleUpdateThreshold = () => {
-        console.log('저장된 기준:', threshold);
+    const handleUpdateThreshold = async () => {
+        try {
+            const formData = {
+                key: 'Expert_thresh',
+                value: String(threshold),
+            };
+            const res = await settings(formData);
+            console.log('✅ 저장 성공:', res.data);
+            alert('Expert 기준이 저장되었습니다.');
+        } catch (error) {
+            console.error('❌ Expert 기준 저장 실패:', error);
+            alert('저장 중 오류가 발생했습니다.');
+        }
     };
 
     return (
@@ -336,12 +388,25 @@ export default function AdminUserPage() {
                                     >
                                         <button
                                             className="bg-yellow-400 px-2 py-1 rounded text-white text-xs"
-                                            onClick={() =>
+                                            disabled={
+                                                user.role === 'admin' ||
+                                                user.role === 'superadmin'
+                                            }
+                                            onClick={() => {
+                                                if (
+                                                    user.role === 'admin' ||
+                                                    user.role === 'superadmin'
+                                                ) {
+                                                    alert(
+                                                        'admin 및 superadmin의 등급은 변경할 수 없습니다.',
+                                                    );
+                                                    return;
+                                                }
                                                 handleRankClick(
                                                     user.id,
                                                     user.nickname,
-                                                )
-                                            }
+                                                );
+                                            }}
                                         >
                                             등급 변경
                                         </button>

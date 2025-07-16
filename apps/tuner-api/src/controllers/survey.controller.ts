@@ -12,7 +12,7 @@ import {
   getSurveyQuestion,
   updateSurveyResponse,
 } from "../services/survey.service";
-import { calculateSurveyResult } from "../services/survey.result.service"
+import { calculateSurveyResult } from "../services/survey.result.service";
 import { PrismaClient, QuestionType, SurveyStatus } from "@prisma/client";
 const prisma = new PrismaClient();
 
@@ -204,7 +204,9 @@ export const createSurveyParticipantHandler = async (
     const user_id = req.user?.userId;
 
     if (!user_id || !survey_id || !answers) {
-      res.status(400).json({ message: "user_id, survey_id, answers는 필수입니다." });
+      res
+        .status(400)
+        .json({ message: "user_id, survey_id, answers는 필수입니다." });
       return;
     }
 
@@ -219,10 +221,11 @@ export const createSurveyParticipantHandler = async (
     res.status(201).json({ success: true, data: newParticipant });
   } catch (err: any) {
     console.error("설문 응답 생성 오류:", err);
-    res.status(500).json({ success: false, message: "응답 생성 실패", error: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: "응답 생성 실패", error: err.message });
   }
 };
-
 
 // GET /survey-participants
 export const getAllSurveyParticipantsHandler = async (
@@ -318,7 +321,9 @@ export const getSurveyResultHandler = async (req: Request, res: Response) => {
     res.status(200).json({ success: true, data: result });
   } catch (err: any) {
     console.error("[getSurveyResultHandler]", err);
-    res.status(500).json({ success: false, message: "결과 조회 실패", error: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: "결과 조회 실패", error: err.message });
   }
 };
 
@@ -378,8 +383,10 @@ export const getMySurvey = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const calculateSurveyResultHandler = async (req: Request, res: Response) => {
-  
+export const calculateSurveyResultHandler = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const surveyId = Number(req.params.surveyId);
     console.log("surveyId:", surveyId);
@@ -390,20 +397,35 @@ export const calculateSurveyResultHandler = async (req: Request, res: Response) 
 
     const result = await calculateSurveyResult(surveyId);
 
-    res.status(200).json({ success: true, message: `${req.params.surveyId} 통계 계산 완료`, data: result });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `${req.params.surveyId} 통계 계산 완료`,
+        data: result,
+      });
   } catch (err: any) {
     console.error("[calculateSurveyResultHandler]", err);
-    res.status(500).json({ success: false, message: `${req.params.surveyId} 통계 계산 실패`, error: err.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: `${req.params.surveyId} 통계 계산 실패`,
+        error: err.message,
+      });
   }
 };
 
-export const updateSurveyResponseHandler = async (req: AuthRequest, res: Response) => {
+export const updateSurveyResponseHandler = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
     const userId = req.user?.userId;
     const { surveyId, answers, status } = req.body;
 
     if (!userId || !surveyId || !answers) {
-      res.status(400).json({ success: false, message: '필수 파라미터 누락' });
+      res.status(400).json({ success: false, message: "필수 파라미터 누락" });
       return;
     }
 
@@ -415,18 +437,18 @@ export const updateSurveyResponseHandler = async (req: AuthRequest, res: Respons
     });
 
     if (result.count === 0) {
-      res.status(404).json({ success: false, message: '참여자 정보 없음' });
-      return
+      res.status(404).json({ success: false, message: "참여자 정보 없음" });
+      return;
     }
 
     res.json({
       success: true,
-      message: '설문 응답 수정 완료!',
+      message: "설문 응답 수정 완료!",
       updatedCount: result.count,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: '서버 오류', error });
+    res.status(500).json({ success: false, message: "서버 오류", error });
     return;
   }
 };

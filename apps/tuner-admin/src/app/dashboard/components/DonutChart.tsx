@@ -7,7 +7,14 @@ interface DonutChartProps {
     }[];
 }
 
-export const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+export const COLORS = [
+    '#0088FE',
+    '#00C49F',
+    '#FFBB28',
+    '#FF8042',
+    '#A28EFF',
+    '#FF69B4',
+];
 
 export const DonutChart = ({ data }: DonutChartProps) => (
     <PieChart width={300} height={300}>
