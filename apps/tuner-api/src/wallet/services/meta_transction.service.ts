@@ -178,9 +178,13 @@ export class MetaTransctionService {
    * owner가 spender에게 위임한 토큰 allowance 조회
    */
   async getAllowance(owner: string, spender: string, tokenAddress: string) {
+    let ownerAddress = owner;
+    if(owner === "owner"){
+      ownerAddress = this.wallet.address;
+    }
     const abi = ["function allowance(address owner, address spender) public view returns (uint256)"];
     const tunerToken = new Contract(tokenAddress, abi, this.provider);
-    const allowance = await tunerToken.allowance(owner, spender);
+    const allowance = await tunerToken.allowance(ownerAddress, spender);
     // 18자리 ether 단위로 변환
     return ethers.formatUnits(allowance, 18);
   }
