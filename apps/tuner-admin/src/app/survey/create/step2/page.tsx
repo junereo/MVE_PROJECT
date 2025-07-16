@@ -490,7 +490,7 @@ export default function SurveyStep2() {
     return (
         <div>
             <div className="w-full text-black font-bold text-2xl py-3">
-                Survey create Step2
+                설문 만들기 Step2
             </div>
             <div className="p-6">
                 <div className="flex justify-center">

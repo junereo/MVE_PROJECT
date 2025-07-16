@@ -72,7 +72,7 @@ const SignUpForm = () => {
     return (
         <div>
             <div className="w-full  text-black text-2xl py-3  font-bold">
-                Tunemate Sing Up
+                관리자 회원 가입
             </div>
             <div className="flex justify-center py-2 px-4">
                 <div className="w-full max-w-md bg-black text-white p-8 rounded-2xl shadow-xl">

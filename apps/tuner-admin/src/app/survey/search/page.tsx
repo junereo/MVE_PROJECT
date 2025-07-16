@@ -6,7 +6,7 @@ const Youtube = () => {
     return (
         <div>
             <div className="w-full font-bold text-black text-2xl py-3 ">
-                Survey Youtuve Search
+                유튜브 검색
             </div>
             <div className="p-6">
                 <YoutubeSearch />

@@ -4,9 +4,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSurveyStore } from '@/store/useSurveyCreateStore';
 import Dropdown from '../../../components/ui/DropDown';
-import { surveyView } from '@/lib/network/api';
+import { surveyView, userReward } from '@/lib/network/api';
 import Image from 'next/image';
+import { useSessionCheck } from '@/hooks/useSessionCheck';
+import { useSessionStore } from '@/store/useAuthmeStore';
 const SurveyStep1 = () => {
+    useSessionCheck();
+    const { user } = useSessionStore();
+
     const genreOptions = [
         '발라드',
         '힙합',
@@ -32,6 +37,7 @@ const SurveyStep1 = () => {
         reward: '',
         expertReward: '',
     });
+    const [tokenBalance, setTokenBalance] = useState<number | null>(null);
 
     useEffect(() => {
         const url = new URL(window.location.href);
@@ -96,6 +102,22 @@ const SurveyStep1 = () => {
         setup();
     }, [id, videoId, title, thumbnail, channelTitle, setStep1]);
 
+    // 리워드 조회
+    useEffect(() => {
+        const fetchUserToken = async () => {
+            if (!user?.id) return;
+            try {
+                const { data } = await userReward(user.id);
+                setTokenBalance(data.token);
+                console.log(' 유저 토큰 잔액:', data.token);
+            } catch (error) {
+                console.error(' 유저 토큰 조회 실패:', error);
+            }
+        };
+
+        fetchUserToken();
+    }, [user?.id]);
+
     const handleInputChange = useCallback(
         (field: keyof typeof step1, value: string | number | boolean) => {
             console.log('💡 변경 필드:', field, value); // 추가
@@ -149,7 +171,7 @@ const SurveyStep1 = () => {
     return (
         <div>
             <div className="w-full font-bold text-black text-2xl py-3">
-                Survey create Step1
+                설문 만들기 Step1
             </div>
             <div className="p-6">
                 <div className="flex justify-center">
@@ -458,7 +480,7 @@ const SurveyStep1 = () => {
                                     <div className="flex flex-wrap gap-4 flex-1 mt-4 md:mt-0">
                                         <div className="flex flex-col w-full md:w-[150px]">
                                             <label className="text-sm font-medium mb-1">
-                                                전체 리워드 (STK)
+                                                전체 리워드 (MVE)
                                             </label>
                                             <input
                                                 type="text"
@@ -605,6 +627,39 @@ const SurveyStep1 = () => {
                                                 className="border p-2"
                                             />
                                         </div>
+                                        {tokenBalance !== null && (
+                                            <div className=" pt-4  text-gray-500 text-right">
+                                                <div>
+                                                    보유 잔액:{' '}
+                                                    <span className="font-semibold">
+                                                        {tokenBalance} MVE
+                                                    </span>
+                                                </div>
+                                                {step1.reward_amount !==
+                                                    undefined &&
+                                                    !isNaN(
+                                                        Number(
+                                                            step1.reward_amount,
+                                                        ),
+                                                    ) && (
+                                                        <div>
+                                                            차감 후:{' '}
+                                                            <span className="font-semibold">
+                                                                {(
+                                                                    tokenBalance -
+                                                                    Number(
+                                                                        step1.reward_amount,
+                                                                    ) /
+                                                                        1000
+                                                                ).toFixed(
+                                                                    0,
+                                                                )}{' '}
+                                                                MVE
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -662,6 +717,16 @@ const SurveyStep1 = () => {
                                         ) {
                                             return alert(
                                                 '발매일을 입력해주세요.',
+                                            );
+                                        }
+                                        if (
+                                            step1.surveyType === 'official' &&
+                                            tokenBalance !== null &&
+                                            Number(step1.reward_amount) / 1000 >
+                                                tokenBalance
+                                        ) {
+                                            return alert(
+                                                '리워드가 보유 토큰보다 많습니다.',
                                             );
                                         }
 

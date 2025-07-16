@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 interface RewardModalProps {
     isOpen: boolean;
     userNickname: string;
+    defaultAmount?: number;
     onClose: () => void;
     onConfirm: (amount: number) => void;
 }
@@ -12,6 +13,7 @@ interface RewardModalProps {
 export default function RewardModal({
     isOpen,
     userNickname,
+    defaultAmount,
     onClose,
     onConfirm,
 }: RewardModalProps) {
@@ -38,7 +40,9 @@ export default function RewardModal({
         if (isOpen) document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [handleClose, isOpen]);
-
+    useEffect(() => {
+        setAmount(defaultAmount ?? 0);
+    }, [defaultAmount]);
     const handleConfirm = () => {
         if (typeof amount === 'number' && amount > 0) {
             onConfirm(amount);
