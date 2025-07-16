@@ -116,7 +116,7 @@ CREATE TABLE "Survey_Participants" (
     "survey_id" INTEGER NOT NULL,
     "answers" JSONB NOT NULL,
     "status" "SurveyStatus" NOT NULL DEFAULT 'draft',
-    "rewarded" BOOLEAN NOT NULL DEFAULT false,
+    "rewarded" INTEGER NOT NULL DEFAULT 0,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -180,6 +180,17 @@ CREATE TABLE "TunerContract" (
     CONSTRAINT "TunerContract_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Setting" (
+    "id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Setting_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -187,7 +198,13 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_Oauth_provider_id_key" ON "User_Oauth"("provider_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Survey_Participants_user_id_survey_id_key" ON "Survey_Participants"("user_id", "survey_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Survey_Result_survey_id_key" ON "Survey_Result"("survey_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Setting_key_key" ON "Setting"("key");
 
 -- AddForeignKey
 ALTER TABLE "User_Oauth" ADD CONSTRAINT "User_Oauth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
