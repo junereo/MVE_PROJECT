@@ -1,7 +1,6 @@
 import express from "express";
 import {
   userRoutes,
-  adminRoutes,
   authRoutes,
   surveyRoutes,
   transaction,
@@ -44,7 +43,6 @@ app.use("/auth", authRoutes);         // 인증 관련 라우트
 app.use("/survey", surveyRoutes);     // 설문 관련 라우트
 app.use("/withdraw", withdrawal);     // 출금 관련 라우트
 app.use("/transac", transaction);     // 트랜잭션 관련 라우트
-app.use("/admin", adminRoutes);       // 관리자 관련 라우트
 app.use("/contract", routerWallet);   // 지갑 관련 라우트
 app.use('/settings', settingRoutes);  // 설정 관련 라우트
 
