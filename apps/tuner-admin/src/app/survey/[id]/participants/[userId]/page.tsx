@@ -24,7 +24,7 @@ interface Participant {
         nickname: string;
         role: string;
     };
-    reward: number;
+    rewarded: number;
     answers: AnswerItem[];
 }
 
@@ -41,7 +41,6 @@ export default function ParticipantDetailPage() {
 
             const surveyQs: SurveyQuestion[] = result.data.survey_question;
             setSurveyQuestions(surveyQs);
-            console.log('참여자', result.data.participants);
 
             const p = result.data.participants.find(
                 (item: {
@@ -51,7 +50,6 @@ export default function ParticipantDetailPage() {
                     answers: { answers: Omit<AnswerItem, 'question_type'>[] };
                 }) => String(item.user_id) === String(userId),
             );
-            console.log('이건 p여', p);
 
             if (!p) return;
 
@@ -79,7 +77,7 @@ export default function ParticipantDetailPage() {
             });
             setParticipant({
                 user: p.user,
-                reward,
+                rewarded: p.rewarded,
                 answers: enrichedAnswers,
             });
         };
@@ -126,7 +124,7 @@ export default function ParticipantDetailPage() {
 
     return (
         <>
-            <div className="text-2xl font-bold py-3">User Survey View</div>
+            <div className="text-2xl font-bold py-3">유저 설문 정보</div>
             <div className="p-6 space-y-6">
                 <div className="mb-6 border p-4 rounded bg-gray-50">
                     <p>
@@ -136,7 +134,7 @@ export default function ParticipantDetailPage() {
                         등급: <strong>{participant.user.role}</strong>
                     </p>
                     <p>
-                        지급 리워드: <strong>{participant.reward} STK</strong>
+                        지급 리워드: <strong>{participant.rewarded} MVE</strong>
                     </p>
                 </div>
 

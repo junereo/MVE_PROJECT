@@ -480,7 +480,7 @@ const SurveyStep1 = () => {
                                     <div className="flex flex-wrap gap-4 flex-1 mt-4 md:mt-0">
                                         <div className="flex flex-col w-full md:w-[150px]">
                                             <label className="text-sm font-medium mb-1">
-                                                전체 리워드 (STK)
+                                                전체 리워드 (MVE)
                                             </label>
                                             <input
                                                 type="text"
@@ -632,7 +632,7 @@ const SurveyStep1 = () => {
                                                 <div>
                                                     보유 잔액:{' '}
                                                     <span className="font-semibold">
-                                                        {tokenBalance} STK
+                                                        {tokenBalance} MVE
                                                     </span>
                                                 </div>
                                                 {step1.reward_amount !==
@@ -654,7 +654,7 @@ const SurveyStep1 = () => {
                                                                 ).toFixed(
                                                                     0,
                                                                 )}{' '}
-                                                                STK
+                                                                MVE
                                                             </span>
                                                         </div>
                                                     )}

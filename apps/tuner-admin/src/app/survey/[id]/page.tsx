@@ -240,7 +240,7 @@ export default function SurveyDetailPage() {
     return (
         <div>
             <div className="w-full text-black text-2xl py-3 font-bold">
-                Survey Detail - {surveyData.survey_title}
+                설문 상세정보 - {surveyData.survey_title}
             </div>
             <div className="p-6">
                 <div className="flex flex-col md:flex-row gap-6">
@@ -277,15 +277,15 @@ export default function SurveyDetailPage() {
                                     <>
                                         <p>
                                             💰 총 리워드:{' '}
-                                            {surveyData.reward_amount} STK
+                                            {surveyData.reward_amount} MVE
                                         </p>
                                         <p>
-                                            지급 완료: 0 STK / 잔여:{' '}
-                                            {surveyData.reward_amount} STK
+                                            지급 완료: 0 MVE / 잔여:{' '}
+                                            {surveyData.reward_amount} MVE
                                             <br />
-                                            일반 유저: {surveyData.reward} STK /
+                                            일반 유저: {surveyData.reward} MVE /
                                             Expert: {surveyData.expert_reward}{' '}
-                                            STK
+                                            MVE
                                         </p>
                                     </>
                                 )}

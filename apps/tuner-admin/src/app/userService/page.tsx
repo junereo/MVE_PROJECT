@@ -219,7 +219,6 @@ export default function AdminUserPage() {
             alert('Expert 기준이 저장되었습니다.');
         } catch (error) {
             console.error('❌ Expert 기준 저장 실패:', error);
-            alert('저장 중 오류가 발생했습니다.');
         }
     };
 
@@ -233,17 +232,22 @@ export default function AdminUserPage() {
                     <div>
                         출금 가능 리워드:{' '}
                         <span className="font-semibold">
-                            {user?.balance ?? 0} STK
+                            {users
+                                .find((u) => u.id === 1)
+                                ?.rewardLeft?.toLocaleString() ?? 0}{' '}
+                            MVE
                         </span>
                     </div>
                     <div>
                         전체 리워드 총합:{' '}
                         <span className="font-semibold">
-                            {users.reduce(
-                                (acc, user) => acc + user.rewardLeft,
-                                0,
-                            )}{' '}
-                            STK
+                            {users.reduce((acc, user) => {
+                                const reward = Number(user.rewardLeft);
+                                return isNaN(reward) || reward === 0
+                                    ? acc
+                                    : acc + reward;
+                            }, 0)}{' '}
+                            MVE
                         </span>
                     </div>
                 </div>

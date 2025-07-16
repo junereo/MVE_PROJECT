@@ -258,7 +258,7 @@ const Dashboard = () => {
                                                     : 'bg-green-100 text-green-700'
                                             }`}
                                         >
-                                            {survey.reward_amount / 1000} STK
+                                            {survey.reward_amount / 1000} MVE
                                         </span>
                                     </td>
                                     <td className="border px-2 py-1">
