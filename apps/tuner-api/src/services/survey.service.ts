@@ -7,13 +7,19 @@ import {
   Survey,
   Genre,
   Survey_Question,
+  UserRole
 } from "@prisma/client";
 import { AnswerItem } from "../types/survey.types";
 import { calculateSurveyResult } from "./survey.result.service";
 import { DateTime } from "luxon";
+import { SurveyService } from '../wallet/services/survey.service'
+import { MetaTransctionService } from '../wallet/services/meta_transction.service'
+
 // import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
 
 const prisma = new PrismaClient();
+const metaService = new MetaTransctionService()
+const surveyService = new SurveyService(metaService)
 
 // 상태 계산 (한국시간 기준)
 export const checkSurveyActive = (
@@ -27,6 +33,15 @@ export const checkSurveyActive = (
   if (kstNow < start) return "upcoming";
   if (kstNow >= start && kstNow <= end) return "ongoing";
   return "closed";
+};
+
+// 설문 타입 유효성 검사
+const isSurveyType = (value: any): value is SurveyType => {
+  return Object.values(SurveyType).includes(value);
+};
+
+const isUserRole = (value: any): value is UserRole => {
+  return Object.values(UserRole).includes(value);
 };
 
 // 설문 수정
@@ -141,12 +156,6 @@ export const createSurveyParticipant = async ({
   });
 };
 
-
-// 설문 타입 유효성 검사
-const isSurveyType = (value: any): value is SurveyType => {
-  return Object.values(SurveyType).includes(value);
-};
-
 //  설문 생성
 export const createSurvey = async ({
   userId,
@@ -161,6 +170,11 @@ export const createSurvey = async ({
     if (!Object.values(SurveyType).includes(body.type)) {
       throw new Error(`잘못된 설문 타입: ${body.type}`);
     }
+
+    if (body.role && !isUserRole(body.role)) {
+      throw new Error(`잘못된 UserRole 값: ${body.role}`);
+    }
+
     const kstNow = DateTime.now().setZone("Asia/Seoul");
     const startDate = body.start_at ? new Date(body.start_at) : kstNow.toJSDate();
 
@@ -193,7 +207,7 @@ export const createSurvey = async ({
           artist: body.artist ?? "",
           music_uri: body.music_uri ?? "",
           thumbnail_uri: body.thumbnail_uri ?? "",
-          genre: body.genre ?? null,
+          genre: body.genre as Genre ?? null,
           type: body.type,
           is_released: !!body.is_released,
           released_date: new Date(),
@@ -248,14 +262,28 @@ export const createSurvey = async ({
 export const getSurveyListService = async () => {
   const surveys = await prisma.survey.findMany({
     include: {
-      creator: { select: { id: true } },
+      creator: {
+        select: {
+          id: true,
+          nickname: true,
+          role: true,
+        },
+      },
     },
-    orderBy: { start_at: "desc" },
+    orderBy: [
+      {
+        creator: {
+          role: 'asc',
+        },
+      },
+      {
+        start_at: 'desc',
+      },
+    ],
   });
 
   const kstNow = DateTime.now().setZone("Asia/Seoul");
 
-  // 상태 동기화
   for (const survey of surveys) {
     const start = DateTime.fromJSDate(new Date(survey.start_at)).setZone("Asia/Seoul");
     const end = DateTime.fromJSDate(new Date(survey.end_at)).setZone("Asia/Seoul");
@@ -272,7 +300,6 @@ export const getSurveyListService = async () => {
 
   return surveys;
 };
-
 
 // 질문지 생성 또는 업데이트
 export const setSurveyQuestion = async ({
@@ -478,4 +505,83 @@ export const updateSurveyResponse = async ({
   });
 
   return updated;
+};
+
+
+export const terminateSurvey = async (
+    surveyId: number
+  ) => {
+  const survey = await prisma.survey.update({
+              where: { id: surveyId },
+              data: { is_active: "closed" },
+            })
+
+  const participants = await prisma.survey_Participants.findMany({
+    where: { survey_id: surveyId },
+    select: {
+      id: true,
+      user_id: true,
+      rewarded: true,
+      user: {
+        select: {
+          id: true,
+          role: true,
+        },
+      },
+    },
+  })
+
+  // 참여자 병렬 처리
+  await Promise.all(
+    participants.map(async (participant) => {
+      if (!participant.user_id || !participant.user) return
+
+      const rewardAmount = participant.rewarded ?? 0
+      if (rewardAmount <= 0) return
+
+      await prisma.transaction.create({
+        data: {
+          user_id: participant.user_id,
+          type: 'DEPOSIT',
+          amount: rewardAmount,
+          memo: `설문 참여 리워드 (설문 ID: ${surveyId})`,
+        },
+      })
+
+      await prisma.user.update({
+        where: { id: participant.user_id },
+        data: {
+          balance: { increment: rewardAmount },
+        },
+      })
+
+      await prisma.survey_Participants.update({
+        where: { id: participant.id },
+        data: { rewarded: 0 },
+      })
+
+      let metadata_ipfs = 'failed'
+      try {
+        const ipfsResult = await surveyService.submitSurveyAndMint(
+          String(participant.user_id),
+          String(surveyId),
+          JSON.stringify(survey)
+        )
+        if (ipfsResult?.metadataUri) {
+          metadata_ipfs = ipfsResult.metadataUri
+        }
+      } catch (e) {
+        console.error('[CRON] IPFS 업로드 실패:', e)
+      }
+
+      await prisma.survey_Result.updateMany({
+        where: { survey_id: surveyId },
+        data: { metadata_ipfs },
+      })
+
+      console.log(
+        `[CRON] 지급 완료: user_id=${participant.user_id}, amount=${rewardAmount}, metadata_ipfs=${metadata_ipfs}`
+      )
+    })
+  )   
 };

@@ -11,6 +11,7 @@ import {
   createSurveyResult,
   getSurveyQuestion,
   updateSurveyResponse,
+  terminateSurvey,
 } from "../services/survey.service";
 import { calculateSurveyResult } from "../services/survey.result.service"
 import { PrismaClient, QuestionType, SurveyStatus } from "@prisma/client";
@@ -131,7 +132,27 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
           creator: { select: { id: true, nickname: true, role: true } },
         },
       });
-      res.status(200).json({ success: true, data: allSurveys });
+
+      // 각 survey별로 rest_amount 계산
+      const surveysWithRestAmount = allSurveys.map((survey) => {
+        // 참여자별 리워드 합산
+        let totalReward = 0;
+        survey.participants.forEach((participant) => {
+          if (participant.user?.role === "ordinary") {
+            totalReward += survey.reward ?? 0;
+          } else if (participant.user?.role === "expert") {
+            totalReward += survey.expert_reward ?? 0;
+          }
+        });
+        // 남은 리워드 계산
+        const rest_amount = (survey.reward_amount ?? 0) - totalReward;
+        return {
+          ...survey,
+          rest_amount,
+        };
+      });
+
+      res.status(200).json({ success: true, data: surveysWithRestAmount });
       return;
     }
 
@@ -428,5 +449,23 @@ export const updateSurveyResponseHandler = async (req: AuthRequest, res: Respons
     console.error(error);
     res.status(500).json({ success: false, message: '서버 오류', error });
     return;
+  }
+};
+
+// PUT /terminationSurvey
+export const terminateSurveyHandler = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const surveyId = Number(req.params.surveyId);
+    console.log("surveyId:", surveyId);
+    await terminateSurvey(surveyId);
+    res.status(200).json({ success: true });
+  } catch (err: any) {
+    console.error("설문 종료 오류:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "설문 종료 실패", error: err.message });
   }
 };
