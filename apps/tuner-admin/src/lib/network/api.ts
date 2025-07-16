@@ -2,9 +2,11 @@ import {
     SurveyCreatePayload,
     SurveyQuestionPayload,
     LoginFormData,
+    SettingsPayload,
 } from '@/types';
 
 import axiosClient from '@/lib/network/axios';
+import { ServerUser, User } from '@/app/userService/page';
 
 // 로그인 요청
 export const pushLogin = async (formData: LoginFormData) => {
@@ -45,6 +47,21 @@ export const surveyList = async () => {
 // 설문 상세페이지
 export const surveyView = async (id: number | string) => {
     const res = await axiosClient.get(`/survey/s/${id}`);
+    console.log('설문 데이터', res);
+
+    return res.data;
+};
+
+// 설문 통계 데이터
+export const userSurveyData = async (id: number | string) => {
+    const res = await axiosClient.post(`/survey/c/${id}`);
+    console.log('설문 통계 데이터', res);
+
+    return res.data;
+};
+export const surveyEndData = async (id: number | string) => {
+    const res = await axiosClient.get(`/survey/r/${id}`);
+    console.log('설문 데이터', res);
 
     return res.data;
 };
@@ -65,9 +82,14 @@ export const surveyPut = async (
 ) => {
     await axiosClient.put(`/survey/${id}`, serverPayload);
 };
+export const surveyClose = async (id: number) => {
+    await axiosClient.put(`/survey/t/${id}`);
+};
 // 모든 유저 조회 list
 export const userList = async () => {
     const res = await axiosClient.get('/user');
+    console.log('유저리스트', res);
+
     return res;
 };
 
@@ -107,4 +129,27 @@ export const fetchFixedQuestions = async (
 ) => {
     const response = await axiosClient.get(`/survey/q/${questionnaireId}`);
     return response.data;
+};
+
+export const userReward = async (id: number) => {
+    const response = await axiosClient.get(`/contract/wallet/token/${id}`);
+    return response;
+};
+// 유저 등급변경
+export const userExpert = async (id: number, data: Partial<User>) => {
+    const response = await axiosClient.put(`/user/${id}`, data);
+    return response;
+};
+// 세팅
+export const settings = async (formData: SettingsPayload) => {
+    const response = await axiosClient.patch(`/settings`, formData);
+
+    return response;
+};
+
+// 세팅 보기
+export const settingsview = async () => {
+    const response = await axiosClient.get(`/settings`);
+
+    return response;
 };

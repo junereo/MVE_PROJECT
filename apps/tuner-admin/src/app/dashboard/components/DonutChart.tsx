@@ -5,11 +5,19 @@ interface DonutChartProps {
         name: string;
         value: number;
     }[];
+    colors?: string[];
 }
 
-export const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+export const COLORS = [
+    '#0088FE',
+    '#00C49F',
+    '#FFBB28',
+    '#FF8042',
+    '#A28EFF',
+    '#FF69B4',
+];
 
-export const DonutChart = ({ data }: DonutChartProps) => (
+export const DonutChart = ({ data, colors }: DonutChartProps) => (
     <PieChart width={300} height={300}>
         <Pie
             data={data}
@@ -24,7 +32,11 @@ export const DonutChart = ({ data }: DonutChartProps) => (
             {data.map((entry, index) => (
                 <Cell
                     key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
+                    fill={
+                        colors?.length
+                            ? colors[index % colors.length]
+                            : COLORS[index % COLORS.length]
+                    }
                 />
             ))}
         </Pie>
