@@ -85,16 +85,6 @@ export default function LoginForm() {
       });
       setIsModalOpen(true);
     }
-
-    /*
-        테스트
-        try {
-          const res = await mockLogin(formData);
-          alert("로그인 성공");
-        } catch (err) {
-          alert("로그인 실패");
-        }
-    */
   };
 
   return (
@@ -117,7 +107,7 @@ export default function LoginForm() {
           onSubmit={handleSubmit}
           className="flex flex-col gap-4 bg-white p-6 rounded-lg"
         >
-          <div className="mb-2">
+          <div className="flex flex-col gap-3 mb-2">
             <Input
               //   label="이메일"
               name="email"

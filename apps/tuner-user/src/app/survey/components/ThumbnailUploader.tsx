@@ -30,8 +30,16 @@ export default function ThumbnailUploader() {
   };
 
   return (
-    <>
-      <h2 className="text-base font-semibold text-gray-700">이미지 업로드</h2>
+    <div className="pt-4 pb-4">
+      <div className="mb-4 space-y-1">
+        <h2 className="text-base font-semibold text-gray-800">
+          썸네일 이미지 업로드
+        </h2>
+        <p className="text-sm text-gray-500">
+          이미지를 업로드하지 않으면 유튜브 썸네일이 자동으로 사용됩니다.
+        </p>
+      </div>
+
       <div className="flex flex-col items-center">
         {step1.thumbnail_uri ? (
           <div className="w-full h-[180px] relative border mb-2 rounded overflow-hidden bg-white">
@@ -45,8 +53,7 @@ export default function ThumbnailUploader() {
         ) : (
           <div className="w-full h-[180px] border-2 border-dashed border-gray-400 rounded flex items-center justify-center mb-2">
             <span className="text-gray-500">
-              이미지 업로드하지 않을 시<div /> 유튜브 썸네일로 설문이
-              생성됩니다.
+              썸네일 이미지를 업로드해주세요.
             </span>
           </div>
         )}
@@ -59,6 +66,6 @@ export default function ThumbnailUploader() {
           </Button>
         )}
       </div>
-    </>
+    </div>
   );
 }

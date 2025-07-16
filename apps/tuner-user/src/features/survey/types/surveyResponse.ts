@@ -30,6 +30,12 @@ export interface SurveyResponse {
 
   status: "draft" | "complete";
 
+  creator: {
+    id: number;
+    nickname: string;
+    role: "ordinary" | "expert" | "admin";
+  };
+
   participants?: {
     id: number;
     survey_id: number;
