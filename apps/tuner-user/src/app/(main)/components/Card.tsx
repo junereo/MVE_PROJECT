@@ -8,9 +8,11 @@ import { getSurveyList } from "@/features/survey/services/survey";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
 
 export default function Card({
+  active,
   status,
 }: {
-  status: "all" | "ongoing" | "closed";
+  active: "all" | "ongoing" | "closed";
+  status: "draft" | "complete";
 }) {
   const router = useRouter();
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
@@ -26,10 +28,11 @@ export default function Card({
         });
 
         const filtered: SurveyResponse[] =
-          status === "all"
+          active === "all" && status === "complete"
             ? sorted
             : sorted.filter(
-                (item: SurveyResponse) => item.is_active === status
+                (item: SurveyResponse) =>
+                  item.is_active === active && item.status === status
               );
 
         setSurveys(filtered);
@@ -39,7 +42,7 @@ export default function Card({
     };
 
     fetchSurveys();
-  }, [status]);
+  }, [active]);
 
   return surveys.length === 0 ? (
     <div className="flex flex-col items-center justify-center py-20 text-gray-400 w-full col-span-2">
@@ -51,9 +54,9 @@ export default function Card({
         className="mb-4"
       />
       <p className="text-sm">
-        {status === "ongoing"
+        {active === "ongoing"
           ? "진행중인 설문이 없습니다."
-          : status === "closed"
+          : active === "closed"
           ? "종료된 설문이 없습니다."
           : "설문이 없습니다."}
       </p>

@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import Menubar from "./Menubar";
-import SearchInput from "../ui/SearchInput";
+import Menubar from "@/components/layouts/Menubar";
 import Image from "next/image";
 
 export default function Header() {
@@ -23,7 +22,6 @@ export default function Header() {
           </Link>
         </div>
         <nav className="flex items-center gap-4">
-          <SearchInput />
           <button
             onClick={() => setMenubarOpen(true)}
             aria-label="Open menu"

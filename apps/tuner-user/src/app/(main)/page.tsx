@@ -16,7 +16,7 @@ export default function Home() {
             <Link href="/survey">전체보기</Link>
           </button>
         </div>
-        <Card status="ongoing" />
+        <Card active="ongoing" status="complete" />
         <Link
           href="/survey"
           className="block w-fit mx-auto px-5 py-2 rounded-xl border border-blue-500 text-blue-500 text-sm sm:text-base font-semibold shadow-sm hover:bg-blue-600 hover:text-white hover:shadow-md transition-all"
@@ -31,7 +31,7 @@ export default function Home() {
             <Link href="/survey">전체보기</Link>
           </button>
         </div>
-        <MainSurveyList status="closed" />
+        <MainSurveyList status="closed" submitStatus="complete" />
       </section>
     </div>
   );

@@ -13,6 +13,9 @@ import { useEffect, useState } from "react";
 import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import SurveyResult from "./components/SurveyResult";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
+import { UserUpdatePayload } from "@/features/users/types/userInfo";
+import Link from "next/link";
+import YoutubeThumbnailPlayer from "./components/YoutubeThumbnailPlayer";
 
 type SurveyStatus = "upcoming" | "ongoing" | "closed";
 
@@ -56,6 +59,7 @@ export default function SurveyDetail() {
     end_at,
     participants,
     reward_amount,
+    status,
     is_active,
     released_date,
   } = survey;
@@ -75,34 +79,23 @@ export default function SurveyDetail() {
             { label: `${survey_title}` },
           ]}
         />
-        <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-6 shadow-md">
-          {music_uri ? (
-            <a href={music_uri} target="_blank" rel="noopener noreferrer">
-              <Image
-                src={thumbnail_uri}
-                alt={music_title}
-                fill
-                className="object-cover rounded-xl"
-                sizes="(max-width: 768px) 100vw, 600px"
-              />
-            </a>
-          ) : (
-            <Image
-              src={thumbnail_uri}
-              alt={music_title}
-              fill
-              className="object-cover rounded-xl"
-              sizes="(max-width: 768px) 100vw, 600px"
-            />
-          )}
-          <div className="absolute top-3 left-3 px-3 py-1 bg-white/80 text-xs font-medium rounded-full backdrop-blur-sm text-blue-600">
-            {type === "official" ? "공식 설문" : "일반 설문"}
-          </div>
-        </div>
-        <div className="mb-4 px-1">
+        <YoutubeThumbnailPlayer
+          thumbnail={thumbnail_uri}
+          youtubeUrl={music_uri}
+          title={music_title}
+          badgeText={type === "official" ? "공식 설문" : "일반 설문"}
+        />
+
+        <div className="flex justify-between items-center mb-4 px-1">
           <h1 className="text-[20px] sm:text-[22px] font-bold text-gray-900 leading-snug break-keep">
             {survey_title}
           </h1>
+          <div className="text-sm text-gray-500">
+            설문 생성자 :{" "}
+            <span className="font-medium text-gray-700">
+              {survey.creator.nickname}
+            </span>
+          </div>
         </div>
 
         <div className="mb-6 border-t border-gray-100 pt-4 px-1 space-y-1 sm:space-y-2">
@@ -172,7 +165,22 @@ export default function SurveyDetail() {
               ) : (
                 // 응답 임시 저장 (draft)
                 <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full  max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
-                  <Button color="blue">설문 응답 수정</Button>
+                  <Button
+                    color="yellow"
+                    onClick={() => {
+                      sessionStorage.setItem(
+                        "editResponseData",
+                        JSON.stringify({
+                          surveyId: id,
+                          answers: myParticipation.answers,
+                          surveyTitle: survey.survey_title,
+                        })
+                      );
+                      router.push(`/survey/${id}/editResponse`);
+                    }}
+                  >
+                    설문 응답 수정
+                  </Button>
                 </div>
               )
             ) : (
@@ -189,7 +197,8 @@ export default function SurveyDetail() {
           </>
         )}
 
-        {is_active === "upcoming" &&
+        {(is_active === "upcoming" || status === "draft") &&
+          user &&
           user &&
           String(user.id) === String(survey.user_id) && (
             <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">

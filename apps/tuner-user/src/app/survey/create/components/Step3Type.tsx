@@ -86,7 +86,7 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
       </header>
 
       <div className="space-y-4">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-16">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-10">
           Step 3: 설문 유형
         </h2>
         <div className="flex gap-2">
