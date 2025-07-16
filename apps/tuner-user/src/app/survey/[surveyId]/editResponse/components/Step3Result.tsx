@@ -56,7 +56,7 @@ export default function Step3Result({ surveyId, onPrev }: Step3Props) {
   const ui = getStatusUI(status, surveyId);
 
   return (
-    <div className="flex justify-center px-4 sm:pt-[150px]">
+    <div className="flex justify-center px-4">
       <div className="bg-white w-full max-w-[485px] py-10 text-center flex flex-col justify-center items-center gap-10">
         <Image
           src={ui.image}

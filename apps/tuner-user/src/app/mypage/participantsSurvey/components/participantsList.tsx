@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 import { useSurveyAnswerStore } from "@/features/users/store/useSurveyAnswerStore";
-
 import List from "@/components/ui/List";
+import { usePagination } from "@/features/survey/hooks/usePagination";
+import Pagination from "@/components/ui/Pagination";
+import Image from "next/image";
 
 const statusTextMap = {
   draft: "임시저장",
@@ -30,9 +31,15 @@ export default function ParticipantsList() {
     (a) => a.status === "complete"
   ).length;
 
+  const {
+    currentPage,
+    totalPages,
+    currentData: paginatedSurveys,
+    setCurrentPage,
+  } = usePagination(filtered, 6); // 한 페이지당 6개
+
   return (
-    <div className="space-y-4 max-w-[700px] mx-auto">
-      {/* 상태 필터 */}
+    <div className="space-y-4 min-h-[calc(100vh-100px)] max-w-[700px] mx-auto relative pb-16">
       <div className="flex justify-around border-b pb-2">
         {statusList.map((s) => (
           <button
@@ -49,7 +56,6 @@ export default function ParticipantsList() {
         ))}
       </div>
 
-      {/* 요약 */}
       <div className="flex items-center justify-between mt-4 mb-2 px-1">
         <h2 className="text-lg font-semibold text-gray-800">설문 참여 내역</h2>
         <span className="text-sm text-gray-500">
@@ -57,13 +63,25 @@ export default function ParticipantsList() {
         </span>
       </div>
 
-      {/* 리스트 */}
       {filtered.length === 0 ? (
-        <p className="text-center text-sm text-gray-500">
-          참여한 설문이 없습니다.
-        </p>
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400 w-full col-span-2">
+          <Image
+            src="/images/empty-survey.png"
+            alt="설문 없음"
+            width={96}
+            height={96}
+            className="mb-4"
+          />
+          <p className="text-center text-sm text-gray-500">
+            {status === "draft"
+              ? "임시저장한 설문이 없습니다."
+              : status === "complete"
+              ? "참여완료한 설문이 없습니다."
+              : "참여한 설문이 없습니다."}
+          </p>
+        </div>
       ) : (
-        filtered.map((item) => (
+        paginatedSurveys.map((item) => (
           <List
             key={item.id}
             onClick={() => router.push(`/survey/${item.survey.id}`)}
@@ -82,6 +100,14 @@ export default function ParticipantsList() {
           />
         ))
       )}
+
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </div>
   );
 }
