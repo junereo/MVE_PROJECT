@@ -181,7 +181,18 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    res.status(200).json({ success: true, data: survey });
+    // rest_amount 계산
+    let totalReward = 0;
+    survey.participants.forEach((participant: any) => {
+      if (participant.user?.role === "ordinary") {
+        totalReward += survey.reward ?? 0;
+      } else if (participant.user?.role === "expert") {
+        totalReward += survey.expert_reward ?? 0;
+      }
+    });
+    const rest_amount = (survey.reward_amount ?? 0) - totalReward;
+
+    res.status(200).json({ success: true, data: { ...survey, rest_amount } });
     return;
   } catch (err: any) {
     console.error("설문 조회 실패:", err);
