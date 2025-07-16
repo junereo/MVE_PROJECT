@@ -3,7 +3,7 @@ import { requestWithdrawal, getUserWithdrawals } from '../controllers/withdrawal
 
 const router = Router();
 
-router.post('/', requestWithdrawal);
-router.get('/:userId', getUserWithdrawals);
+router.post('/', requestWithdrawal); // Request a withdrawal
+router.get('/:userId', getUserWithdrawals); // Get withdrawals for a specific user
 
 export default router;
