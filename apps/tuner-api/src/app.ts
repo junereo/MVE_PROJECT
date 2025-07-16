@@ -27,7 +27,7 @@ app.use(
     origin: [
       "https://tunemate.store",
       "https://admin.tunemate.store",
-      "http://localhost:3000",
+      "http://localhost:3001",
     ],
     credentials: true,
   })
