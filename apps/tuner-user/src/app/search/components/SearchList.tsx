@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation";
 import { useSearchSurveyStore } from "@/features/survey/store/useSearchSurveyStore";
 import { getSurveyList } from "@/features/survey/services/survey";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
+import { usePagination } from "@/features/survey/hooks/usePagination";
 import List from "@/components/ui/List";
+import Pagination from "@/components/ui/Pagination";
+import SortToggle from "@/components/ui/SortToggle";
 
 const statusTextMap: Record<SurveyResponse["is_active"], string> = {
   upcoming: "예정",
@@ -22,36 +25,59 @@ export default function SearchList() {
   const [status, setStatus] = useState<Status>("all");
   const [allSurveys, setAllSurveys] = useState<SurveyResponse[]>([]);
   const { keyword } = useSearchSurveyStore();
+  const [sortOption, setSortOption] = useState<
+    "latest" | "oldest" | "participants"
+  >("latest");
+
+  const filteredSurveys = useMemo(() => {
+    return allSurveys
+      .filter((item) => {
+        const statusMatch = status === "all" || item.is_active === status;
+        const keywordMatch = keyword
+          ? [item.survey_title, item.artist, item.music_title]
+              .filter(Boolean)
+              .some((field) =>
+                field.toLowerCase().includes(keyword.toLowerCase())
+              )
+          : true;
+        return statusMatch && keywordMatch;
+      })
+      .sort((a, b) => {
+        if (sortOption === "latest") {
+          return (
+            new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
+          );
+        }
+        if (sortOption === "oldest") {
+          return (
+            new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
+          );
+        }
+        if (sortOption === "participants") {
+          return (b.participants?.length || 0) - (a.participants?.length || 0);
+        }
+        return 0;
+      });
+  }, [allSurveys, status, keyword, sortOption]);
+
+  const {
+    currentPage,
+    totalPages,
+    currentData: paginatedSurveys,
+    setCurrentPage,
+  } = usePagination(filteredSurveys, 6);
 
   useEffect(() => {
     const fetchSurveys = async () => {
       try {
         const res = await getSurveyList();
-        const sorted = res.data.sort(
-          (a, b) =>
-            new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
-        );
-        setAllSurveys(sorted);
+        setAllSurveys(res.data);
       } catch (e) {
         console.error("설문 목록 불러오기 실패", e);
       }
     };
     fetchSurveys();
   }, []);
-
-  const filteredSurveys = useMemo(() => {
-    return allSurveys.filter((item) => {
-      const statusMatch = status === "all" || item.is_active === status;
-      const keywordMatch = keyword
-        ? [item.survey_title, item.artist, item.music_title]
-            .filter(Boolean)
-            .some((field) =>
-              field.toLowerCase().includes(keyword.toLowerCase())
-            )
-        : true;
-      return statusMatch && keywordMatch;
-    });
-  }, [allSurveys, status, keyword]);
 
   const emptyMessage = useMemo(() => {
     if (!keyword) {
@@ -64,8 +90,8 @@ export default function SearchList() {
   }, [status, keyword]);
 
   return (
-    <div className="space-y-4 max-w-[700px] mx-auto">
-      <div className="flex justify-around border-b pb-2">
+    <div className="space-y-4 min-h-[calc(100vh-100px)] max-w-[700px] mx-auto relative pb-16">
+      <div className="flex justify-around border-b pb-2 mb-4">
         {statusList.map((s) => (
           <button
             key={s}
@@ -83,6 +109,16 @@ export default function SearchList() {
         ))}
       </div>
 
+      <SortToggle
+        options={[
+          { label: "최신순", value: "latest" },
+          { label: "오래된순", value: "oldest" },
+          { label: "인기순", value: "participants" },
+        ]}
+        value={sortOption}
+        onChange={setSortOption}
+      />
+
       {filteredSurveys.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-gray-400">
           <Image
@@ -97,7 +133,7 @@ export default function SearchList() {
           </p>
         </div>
       ) : (
-        filteredSurveys.map((item) => (
+        paginatedSurveys.map((item) => (
           <List
             key={item.id}
             onClick={() => router.push(`/survey/${item.id}`)}
@@ -117,6 +153,14 @@ export default function SearchList() {
           />
         ))
       )}
+
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </div>
   );
 }
