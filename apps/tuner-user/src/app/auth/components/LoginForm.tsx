@@ -134,9 +134,11 @@ export default function LoginForm() {
             로그인
           </Button>
           <div className="flex justify-center gap-6 text-sm text-blue-500 mt-2">
-            <button className="hover:underline">비밀번호 찾기</button>
+            <Link href="/auth/find-password" className="hover:underline">
+              비밀번호 찾기
+            </Link>
             <Link href="/auth/find-id" className="hover:underline">
-              아이디 찾기
+              이메일 찾기
             </Link>
             <Link href="/auth/signup" className="hover:underline">
               회원가입
