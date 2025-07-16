@@ -1,7 +1,6 @@
 import express from "express";
 import {
   userRoutes,
-  adminRoutes,
   authRoutes,
   surveyRoutes,
   transaction,
@@ -39,14 +38,13 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // 라우트 설정
-app.use('/user', userRoutes);
-app.use("/auth", authRoutes);
-app.use("/survey", surveyRoutes);
-app.use("/withdraw", withdrawal);
-app.use("/transac", transaction);
-app.use("/admin", adminRoutes);
-app.use("/contract", routerWallet);
-app.use('/settings', settingRoutes);
+app.use('/user', userRoutes);         //유저 관련 라우트
+app.use("/auth", authRoutes);         // 인증 관련 라우트
+app.use("/survey", surveyRoutes);     // 설문 관련 라우트
+app.use("/withdraw", withdrawal);     // 출금 관련 라우트
+app.use("/transac", transaction);     // 트랜잭션 관련 라우트
+app.use("/contract", routerWallet);   // 지갑 관련 라우트
+app.use('/settings', settingRoutes);  // 설정 관련 라우트
 
 
 // 기본 라우트
