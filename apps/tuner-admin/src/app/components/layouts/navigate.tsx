@@ -10,22 +10,26 @@ export default function Navigate() {
     const pathname = usePathname(); // ✅ 현재 경로 가져오기
 
     const navItems = [
-        { label: '대시보드', href: '/dashboard', activePath: '/dashboard' },
+        { label: '대시 보드', href: '/dashboard', activePath: '/dashboard' },
         {
-            label: '설문조사',
+            label: '설문 조사',
             href: '/survey',
             activePath: '/survey',
         },
-        { label: '회원가입', href: '/signup', activePath: '/signup' },
+        { label: '회원 가입', href: '/signup', activePath: '/signup' },
         {
-            label: '고정질문',
+            label: '고정 질문',
             href: '/fixedQuestion',
             activePath: '/fixedQuestion',
         },
-        { label: '유저관리', href: '/userService', activePath: '/userService' },
-        { label: '지갑관리', href: '/wallet', activePath: '/wallet' },
         {
-            label: 'SBT출금',
+            label: '유저 관리',
+            href: '/userService',
+            activePath: '/userService',
+        },
+        { label: '지갑 관리', href: '/wallet', activePath: '/wallet' },
+        {
+            label: '출금 관리',
             href: '/userWithdrawal',
             activePath: '/userWithdrawal',
         },

@@ -153,7 +153,7 @@ export default function SurveyComplete() {
     return (
         <div>
             <div className="w-full font-bold text-black text-2xl py-3">
-                Survey create Complete
+                설문 만들기 제출
             </div>
             <div className="p-6">
                 <div className="flex justify-center">

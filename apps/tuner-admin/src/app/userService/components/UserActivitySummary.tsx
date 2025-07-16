@@ -33,10 +33,10 @@ const UserActivitySummary: React.FC<UserActivitySummaryProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 w-full max-w-4xl">
             <SummaryCard title="참여 설문 수" value={participationCount} />
             <SummaryCard title="생성 설문 수" value={creationCount} />
-            <SummaryCard title="총 리워드" value={`${totalReward} STK`} />
+            <SummaryCard title="총 리워드" value={`${totalReward} MVE`} />
             <SummaryCard
                 title="출금 가능 리워드"
-                value={`${withdrawableReward} STK`}
+                value={`${withdrawableReward} MVE`}
             />
         </div>
     );
