@@ -6,6 +6,7 @@ import {
 } from '@/types';
 
 import axiosClient from '@/lib/network/axios';
+import { ServerUser, User } from '@/app/userService/page';
 
 // 로그인 요청
 export const pushLogin = async (formData: LoginFormData) => {
@@ -135,7 +136,7 @@ export const userReward = async (id: number) => {
     return response;
 };
 // 유저 등급변경
-export const userExpert = async (id: number, data: any) => {
+export const userExpert = async (id: number, data: Partial<User>) => {
     const response = await axiosClient.put(`/user/${id}`, data);
     return response;
 };

@@ -53,11 +53,6 @@ export default function ParticipantDetailPage() {
 
             if (!p) return;
 
-            const reward =
-                p.user.badge_issued_at !== null
-                    ? result.data.expert_reward
-                    : result.data.reward;
-
             const enrichedAnswers: AnswerItem[] = (
                 p.answers as Omit<AnswerItem, 'question_type'>[]
             ).map((a) => {

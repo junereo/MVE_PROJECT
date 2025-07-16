@@ -7,7 +7,7 @@ import RewardModal from '../userService/components/RewardModal';
 import { useSessionStore } from '@/store/useAuthmeStore';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { settings, userList, userReward } from '@/lib/network/api';
+import { settings, userList } from '@/lib/network/api';
 interface User {
     id: number;
     user_id: number;
@@ -38,7 +38,6 @@ interface PoolItem {
 }
 
 export default function UserWithdrawal() {
-    const { user } = useSessionStore();
     const [users, setUsers] = useState<User[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortNewestFirst, setSortNewestFirst] = useState(true);
@@ -153,15 +152,15 @@ export default function UserWithdrawal() {
     );
     const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-    const handleRewardClick = (
-        id: number,
-        nickname: string,
-        amount: number,
-    ) => {
-        console.log('선택한 유저:', { id, nickname, amount });
-        setSelectedUser({ id, nickname, amount });
-        setRewardModalOpen(true);
-    };
+    // const handleRewardClick = (
+    //     id: number,
+    //     nickname: string,
+    //     amount: number,
+    // ) => {
+    //     console.log('선택한 유저:', { id, nickname, amount });
+    //     setSelectedUser({ id, nickname, amount });
+    //     setRewardModalOpen(true);
+    // };
     const handleUpdateSbtThreshold = async () => {
         try {
             const formData = {

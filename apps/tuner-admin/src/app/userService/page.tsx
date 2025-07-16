@@ -9,24 +9,23 @@ import { useSessionStore } from '@/store/useAuthmeStore';
 import { useRouter } from 'next/navigation';
 import axiosClient from '@/lib/network/axios';
 
-interface User {
+export interface User {
     id: number;
     nickname: string;
     email: string;
     role: 'superadmin' | 'admin' | 'ordinary' | 'expert';
     rewardLeft: number;
 }
-interface ServerUser {
+export interface ServerUser {
     id: number;
     email: string;
     nickname: string;
-    role: 'superadmin' | 'admin' | 'ordinary';
+    role: 'superadmin' | 'admin' | 'ordinary' | 'expert';
     balance: number;
     badge_issued_at: string | null;
     rewardLeft?: number;
 }
 export default function AdminUserPage() {
-    const { user } = useSessionStore();
     const router = useRouter();
     const [users, setUsers] = useState<User[]>([]);
     const [threshold, setThreshold] = useState(5);
