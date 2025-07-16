@@ -156,7 +156,7 @@ export const getSurvey = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // 특정 설문 상세 조회
+    // 특정 설문 상세 조회 rest_amount 계산
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
       include: {
