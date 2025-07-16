@@ -7,6 +7,7 @@ import {
   Survey,
   Genre,
   Survey_Question,
+  UserRole
 } from "@prisma/client";
 import { AnswerItem } from "../types/survey.types";
 import { calculateSurveyResult } from "./survey.result.service";
@@ -32,6 +33,15 @@ export const checkSurveyActive = (
   if (kstNow < start) return "upcoming";
   if (kstNow >= start && kstNow <= end) return "ongoing";
   return "closed";
+};
+
+// 설문 타입 유효성 검사
+const isSurveyType = (value: any): value is SurveyType => {
+  return Object.values(SurveyType).includes(value);
+};
+
+const isUserRole = (value: any): value is UserRole => {
+  return Object.values(UserRole).includes(value);
 };
 
 // 설문 수정
@@ -146,12 +156,6 @@ export const createSurveyParticipant = async ({
   });
 };
 
-
-// 설문 타입 유효성 검사
-const isSurveyType = (value: any): value is SurveyType => {
-  return Object.values(SurveyType).includes(value);
-};
-
 //  설문 생성
 export const createSurvey = async ({
   userId,
@@ -166,6 +170,11 @@ export const createSurvey = async ({
     if (!Object.values(SurveyType).includes(body.type)) {
       throw new Error(`잘못된 설문 타입: ${body.type}`);
     }
+
+    if (body.role && !isUserRole(body.role)) {
+      throw new Error(`잘못된 UserRole 값: ${body.role}`);
+    }
+
     const kstNow = DateTime.now().setZone("Asia/Seoul");
     const startDate = body.start_at ? new Date(body.start_at) : kstNow.toJSDate();
 
@@ -198,7 +207,7 @@ export const createSurvey = async ({
           artist: body.artist ?? "",
           music_uri: body.music_uri ?? "",
           thumbnail_uri: body.thumbnail_uri ?? "",
-          genre: body.genre ?? null,
+          genre: body.genre as Genre ?? null,
           type: body.type,
           is_released: !!body.is_released,
           released_date: new Date(),
@@ -253,14 +262,28 @@ export const createSurvey = async ({
 export const getSurveyListService = async () => {
   const surveys = await prisma.survey.findMany({
     include: {
-      creator: { select: { id: true } },
+      creator: {
+        select: {
+          id: true,
+          nickname: true,
+          role: true,
+        },
+      },
     },
-    orderBy: { start_at: "desc" },
+    orderBy: [
+      {
+        creator: {
+          role: 'asc',
+        },
+      },
+      {
+        start_at: 'desc',
+      },
+    ],
   });
 
   const kstNow = DateTime.now().setZone("Asia/Seoul");
 
-  // 상태 동기화
   for (const survey of surveys) {
     const start = DateTime.fromJSDate(new Date(survey.start_at)).setZone("Asia/Seoul");
     const end = DateTime.fromJSDate(new Date(survey.end_at)).setZone("Asia/Seoul");
@@ -277,7 +300,6 @@ export const getSurveyListService = async () => {
 
   return surveys;
 };
-
 
 // 질문지 생성 또는 업데이트
 export const setSurveyQuestion = async ({
