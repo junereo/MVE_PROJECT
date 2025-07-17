@@ -120,7 +120,7 @@ export default function SurveyListPage() {
         const fetchSurveys = async () => {
             try {
                 const list = await surveylist();
-                console.log('불러온 설문 리스트:', list);
+                // console.log('불러온 설문 리스트:', list);
                 setSurveys(list);
             } catch (err) {
                 console.error('설문 리스트 불러오기 실패:', err);

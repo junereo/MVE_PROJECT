@@ -113,7 +113,7 @@ export default function WalletTabs() {
         setLoading(true);
         const tId = setTimeout(() => setLoading(false), 20000);
         setTimeoutId(tId);
-        console.log('지갑생성', tId);
+        // console.log('지갑생성', tId);
 
         try {
             const res = await axios({ url, method, data });
@@ -172,6 +172,7 @@ export default function WalletTabs() {
                         <TabsTrigger value="sendToken">Send Token</TabsTrigger>
                         <TabsTrigger value="burnToken">Burn Token</TabsTrigger>
                         <TabsTrigger value="getBadge">Get Badge</TabsTrigger>
+                        <TabsTrigger value="setBadge">Set Badge</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="createWallet">
@@ -341,6 +342,33 @@ export default function WalletTabs() {
                             >
                                 뱃지 조회
                             </Button>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="setBadge">
+                        <div className="space-y-2">
+                            <Input
+                                placeholder="UID"
+                                value={uid}
+                                onChange={(e) => setUid(e.target.value)}
+                            />
+                            <Button
+                                onClick={() =>
+                                    handleRequest(
+                                        baseUrl +
+                                            `/contract/wallet/badge/${uid}`,
+                                        'POST',
+                                    )
+                                }
+                            >
+                                뱃지 발급
+                            </Button>
+                            {resultMessage && (
+                                <div className="mt-2 p-2 bg-gray-100 rounded text-sm whitespace-pre-wrap border border-gray-300">
+                                    {resultMessage.length > 100
+                                        ? resultMessage.slice(0, 100) + '...'
+                                        : resultMessage}
+                                </div>
+                            )}
                         </div>
                     </TabsContent>
                 </Tabs>

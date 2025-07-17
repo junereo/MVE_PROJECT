@@ -160,7 +160,6 @@ export default function FixedQuestionTemplatePage() {
                 question_type: Question_type.fixed,
                 question_order: 1,
             };
-            console.log('페이로드', payload);
 
             await createTemplate(payload);
             alert('저장 완료!');

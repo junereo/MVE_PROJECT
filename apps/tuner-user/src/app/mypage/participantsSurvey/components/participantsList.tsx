@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useSurveyAnswerStore } from "@/features/users/store/useSurveyAnswerStore";
 import List from "@/components/ui/List";
 import { usePagination } from "@/features/survey/hooks/usePagination";
 import Pagination from "@/components/ui/Pagination";
-import Image from "next/image";
+import SortToggle from "@/components/ui/SortToggle";
 
 const statusTextMap = {
   draft: "임시저장",
@@ -20,23 +21,35 @@ export default function ParticipantsList() {
   const router = useRouter();
   const { answers: allAnswers } = useSurveyAnswerStore();
   const [status, setStatus] = useState<Status>("all");
+  const [sortOption, setSortOption] = useState<"latest" | "oldest">("latest");
 
+  // 필터링
   const filtered =
     status === "all"
       ? allAnswers
       : allAnswers.filter((item) => item.status === status);
 
+  // 정렬
+  const sorted = [...filtered].sort((a, b) => {
+    const aDate = new Date(a.survey.start_at).getTime();
+    const bDate = new Date(b.survey.start_at).getTime();
+    return sortOption === "latest" ? bDate - aDate : aDate - bDate;
+  });
+
+  // 카운트
   const draftCount = allAnswers.filter((a) => a.status === "draft").length;
   const completeCount = allAnswers.filter(
     (a) => a.status === "complete"
   ).length;
+
+  // 페이지네이션
 
   const {
     currentPage,
     totalPages,
     currentData: paginatedSurveys,
     setCurrentPage,
-  } = usePagination(filtered, 6); // 한 페이지당 6개
+  } = usePagination(sorted, 6); // 한 페이지당 6개
 
   return (
     <div className="space-y-4 min-h-[calc(100vh-100px)] max-w-[700px] mx-auto relative pb-16">
@@ -55,6 +68,14 @@ export default function ParticipantsList() {
           </button>
         ))}
       </div>
+      <SortToggle
+        options={[
+          { label: "최신순", value: "latest" },
+          { label: "오래된순", value: "oldest" },
+        ]}
+        value={sortOption}
+        onChange={setSortOption}
+      />
 
       <div className="flex items-center justify-between mt-4 mb-2 px-1">
         <h2 className="text-lg font-semibold text-gray-800">설문 참여 내역</h2>

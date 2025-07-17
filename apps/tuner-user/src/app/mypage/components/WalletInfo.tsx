@@ -4,7 +4,6 @@ import { Wallet, ArrowDown } from "lucide-react";
 
 export default function WalletInfo({ balance, tuner }: withdrawalProps) {
   const point = Math.floor(balance / 1000);
-  console.log(tuner);
 
   return (
     <div className="bg-white p-4">

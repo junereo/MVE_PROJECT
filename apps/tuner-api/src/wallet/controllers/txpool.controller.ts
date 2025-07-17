@@ -41,7 +41,9 @@ export const txSign = async(req: Request, res: Response):Promise<void> => {
     return;
   }
 
-  const isValid = await txPoolService.verifyAndAdd(message, String(uid));
+  const divMessage = (Number(message) / 1000).toString();
+  
+  const isValid = await txPoolService.verifyAndAdd(divMessage, String(uid));
   console.log(isValid)
 
 

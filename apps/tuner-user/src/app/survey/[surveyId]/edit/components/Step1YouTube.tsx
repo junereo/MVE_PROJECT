@@ -55,7 +55,6 @@ export default function Step1YouTube({ onNext }: Step1Props) {
       start_at,
       end_at,
     });
-
     onNext();
   };
 
