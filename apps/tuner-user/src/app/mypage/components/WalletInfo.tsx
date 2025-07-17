@@ -4,6 +4,7 @@ import { Wallet, ArrowDown } from "lucide-react";
 
 export default function WalletInfo({ balance, tuner }: withdrawalProps) {
   const point = Math.floor(balance / 1000);
+  console.log(tuner);
 
   return (
     <div className="bg-white p-4">
@@ -17,7 +18,7 @@ export default function WalletInfo({ balance, tuner }: withdrawalProps) {
         </div>
         <div className="flex flex-col gap-3 border-l border-l-gray-200">
           <p className="text-sm text-gray-600">TUNER</p>
-          <p className="font-medium text-gray-800">{tuner} t</p>
+          <p className="font-medium text-gray-800">{tuner || 0} t</p>
         </div>
       </div>
       <div className="flex justify-end pt-3">

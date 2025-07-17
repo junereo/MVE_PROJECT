@@ -19,11 +19,10 @@ export default function SurveyResult({ surveyId }: { surveyId: number }) {
     const fetch = async () => {
       try {
         const res = await getSurveyResult(surveyId);
-        console.log("설문 결과", res);
         const { survey_statistics, demographics } = normalizeSurveyResult(
           res.data
         );
-        console.log("normalized", survey_statistics, demographics);
+
         setData({
           survey_statistics,
           demographics,
@@ -83,7 +82,6 @@ function calcAverage(distribution: number[] = []) {
 }
 
 function percent(count: number, total: number) {
-  console.log("percent()", { count, total });
   if (!total || total === 0) return 0;
   return total === 0 ? 0 : Math.round((count / total) * 100);
 }

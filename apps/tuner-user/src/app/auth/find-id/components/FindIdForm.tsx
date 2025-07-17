@@ -28,9 +28,8 @@ export default function FindIdForm() {
     }
 
     try {
-      console.log("phoneNumber", phoneNumber);
       const res = await findUserId(phoneNumber);
-      console.log("아이디 찾기", res);
+
       if (res.data.success) {
         setEmailResult(res.data.email);
         setPhoneNumber("");
