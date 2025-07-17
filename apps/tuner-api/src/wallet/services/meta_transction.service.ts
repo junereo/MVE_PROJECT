@@ -28,7 +28,7 @@ export class MetaTransctionService {
   }
 
   async init(): Promise<void> {
-    this.provider = new JsonRpcProvider(`${process.env.SEPLOIA_RPC_URL}`);
+    this.provider = new JsonRpcProvider(`${process.env.KAIROS_RPC_URL}`);
 
     this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
     // DB에서 ABI 및 contract address 동적 로드
