@@ -331,7 +331,7 @@ export default function SurveyListPage() {
                                                     : 'bg-green-100 text-green-700'
                                             }`}
                                         >
-                                            {survey.rest_amount} MVE
+                                            {survey.rest_amount} 포인트
                                         </span>
                                     </td>
                                     <td className="border px-2 py-1 h-[40px] align-middle">

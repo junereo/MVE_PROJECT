@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { settings, userList, userReward, userExpert } from '@/lib/network/api';
+import {
+    settings,
+    userList,
+    userReward,
+    userExpert,
+    userSBTtoken,
+} from '@/lib/network/api';
 import Dropdown from '@/app/components/ui/DropDown';
 import RankChangeModal from './components/RankChaingeModal';
 import RewardModal from './components/RewardModal';
@@ -15,6 +21,7 @@ export interface User {
     email: string;
     role: 'superadmin' | 'admin' | 'ordinary' | 'expert';
     rewardLeft: number;
+    balance: number;
 }
 export interface ServerUser {
     id: number;
@@ -42,6 +49,7 @@ export default function AdminUserPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [ownerRewardLeft, setOwnerRewardLeft] = useState<number>(0);
     const usersPerPage = 15;
+    useSessionStore();
 
     // useEffect(() => {
     //     const fetchUsers = async () => {
@@ -69,7 +77,6 @@ export default function AdminUserPage() {
 
     //     fetchUsers();
     // }, []);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -87,6 +94,7 @@ export default function AdminUserPage() {
                                 email: u.email,
                                 role: u.badge_issued_at ? 'expert' : u.role,
                                 rewardLeft: res.data.token ?? 0,
+                                balance: u.balance,
                             };
                         } catch (e) {
                             console.error(
@@ -99,6 +107,7 @@ export default function AdminUserPage() {
                                 email: u.email,
                                 role: u.badge_issued_at ? 'expert' : u.role,
                                 rewardLeft: 0,
+                                balance: u.balance,
                             };
                         }
                     }),
@@ -177,29 +186,37 @@ export default function AdminUserPage() {
                 const userToUpdate = users.find(
                     (u) => u.id === selectedUser.id,
                 );
-                console.log(userToUpdate);
+                if (!userToUpdate) return;
 
                 if (
-                    userToUpdate?.role === 'admin' ||
-                    userToUpdate?.role === 'superadmin'
+                    userToUpdate.role === 'admin' ||
+                    userToUpdate.role === 'superadmin'
                 ) {
                     alert('admin 및 superadmin의 등급은 변경할 수 없습니다.');
                     return;
                 }
 
-                await userExpert(userToUpdate!.id, {
+                // 1. SBT 뱃지 발급
+                try {
+                    const res = await userSBTtoken(userToUpdate.id);
+                    console.log('SBT 뱃지 발급 성공:', res.data);
+                } catch (error) {
+                    console.error('SBT 뱃지 발급 실패:', error);
+                    alert('SBT 뱃지 발급에 실패했습니다.');
+                    return;
+                }
+
+                // 2. Expert 등급 변경
+                await userExpert(userToUpdate.id, {
                     ...userToUpdate,
                     role: 'expert',
                 });
                 alert(
-                    `${
-                        userToUpdate!.nickname
-                    }의 등급이 Expert로 변경되었습니다.`,
+                    `${userToUpdate.nickname}의 등급이 Expert로 변경되었습니다.`,
                 );
 
-                // 사용자 목록 갱신
+                // 3. 유저 목록 갱신
                 const { data } = await userList();
-
                 const mappedUsers = data.map((user: ServerUser) => ({
                     id: user.id,
                     nickname: user.nickname,
@@ -213,6 +230,7 @@ export default function AdminUserPage() {
                 }));
                 setUsers(mappedUsers);
 
+                // 모달 종료
                 setRankModalOpen(false);
                 setSelectedUser(null);
             } catch (error) {
@@ -229,7 +247,7 @@ export default function AdminUserPage() {
                 value: String(threshold),
             };
             const res = await settings(formData);
-            console.log('✅ 저장 성공:', res.data);
+            console.log(' 저장 성공:', res.data);
             alert('Expert 기준이 저장되었습니다.');
         } catch (error) {
             console.error('❌ Expert 기준 저장 실패:', error);
@@ -246,7 +264,7 @@ export default function AdminUserPage() {
                     <div>
                         출금 가능 리워드:{' '}
                         <span className="font-semibold">
-                            {ownerRewardLeft.toLocaleString()} MVE
+                            {ownerRewardLeft.toLocaleString()} Tuner
                         </span>
                     </div>
                     <div>
@@ -258,7 +276,7 @@ export default function AdminUserPage() {
                                     ? acc
                                     : acc + reward;
                             }, 0)}{' '}
-                            MVE
+                            Tuner
                         </span>
                     </div>
                 </div>
@@ -360,7 +378,10 @@ export default function AdminUserPage() {
                                     등급
                                 </th>
                                 <th className="border px-2 py-1 w-[120px]">
-                                    MVE 리워드 잔량
+                                    포인트
+                                </th>
+                                <th className="border px-2 py-1 w-[120px]">
+                                    Tuner토큰
                                 </th>
                                 <th className="border px-2 py-1 w-[160px]">
                                     관리
@@ -394,8 +415,11 @@ export default function AdminUserPage() {
                                     <td className="border px-2 py-1 capitalize">
                                         {user.role}
                                     </td>
+                                    <td className="border px-2 py-1 capitalize">
+                                        {user.balance / 1000}
+                                    </td>
                                     <td className="border px-2 py-1">
-                                        {user.rewardLeft} MVE
+                                        {user.rewardLeft} Tuner
                                     </td>
                                     <td
                                         className="border px-2 py-1 space-x-2"
