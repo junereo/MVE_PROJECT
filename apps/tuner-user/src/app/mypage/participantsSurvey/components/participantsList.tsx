@@ -3,11 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useSurveyAnswerStore } from "@/features/users/store/useSurveyAnswerStore";
 import List from "@/components/ui/List";
 import { usePagination } from "@/features/survey/hooks/usePagination";
 import Pagination from "@/components/ui/Pagination";
 import SortToggle from "@/components/ui/SortToggle";
+import { MySurveyAnswer } from "@/features/users/types/MySurveyAnswer";
+
+type Props = {
+  answers: MySurveyAnswer[];
+};
 
 const statusTextMap = {
   draft: "임시저장",
@@ -17,9 +21,9 @@ const statusTextMap = {
 const statusList = ["all", "draft", "complete"] as const;
 type Status = (typeof statusList)[number];
 
-export default function ParticipantsList() {
+export default function ParticipantsList({ answers }: Props) {
   const router = useRouter();
-  const { answers: allAnswers } = useSurveyAnswerStore();
+  const allAnswers = answers;
   const [status, setStatus] = useState<Status>("all");
   const [sortOption, setSortOption] = useState<"latest" | "oldest">("latest");
 
