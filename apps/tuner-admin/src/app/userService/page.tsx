@@ -198,8 +198,8 @@ export default function AdminUserPage() {
 
                 // 1. SBT 뱃지 발급
                 try {
-                    const res = await userSBTtoken(userToUpdate.id);
-                    console.log('SBT 뱃지 발급 성공:', res.data);
+                    await userSBTtoken(userToUpdate.id);
+                    // console.log('SBT 뱃지 발급 성공:', res.data);
                 } catch (error) {
                     console.error('SBT 뱃지 발급 실패:', error);
                     alert('SBT 뱃지 발급에 실패했습니다.');

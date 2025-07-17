@@ -66,7 +66,7 @@ export default function UserWithdrawal() {
 
                 const spender = contractRes.data.ca_transac;
                 const tokenAddress = contractRes.data.ca_token;
-                console.log(spender, tokenAddress);
+                // console.log(spender, tokenAddress);
 
                 // 3. 오너 기준 출금 가능 리워드 조회
                 let rewardLeft = 0;
@@ -167,8 +167,8 @@ export default function UserWithdrawal() {
                 key: 'sbt_issuance_standard',
                 value: String(sbtThreshold),
             };
-            const res = await settings(formData);
-            console.log('SBT 기준 저장 성공:', res.data);
+            await settings(formData);
+            // console.log('SBT 기준 저장 성공:', res.data);
             alert('Expert 기준이 저장되었습니다.');
         } catch (error) {
             console.error('SBT 기준 저장 실패:', error);
