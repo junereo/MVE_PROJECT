@@ -9,8 +9,6 @@ export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
 
   const allQuestions = [...step4.questions, ...step4.customQuestions];
 
-  console.log(step1);
-
   return {
     artist: selectedVideo?.artist || "",
     music_title: selectedVideo?.music_title || "",

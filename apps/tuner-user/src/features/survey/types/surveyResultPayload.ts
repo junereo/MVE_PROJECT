@@ -12,13 +12,16 @@ export interface SurveyResultData {
   reward_claimed: number;
   reward_claimed_amount: number;
   survey_id: number;
-  survey_statistics: QuestionStat[]; // 설문 문항별 통계
-  demographics: DemographicData;
+  survey_statistics: { [key: string]: QuestionStat | DemographicData }; // 설문 문항별 통계
 }
 
 export interface QuestionStat {
   id: number;
   average: number[]; // 옵션별 응답 수
+}
+
+export interface Demographics {
+  demographics: DemographicData;
 }
 
 export interface DemographicData {
