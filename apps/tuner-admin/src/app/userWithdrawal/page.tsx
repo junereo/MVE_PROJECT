@@ -51,7 +51,7 @@ export default function UserWithdrawal() {
     const [currentPage, setCurrentPage] = useState(1);
     const [sbtThreshold, setSbtThreshold] = useState(100);
     const usersPerPage = 15;
-
+    useSessionStore();
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -205,183 +205,198 @@ export default function UserWithdrawal() {
     };
 
     return (
-        <div className="p-6">
-            <div className="text-2xl font-bold mb-4">출금 관리</div>
-
-            <div className="bg-white p-4 rounded-xl shadow mb-6 text-sm flex flex-wrap gap-4">
-                <div>
-                    출금 가능 리워드:{' '}
-                    <span className="font-semibold">
-                        {(
-                            users.find((u) => u.user_id === 1)?.rewardLeft ?? 0
-                        ).toLocaleString()}{' '}
-                        MVE
-                    </span>
-                </div>
-
-                <div>
-                    요청 리워드 총합:{' '}
-                    <span className="font-semibold">
-                        {users
-                            .filter((u) => u.status === 'pending')
-                            .reduce((acc, u) => acc + (u.amount ?? 0), 0)
-                            .toLocaleString()}{' '}
-                        MVE
-                    </span>
-                </div>
-                <div>
-                    출금 요청 유저 수:{' '}
-                    <span className="font-semibold">
-                        {
-                            Array.from(
-                                new Set(
-                                    users
-                                        .filter((u) => u.status === 'pending')
-                                        .map((u) => u.user_id),
-                                ),
-                            ).length
-                        }
-                        명
-                    </span>
-                </div>
-                <div>
-                    출금 요청 수:{' '}
-                    <span className="font-semibold">
-                        {users.filter((u) => u.status === 'pending').length}건
-                    </span>
-                </div>
+        <div className="">
+            <div className="w-full  text-black text-2xl py-3  font-bold">
+                출금 관리
             </div>
-
-            <div className="flex flex-wrap justify-between items-center mb-4 w-full gap-4">
-                {/* 왼쪽 영역 */}
-                <div className="flex flex-wrap items-center gap-2">
-                    <input
-                        type="text"
-                        placeholder="User ID (숫자) 또는 이메일 검색"
-                        value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        className="border min-w-[300px] rounded px-3 py-2 text-sm"
-                    />
-
-                    <Dropdown
-                        options={['전체', 'pending', 'completed', 'failed']}
-                        selected={statusFilter}
-                        onSelect={(val) => {
-                            setStatusFilter(val);
-                            setCurrentPage(1);
-                        }}
-                    />
-
-                    <Dropdown
-                        options={['최신순', '오래된순']}
-                        selected={sortNewestFirst ? '최신순' : '오래된순'}
-                        onSelect={(val) => {
-                            setSortNewestFirst(val === '최신순');
-                            setCurrentPage(1);
-                        }}
-                    />
-                </div>
-
-                {/* 오른쪽 영역 */}
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 bg-white px-3 py-2 rounded shadow">
-                        <span className="text-sm text-gray-600">
-                            SBT 발급 기준
+            <div className="p-6">
+                <div className="bg-white p-4 rounded-xl shadow mb-6 text-sm flex flex-wrap gap-4">
+                    <div>
+                        Tuner 토큰 총량:{' '}
+                        <span className="font-semibold">
+                            {(
+                                users.find((u) => u.user_id === 1)
+                                    ?.rewardLeft ?? 0
+                            ).toLocaleString()}{' '}
+                            Tuner
                         </span>
-                        <button
-                            className="bg-gray-300 px-2 rounded text-lg"
-                            onClick={() =>
-                                setSbtThreshold((prev) =>
-                                    Math.max(10, prev - 10),
-                                )
-                            }
-                        >
-                            -
-                        </button>
-                        <span className="font-bold text-sm">
-                            {sbtThreshold}
-                        </span>
-                        <button
-                            className="bg-gray-300 px-2 rounded text-lg"
-                            onClick={() => setSbtThreshold((prev) => prev + 10)}
-                        >
-                            +
-                        </button>
-                        <button
-                            onClick={handleUpdateSbtThreshold}
-                            className="bg-blue-500 text-white text-xs px-3 py-1 rounded"
-                        >
-                            저장
-                        </button>
                     </div>
 
-                    <Button
-                        className="bg-green-500 text-white hover:bg-green-600"
-                        onClick={async () => {
-                            try {
-                                await axiosClient.post('/contract/tx/submit');
-                                toast.success('전체 리워드 지급 완료!');
-                            } catch (error) {
-                                console.error('전체 지급 실패:', error);
-                                toast.error('전체 지급에 실패했습니다.');
+                    <div>
+                        요청 Tuner 총합:{' '}
+                        <span className="font-semibold">
+                            {users
+                                .filter((u) => u.status === 'pending')
+                                .reduce((acc, u) => acc + (u.amount ?? 0), 0)
+                                .toLocaleString()}{' '}
+                            Tuner
+                        </span>
+                    </div>
+                    <div>
+                        출금 요청 유저 수:{' '}
+                        <span className="font-semibold">
+                            {
+                                Array.from(
+                                    new Set(
+                                        users
+                                            .filter(
+                                                (u) => u.status === 'pending',
+                                            )
+                                            .map((u) => u.user_id),
+                                    ),
+                                ).length
                             }
-                        }}
-                    >
-                        리워드 전체 지급
-                    </Button>
+                            명
+                        </span>
+                    </div>
+                    <div>
+                        출금 요청 수:{' '}
+                        <span className="font-semibold">
+                            {users.filter((u) => u.status === 'pending').length}
+                            건
+                        </span>
+                    </div>
                 </div>
-            </div>
+                <div className="flex flex-wrap justify-between items-center mb-4 w-full gap-4">
+                    {/* 왼쪽 영역 */}
+                    <div className="flex flex-wrap items-center gap-2">
+                        <input
+                            type="text"
+                            placeholder="User ID (숫자) 또는 이메일 검색"
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="border min-w-[300px] rounded px-3 py-2 text-sm"
+                        />
 
-            <div className="bg-white rounded-xl shadow p-4 w-full overflow-auto max-h-[600px]">
-                <table className="w-full table-fixed border text-sm text-center">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="border px-2 py-1 w-[40px]">ID</th>
-                            <th className="border px-2 py-1 w-[40px]">
-                                User ID
-                            </th>
-                            <th className="border px-2 py-1 w-[220px]">
-                                이메일
-                            </th>
-                            <th className="border px-2 py-1 w-[100px]">
-                                요청한 MVE
-                            </th>
-                            <th className="border px-2 py-1 w-[100px]">상태</th>
-                            <th className="border px-2 py-1 w-[320px]">
-                                TxHash(사용자 지갑주소)
-                            </th>
-                            <th className="border px-2 py-1 w-[160px]">
-                                Requested At
-                            </th>
-                            {/* <th className="border px-2 py-1 w-[80px]">관리</th> */}
-                        </tr>
-                    </thead>
-                    <tbody className="min-h-[720px]">
-                        {paginatedUsers.map((user) => (
-                            <tr key={user.id}>
-                                <td className="border px-2 py-1">{user.id}</td>
-                                <td className="border px-2 py-1">
-                                    {user.user_id}
-                                </td>
-                                <td className="border px-2 py-1">
-                                    {user.email}
-                                </td>
-                                <td className="border px-2 py-1">
-                                    {user.amount} MVE
-                                </td>
-                                <td className="border px-2 py-1">
-                                    {user.status}
-                                </td>
-                                <td className="border px-2 py-1 truncate max-w-xs">
-                                    {user.txhash}
-                                </td>
-                                <td className="border px-2 py-1">
-                                    {formatDate(user.requested_at)}
-                                </td>
-                                {/* <td className="border px-2 py-1">
+                        <Dropdown
+                            options={['전체', 'pending', 'completed', 'failed']}
+                            selected={statusFilter}
+                            onSelect={(val) => {
+                                setStatusFilter(val);
+                                setCurrentPage(1);
+                            }}
+                        />
+
+                        <Dropdown
+                            options={['최신순', '오래된순']}
+                            selected={sortNewestFirst ? '최신순' : '오래된순'}
+                            onSelect={(val) => {
+                                setSortNewestFirst(val === '최신순');
+                                setCurrentPage(1);
+                            }}
+                        />
+                    </div>
+
+                    {/* 오른쪽 영역 */}
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded shadow">
+                            <span className="text-sm text-gray-600">
+                                SBT 발급 기준
+                            </span>
+                            <button
+                                className="bg-gray-300 px-2 rounded text-lg"
+                                onClick={() =>
+                                    setSbtThreshold((prev) =>
+                                        Math.max(10, prev - 10),
+                                    )
+                                }
+                            >
+                                -
+                            </button>
+                            <span className="font-bold text-sm">
+                                {sbtThreshold}
+                            </span>
+                            <button
+                                className="bg-gray-300 px-2 rounded text-lg"
+                                onClick={() =>
+                                    setSbtThreshold((prev) => prev + 10)
+                                }
+                            >
+                                +
+                            </button>
+                            <button
+                                onClick={handleUpdateSbtThreshold}
+                                className="bg-blue-500 text-white text-xs px-3 py-1 rounded"
+                            >
+                                저장
+                            </button>
+                        </div>
+
+                        <Button
+                            className="bg-green-500 text-white hover:bg-green-600"
+                            onClick={async () => {
+                                try {
+                                    await axiosClient.post(
+                                        '/contract/tx/submit',
+                                    );
+                                    toast.success('전체 리워드 지급 완료!');
+                                } catch (error) {
+                                    console.error('전체 지급 실패:', error);
+                                    toast.error('전체 지급에 실패했습니다.');
+                                }
+                            }}
+                        >
+                            리워드 전체 지급
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl shadow p-4 w-full overflow-auto min-h-[500px]">
+                    <table className="w-full table-fixed border text-sm text-center">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="border px-2 py-1 w-[40px]">
+                                    ID
+                                </th>
+                                <th className="border px-2 py-1 w-[40px]">
+                                    User ID
+                                </th>
+                                <th className="border px-2 py-1 w-[220px]">
+                                    이메일
+                                </th>
+                                <th className="border px-2 py-1 w-[100px]">
+                                    요청한 Tuner
+                                </th>
+                                <th className="border px-2 py-1 w-[100px]">
+                                    상태
+                                </th>
+                                <th className="border px-2 py-1 w-[320px]">
+                                    TxHash(사용자 지갑주소)
+                                </th>
+                                <th className="border px-2 py-1 w-[160px]">
+                                    Requested At
+                                </th>
+                                {/* <th className="border px-2 py-1 w-[80px]">관리</th> */}
+                            </tr>
+                        </thead>
+                        <tbody className="min-h-[720px]">
+                            {paginatedUsers.map((user) => (
+                                <tr key={user.id}>
+                                    <td className="border px-2 py-1">
+                                        {user.id}
+                                    </td>
+                                    <td className="border px-2 py-1">
+                                        {user.user_id}
+                                    </td>
+                                    <td className="border px-2 py-1">
+                                        {user.email}
+                                    </td>
+                                    <td className="border px-2 py-1">
+                                        {user.amount} MVE
+                                    </td>
+                                    <td className="border px-2 py-1">
+                                        {user.status}
+                                    </td>
+                                    <td className="border px-2 py-1 truncate max-w-xs">
+                                        {user.txhash}
+                                    </td>
+                                    <td className="border px-2 py-1">
+                                        {formatDate(user.requested_at)}
+                                    </td>
+                                    {/* <td className="border px-2 py-1">
                                     <button
                                         className="bg-blue-500 px-2 py-1 rounded text-white text-xs"
                                         onClick={() =>
@@ -395,40 +410,41 @@ export default function UserWithdrawal() {
                                         리워드 지급
                                     </button>
                                 </td> */}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="min-h-[60px] flex items-center justify-center">
-                {totalPages > 1 && (
-                    <div className="mt-6 flex justify-center items-center gap-2 text-sm">
-                        {Array.from({ length: totalPages }).map((_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setCurrentPage(i + 1)}
-                                className={`px-3 py-1 rounded ${
-                                    currentPage === i + 1
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-200 text-gray-800'
-                                }`}
-                            >
-                                {i + 1}
-                            </button>
-                        ))}
-                    </div>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="min-h-[60px] flex items-center justify-center">
+                    {totalPages > 1 && (
+                        <div className="mt-6 flex justify-center items-center gap-2 text-sm">
+                            {Array.from({ length: totalPages }).map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                    className={`px-3 py-1 rounded ${
+                                        currentPage === i + 1
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-200 text-gray-800'
+                                    }`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                {selectedUser && (
+                    <RewardModal
+                        key={selectedUser.id}
+                        isOpen={rewardModalOpen}
+                        userNickname={selectedUser.nickname}
+                        defaultAmount={selectedUser.amount}
+                        onClose={() => setRewardModalOpen(false)}
+                        onConfirm={handleConfirmReward}
+                    />
                 )}
             </div>
-            {selectedUser && (
-                <RewardModal
-                    key={selectedUser.id}
-                    isOpen={rewardModalOpen}
-                    userNickname={selectedUser.nickname}
-                    defaultAmount={selectedUser.amount}
-                    onClose={() => setRewardModalOpen(false)}
-                    onConfirm={handleConfirmReward}
-                />
-            )}
         </div>
     );
 }
