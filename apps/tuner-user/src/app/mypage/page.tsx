@@ -19,6 +19,7 @@ import SurveyStats from "./components/SurveyStats";
 
 import { surveyStats } from "@/features/users/utils/surveyStats";
 import { surveyParticipationStats } from "@/features/users/utils/surveyParticipationStats";
+import { getTunerBalance } from "@/features/withdrawal/utils/getTunerBalance";
 
 export default function MyPage() {
   const router = useRouter();
@@ -28,9 +29,7 @@ export default function MyPage() {
   const { answers, setAnswers } = useSurveyAnswerStore();
   const { withdrawals, setWithdrawals } = useWithdrawalStore();
 
-  const tunerTotal = withdrawals
-    .filter((w) => w.status === "completed")
-    .reduce((sum, w) => sum + w.amount, 0);
+  const tuner = getTunerBalance(withdrawals);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -59,7 +58,7 @@ export default function MyPage() {
     <div className="bg-gray-100 space-y-2">
       <Breadcrumb crumbs={[{ label: "마이페이지" }]} />
       <UserProfile nickname={userInfo.nickname} role={userInfo.role} />
-      <WalletInfo balance={userInfo.balance} tuner={tunerTotal} />
+      <WalletInfo balance={userInfo.balance} tuner={tuner} />
 
       <SurveyStats
         title="설문 생성 내역"

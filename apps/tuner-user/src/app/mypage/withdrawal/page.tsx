@@ -6,6 +6,7 @@ import { requestWithdrawal } from "@/features/withdrawal/services/withdrawal";
 import { useUserStore } from "@/features/users/store/useUserStore";
 import LatestRequestCard from "../withdrawal/components/LatestRequestCard";
 import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
+import { getTunerBalance } from "@/features/withdrawal/utils/getTunerBalance";
 
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
@@ -35,9 +36,7 @@ export default function Reward() {
   if (!userInfo) return null;
 
   const point = Math.floor(balance / 1000);
-  const tuner = withdrawals
-    .filter((w) => w.status === "completed")
-    .reduce((acc, cur) => acc + cur.amount, 0);
+  const tuner = getTunerBalance(withdrawals);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
