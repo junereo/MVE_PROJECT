@@ -30,7 +30,6 @@ export default function MainSurveyList({
     const fetchSurveys = async () => {
       try {
         const res = await getSurveyList();
-        console.log("설문정보", res.data);
         const sorted = res.data.sort((a: SurveyResponse, b: SurveyResponse) => {
           return (
             new Date(b.start_at).getTime() - new Date(a.start_at).getTime()

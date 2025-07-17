@@ -1,12 +1,12 @@
 "use client";
 
 import { Wallet, ArrowDown, ReceiptText } from "lucide-react";
-import { useState } from "react";
-import { requestWithdrawal } from "@/features/withdrawal/services/withdrawal";
+import { useEffect, useState } from "react";
+
+import { toast } from "sonner";
 import { useUserStore } from "@/features/users/store/useUserStore";
 import LatestRequestCard from "../withdrawal/components/LatestRequestCard";
 import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
-import { getTunerBalance } from "@/features/withdrawal/utils/getTunerBalance";
 
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
@@ -15,6 +15,8 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import Disclosure from "@/components/ui/Disclosure";
 import Pagination from "@/components/ui/Pagination";
 import WithdrawalList from "./components/WithdrawalHistoryList";
+import { getAddressToken } from "@/features/withdrawal/services/contract";
+import { requestTxPoolWithdrawal } from "@/features/withdrawal/services/contract";
 
 export default function Reward() {
   const [amount, setAmount] = useState("");
@@ -25,7 +27,9 @@ export default function Reward() {
   const perPage = 5;
   const latest = withdrawals[0]; // 가장 최근 요청
   const rest = withdrawals.slice(1);
+  const [tuner, setTuner] = useState(0);
   const totalPages = Math.ceil(rest.length / perPage);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
     image: "",
@@ -33,12 +37,28 @@ export default function Reward() {
     buttonLabel: "",
     color: "",
   });
-  if (!userInfo) return null;
 
   const point = Math.floor(balance / 1000);
-  const tuner = getTunerBalance(withdrawals);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (!userInfo?.id) return;
+
+    const fetchTuner = async () => {
+      try {
+        const res = await getAddressToken(userInfo.id);
+        const parsed = Number(res.token);
+        setTuner(isNaN(parsed) ? 0 : parsed);
+      } catch (err) {
+        console.error("TUNER 잔액 조회 실패:", err);
+        setTuner(0);
+      }
+    };
+
+    if (userInfo?.id) fetchTuner();
+  }, [userInfo]);
+  if (!userInfo) return null;
+
+  const handleWithdraw = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const numericAmount = parseFloat(amount);
@@ -54,17 +74,16 @@ export default function Reward() {
       return;
     }
 
+    setLoading(true);
+    const tId = setTimeout(() => setLoading(false), 20000);
+
+    // 실제 출금 요청
     try {
-      // 실제 출금 요청
-      const res = await requestWithdrawal({
-        user_id: userInfo.id,
-        amount: numericAmount,
-        txhash: `${Date.now()}-${Math.random()}`, // 임시 트랜잭션 해시
-        status: "completed",
+      const res = await requestTxPoolWithdrawal({
+        uid: userInfo.id,
+        message: numericAmount.toString(),
       });
-
-      console.log("출금 요청 응답", res);
-
+      clearTimeout(tId);
       setModalContent({
         image: "check.png",
         description: `${numericAmount} ETH 출금 요청이 완료되었습니다.`,
@@ -73,6 +92,7 @@ export default function Reward() {
       });
       setAmount("");
     } catch (err) {
+      clearTimeout(tId);
       console.error("출금 요청 실패:", err);
 
       setModalContent({
@@ -141,7 +161,7 @@ export default function Reward() {
         </div>
 
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleWithdraw}
           className="flex flex-col gap-5 max-w-[768px] sm:max-w-[640px] xs:max-w-[485px]"
         >
           <Input
@@ -159,8 +179,8 @@ export default function Reward() {
             }}
           />
 
-          <Button type="submit" color="blue">
-            출금하기
+          <Button color="blue" type="submit" disabled={loading}>
+            {loading ? "출금 중..." : "출금 신청"}
           </Button>
         </form>
       </div>

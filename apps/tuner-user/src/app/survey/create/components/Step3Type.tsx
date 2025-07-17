@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
 import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
-import { getTunerBalance } from "@/features/withdrawal/utils/getTunerBalance";
+import { getAddressToken } from "@/features/withdrawal/services/contract";
+import { useUserStore } from "@/features/users/store/useUserStore";
 
 interface Step3Props {
   onPrev: () => void;
@@ -15,6 +16,8 @@ interface Step3Props {
 
 export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const { step3, setStep3 } = useSurveyStore();
+  const { userInfo } = useUserStore();
+  const [tunerBalance, setTunerBalance] = useState(0);
 
   const [surveyType, setSurveyType] = useState<SurveyTypeEnum>(
     step3.surveyType ?? SurveyTypeEnum.OFFICIAL
@@ -24,8 +27,21 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const [expertReward, setExpertReward] = useState("");
 
   const { withdrawals } = useWithdrawalStore();
-  const tunerBalance = getTunerBalance(withdrawals); // 실제 사용 가능 TUNER
-  const remainingBalance = tunerBalance - Number(rewardAmount || 0);
+
+  useEffect(() => {
+    const fetchTuner = async () => {
+      if (!userInfo?.id) return;
+      try {
+        const res = await getAddressToken(userInfo.id);
+        const parsed = Number(res.token);
+        setTunerBalance(isNaN(parsed) ? 0 : parsed);
+      } catch (err) {
+        console.error("TUNER 잔액 조회 실패:", err);
+        setTunerBalance(0);
+      }
+    };
+    fetchTuner();
+  }, [userInfo]);
 
   useEffect(() => {
     if (step3.reward_amount) {
@@ -67,6 +83,7 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const total = Number(rewardAmount);
   const general = Number(reward);
   const expert = Number(expertReward);
+  const remainingBalance = tunerBalance - total;
 
   const isValid =
     surveyType === SurveyTypeEnum.GENERAL ||

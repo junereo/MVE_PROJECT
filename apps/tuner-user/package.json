@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
@@ -20,6 +20,7 @@
     "next": "14.2.29",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "sonner": "^2.0.6",
     "swiper": "^11.2.10",
     "zustand": "^5.0.5"
   },

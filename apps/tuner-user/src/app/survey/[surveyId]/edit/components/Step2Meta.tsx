@@ -58,8 +58,6 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
     onNext();
   };
 
-  console.log("step2", step2);
-
   return (
     <>
       <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[56px] flex justify-between items-center bg-white text-black border-b border-gray-200 px-4 z-30">
