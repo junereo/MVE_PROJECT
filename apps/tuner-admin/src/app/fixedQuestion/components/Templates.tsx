@@ -102,8 +102,7 @@ const fixedQuestions: FixedQuestion[] = [
     },
     {
         category: 'step3',
-        question_text:
-            '다른 가수가 리메이크 한다면 어울릴 것 같은 아티스트는? (1개 선택)',
+        question_text: '다른 가수가 리메이크 한다면 어울릴 것 같은 아티스트는?',
         question_type: Question_type.fixed,
         type: QuestionTypeEnum.SUBJECTIVE,
         options: [],

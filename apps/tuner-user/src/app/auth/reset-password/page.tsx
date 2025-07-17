@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import ResetPasswordForm from "./components/ResetPasswordForm";
+import ResetPasswordFormWrapper from "./components/ResetPasswordFormWrapper";
 
 export default function ResetPassword() {
   return (
@@ -22,7 +22,7 @@ export default function ResetPassword() {
           </h1>
           <p className="text-sm text-gray-500">비밀번호를 재설정 해주세요</p>
         </div>
-        <ResetPasswordForm />
+        <ResetPasswordFormWrapper />
         <div className="flex items-center justify-center gap-3">
           <Link
             href="/"

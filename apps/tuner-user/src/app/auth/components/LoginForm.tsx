@@ -47,11 +47,15 @@ export default function LoginForm() {
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
     setFormData(updated);
-    const error = validateLoginField(
-      name as keyof LoginFormData,
-      value,
-      updated
-    );
+    const error = (() => {
+      const baseError = validateLoginField(name as keyof LoginFormData, value);
+      if (name === "confirmPassword" && updated.password !== value) {
+        return "비밀번호가 일치하지 않습니다.";
+      }
+
+      return baseError;
+    })();
+
     setErrors((prev) => ({ ...prev, [name]: error }));
   };
 

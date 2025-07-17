@@ -14,7 +14,7 @@ export const useSessionCheck = () => {
         const check = async () => {
             try {
                 const { data } = await axiosClient.post('/auth/me'); //  서버는 쿠키 보고 사용자 확인
-                console.log(data);
+                // console.log(data);
 
                 if (
                     !data ||

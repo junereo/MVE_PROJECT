@@ -22,9 +22,7 @@ type Status = (typeof statusList)[number];
 export default function SurveyList() {
   const router = useRouter();
   const [status, setStatus] = useState<Status>("all");
-  const [submitStatus, setSubmitStatus] = useState<"draft" | "complete">(
-    "complete"
-  ); // 설문 제출 상태 (완료만 보기)
+  const [submitStatus] = useState<"draft" | "complete">("complete"); // 설문 제출 상태 (완료만 보기)
   const [surveys, setSurveys] = useState<SurveyResponse[]>([]);
   const [sortOption, setSortOption] = useState<
     "latest" | "oldest" | "participants"

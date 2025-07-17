@@ -13,7 +13,7 @@ export default function EditResponse({ params }: Props) {
   const surveyId = Number(params.surveyId);
   const [surveyTitle, setSurveyTitle] = useState<string>("");
   const [answers, setAnswers] = useState<AnswerItem[] | null>(null);
-  const [userInfo, setUserInfo] = useState<UserUpdatePayload | null>(null);
+  const [, setUserInfo] = useState<UserUpdatePayload | null>(null);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("editResponseData");
