@@ -53,7 +53,6 @@ export default function MemberEditForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("제출할 데이터", { nickname, role, phone, email });
 
     try {
       await updateUserInfo(user.id, {

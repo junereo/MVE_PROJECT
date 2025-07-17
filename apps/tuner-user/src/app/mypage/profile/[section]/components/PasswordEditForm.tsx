@@ -43,7 +43,6 @@ export default function PasswordEditForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("제출할 데이터", { simplePassword });
 
     if (!/^\d{6}$/.test(simplePassword)) {
       setSimplePasswordError("6자리 숫자로 입력해주세요.");
