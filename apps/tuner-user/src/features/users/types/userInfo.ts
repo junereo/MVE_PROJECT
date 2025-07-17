@@ -37,6 +37,7 @@ export interface UserProfileProps {
 
 export interface withdrawalProps {
   balance: number;
+  tuner: number;
 }
 
 // 마이페이지 전체 사용자 정보용

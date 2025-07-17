@@ -13,8 +13,6 @@ import { useEffect, useState } from "react";
 import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import SurveyResult from "./components/SurveyResult";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
-import { UserUpdatePayload } from "@/features/users/types/userInfo";
-import Link from "next/link";
 import YoutubeThumbnailPlayer from "./components/YoutubeThumbnailPlayer";
 
 type SurveyStatus = "upcoming" | "ongoing" | "closed";

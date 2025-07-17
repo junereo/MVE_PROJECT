@@ -15,7 +15,14 @@ import {
 } from "../services/survey.service";
 import { calculateSurveyResult } from "../services/survey.result.service";
 import { PrismaClient, QuestionType, SurveyStatus } from "@prisma/client";
+import { MetaTransctionService } from "../wallet/services/meta_transction.service";
 const prisma = new PrismaClient();
+const metaTransctionService = new MetaTransctionService();
+
+// MetaTransctionService 초기화
+(async () => {
+  await metaTransctionService.init();
+})();
 
 interface AuthRequest extends Request {
   user?: {
@@ -44,12 +51,77 @@ export const createSurveyHandler = async (req: AuthRequest, res: Response) => {
 
     console.log("설문 생성 요청 데이터:", data);
 
+    // reward_amount가 있는지 확인
+    if (!data.reward_amount || data.reward_amount <= 0) {
+      res.status(400).json({ success: false, message: "reward_amount는 필수이며0커야 합니다." });
+      return;
+    }
+
+    const excute : boolean = false;
+    if(excute){
+      // 1. 사용자 지갑 생성
+      const wallet = await metaTransctionService.createWallet(userId);
+      const userAddress = wallet.address;
+
+      // 2토큰 잔액 확인
+      const currentBalance = await metaTransctionService.getKGTToken(userAddress);
+      console.log(`현재 잔액: ${currentBalance}, 필요 금액: ${data.reward_amount}`);
+
+      // 3. 잔액이 부족한 경우 에러 반환
+      if (currentBalance < (data.reward_amount / 1000)) {
+        res.status(400).json({
+          success: false,
+          message: `토큰 잔액이 부족합니다. 현재 잔액: ${currentBalance}, 필요 금액: ${(data.reward_amount / 1000)}`
+        });
+        return;
+      }
+
+      // 4 토큰 출금 (시스템 지갑으로 전송)
+      const systemWallet = await metaTransctionService.createWallet("owner");
+      const systemAddress = systemWallet.address;
+      const txMessage = { sender: userAddress, data: systemAddress, value: (data.reward_amount / 1000).toString() };
+      const sign = await metaTransctionService.createSign(
+        wallet,
+        JSON.stringify(txMessage)
+      );
+
+      console.log("txMessage", txMessage);
+
+      const transferResult = await metaTransctionService.sendKGTToken(
+        userAddress,
+        systemAddress,
+        (data.reward_amount / 1000),
+        txMessage,
+        sign
+      );
+
+      console.log("토큰 출금 완료:", transferResult);
+
+      // 5. 출금 내역을 WithdrawalRequest에 기록
+      const withdrawalRequest = await prisma.withdrawalRequest.create({
+        data: {     user_id: user_Id,
+          amount: data.reward_amount,
+          txhash: transferResult?.hash || "unknown",
+          message: JSON.stringify(txMessage),
+          signature: sign,
+          status: "completed"
+        }
+      });
+
+      console.log("출금 내역 기록 완료:", withdrawalRequest.id);
+    }
+
+    // 6성
     const survey = await createSurvey({
       userId: user_Id,
       body: data,
     });
 
-    res.status(201).json({ success: true, data: survey });
+
+    res.status(201).json({ 
+      success: true, 
+      data: survey,
+    });
   } catch (err: any) {
     console.error("설문 생성 실패:", err);
     res.status(500).json({
