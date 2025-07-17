@@ -6,6 +6,7 @@ import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useUserStore } from "@/features/users/store/useUserStore";
 import { useSurveyAnswerStore } from "@/features/users/store/useSurveyAnswerStore";
+import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
 
 import { getUserInfo } from "@/features/users/services/user";
 import { getMySurveyAnswer } from "@/features/users/services/survey";
@@ -25,6 +26,7 @@ export default function MyPage() {
   const { user } = useAuthStore();
   const { userInfo, setUserInfo } = useUserStore();
   const { answers, setAnswers } = useSurveyAnswerStore();
+  const { setWithdrawals } = useWithdrawalStore();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -33,9 +35,11 @@ export default function MyPage() {
         const data = await getMySurveyAnswer();
         console.log("참여 설문 응답 결과", data.data);
         const result = await getUserWithdrawals(Number(user.id));
-        console.log("출금 내역", result);
+
+        console.log("출금 내역", result.data);
         setUserInfo(res.data);
         setAnswers(data.data);
+        setWithdrawals(result.data);
       }
     };
     setTimeout(() => {

@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { logoutRequest } from "@/features/auth/services/login";
+import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
+import { useUserStore } from "@/features/users/store/useUserStore";
 
 interface LogoutButtonProps {
   onClose?: () => void; // 사이드바 닫기
@@ -16,6 +18,8 @@ export default function LogoutButton({ onClose }: LogoutButtonProps) {
   const { logout } = useAuthStore(); // 상태 리셋 함수 가져옴
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { clearWithdrawals } = useWithdrawalStore();
+  const { clearUserInfo } = useUserStore();
 
   const handleLogout = async () => {
     const res = await logoutRequest(); // 백엔드 api 로그아웃 요청
@@ -23,6 +27,8 @@ export default function LogoutButton({ onClose }: LogoutButtonProps) {
     // api 요청 성공 200번일 때 아래 처리되도록-!
     if (res.status === 200) {
       logout(); // Zustand 상태 초기화 (token, user → null)
+      clearUserInfo();
+      clearWithdrawals();
       queryClient.removeQueries({ queryKey: ["user"] }); // React Query 캐시 삭제
       onClose?.(); // 사이드바 닫기
       router.push("/"); // 메인 페이지로 이동

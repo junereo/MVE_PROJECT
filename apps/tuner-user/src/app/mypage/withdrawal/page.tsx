@@ -1,21 +1,30 @@
 "use client";
 
 import { Wallet, ArrowDown } from "lucide-react";
-import { useEffect, useState } from "react";
-
+import { useState } from "react";
 import { requestWithdrawal } from "@/features/withdrawal/services/withdrawal";
-
 import { useUserStore } from "@/features/users/store/useUserStore";
+import LatestRequestCard from "../withdrawal/components/LatestRequestCard";
+import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
 
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import Disclosure from "@/components/ui/Disclosure";
+import Pagination from "@/components/ui/Pagination";
+import WithdrawalList from "./components/WithdrawalHistoryList";
 
 export default function Reward() {
   const [amount, setAmount] = useState("");
   const userInfo = useUserStore((state) => state.userInfo);
   const balance = userInfo?.balance ?? 0;
+  const { withdrawals } = useWithdrawalStore();
+  const [page, setPage] = useState(1);
+  const perPage = 5;
+  const latest = withdrawals[0]; // 가장 최근 요청
+  const rest = withdrawals.slice(1);
+  const totalPages = Math.ceil(rest.length / perPage);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
     image: "",
@@ -23,14 +32,7 @@ export default function Reward() {
     buttonLabel: "",
     color: "",
   });
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      // const res = await getUserProfile(); // 예: /me 같은 API
-      // setBalance(res.data.balance);
-    };
-    fetchUser();
-  }, []);
+  if (!userInfo) return null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -51,10 +53,10 @@ export default function Reward() {
     try {
       // 실제 출금 요청
       const res = await requestWithdrawal({
-        user_id: 1, // 나중에 로그인 유저 ID로 교체
+        user_id: userInfo.id,
         amount: numericAmount,
         txhash: `${Date.now()}-${Math.random()}`, // 임시 트랜잭션 해시
-        status: "pending",
+        status: "completed",
       });
 
       console.log("출금 요청 응답", res);
@@ -116,7 +118,7 @@ export default function Reward() {
           <div className="flex flex-col gap-3 border-l border-l-gray-200">
             <p className="text-sm text-gray-600">TUNER</p>
             <p className="font-medium text-gray-800">
-              10 <span className="text-blue-600 font-bold">TUNER</span>
+              {0} <span className="text-blue-600 font-bold">TUNER</span>
             </p>
           </div>
         </div>
@@ -145,6 +147,24 @@ export default function Reward() {
             출금하기
           </Button>
         </form>
+      </div>
+
+      <div className="bg-white shadow-sm p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <ArrowDown className="w-5 h-5 text-green-500" />
+          <h2 className="text-base font-semibold text-gray-800">TUNER 내역</h2>
+        </div>
+        {latest && <LatestRequestCard data={latest} />}
+        {rest.length > 0 && (
+          <Disclosure title="이전 출금 요청 보기">
+            <WithdrawalList data={rest} page={page} perPage={perPage} />
+            <Pagination
+              totalPages={totalPages}
+              currentPage={page}
+              onPageChange={(newPage) => setPage(newPage)}
+            />
+          </Disclosure>
+        )}
       </div>
     </div>
   );
