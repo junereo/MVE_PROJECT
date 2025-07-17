@@ -3,18 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Search } from "lucide-react";
-import { useSearchSurveyStore } from "@/features/survey/store/useSearchSurveyStore";
 
 const SearchInput = () => {
   const router = useRouter();
-  const { setKeyword } = useSearchSurveyStore();
   const [value, setValue] = useState("");
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!value.trim()) return;
-    setKeyword(value);
-    router.push("/search");
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return;
+    console.log("검색 이동:", `/search?keyword=${trimmedValue}`);
+    router.push(`/search?keyword=${encodeURIComponent(value.trim())}`);
   };
 
   return (

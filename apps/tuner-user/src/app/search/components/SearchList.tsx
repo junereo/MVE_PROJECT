@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useSearchSurveyStore } from "@/features/survey/store/useSearchSurveyStore";
+import { useSearchParams } from "next/navigation";
 import { getSurveyList } from "@/features/survey/services/survey";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import { usePagination } from "@/features/survey/hooks/usePagination";
@@ -24,7 +24,8 @@ export default function SearchList() {
   const router = useRouter();
   const [status, setStatus] = useState<Status>("all");
   const [allSurveys, setAllSurveys] = useState<SurveyResponse[]>([]);
-  const { keyword } = useSearchSurveyStore();
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("keyword") || "";
   const [sortOption, setSortOption] = useState<
     "latest" | "oldest" | "participants"
   >("latest");
