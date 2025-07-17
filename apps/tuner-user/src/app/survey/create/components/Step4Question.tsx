@@ -66,7 +66,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
     const getData = async () => {
       try {
         const response = await fetchSurveyQuestions(questionsId);
-        console.log("기본 설문", response);
+
         if (!response.success || !Array.isArray(response.data)) {
           throw new Error("응답 형식이 올바르지 않습니다.");
         }
@@ -186,12 +186,10 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
   const handleSubmit = async () => {
     try {
       const payload = formatSurveyPayload(SurveyStatusEnum.COMPLETE);
-      console.log("payload", payload);
       const res = await createSurvey(payload);
-      console.log("생성 완", res);
       const surveyId = res.data.id;
       setCreatedSurveyId(surveyId);
-      console.log("설문 생성", res);
+
       setSurveySubmitStatus("success");
       resetSurvey();
       onNext();
