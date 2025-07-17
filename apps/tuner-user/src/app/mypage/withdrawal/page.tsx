@@ -3,7 +3,6 @@
 import { Wallet, ArrowDown, ReceiptText } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { toast } from "sonner";
 import { useUserStore } from "@/features/users/store/useUserStore";
 import LatestRequestCard from "../withdrawal/components/LatestRequestCard";
 import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
@@ -61,7 +60,7 @@ export default function Reward() {
   const handleWithdraw = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const numericAmount = parseFloat(amount);
+    const numericAmount = parseFloat(amount) * 1000;
 
     if (isNaN(numericAmount) || numericAmount <= 0 || numericAmount > balance) {
       setModalContent({
@@ -79,14 +78,16 @@ export default function Reward() {
 
     // 실제 출금 요청
     try {
-      const res = await requestTxPoolWithdrawal({
+      await requestTxPoolWithdrawal({
         uid: userInfo.id,
         message: numericAmount.toString(),
       });
       clearTimeout(tId);
       setModalContent({
         image: "check.png",
-        description: `${numericAmount} ETH 출금 요청이 완료되었습니다.`,
+        description: `${
+          numericAmount / 1000
+        } 포인트 출금 요청이 완료되었습니다.`,
         buttonLabel: "확인",
         color: "blue",
       });

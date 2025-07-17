@@ -1,4 +1,3 @@
-import Header from "@/components/layouts/Header";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
 import Wrapper from "@/components/layouts/Wrapper";
 

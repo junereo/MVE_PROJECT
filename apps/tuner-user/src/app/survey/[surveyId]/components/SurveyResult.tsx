@@ -6,7 +6,6 @@ import {
 } from "@/features/survey/utils/normalizeSurveyResult";
 import { useQuestionResults } from "@/features/survey/hooks/useQuestionResults";
 
-import SummaryCard from "./SummaryCard";
 import TrendHighlight from "./TrendHighlight";
 import ParticipantStats from "./ParticipantStats";
 import QuestionBasedResponses from "./QuestionBasedResponses";
@@ -70,15 +69,6 @@ export default function SurveyResult({ surveyId }: { surveyId: number }) {
       )}
     </div>
   );
-}
-
-function calcAverage(distribution: number[] = []) {
-  const total = distribution.reduce((a, b) => a + b, 0);
-  const sum = distribution.reduce(
-    (acc, count, idx) => acc + count * (5 - idx),
-    0
-  );
-  return total === 0 ? 0 : +(sum / total).toFixed(1);
 }
 
 function percent(count: number, total: number) {

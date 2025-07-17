@@ -51,7 +51,7 @@ export default function MainSurveyList({
     };
 
     fetchSurveys();
-  }, [status]);
+  }, [status, submitStatus]);
 
   return surveys.length === 0 ? (
     <div className="flex flex-col items-center justify-center pt-10 text-gray-400 w-full col-span-2">
