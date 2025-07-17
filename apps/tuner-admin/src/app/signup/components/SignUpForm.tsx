@@ -47,8 +47,7 @@ const SignUpForm = () => {
         }
 
         try {
-            const result = await pushOauth(formData);
-            console.log(result);
+            await pushOauth(formData);
             alert('회원가입이 완료되었습니다.');
             router.push('/dashboard');
         } catch (error) {

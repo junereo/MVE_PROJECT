@@ -40,14 +40,14 @@ export const nftList = async () => {
 // 발급된 설문 리스트
 export const surveyList = async () => {
     const res = await axiosClient.get('/survey/s/0');
-    console.log('설문 리스트:', res.data);
+    // console.log('설문 리스트:', res.data);
 
     return res.data;
 };
 // 설문 상세페이지
 export const surveyView = async (id: number | string) => {
     const res = await axiosClient.get(`/survey/s/${id}`);
-    console.log('설문 데이터', res);
+    // console.log('설문 데이터', res);
 
     return res.data;
 };
@@ -55,13 +55,13 @@ export const surveyView = async (id: number | string) => {
 // 설문 통계 데이터
 export const userSurveyData = async (id: number | string) => {
     const res = await axiosClient.post(`/survey/c/${id}`);
-    console.log('설문 통계 데이터', res);
+    // console.log('설문 통계 데이터', res);
 
     return res.data;
 };
 export const surveyEndData = async (id: number | string) => {
     const res = await axiosClient.get(`/survey/r/${id}`);
-    console.log('설문 데이터', res);
+    // console.log('설문 데이터', res);
 
     return res.data;
 };
@@ -88,7 +88,7 @@ export const surveyClose = async (id: number) => {
 // 모든 유저 조회 list
 export const userList = async () => {
     const res = await axiosClient.get('/user');
-    console.log('유저리스트', res);
+    // console.log('유저리스트', res);
 
     return res;
 };

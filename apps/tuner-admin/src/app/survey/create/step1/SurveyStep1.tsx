@@ -48,7 +48,7 @@ const SurveyStep1 = () => {
                 // 설문 수정
                 try {
                     const { data } = await surveyView(id);
-                    console.log(data);
+                    // console.log(data);
 
                     setStep1({
                         youtubeVideoId: data.music_id,
@@ -109,7 +109,7 @@ const SurveyStep1 = () => {
             try {
                 const { data } = await userReward(user.id);
                 setTokenBalance(data.token);
-                console.log(' 유저 토큰 잔액:', data.token);
+                // console.log(' 유저 토큰 잔액:', data.token);
             } catch (error) {
                 console.error(' 유저 토큰 조회 실패:', error);
             }
@@ -120,7 +120,7 @@ const SurveyStep1 = () => {
 
     const handleInputChange = useCallback(
         (field: keyof typeof step1, value: string | number | boolean) => {
-            console.log('💡 변경 필드:', field, value); // 추가
+            // console.log('💡 변경 필드:', field, value);
             if (value !== undefined) {
                 setStep1({ [field]: value });
             }
@@ -158,13 +158,13 @@ const SurveyStep1 = () => {
         const isFromSearch = params.get('fromSearch') === 'true';
 
         if (isFromSearch) {
-            console.log('⛔ 유지: search에서 옴');
+            // console.log(' 유지: search에서 옴');
             params.delete('fromSearch');
             window.history.replaceState({}, '', url.toString());
             return; // 여기서 끝냄
         }
 
-        console.log(' 리셋 수행: fromSearch 없음');
+        // console.log(' 리셋 수행: fromSearch 없음');
         resetSurvey();
     }, [resetSurvey]);
 
