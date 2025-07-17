@@ -2,7 +2,15 @@
 
 import axios from "axios";
 
-const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+type YoutubeSearchItem = {
+  id: {
+    videoId: string;
+  };
+  snippet: {
+    title: string;
+    channelTitle: string;
+  };
+};
 
 export const fetchYoutubeVideos = async (query: string) => {
   const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
@@ -52,7 +60,7 @@ export const fetchYoutubeVideos = async (query: string) => {
     },
   });
 
-  return res.data.items.map((item: any) => ({
+  return res.data.items.map((item: YoutubeSearchItem) => ({
     music_title: item.snippet.title,
     artist: item.snippet.channelTitle,
     thumbnail_uri: `https://i.ytimg.com/vi/${item.id.videoId}/sddefault.jpg`,

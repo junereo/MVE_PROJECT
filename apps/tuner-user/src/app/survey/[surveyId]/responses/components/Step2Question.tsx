@@ -27,7 +27,6 @@ import QuestionOptions from "@/app/survey/components/QuestionOptions";
 import QuestionSubjective from "@/app/survey/components/QuestionSubjective";
 import { formatDefaultAnswers } from "@/features/survey/utils/fotmatAnswers";
 import { userUpdatePayload } from "@/features/users/utils/userUpdatePayload";
-import { UserSurveyInfo } from "@/features/users/types/userInfo";
 
 interface Step2Props {
   surveyId: number;
@@ -63,7 +62,9 @@ export default function Step2Question({
   const [showErrors, setShowErrors] = useState(false);
 
   const currentKey = baseCategories[tabIndex]?.key ?? "";
-  const currentAnswers = answers[currentKey] || {};
+  const currentAnswers = useMemo(() => {
+    return answers[currentKey] || {};
+  }, [answers, currentKey]);
 
   const currentQuestions = useMemo(
     () => questions.filter((q) => q.category === currentKey),
