@@ -1,0 +1,67 @@
+diff --git a/apps/tuner-api/src/services/survey.service.ts b/apps/tuner-api/src/services/survey.service.ts
+index 93ee0b9..8f14558 100644
+--- a/apps/tuner-api/src/services/survey.service.ts
++++ b/apps/tuner-api/src/services/survey.service.ts
+@@ -72,20 +72,33 @@ export const createSurveyParticipant = async ({
+ }) => {
+   const survey = await prisma.survey.findUnique({
+     where: { id: survey_id },
+-    select: { status: true, is_active: true, reward: true, expert_reward: true },
++    select: {
++      status: true,
++      is_active: true,
++      reward: true,
++      expert_reward: true,
++    },
+   });
+   if (!survey) throw new Error("해당 설문이 존재하지 않습니다.");
+ 
+   const user = await prisma.user.findUnique({
+     where: { id: user_id },
+-    select: { gender: true, age: true, genre: true, job_domain: true, role: true, badge_issued_at: true },
++    select: {
++      gender: true,
++      age: true,
++      genre: true,
++      job_domain: true,
++      role: true,
++      badge_issued_at: true,
++    },
+   });
+   if (!user) throw new Error("해당 유저가 존재하지 않습니다.");
+ 
+   const needsUpdate =
+     user.gender === null ||
+     user.age === null ||
+-    !user.genre || user.genre.length === 0 ||
++    !user.genre ||
++    user.genre.length === 0 ||
+     user.job_domain === null;
+ 
+   if (needsUpdate) {
+@@ -96,9 +109,10 @@ export const createSurveyParticipant = async ({
+       data: {
+         gender: user_info.gender,
+         age: user_info.age as any,
+-        genre: Array.isArray(user_info.genre) && user_info.genre.length > 0
+-          ? user_info.genre[0] as Genre
+-          : null,
++        genre:
++          Array.isArray(user_info.genre) && user_info.genre.length > 0
++            ? (user_info.genre[0] as Genre)
++            : null,
+         job_domain: user_info.job_domain,
+       },
+     });
+@@ -125,9 +139,9 @@ export const createSurveyParticipant = async ({
+ 
+   // 지급 리워드 결정
+   let rewardAmount = 0;
+-  if (user.role === 'expert') {
++  if (user.role === "expert") {
+     rewardAmount = survey.expert_reward ?? 0;
+-  } else if (user.role === 'ordinary') {
++  } else if (user.role === "ordinary") {
+     rewardAmount = survey.reward ?? 0;
+   }
+ 
