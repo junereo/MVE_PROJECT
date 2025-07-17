@@ -5,7 +5,6 @@ import Input from "@/components/ui/Input";
 import { useEffect, useState } from "react";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
-import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
 import { getAddressToken } from "@/features/withdrawal/services/contract";
 import { useUserStore } from "@/features/users/store/useUserStore";
 
@@ -25,8 +24,6 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const [rewardAmount, setRewardAmount] = useState("");
   const [reward, setReward] = useState("");
   const [expertReward, setExpertReward] = useState("");
-
-  const { withdrawals } = useWithdrawalStore();
 
   useEffect(() => {
     const fetchTuner = async () => {

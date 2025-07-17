@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -9,7 +8,6 @@ import { requestPassword } from "@/features/auth/services/find";
 import { validateEmail } from "@/features/auth/utils/validateCommon";
 
 export default function RequestPasswordForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [errorModal, setErrorModal] = useState<null | { message: string }>(

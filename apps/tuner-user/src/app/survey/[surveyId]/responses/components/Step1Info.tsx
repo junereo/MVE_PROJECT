@@ -64,14 +64,12 @@ export default function Step1Info({
     };
 
     fetchUserInfo();
-  }, [setUserInfo]);
+  }, [setUserInfo, user?.id]);
 
   const handleNext = () => {
     setUserInfo({ gender, age, genre, jobDomain });
     onNext();
   };
-
-  useEffect(() => {}, [gender, age, genre, jobDomain]);
 
   const isValid = gender && age && genre && typeof jobDomain === "boolean";
 
