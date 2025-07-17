@@ -278,7 +278,7 @@ export default function SurveyDetailPage() {
                                         <p>
                                             💰 총 리워드:{' '}
                                             {surveyData.reward_amount.toLocaleString()}{' '}
-                                            MVE
+                                            포인트
                                         </p>
                                         <p>
                                             지급 완료:{' '}
@@ -286,17 +286,17 @@ export default function SurveyDetailPage() {
                                                 surveyData.reward_amount -
                                                 surveyData.rest_amount / 1000
                                             ).toLocaleString()}{' '}
-                                            MVE / 잔여:{' '}
+                                            포인트 / 잔여:{' '}
                                             {(
                                                 surveyData.rest_amount / 1000
                                             ).toLocaleString()}{' '}
-                                            MVE
+                                            포인트
                                             <br />
                                             일반 유저:{' '}
                                             {surveyData.reward.toLocaleString()}{' '}
-                                            MVE / Expert:{' '}
+                                            포인트 / Expert:{' '}
                                             {surveyData.expert_reward.toLocaleString()}{' '}
-                                            MVE
+                                            포인트
                                         </p>
                                     </>
                                 )}

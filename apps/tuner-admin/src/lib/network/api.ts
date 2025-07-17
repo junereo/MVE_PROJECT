@@ -6,7 +6,7 @@ import {
 } from '@/types';
 
 import axiosClient from '@/lib/network/axios';
-import { ServerUser, User } from '@/app/userService/page';
+import { User } from '@/app/userService/page';
 
 // 로그인 요청
 export const pushLogin = async (formData: LoginFormData) => {
@@ -138,6 +138,15 @@ export const userReward = async (id: number) => {
 // 유저 등급변경
 export const userExpert = async (id: number, data: Partial<User>) => {
     const response = await axiosClient.put(`/user/${id}`, data);
+    return response;
+};
+// 유저 SBT 토큰 발급
+export const userSBTtoken = async (id: number) => {
+    const response = await axiosClient.post(
+        `/contract/wallet/badge/${id}`,
+        {},
+        { timeout: 50000 },
+    );
     return response;
 };
 // 세팅
