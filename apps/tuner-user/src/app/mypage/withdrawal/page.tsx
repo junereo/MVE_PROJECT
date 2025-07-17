@@ -63,8 +63,6 @@ export default function Reward() {
         status: "completed",
       });
 
-      console.log("출금 요청 응답", res);
-
       setModalContent({
         image: "check.png",
         description: `${numericAmount} ETH 출금 요청이 완료되었습니다.`,

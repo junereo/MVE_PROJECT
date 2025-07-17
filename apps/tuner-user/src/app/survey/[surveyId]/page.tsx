@@ -34,7 +34,6 @@ export default function SurveyDetail() {
     const fetch = async () => {
       try {
         const response = await getSurveyById(Number(params.surveyId));
-        console.log("설문 상세", response);
         setSurvey(response);
       } catch (err) {
         console.error("설문 상세 불러오기 실패", err);

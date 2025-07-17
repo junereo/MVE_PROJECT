@@ -84,7 +84,7 @@ export default function Step2Question({
     if (step4.questions.length === 0 && step4.customQuestions.length === 0) {
       getSurveyById(surveyId).then((res) => {
         const rawQuestions = res.survey_question;
-        console.log("rawQuestions", rawQuestions);
+
         if (!Array.isArray(rawQuestions) || rawQuestions.length === 0) {
           console.error("질문이 없습니다.");
           return;

@@ -55,7 +55,7 @@ export default function SurveyEditForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("제출할 데이터", { gender, age, genre, job });
+
     try {
       await updateUserInfo(user.id, {
         gender: gender === "true",

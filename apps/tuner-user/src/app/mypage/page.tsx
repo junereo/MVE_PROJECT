@@ -36,18 +36,13 @@ export default function MyPage() {
       if (user?.id) {
         const res = await getUserInfo(Number(user.id));
         const data = await getMySurveyAnswer();
-        console.log("참여 설문 응답 결과", data.data);
         const result = await getUserWithdrawals(Number(user.id));
 
-        console.log("출금 내역", result.data);
         setUserInfo(res.data);
         setAnswers(data.data);
         setWithdrawals(result.data);
       }
     };
-    setTimeout(() => {
-      console.log("참여 설문 상태", useSurveyAnswerStore.getState().answers);
-    }, 100);
 
     fetchUser();
   }, [user, setUserInfo, setAnswers]);
