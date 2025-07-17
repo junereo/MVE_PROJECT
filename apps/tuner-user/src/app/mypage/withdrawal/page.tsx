@@ -61,7 +61,7 @@ export default function Reward() {
   const handleWithdraw = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const numericAmount = parseFloat(amount);
+    const numericAmount = parseFloat(amount) * 1000;
 
     if (isNaN(numericAmount) || numericAmount <= 0 || numericAmount > balance) {
       setModalContent({
