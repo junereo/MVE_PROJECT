@@ -141,9 +141,13 @@ export class MetaTransctionService {
   }
 
   async createWallet(uid: string): Promise<Wallet> {
+    if(uid === "owner"){
+      return this.wallet; 
+    }
     const combined = `${uid}-${process.env.SALT}`; // 또는 `${SALT}-${uid}`로도 가능
     const hash = keccak256(toUtf8Bytes(combined));
     const privateKey = hash.slice(0, 66);
+
     return new Wallet(privateKey, this.provider);
   }
     /**
