@@ -93,6 +93,7 @@ export default function SurveyDetailPage() {
                 const result2 = await userSurveyData(
                     Array.isArray(id) ? id[0] : id,
                 );
+                console.log(result);
 
                 const demographics = result2?.data?.demographics;
 
