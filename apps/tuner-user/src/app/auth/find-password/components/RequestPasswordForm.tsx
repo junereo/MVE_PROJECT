@@ -30,9 +30,8 @@ export default function RequestPasswordForm() {
     }
 
     try {
-      console.log("email", email);
       const res = await requestPassword(email);
-      console.log("메일 요청", res);
+
       if (res.success) {
         setResultMessage("비밀번호 재설정 링크가 전송되었습니다.");
         setEmail("");

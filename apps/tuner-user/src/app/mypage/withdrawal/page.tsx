@@ -1,12 +1,11 @@
 "use client";
 
 import { Wallet, ArrowDown, ReceiptText } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { requestWithdrawal } from "@/features/withdrawal/services/withdrawal";
 import { useUserStore } from "@/features/users/store/useUserStore";
 import LatestRequestCard from "../withdrawal/components/LatestRequestCard";
 import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
-import { getTunerBalance } from "@/features/withdrawal/utils/getTunerBalance";
 
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
@@ -15,6 +14,7 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import Disclosure from "@/components/ui/Disclosure";
 import Pagination from "@/components/ui/Pagination";
 import WithdrawalList from "./components/WithdrawalHistoryList";
+import { getAddressToken } from "@/features/withdrawal/services/contract";
 
 export default function Reward() {
   const [amount, setAmount] = useState("");
@@ -25,6 +25,7 @@ export default function Reward() {
   const perPage = 5;
   const latest = withdrawals[0]; // 가장 최근 요청
   const rest = withdrawals.slice(1);
+  const [tuner, setTuner] = useState(0);
   const totalPages = Math.ceil(rest.length / perPage);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
@@ -33,10 +34,26 @@ export default function Reward() {
     buttonLabel: "",
     color: "",
   });
-  if (!userInfo) return null;
 
   const point = Math.floor(balance / 1000);
-  const tuner = getTunerBalance(withdrawals);
+
+  useEffect(() => {
+    if (!userInfo?.id) return;
+
+    const fetchTuner = async () => {
+      try {
+        const res = await getAddressToken(userInfo.id);
+        const parsed = Number(res.token);
+        setTuner(isNaN(parsed) ? 0 : parsed);
+      } catch (err) {
+        console.error("TUNER 잔액 조회 실패:", err);
+        setTuner(0);
+      }
+    };
+
+    if (userInfo?.id) fetchTuner();
+  }, [userInfo]);
+  if (!userInfo) return null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -62,8 +79,6 @@ export default function Reward() {
         txhash: `${Date.now()}-${Math.random()}`, // 임시 트랜잭션 해시
         status: "completed",
       });
-
-      console.log("출금 요청 응답", res);
 
       setModalContent({
         image: "check.png",
