@@ -1,0 +1,89 @@
+diff --git a/apps/tuner-admin/package.json b/apps/tuner-admin/package.json
+index f523be5..963d357 100644
+--- a/apps/tuner-admin/package.json
++++ b/apps/tuner-admin/package.json
+@@ -1,43 +1,43 @@
+ {
+-  "name": "tuner-user",
+-  "version": "0.1.0",
+-  "private": true,
+-  "scripts": {
+-    "dev": "next dev -p 3001",
+-    "build": "next build",
+-    "start": "next start",
+-    "lint": "eslint 'src/**/*.{ts,tsx}'",
+-    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,md}'"
+-  },
+-  "dependencies": {
+-    "@radix-ui/react-accordion": "^1.2.11",
+-    "@radix-ui/react-slot": "^1.2.3",
+-    "@radix-ui/react-tabs": "^1.1.12",
+-    "@tanstack/react-query": "^5.80.7",
+-    "axios": "^1.9.0",
+-    "class-variance-authority": "^0.7.1",
+-    "clsx": "^2.1.1",
+-    "js-cookie": "^3.0.5",
+-    "jwt-decode": "^4.0.0",
+-    "lucide-react": "^0.518.0",
+-    "next": "14.2.29",
+-    "react": "^18.3.1",
+-    "react-dom": "^18.3.1",
+-    "recharts": "^2.15.3",
+-    "sonner": "^2.0.5",
+-    "tailwind-merge": "^3.3.1",
+-    "zustand": "^5.0.5"
+-  },
+-  "devDependencies": {
+-    "@types/js-cookie": "^3.0.6",
+-    "@types/node": "^20.19.0",
+-    "@types/react": "^18.3.23",
+-    "@types/react-dom": "^18.3.7",
+-    "eslint": "^8.57.0",
+-    "eslint-config-next": "14.2.29",
+-    "postcss": "^8.5.4",
+-    "tailwindcss": "^3.4.1",
+-    "tailwindcss-animate": "^1.0.7",
+-    "typescript": "^5.8.3"
+-  }
++    "name": "tuner-user",
++    "version": "0.1.0",
++    "private": true,
++    "scripts": {
++        "dev": "next dev -p 3000",
++        "build": "next build",
++        "start": "next start",
++        "lint": "eslint 'src/**/*.{ts,tsx}'",
++        "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,md}'"
++    },
++    "dependencies": {
++        "@radix-ui/react-accordion": "^1.2.11",
++        "@radix-ui/react-slot": "^1.2.3",
++        "@radix-ui/react-tabs": "^1.1.12",
++        "@tanstack/react-query": "^5.80.7",
++        "axios": "^1.9.0",
++        "class-variance-authority": "^0.7.1",
++        "clsx": "^2.1.1",
++        "js-cookie": "^3.0.5",
++        "jwt-decode": "^4.0.0",
++        "lucide-react": "^0.518.0",
++        "next": "14.2.29",
++        "react": "^18.3.1",
++        "react-dom": "^18.3.1",
++        "recharts": "^2.15.3",
++        "sonner": "^2.0.5",
++        "tailwind-merge": "^3.3.1",
++        "zustand": "^5.0.5"
++    },
++    "devDependencies": {
++        "@types/js-cookie": "^3.0.6",
++        "@types/node": "^20.19.0",
++        "@types/react": "^18.3.23",
++        "@types/react-dom": "^18.3.7",
++        "eslint": "^8.57.0",
++        "eslint-config-next": "14.2.29",
++        "postcss": "^8.5.4",
++        "tailwindcss": "^3.4.1",
++        "tailwindcss-animate": "^1.0.7",
++        "typescript": "^5.8.3"
++    }
+ }
