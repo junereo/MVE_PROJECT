@@ -199,7 +199,8 @@ export default function Step4Question({
         ...formatSurveyPayload(SurveyStatusEnum.COMPLETE),
         surveyId, // props로 받은 surveyId 추가
       };
-      await updateSurvey(payload, surveyId);
+      const res = await updateSurvey(payload, surveyId);
+      console.log("설문 수정", res);
       setCreatedSurveyId(Number(surveyId));
       setSurveySubmitStatus("success");
       resetSurvey();

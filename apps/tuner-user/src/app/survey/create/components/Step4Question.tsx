@@ -204,6 +204,8 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
   const handleSave = async () => {
     try {
       const payload = formatSurveyPayload(SurveyStatusEnum.DRAFT);
+      console.log(payload.reward_amount);
+
       await createSurvey(payload);
       setSurveySubmitStatus("saved"); // 임시저장 성공 상태로 업데이트
       onNext();
