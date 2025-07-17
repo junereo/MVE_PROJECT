@@ -43,7 +43,7 @@ export function normalizeSurveyResult(
   const stats: QuestionStat[] = [];
   let demographics: DemographicData | null = null;
 
-  for (const [key, value] of Object.entries(raw.survey_statistics)) {
+  for (const [value] of Object.entries(raw.survey_statistics)) {
     if (typeof value === "object" && "id" in value && "average" in value) {
       stats.push(value as QuestionStat);
     } else if (

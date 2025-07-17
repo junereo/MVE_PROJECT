@@ -42,7 +42,7 @@ export default function Card({
     };
 
     fetchSurveys();
-  }, [active]);
+  }, [active, status]);
 
   return surveys.length === 0 ? (
     <div className="flex flex-col items-center justify-center py-20 text-gray-400 w-full col-span-2">

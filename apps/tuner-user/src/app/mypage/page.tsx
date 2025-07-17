@@ -27,7 +27,7 @@ export default function MyPage() {
   const { user } = useAuthStore();
   const { userInfo, setUserInfo } = useUserStore();
   const { answers, setAnswers } = useSurveyAnswerStore();
-  const { withdrawals, setWithdrawals } = useWithdrawalStore();
+  const { setWithdrawals } = useWithdrawalStore();
   const [tuner, setTuner] = useState<number>(0);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function MyPage() {
     };
 
     fetchUser();
-  }, [user, setUserInfo, setAnswers]);
+  }, [user, setUserInfo, setAnswers, setWithdrawals]);
 
   if (!isInitialized || !userInfo) return null;
 

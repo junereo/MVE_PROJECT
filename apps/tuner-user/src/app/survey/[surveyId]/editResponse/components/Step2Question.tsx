@@ -134,7 +134,7 @@ export default function Step2Question({
         setAnswer(category, question.id, validAnswer);
       });
     }
-  }, [submitAnswers, questions]);
+  }, [submitAnswers, questions, setAnswer]);
 
   const handlePrev = () => {
     if (tabIndex > 0) {
@@ -184,9 +184,9 @@ export default function Step2Question({
     };
 
     try {
-      const response = await updateUserInfo(Number(user.id), userPayload);
+      await updateUserInfo(Number(user.id), userPayload);
 
-      const res = await postSurveyAnswer(surveyPayload);
+      await postSurveyAnswer(surveyPayload);
 
       sessionStorage.removeItem("editResponseData");
       setSubmitStatus("success");

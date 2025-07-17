@@ -11,7 +11,6 @@ import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
 import { InputTypeEnum } from "@/features/survey/types/enums";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
-import { useUserStore } from "@/features/users/store/useUserStore";
 import {
   AgeKey,
   ageMap,
@@ -64,7 +63,7 @@ export default function Step1Info({
     };
 
     fetchUserInfo();
-  }, [setUserInfo]);
+  }, [setUserInfo, user?.id]);
 
   const handleNext = () => {
     setUserInfo({ gender, age, genre, jobDomain });
