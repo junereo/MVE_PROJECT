@@ -91,13 +91,13 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
         </h2>
         <div className="flex gap-2">
           <Button
-            color={surveyType === SurveyTypeEnum.OFFICIAL ? "blue" : "white"}
+            color={surveyType === SurveyTypeEnum.OFFICIAL ? "green" : "white"}
             onClick={() => setSurveyType(SurveyTypeEnum.OFFICIAL)}
           >
             공식
           </Button>
           <Button
-            color={surveyType === SurveyTypeEnum.GENERAL ? "blue" : "white"}
+            color={surveyType === SurveyTypeEnum.GENERAL ? "green" : "white"}
             onClick={() => setSurveyType(SurveyTypeEnum.GENERAL)}
           >
             일반
@@ -154,7 +154,7 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
           </Button>
         </div>
         <div className="w-[180px] sm:w-[400px]">
-          <Button onClick={handleNext} disabled={!isValid} color="blue">
+          <Button onClick={handleNext} disabled={!isValid} color="green">
             다음
           </Button>
         </div>

@@ -57,7 +57,7 @@ export default function ThumbnailUploader() {
             </span>
           </div>
         )}
-        <Button onClick={handleUpload} color="blue">
+        <Button onClick={handleUpload} color="green">
           이미지 업로드
         </Button>
         {step1.thumbnail_uri && (

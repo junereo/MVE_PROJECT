@@ -97,8 +97,8 @@ export default function SearchList() {
             key={s}
             className={`flex-1 min-w-0 py-1 text-sm sm:text-base transition ${
               status === s
-                ? "bg-blue-500 text-white font-semibold shadow-sm"
-                : "bg-gray-100 text-gray-800 hover:bg-blue-100"
+                ? "bg-[#57CC7E] text-white font-semibold shadow-sm"
+                : "bg-gray-100 text-gray-800 hover:bg-[#E8FDF0]"
             }`}
             onClick={() => setStatus(s)}
           >

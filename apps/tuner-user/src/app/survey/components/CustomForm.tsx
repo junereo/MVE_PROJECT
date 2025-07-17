@@ -157,7 +157,7 @@ export default function CustomForm({
                 <button
                   type="button"
                   onClick={() => onAddOption(q.id)}
-                  className="text-blue-600 text-sm font-medium underline hover:opacity-80 transition"
+                  className="text-[#57CC7E] text-sm font-medium underline hover:opacity-80 transition"
                 >
                   + 선택지 추가
                 </button>
@@ -177,7 +177,7 @@ export default function CustomForm({
         </div>
       ))}
 
-      <Button onClick={onAdd} color="blue">
+      <Button onClick={onAdd} color="green">
         커스텀 설문 추가
       </Button>
     </div>

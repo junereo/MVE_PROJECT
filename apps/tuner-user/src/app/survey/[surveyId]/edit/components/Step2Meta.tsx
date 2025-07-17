@@ -85,13 +85,13 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
           <div className="text-sm font-medium">음원 상태</div>
           <div className="flex gap-2">
             <Button
-              color={releaseType === "unreleased" ? "blue" : "white"}
+              color={releaseType === "unreleased" ? "green" : "white"}
               onClick={() => setReleaseType("unreleased")}
             >
               미발매
             </Button>
             <Button
-              color={releaseType === "released" ? "blue" : "white"}
+              color={releaseType === "released" ? "green" : "white"}
               onClick={() => setReleaseType("released")}
             >
               발매
@@ -127,7 +127,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
           </Button>
         </div>
         <div className="w-[180px] sm:w-[400px]">
-          <Button onClick={handleNext} disabled={!isValid} color="blue">
+          <Button onClick={handleNext} disabled={!isValid} color="green">
             다음
           </Button>
         </div>
