@@ -1,4 +1,8 @@
-import { SummaryStats } from "@/features/survey/types/surveyResultPayload";
+export type SummaryStats = {
+  "작품성 평균": number;
+  "대중성 평균": number;
+  "참여자 수": number;
+};
 
 export default function SummaryCard({ summary }: { summary: SummaryStats }) {
   return (

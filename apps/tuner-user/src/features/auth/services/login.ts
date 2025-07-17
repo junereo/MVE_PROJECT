@@ -51,14 +51,3 @@ export const getMe = async () => {
   const response = await axios.post("/auth/me"); // 쿠키 기반
   return response.data.user; // {id, nickname}
 };
-
-/*
-  테스트용
-
-  // 로그인
-  export const mockLogin = async (data: { email: string; password: string }) => {
-    console.log("mockLogin called with data: ", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return { status: 201, data: { message: "로그인 성공" } };
-  };
-*/
