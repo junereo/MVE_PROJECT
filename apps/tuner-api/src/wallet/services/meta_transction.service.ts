@@ -28,7 +28,7 @@ export class MetaTransctionService {
   }
 
   async init(): Promise<void> {
-    this.provider = new JsonRpcProvider(`${process.env.SEPLOIA_RPC_URL}`);
+    this.provider = new JsonRpcProvider(`${process.env.KAIROS_RPC_URL}`);
 
     this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
     // DB에서 ABI 및 contract address 동적 로드
@@ -141,9 +141,13 @@ export class MetaTransctionService {
   }
 
   async createWallet(uid: string): Promise<Wallet> {
+    if(uid === "owner"){
+      return this.wallet; 
+    }
     const combined = `${uid}-${process.env.SALT}`; // 또는 `${SALT}-${uid}`로도 가능
     const hash = keccak256(toUtf8Bytes(combined));
     const privateKey = hash.slice(0, 66);
+
     return new Wallet(privateKey, this.provider);
   }
     /**
