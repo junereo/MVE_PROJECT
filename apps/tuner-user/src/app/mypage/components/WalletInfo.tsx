@@ -2,7 +2,9 @@ import Link from "next/link";
 import { withdrawalProps } from "@/features/users/types/userInfo";
 import { Wallet, ArrowDown } from "lucide-react";
 
-export default function WalletInfo({ balance }: withdrawalProps) {
+export default function WalletInfo({ balance, tuner }: withdrawalProps) {
+  const point = Math.floor(balance / 1000);
+
   return (
     <div className="bg-white p-4">
       <div className="flex items-center gap-2">
@@ -11,11 +13,11 @@ export default function WalletInfo({ balance }: withdrawalProps) {
       <div className="grid grid-flow-col grid-row-2 gap-4 text-center">
         <div className="flex flex-col gap-3">
           <p className="text-sm text-gray-600">포인트</p>
-          <p className="text-gray-800 font-medium">{balance || 0}</p>
+          <p className="text-gray-800 font-medium">{point || 0} p</p>
         </div>
         <div className="flex flex-col gap-3 border-l border-l-gray-200">
           <p className="text-sm text-gray-600">TUNER</p>
-          <p className="font-medium text-gray-800">10 TUNER</p>
+          <p className="font-medium text-gray-800">{tuner} t</p>
         </div>
       </div>
       <div className="flex justify-end pt-3">

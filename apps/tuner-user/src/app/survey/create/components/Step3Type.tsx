@@ -5,6 +5,8 @@ import Input from "@/components/ui/Input";
 import { useEffect, useState } from "react";
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
+import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
+import { getTunerBalance } from "@/features/withdrawal/utils/getTunerBalance";
 
 interface Step3Props {
   onPrev: () => void;
@@ -20,6 +22,10 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
   const [rewardAmount, setRewardAmount] = useState("");
   const [reward, setReward] = useState("");
   const [expertReward, setExpertReward] = useState("");
+
+  const { withdrawals } = useWithdrawalStore();
+  const tunerBalance = getTunerBalance(withdrawals); // 실제 사용 가능 TUNER
+  const remainingBalance = tunerBalance - Number(rewardAmount || 0);
 
   useEffect(() => {
     if (step3.reward_amount) {
@@ -72,7 +78,8 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
       !isNaN(expert) &&
       total > 0 &&
       general > 0 &&
-      expert > 0);
+      expert > 0 &&
+      remainingBalance >= 0);
 
   return (
     <>
@@ -117,7 +124,12 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
               label="리워드 총량"
               type="number"
               value={rewardAmount}
-              onChange={(e) => setRewardAmount(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*\.?\d*$/.test(value)) {
+                  setRewardAmount(value);
+                }
+              }}
               placeholder="리워드 총량을 입력해주세요."
             />
             <Input
@@ -126,7 +138,12 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
               min="0.001"
               inputMode="decimal"
               value={reward}
-              onChange={(e) => setReward(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*\.?\d*$/.test(value)) {
+                  setReward(value);
+                }
+              }}
               placeholder="각 일반 회원에게 지급할 리워드를 입력해주세요."
             />
             <Input
@@ -135,9 +152,31 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
               min="0.001"
               inputMode="decimal"
               value={expertReward}
-              onChange={(e) => setExpertReward(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*\.?\d*$/.test(value)) {
+                  setExpertReward(value);
+                }
+              }}
               placeholder="각 Expert 회원에게 지급할 리워드를 입력해주세요."
             />
+            {surveyType === SurveyTypeEnum.OFFICIAL && (
+              <div className="text-right text-sm text-gray-600 pt-1">
+                보유 TUNER:{" "}
+                <span className="font-semibold text-black">
+                  {tunerBalance.toFixed(1)} TUNER
+                </span>
+                <br />
+                차감 후 잔액:{" "}
+                <span
+                  className={`font-semibold ${
+                    remainingBalance < 0 ? "text-red-500" : "text-black"
+                  }`}
+                >
+                  {remainingBalance.toFixed(1)} TUNER
+                </span>
+              </div>
+            )}
           </>
         )}
         {surveyType === SurveyTypeEnum.GENERAL && (
