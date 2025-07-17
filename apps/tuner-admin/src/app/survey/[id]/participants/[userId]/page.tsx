@@ -37,7 +37,6 @@ export default function ParticipantDetailPage() {
         const fetchData = async () => {
             if (!id || !userId) return;
             const result = await surveyView(Array.isArray(id) ? id[0] : id);
-            console.log(result);
 
             const surveyQs: SurveyQuestion[] = result.data.survey_question;
             setSurveyQuestions(surveyQs);
