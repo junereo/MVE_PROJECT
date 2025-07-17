@@ -182,7 +182,7 @@ export default function FixedQuestionTemplatePage() {
     return (
         <div className="">
             <div className="w-full  text-black text-2xl py-3  font-bold">
-                fixedQuestion
+                고정 질문
             </div>
             <div className="p-6">
                 <div className="flex justify-center">

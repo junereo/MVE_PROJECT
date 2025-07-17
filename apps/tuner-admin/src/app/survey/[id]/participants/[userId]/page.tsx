@@ -129,7 +129,8 @@ export default function ParticipantDetailPage() {
                         등급: <strong>{participant.user.role}</strong>
                     </p>
                     <p>
-                        지급 리워드: <strong>{participant.rewarded} MVE</strong>
+                        지급 리워드:{' '}
+                        <strong>{participant.rewarded} 포인트</strong>
                     </p>
                 </div>
 

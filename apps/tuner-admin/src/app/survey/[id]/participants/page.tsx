@@ -138,7 +138,7 @@ export default function SurveyParticipantsPage() {
                                 </td>
                                 <td className="border px-2 py-1">{p.status}</td>
                                 <td className="border px-2 py-1 w-[100px]">
-                                    {p.rewarded} MVE
+                                    {p.rewarded} 포인트
                                 </td>
                             </tr>
                         ))}

@@ -1,6 +1,6 @@
 // src/controllers/metaTransaction.controller.ts
-import express, { Request, Response, Router } from 'express';
-import { MetaTransctionService } from '../services/meta_transction.service.js';
+import express, { Request, Response, Router } from "express";
+import { MetaTransctionService } from "../services/meta_transction.service.js";
 import { ethers } from "ethers";
 
 const router: Router = express.Router();
@@ -20,7 +20,7 @@ export const createWallet = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
- 
+
 // 토큰 생성 관리자 -> 유저
 export const createToken = async (req: Request, res: Response) => {
   const { uid, value } = req.body as { uid: string; value: string };
@@ -35,9 +35,14 @@ export const createToken = async (req: Request, res: Response) => {
     console.log("txMessage", txMessage); // 132여야 정상
     console.log("JSON.stringify(txMessage)", JSON.stringify(txMessage)); // 132여야 정상
 
-    const result = await metaTransctionService.createKGTToken(address, value, messageString, sign);
+    const result = await metaTransctionService.createKGTToken(
+      address,
+      value,
+      messageString,
+      sign
+    );
 
-    console.log("result", result );
+    console.log("result", result);
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -72,7 +77,7 @@ export const getAddressBadge = async (req: Request, res: Response) => {
   }
 };
 
-// 뱃지 조회
+// 뱃지 생성
 export const setAddressBadge = async (req: Request, res: Response) => {
   const { uid } = req.params;
   try {
@@ -148,7 +153,12 @@ export const burnToken = async (req: Request, res: Response) => {
       JSON.stringify(txMessage)
     );
 
-    const result = await metaTransctionService.useKGTToken(sender, value, txMessage, sign);
+    const result = await metaTransctionService.useKGTToken(
+      sender,
+      value,
+      txMessage,
+      sign
+    );
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -157,9 +167,17 @@ export const burnToken = async (req: Request, res: Response) => {
 
 // TunerToken approve
 export const approveTunerToken = async (req: Request, res: Response) => {
-  const { spender, tokenAddress, amount } = req.body as { spender: string; tokenAddress: string; amount?: string };
+  const { spender, tokenAddress, amount } = req.body as {
+    spender: string;
+    tokenAddress: string;
+    amount?: string;
+  };
   try {
-    const result = await metaTransctionService.approveTunerToken(spender, tokenAddress, amount);
+    const result = await metaTransctionService.approveTunerToken(
+      spender,
+      tokenAddress,
+      amount
+    );
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -168,9 +186,15 @@ export const approveTunerToken = async (req: Request, res: Response) => {
 
 // TunerToken revoke approve
 export const revokeTunerToken = async (req: Request, res: Response) => {
-  const { spender, tokenAddress } = req.body as { spender: string; tokenAddress: string };
+  const { spender, tokenAddress } = req.body as {
+    spender: string;
+    tokenAddress: string;
+  };
   try {
-    const result = await metaTransctionService.revokeTunerToken(spender, tokenAddress);
+    const result = await metaTransctionService.revokeTunerToken(
+      spender,
+      tokenAddress
+    );
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -179,22 +203,33 @@ export const revokeTunerToken = async (req: Request, res: Response) => {
 
 // TunerToken allowance 조회
 export const getAllowance = async (req: Request, res: Response) => {
-  const { owner, spender, tokenAddress } = req.body as { owner: string; spender: string; tokenAddress: string };
+  const { owner, spender, tokenAddress } = req.body as {
+    owner: string;
+    spender: string;
+    tokenAddress: string;
+  };
   try {
-    const allowance = await metaTransctionService.getAllowance(owner, spender, tokenAddress);
+    const allowance = await metaTransctionService.getAllowance(
+      owner,
+      spender,
+      tokenAddress
+    );
     res.json({ allowance });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
 
-
-
-export const getCirculatingSupplyController = async (req: Request, res: Response) => {
+export const getCirculatingSupplyController = async (
+  req: Request,
+  res: Response
+) => {
   const { tokenAddress } = req.query as { tokenAddress: string };
 
   try {
-    const result = await metaTransctionService.getCirculatingSupply(tokenAddress);
+    const result = await metaTransctionService.getCirculatingSupply(
+      tokenAddress
+    );
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
