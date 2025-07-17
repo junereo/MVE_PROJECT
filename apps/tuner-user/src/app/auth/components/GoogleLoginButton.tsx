@@ -10,8 +10,6 @@ export default function GoogleLoginButton() {
     `&response_type=code` +
     `&scope=openid%20email%20profile`;
 
-  console.log("GOOGLE_AUTH_URL", GOOGLE_AUTH_URL);
-
   const handleLogin = () => {
     window.location.href = GOOGLE_AUTH_URL;
   };
