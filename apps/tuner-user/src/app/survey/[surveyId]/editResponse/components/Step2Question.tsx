@@ -136,14 +136,6 @@ export default function Step2Question({
     }
   }, [submitAnswers, questions]);
 
-  useEffect(() => {
-    console.log("설문 답변", answers);
-  }, [answers]);
-
-  useEffect(() => {
-    console.log("user.id 확인:", user?.id);
-  }, [user]);
-
   const handlePrev = () => {
     if (tabIndex > 0) {
       setTabIndex((prev) => prev - 1);
@@ -190,14 +182,12 @@ export default function Step2Question({
       status: SurveyStatusEnum.COMPLETE,
       user_info: userPayload,
     };
-    console.log("userPayload", userPayload);
-    console.log("payload", surveyPayload);
 
     try {
       const response = await updateUserInfo(Number(user.id), userPayload);
-      console.log("기본 정보", response);
+
       const res = await postSurveyAnswer(surveyPayload);
-      console.log("설문 참여", res);
+
       sessionStorage.removeItem("editResponseData");
       setSubmitStatus("success");
       resetAnswers();
@@ -233,7 +223,6 @@ export default function Step2Question({
       answers: formattedAnswers,
       status: SurveyStatusEnum.DRAFT,
     };
-    console.log("payload", payload);
 
     try {
       await postSurveyAnswer(payload);

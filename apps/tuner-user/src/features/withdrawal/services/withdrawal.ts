@@ -1,8 +1,8 @@
 import axios from "@/lib/network/axios";
-import { WithdrawalRequest } from "../types/withdrawal";
+import { WithdrawalRequestPayload } from "../types/withdrawal";
 
 // 출금 요청
-export const requestWithdrawal = async (payload: WithdrawalRequest) => {
+export const requestWithdrawal = async (payload: WithdrawalRequestPayload) => {
   const res = await axios.post("/withdraw", payload);
   return res.data;
 };

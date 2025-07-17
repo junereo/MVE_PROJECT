@@ -15,7 +15,6 @@ export const useUser = () => {
   });
 
   useEffect(() => {
-    console.log("getMe 응답:", data);
     if (data) {
       setUser(data); // 로그인 정보 Zustand에 저장
     }

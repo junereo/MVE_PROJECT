@@ -23,8 +23,3 @@ export const updateUserInfo = async (
   const response = await axios.put(`/user/${userId}`, payload);
   return response; // nickname, phone_number, simple_passwoard
 };
-
-// // 리워드 내역
-// export const getUserReward = async () => {
-//   // const response = await axios.get("/users/me/rewards");
-// };

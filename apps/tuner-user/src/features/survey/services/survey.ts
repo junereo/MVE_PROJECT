@@ -53,7 +53,7 @@ export const postSurveyAnswer = async (payload: SurveySubmitPayload) => {
   return res.data;
 };
 
-// 설문 결과 불러오기
+// 설문 통계 데이터
 export const getSurveyResult = async (questionsId: number) => {
   const response = await axios.get(`/survey/r/${questionsId}`);
   return response.data;
