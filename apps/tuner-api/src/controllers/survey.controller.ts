@@ -52,9 +52,11 @@ export const createSurveyHandler = async (req: AuthRequest, res: Response) => {
     console.log("설문 생성 요청 데이터:", data);
 
     // reward_amount가 있는지 확인
-    if (!data.reward_amount || data.reward_amount <= 0) {
-      res.status(400).json({ success: false, message: "reward_amount는 필수이며0커야 합니다." });
-      return;
+    if(data.official){
+      if (!data.reward_amount || data.reward_amount <= 0){
+        res.status(400).json({ success: false, message: "reward_amount는 필수이며0커야 합니다." });
+        return;
+      }
     }
 
     const excute : boolean = false;
