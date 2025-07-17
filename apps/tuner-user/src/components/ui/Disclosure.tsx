@@ -27,7 +27,7 @@ export default function Disclosure({
       <HeadlessDisclosure defaultOpen={defaultOpen}>
         {({ open }) => (
           <>
-            <DisclosureButton className="flex w-full justify-between items-center px-4 py-2 text-sm md:text-base font-semibold text-gray-900 bg-white hover:bg-gray-50 transition">
+            <DisclosureButton className="flex w-full justify-between items-center px-4 py-2 text-sm md:text-base  text-gray-900 bg-white hover:bg-gray-50 transition">
               <span>{title}</span>
               <ChevronUpIcon
                 className={`h- w-5 text-gray-400 transition-transform duration-300 ${

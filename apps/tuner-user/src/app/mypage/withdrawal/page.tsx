@@ -1,6 +1,6 @@
 "use client";
 
-import { Wallet, ArrowDown } from "lucide-react";
+import { Wallet, ArrowDown, ReceiptText } from "lucide-react";
 import { useState } from "react";
 import { requestWithdrawal } from "@/features/withdrawal/services/withdrawal";
 import { useUserStore } from "@/features/users/store/useUserStore";
@@ -33,6 +33,11 @@ export default function Reward() {
     color: "",
   });
   if (!userInfo) return null;
+
+  const point = Math.floor(balance / 1000);
+  const tuner = withdrawals
+    .filter((w) => w.status === "completed")
+    .reduce((acc, cur) => acc + cur.amount, 0);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -98,7 +103,13 @@ export default function Reward() {
           buttonLabel={modalContent.buttonLabel}
           color={modalContent.image === "check.png" ? "blue" : "red"}
           onClose={() => setIsModalOpen(false)}
-          onClick={() => {}}
+          onClick={() => {
+            if (modalContent.image === "check.png") {
+              window.location.reload(); // 출금 성공 시 새로고침
+            } else {
+              setIsModalOpen(false); // 실패 시 그냥 닫기만
+            }
+          }}
         />
       )}
 
@@ -111,14 +122,14 @@ export default function Reward() {
           <div className="flex flex-col gap-3">
             <p className="text-sm text-gray-600">포인트</p>
             <p className="text-gray-800 font-medium ">
-              {balance || 0}{" "}
+              {point || 0}{" "}
               <span className="text-blue-600 font-bold">포인트</span>
             </p>
           </div>
           <div className="flex flex-col gap-3 border-l border-l-gray-200">
             <p className="text-sm text-gray-600">TUNER</p>
             <p className="font-medium text-gray-800">
-              {0} <span className="text-blue-600 font-bold">TUNER</span>
+              {tuner} <span className="text-blue-600 font-bold">TUNER</span>
             </p>
           </div>
         </div>
@@ -138,9 +149,15 @@ export default function Reward() {
             label="출금 금액 (포인트)"
             name="reward"
             type="text"
-            placeholder="예: 1.5 포인트"
+            placeholder="50 포인트 이상 출금 가능합니다."
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              // 숫자 또는 소수점만 허용
+              if (/^[0-9]*\.?[0-9]*$/.test(value) || value === "") {
+                setAmount(value);
+              }
+            }}
           />
 
           <Button type="submit" color="blue">
@@ -151,7 +168,7 @@ export default function Reward() {
 
       <div className="bg-white shadow-sm p-5 space-y-4">
         <div className="flex items-center gap-2">
-          <ArrowDown className="w-5 h-5 text-green-500" />
+          <ReceiptText className="w-5 h-5 text-gray-500" />
           <h2 className="text-base font-semibold text-gray-800">TUNER 내역</h2>
         </div>
         {latest && <LatestRequestCard data={latest} />}

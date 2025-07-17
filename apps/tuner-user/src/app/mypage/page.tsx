@@ -26,7 +26,11 @@ export default function MyPage() {
   const { user } = useAuthStore();
   const { userInfo, setUserInfo } = useUserStore();
   const { answers, setAnswers } = useSurveyAnswerStore();
-  const { setWithdrawals } = useWithdrawalStore();
+  const { withdrawals, setWithdrawals } = useWithdrawalStore();
+
+  const tunerTotal = withdrawals
+    .filter((w) => w.status === "completed")
+    .reduce((sum, w) => sum + w.amount, 0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -55,7 +59,7 @@ export default function MyPage() {
     <div className="bg-gray-100 space-y-2">
       <Breadcrumb crumbs={[{ label: "마이페이지" }]} />
       <UserProfile nickname={userInfo.nickname} role={userInfo.role} />
-      <WalletInfo balance={userInfo.balance} />
+      <WalletInfo balance={userInfo.balance} tuner={tunerTotal} />
 
       <SurveyStats
         title="설문 생성 내역"
