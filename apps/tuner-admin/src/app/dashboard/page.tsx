@@ -7,16 +7,21 @@ import RewardLineChart from './components/Recjarts';
 import SummaryCard from './components/SummaryCard';
 import { surveyList, participantList } from '@/lib/network/api';
 import { SurveyTypeEnum } from '../survey/create/complete/type';
-
 import { useRouter } from 'next/navigation';
 import axiosClient from '@/lib/network/axios';
-interface Survey {
+import {
+    getMonthlyParticipationTrend,
+    getWeeklyParticipationTrend,
+} from '@/utils/chart';
+import Dropdown from '../components/ui/DropDown';
+
+export interface Survey {
     id: number;
     survey_title: string;
     music_title: string;
     is_active: 'upcoming' | 'ongoing' | 'closed';
     status: 'draft' | 'complete';
-    participants: { id: number }[];
+    participants: Participant[];
     reward_amount: number;
     type: SurveyTypeEnum;
     creator: {
@@ -25,11 +30,11 @@ interface Survey {
         role: string;
     };
 }
-
 interface Participant {
     id: number;
     user_id: number;
     survey_id: number;
+    created_at: string;
 }
 
 interface WithdrawalRow {
@@ -45,8 +50,16 @@ const Dashboard = () => {
     useSessionCheck();
 
     const [surveys, setSurveys] = useState<Survey[]>([]);
+    const [chartData, setChartData] = useState<
+        { date: string; participants: number }[]
+    >([]);
+    const [viewMode, setViewMode] = useState<'주간' | '월간'>('주간');
     const [participants, setParticipants] = useState<Participant[]>([]);
     const [withdrawals, setWithdrawals] = useState<WithdrawalRow[]>([]);
+    const [pendingWithdrawalCount, setPendingWithdrawalCount] = useState(0);
+    const [totalRewardDistributed, setTotalRewardDistributed] =
+        useState<number>(0);
+
     useEffect(() => {
         const fetchData = async () => {
             const surveyRes = await surveyList();
@@ -54,14 +67,49 @@ const Dashboard = () => {
             const withdrawalRes = await axiosClient.get(
                 '/contract/tx/pool?status=all',
             );
-            console.log('출금 요청 데이터', withdrawalRes);
 
             setSurveys(surveyRes.data);
             setParticipants(participantRes.data);
             setWithdrawals(withdrawalRes.data);
+
+            const pendingCount = withdrawalRes.data.filter(
+                (item: WithdrawalRow) => item.status === 'pending',
+            ).length;
+            setPendingWithdrawalCount(pendingCount);
+
+            const weekly = getWeeklyParticipationTrend(surveyRes.data);
+            setChartData(weekly);
+
+            try {
+                const userRes = await axiosClient.get('/user');
+                const userList = userRes.data;
+                let total = 0;
+                for (const user of userList) {
+                    try {
+                        const rewardRes = await axiosClient.get(
+                            `/contract/wallet/token/${user.id}`,
+                        );
+                        const reward = Number(rewardRes.data.token ?? 0);
+                        total += isNaN(reward) ? 0 : reward;
+                    } catch (e) {
+                        console.error(`❌ 유저 ${user.id} 리워드 조회 실패`, e);
+                    }
+                }
+                setTotalRewardDistributed(total);
+            } catch (e) {
+                console.error('❌ 전체 유저 목록 또는 리워드 불러오기 실패', e);
+            }
         };
         fetchData();
     }, []);
+    useEffect(() => {
+        if (surveys.length === 0) return;
+        if (viewMode === '주간') {
+            setChartData(getWeeklyParticipationTrend(surveys));
+        } else {
+            setChartData(getMonthlyParticipationTrend(surveys));
+        }
+    }, [viewMode, surveys]);
 
     const totalSurveys = surveys.length;
     const totalParticipants = participants.length;
@@ -116,14 +164,14 @@ const Dashboard = () => {
                         percentage="+8.2%"
                     />
                     <SummaryCard
-                        title="리워드 지급"
-                        value="842"
+                        title="지급된 리워드"
+                        value={totalRewardDistributed.toLocaleString()}
                         trend="Reward Payouts"
                         percentage="+15.4%"
                     />
                     <SummaryCard
-                        title="출금 요청"
-                        value="321"
+                        title="출금 요청 수"
+                        value={pendingWithdrawalCount.toLocaleString()}
                         trend="Withdrawal Requests"
                         percentage="+4.1%"
                     />
@@ -160,10 +208,19 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <div className="bg-white rounded-xl shadow p-4">
-                        <h2 className="text-lg font-semibold mb-2">
-                            설문 참여율
-                        </h2>
-                        <RewardLineChart />
+                        <div className="flex justify-between items-center mb-2">
+                            <h2 className="text-lg font-semibold">
+                                설문 참여율
+                            </h2>
+                            <Dropdown
+                                options={['주간', '월간']}
+                                selected={viewMode}
+                                onSelect={(val) =>
+                                    setViewMode(val as '주간' | '월간')
+                                }
+                            />
+                        </div>
+                        <RewardLineChart data={chartData} viewMode={viewMode} />{' '}
                     </div>
                 </div>
 
@@ -258,7 +315,7 @@ const Dashboard = () => {
                                                     : 'bg-green-100 text-green-700'
                                             }`}
                                         >
-                                            {survey.reward_amount / 1000} MVE
+                                            {survey.reward_amount / 1000} point
                                         </span>
                                     </td>
                                     <td className="border px-2 py-1">
@@ -291,33 +348,41 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {withdrawals.map((row) => (
-                                <tr key={row.id}>
-                                    <td className="border px-2 py-1">
-                                        {row.id}
-                                    </td>
-                                    <td className="border px-2 py-1">
-                                        {row.user_id}
-                                    </td>
-                                    <td className="border px-2 py-1">
-                                        {row.amount}
-                                    </td>
-                                    <td className="border px-2 py-1">
-                                        {row.status}
-                                    </td>
-                                    <td
-                                        className="border px-2 py-1 truncate max-w-[160px]"
-                                        title={row.txhash}
-                                    >
-                                        {row.txhash || '-'}
-                                    </td>
-                                    <td className="border px-2 py-1">
-                                        {new Date(
-                                            row.requested_at,
-                                        ).toLocaleString()}
-                                    </td>
-                                </tr>
-                            ))}
+                            {[...withdrawals]
+                                .filter((row) => row.status === 'pending')
+                                .sort(
+                                    (a, b) =>
+                                        new Date(b.requested_at).getTime() -
+                                        new Date(a.requested_at).getTime(),
+                                )
+                                .slice(0, 10)
+                                .map((row) => (
+                                    <tr key={row.id}>
+                                        <td className="border px-2 py-1">
+                                            {row.id}
+                                        </td>
+                                        <td className="border px-2 py-1">
+                                            {row.user_id}
+                                        </td>
+                                        <td className="border px-2 py-1">
+                                            {row.amount}
+                                        </td>
+                                        <td className="border px-2 py-1">
+                                            {row.status}
+                                        </td>
+                                        <td
+                                            className="border px-2 py-1 truncate max-w-[160px]"
+                                            title={row.txhash}
+                                        >
+                                            {row.txhash || '-'}
+                                        </td>
+                                        <td className="border px-2 py-1">
+                                            {new Date(
+                                                row.requested_at,
+                                            ).toLocaleString()}
+                                        </td>
+                                    </tr>
+                                ))}
                         </tbody>
                     </table>
                 </div>
