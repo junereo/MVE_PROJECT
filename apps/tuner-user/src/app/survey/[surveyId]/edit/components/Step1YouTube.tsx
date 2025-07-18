@@ -55,7 +55,6 @@ export default function Step1YouTube({ onNext }: Step1Props) {
       start_at,
       end_at,
     });
-
     onNext();
   };
 
@@ -99,7 +98,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
       </div>
 
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] h-[72px] bg-white border-t border-gray-200 z-30 flex items-center justify-between gap-3 px-4 py-3">
-        <Button onClick={handleNext} color="blue">
+        <Button onClick={handleNext} color="black">
           다음
         </Button>
       </div>

@@ -75,7 +75,7 @@ export default function FindIdForm() {
               {errorModal.message}
             </p>
           )}
-          <Button type="submit" color="blue">
+          <Button type="submit" color="black">
             아이디 찾기
           </Button>
         </form>
@@ -87,7 +87,7 @@ export default function FindIdForm() {
               {emailResult}
             </p>
           </div>
-          <Button color="blue" onClick={() => router.push("/auth")}>
+          <Button color="black" onClick={() => router.push("/auth")}>
             로그인하러 가기
           </Button>
         </div>

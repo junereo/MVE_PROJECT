@@ -80,6 +80,7 @@ export default function SurveyDetail() {
           youtubeUrl={music_uri}
           title={music_title}
           badgeText={type === "official" ? "공식 설문" : "일반 설문"}
+          type={type}
         />
 
         <div className="flex justify-between items-center mb-4 px-1">
@@ -183,7 +184,7 @@ export default function SurveyDetail() {
               // 참여 전
               <div className="fixed bottom-[65px] left-0 right-0 z-20 px-4 w-full  max-w-[768px] sm:max-w-[640px] xs:max-w-[485px] mx-auto">
                 <Button
-                  color="blue"
+                  color="black"
                   onClick={() => router.push(`/survey/${id}/responses`)}
                 >
                   설문 참여하기

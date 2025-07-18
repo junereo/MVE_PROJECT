@@ -73,13 +73,13 @@ export default function QuestionOptions({
               px-4 py-2 text-sm rounded-xl border transition-all
               ${
                 selected
-                  ? "bg-blue-500 text-white border-blue-500"
+                  ? "bg-[#57CC7E] text-white font-semibold border-[#57CC7E]"
                   : "bg-white text-gray-800 border-gray-300"
               }
               ${
                 isDisabled
                   ? "opacity-50 cursor-not-allowed"
-                  : "hover:border-blue-500"
+                  : "hover:border-[#57CC7E] font-semibold"
               }
               ${optionClassName}
             `}

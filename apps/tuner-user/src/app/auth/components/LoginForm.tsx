@@ -134,10 +134,10 @@ export default function LoginForm() {
             />
           </div>
 
-          <Button type="submit" color="blue">
+          <Button type="submit" color="black">
             로그인
           </Button>
-          <div className="flex justify-center gap-6 text-sm text-blue-500 mt-2">
+          <div className="flex justify-center gap-6 text-sm text-[#57CC7E] font-semibold mt-2">
             <Link href="/auth/find-password" className="hover:underline">
               비밀번호 찾기
             </Link>

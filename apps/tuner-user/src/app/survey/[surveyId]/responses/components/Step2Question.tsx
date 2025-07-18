@@ -293,7 +293,7 @@ export default function Step2Question({
         </div>
         {tabIndex < baseCategories.length - 1 ? (
           <div className="w-[180px] sm:w-[400px]">
-            <Button onClick={handleNext} color="blue">
+            <Button onClick={handleNext} color="black">
               다음
             </Button>
           </div>
@@ -305,7 +305,7 @@ export default function Step2Question({
               </Button>
             </div>
             <div className="w-[110px] sm:w-[300px]">
-              <Button onClick={handleSubmit} disabled={!isValid} color="blue">
+              <Button onClick={handleSubmit} disabled={!isValid} color="black">
                 설문 참여
               </Button>
             </div>

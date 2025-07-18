@@ -75,6 +75,7 @@ export default function Step4Question({
     const getData = async () => {
       try {
         const response = await fetchSurveyQuestions(questionsId);
+        console.log("기본 설문", response);
         if (!response.success || !Array.isArray(response.data)) {
           throw new Error("응답 형식이 올바르지 않습니다.");
         }
@@ -312,7 +313,7 @@ export default function Step4Question({
             </Button>
           </div>
           <div className="w-[180px] sm:w-[400px]">
-            <Button onClick={handleNext} color="blue">
+            <Button onClick={handleNext} color="black">
               다음
             </Button>
           </div>
@@ -331,7 +332,7 @@ export default function Step4Question({
               </Button>
             </div>
             <div className="w-[110px] sm:w-[300px]">
-              <Button onClick={handleSubmit} color="blue">
+              <Button onClick={handleSubmit} color="black">
                 설문 수정
               </Button>
             </div>
