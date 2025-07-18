@@ -313,14 +313,14 @@ export default function SurveyDetailPage() {
                                     {surveyData.is_active === 'upcoming' && (
                                         <Link
                                             href={`/survey/create/step1?id=${surveyData.id}`}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white px-[85px] py-2 text-sm rounded-md font-medium"
+                                            className="bg-blue-500 hover:bg-blue-600 text-white px-[81px] py-2 text-sm rounded-md font-medium"
                                         >
                                             설문 수정하러 가기
                                         </Link>
                                     )}
                                     {surveyData.is_active === 'ongoing' && (
                                         <button
-                                            className="bg-blue-500 hover:bg-blue-600 text-white px-[85px] py-2 text-sm rounded-md font-medium"
+                                            className="bg-blue-500 hover:bg-blue-600 text-white px-[81px] py-2 text-sm rounded-md font-medium"
                                             onClick={async () => {
                                                 try {
                                                     // 조기 종료용 payload 구성
