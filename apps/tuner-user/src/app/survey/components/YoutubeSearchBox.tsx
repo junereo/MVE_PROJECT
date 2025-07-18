@@ -66,14 +66,14 @@ export default function YoutubeSearchBox({
         )}
         <div className="flex gap-2">
           <input
-            className="border p-2 pl-5 flex-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 pl-5 flex-1 rounded focus:outline-none focus:ring-2 focus:ring-[#A2EDB4]"
             placeholder="YOUTUBE 제목 또는 URL 주소를 입력해주세요."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
           <button
-            className="bg-blue-500 text-white px-3 py-1 rounded"
+            className="bg-[#57CC7E] px-3 py-1 rounded"
             onClick={handleSearch}
           >
             검색
@@ -137,7 +137,7 @@ export default function YoutubeSearchBox({
               placeholder="아티스트명을 입력해주세요."
             />
             <button
-              className="text-blue-500 underline text-sm mt-2"
+              className="text-[#57CC7E] underline text-sm mt-2"
               onClick={() => setSelectedVideo(null)}
             >
               ← 다시 선택하기

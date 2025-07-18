@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useSearchSurveyStore } from "@/features/survey/store/useSearchSurveyStore";
+import { useSearchParams } from "next/navigation";
 import { getSurveyList } from "@/features/survey/services/survey";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import { usePagination } from "@/features/survey/hooks/usePagination";
@@ -24,7 +24,8 @@ export default function SearchList() {
   const router = useRouter();
   const [status, setStatus] = useState<Status>("all");
   const [allSurveys, setAllSurveys] = useState<SurveyResponse[]>([]);
-  const { keyword } = useSearchSurveyStore();
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("keyword") || "";
   const [sortOption, setSortOption] = useState<
     "latest" | "oldest" | "participants"
   >("latest");
@@ -97,8 +98,8 @@ export default function SearchList() {
             key={s}
             className={`flex-1 min-w-0 py-1 text-sm sm:text-base transition ${
               status === s
-                ? "bg-blue-500 text-white font-semibold shadow-sm"
-                : "bg-gray-100 text-gray-800 hover:bg-blue-100"
+                ? "bg-[#57CC7E] text-white font-semibold shadow-sm"
+                : "bg-gray-100 text-gray-800 hover:bg-[#E8FDF0]"
             }`}
             onClick={() => setStatus(s)}
           >

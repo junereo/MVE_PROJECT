@@ -1,10 +1,11 @@
 "use client";
 
-import { useSearchSurveyStore } from "@/features/survey/store/useSearchSurveyStore";
+import { useSearchParams } from "next/navigation";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 
 const SearchBreadcrumb = () => {
-  const { keyword } = useSearchSurveyStore();
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("keyword") || "";
 
   return (
     <Breadcrumb

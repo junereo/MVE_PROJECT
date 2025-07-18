@@ -43,28 +43,28 @@ export default function Menubar({ isOpen, onClose }: MenubarProps) {
           <Link
             href="/"
             onClick={onClose}
-            className="hover:text-blue-500 transition"
+            className="hover:text-[#57CC7E] transition"
           >
             홈
           </Link>
           <Link
             href="/survey"
             onClick={onClose}
-            className="hover:text-blue-500 transition"
+            className="hover:text-[#57CC7E] transition"
           >
             설문 목록
           </Link>
           <Link
             href="/survey/create"
             onClick={onClose}
-            className="hover:text-blue-500 transition"
+            className="hover:text-[#57CC7E] transition"
           >
             설문 생성
           </Link>
           <Link
             href="/mypage"
             onClick={onClose}
-            className="hover:text-blue-500 transition"
+            className="hover:text-[#57CC7E] transition"
           >
             마이페이지
           </Link>
