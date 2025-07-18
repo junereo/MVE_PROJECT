@@ -15,8 +15,8 @@ export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
     thumbnail_uri: step1.thumbnail_uri || "",
     music_uri: selectedVideo?.music_uri || "",
 
-    start_at: step1.start_at ? step1.start_at.toISOString() : "",
-    end_at: step1.end_at ? step1.end_at.toISOString() : "",
+    start_at: step1.start_at ? new Date(step1.start_at).toISOString() : "",
+    end_at: step1.end_at ? new Date(step1.end_at).toISOString() : "",
 
     survey_title: step2.survey_title,
     is_released: step2.is_released,
