@@ -11,7 +11,7 @@ export default function QuestionScore({ value, onChange }: Props) {
           key={num}
           className={`py-2 rounded border ${
             value === num
-              ? "bg-blue-500 text-white border-blue-500"
+              ? "bg-[	#57CC7E] text-white border-[	#57CC7E]"
               : "bg-white text-gray-700"
           }`}
           onClick={() => onChange(num)}

@@ -92,7 +92,7 @@ export default function ResetPasswordForm() {
           <p className="text-gray-700 text-sm">
             비밀번호가 성공적으로 변경되었습니다.
           </p>
-          <Button color="blue" onClick={() => router.push("/auth")}>
+          <Button color="black" onClick={() => router.push("/auth")}>
             로그인하러 가기
           </Button>
         </div>
@@ -121,7 +121,7 @@ export default function ResetPasswordForm() {
             placeholder="비밀번호 확인"
             required
           />
-          <Button type="submit" color="blue">
+          <Button type="submit" color="black">
             비밀번호 재설정
           </Button>
         </form>

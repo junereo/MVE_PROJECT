@@ -135,7 +135,7 @@ export default function Reward() {
 
       <div className="bg-white shadow-sm p-5 space-y-4">
         <div className="flex items-center gap-2">
-          <Wallet className="w-5 h-5 text-blue-600" />
+          <Wallet className="w-5 h-5 text-[#57CC7E]" />
           <h2 className="text-base font-semibold text-gray-800">잔액</h2>
         </div>
         <div className="grid grid-flow-col grid-row-2 gap-4 text-center">
@@ -143,13 +143,13 @@ export default function Reward() {
             <p className="text-sm text-gray-600">포인트</p>
             <p className="text-gray-800 font-medium ">
               {point || 0}{" "}
-              <span className="text-blue-600 font-bold">포인트</span>
+              <span className="text-[#57CC7E] font-bold">포인트</span>
             </p>
           </div>
           <div className="flex flex-col gap-3 border-l border-l-gray-200">
             <p className="text-sm text-gray-600">TUNER</p>
             <p className="font-medium text-gray-800">
-              {tuner} <span className="text-blue-600 font-bold">TUNER</span>
+              {tuner} <span className="text-[#57CC7E] font-bold">TUNER</span>
             </p>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function Reward() {
             }}
           />
 
-          <Button color="blue" type="submit" disabled={loading}>
+          <Button color="black" type="submit" disabled={loading}>
             {loading ? "출금 중..." : "출금 신청"}
           </Button>
         </form>

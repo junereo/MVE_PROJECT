@@ -6,6 +6,7 @@ interface YoutubeThumbnailPlayerProps {
   youtubeUrl: string;
   title: string;
   badgeText?: string;
+  type?: "official" | "general";
 }
 
 function extractYoutubeId(url: string): string {
@@ -18,6 +19,7 @@ export default function YoutubeThumbnailPlayer({
   youtubeUrl,
   title,
   badgeText,
+  type,
 }: YoutubeThumbnailPlayerProps) {
   const [showPlayer, setShowPlayer] = useState(false);
   const youtubeId = extractYoutubeId(youtubeUrl);
@@ -48,7 +50,15 @@ export default function YoutubeThumbnailPlayer({
             <Image src="/icons/play.svg" alt="재생" width={60} height={60} />
           </div>
           {badgeText && (
-            <div className="absolute top-3 left-3 px-3 py-1 bg-white/80 text-xs font-medium rounded-full backdrop-blur-sm text-blue-600">
+            <div
+              className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full backdrop-blur-sm
+                ${
+                  type === "official"
+                    ? "bg-[#57CC7E] text-white"
+                    : "bg-gray-100 text-[#57CC7E]"
+                }
+              `}
+            >
               {badgeText}
             </div>
           )}

@@ -74,7 +74,7 @@ export default function RequestPasswordForm() {
               {errorModal.message}
             </p>
           )}
-          <Button type="submit" disabled={isLoading} color="blue">
+          <Button type="submit" disabled={isLoading} color="black">
             {isLoading ? "요청 중..." : "비밀번호 재설정 메일 받기"}
           </Button>
         </form>
@@ -83,7 +83,9 @@ export default function RequestPasswordForm() {
           <div className="text-center space-y-4 border border-gray-100 bg-gray-50 px-6 py-8">
             <p className="text-sm text-gray-500">안내 메시지</p>
             <p className="text-base font-semibold text-gray-800 break-words">
-              비밀번호 재설정 링크가 이메일로 전송되었습니다.
+              비밀번호 재설정 링크가
+              <br />
+              이메일로 전송되었습니다.
               <br />
               메일함을 확인해 주세요.
             </p>

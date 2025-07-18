@@ -1,38 +1,17 @@
-"use client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import ParticipantsSurvey from "./ParticipantsSurvey";
+import { getMySurveyAnswerForSSR } from "@/features/users/services/getMySurveyAnswerForSSR";
 
-import Breadcrumb from "@/components/ui/Breadcrumb";
-import Link from "next/link";
-import { Plus } from "lucide-react";
-import ParticipantsList from "./components/participantsList";
+export default async function ParticipantsSurveyPage() {
+  const accessToken = cookies().get("token")?.value;
 
-export default function ParticipantsSurvey() {
-  return (
-    <>
-      <Breadcrumb
-        crumbs={[
-          { label: "마이페이지", href: "/mypage" },
-          { label: "설문 참여 내역" },
-        ]}
-      />
-      <section className="flex items-end justify-between mb-6">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-gray-900">참여 설문 목록</h1>
-          <p className="text-sm text-gray-500">참여한 설문들을 확인해보세요.</p>
-        </div>
+  if (!accessToken) {
+    redirect("/auth"); // 로그인 안 됐으면 바로 로그인 페이지로
+  }
 
-        <Link
-          href="/survey/create"
-          className="inline-flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
-        >
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">설문 생성</span>
-          <span className="sm:hidden">생성</span>
-        </Link>
-      </section>
+  const res = await getMySurveyAnswerForSSR();
+  const answers = res.data;
 
-      <section className="space-y-3 pb-8">
-        <ParticipantsList />
-      </section>
-    </>
-  );
+  return <ParticipantsSurvey answers={answers} />;
 }

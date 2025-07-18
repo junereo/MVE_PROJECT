@@ -75,7 +75,7 @@ export default function Card({
               alt={`card ${item.id}`}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
+              className="object-contain"
             />
           </div>
           <div className="p-3 space-y-1">

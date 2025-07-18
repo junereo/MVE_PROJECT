@@ -19,7 +19,7 @@ export default function UserProfile({ nickname, role }: UserProfileProps) {
       </div>
       <div className="flex flex-col gap-2">
         <Link href="/mypage/profile">
-          <button className="px-4 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition">
+          <button className="px-4 py-1 text-sm flex items-center gap-1 border border-[#57CC7E] text-[#57CC7E] font-semibold rounded-md hover:bg-[#E8FDF0] transition">
             프로필 관리
           </button>
         </Link>

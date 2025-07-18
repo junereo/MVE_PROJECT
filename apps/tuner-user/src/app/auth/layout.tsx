@@ -1,4 +1,3 @@
-import BottomNavbar from "@/components/layouts/BottomNavbar";
 import Wrapper from "@/components/layouts/Wrapper";
 
 export default function MainLayout({
@@ -9,7 +8,6 @@ export default function MainLayout({
   return (
     <>
       <Wrapper>{children}</Wrapper>
-      <BottomNavbar />
     </>
   );
 }

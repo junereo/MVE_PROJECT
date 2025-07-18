@@ -53,7 +53,7 @@ export default function DateRangePicker({
             key={d}
             type="button"
             onClick={() => handleQuickRange(d)}
-            className="px-3 py-1.5 rounded-full border border-blue-700 text-sm text-blue-700 hover:text-white hover:bg-blue-700 transition"
+            className="px-3 py-1.5 rounded-full border border-[#57CC7E] text-[#57CC7E] text-sm  hover:text-white hover:bg-[#57CC7E] font-semibold transition"
           >
             {d === 0 ? "오늘" : `${d}일`}
           </button>
