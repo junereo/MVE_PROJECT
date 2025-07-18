@@ -1,5 +1,5 @@
 interface ButtonProps {
-  color: "blue" | "yellow" | "white" | "red" | "green";
+  color: "blue" | "yellow" | "white" | "red" | "green" | "black";
   children?: React.ReactNode;
   type?: "submit" | "button";
   onClick?: () => void;
@@ -21,6 +21,7 @@ const Button = ({
     white: "bg-white border border-gray-100 hover:bg-gray-100 text-black",
     red: "bg-red-500 hover:bg-red-600 text-white",
     green: "bg-[#69E38C] hover:bg-[#57CC7E] text-black",
+    black: "bg-black hover:bg-neutral-800 text-white",
   };
 
   return (

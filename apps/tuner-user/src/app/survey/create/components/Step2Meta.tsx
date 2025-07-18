@@ -125,7 +125,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
           </Button>
         </div>
         <div className="w-[180px] sm:w-[400px]">
-          <Button onClick={handleNext} disabled={!isValid} color="green">
+          <Button onClick={handleNext} disabled={!isValid} color="black">
             다음
           </Button>
         </div>

@@ -298,7 +298,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
             </Button>
           </div>
           <div className="w-[180px] sm:w-[400px]">
-            <Button onClick={handleNext} color="green">
+            <Button onClick={handleNext} color="black">
               다음
             </Button>
           </div>
@@ -317,7 +317,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
               </Button>
             </div>
             <div className="w-[110px] sm:w-[300px]">
-              <Button onClick={handleSubmit} color="green">
+              <Button onClick={handleSubmit} color="black">
                 설문 생성
               </Button>
             </div>

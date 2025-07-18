@@ -180,7 +180,7 @@ export default function Reward() {
             }}
           />
 
-          <Button color="green" type="submit" disabled={loading}>
+          <Button color="black" type="submit" disabled={loading}>
             {loading ? "출금 중..." : "출금 신청"}
           </Button>
         </form>

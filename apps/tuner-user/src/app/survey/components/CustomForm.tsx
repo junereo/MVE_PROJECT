@@ -177,7 +177,7 @@ export default function CustomForm({
         </div>
       ))}
 
-      <Button onClick={onAdd} color="green">
+      <Button onClick={onAdd} color="black">
         커스텀 설문 추가
       </Button>
     </div>

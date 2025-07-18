@@ -134,7 +134,7 @@ export default function LoginForm() {
             />
           </div>
 
-          <Button type="submit" color="green">
+          <Button type="submit" color="black">
             로그인
           </Button>
           <div className="flex justify-center gap-6 text-sm text-[#57CC7E] font-semibold mt-2">

@@ -183,7 +183,7 @@ export default function SignupForm() {
             required
           />
         </div>
-        <Button type="submit" color="green">
+        <Button type="submit" color="black">
           가입하기
         </Button>
       </form>

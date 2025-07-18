@@ -74,7 +74,7 @@ export default function RequestPasswordForm() {
               {errorModal.message}
             </p>
           )}
-          <Button type="submit" disabled={isLoading} color="green">
+          <Button type="submit" disabled={isLoading} color="black">
             {isLoading ? "요청 중..." : "비밀번호 재설정 메일 받기"}
           </Button>
         </form>

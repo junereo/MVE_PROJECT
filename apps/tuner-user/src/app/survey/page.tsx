@@ -25,7 +25,7 @@ export default function Survey() {
 
           <Link
             href="/survey/create"
-            className="inline-flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold bg-[#69E38C] hover:bg-[#57CC7E] text-black rounded-md transition"
+            className="inline-flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold bg-black hover:bg-neutral-800 text-white rounded-md transition"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">설문 생성</span>

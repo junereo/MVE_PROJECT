@@ -27,7 +27,7 @@ export default function ParticipantsSurvey({ answers }: Props) {
 
         <Link
           href="/survey/create"
-          className="inline-flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold border border-[#57CC7E] text-[#57CC7E] bg-white rounded-md hover:bg-[#57CC7E] hover:text-white transition"
+          className="inline-flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold bg-black hover:bg-neutral-800 text-white rounded-md transition"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">설문 생성</span>
