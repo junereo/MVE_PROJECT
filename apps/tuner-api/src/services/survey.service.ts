@@ -372,7 +372,9 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
   const kstNow = DateTime.now().setZone("Asia/Seoul");
 
   const start_at = body.start_at ? new Date(body.start_at) : kstNow.toJSDate();
-  const end_at = kstNow.endOf("day").toJSDate();
+  const end_at = body.end_at
+    ? new Date(body.end_at)
+    : kstNow.endOf("day").toJSDate();
 
   if (start_at >= end_at) {
     throw new Error("종료일은 시작일 이후여야 합니다.");
@@ -386,6 +388,7 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
       end_at,
       status: body.status ?? survey.status,
       is_active: checkSurveyActive(start_at, end_at),
+      survey_question: body.survey_question ?? [],
     },
   });
 
