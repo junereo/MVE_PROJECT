@@ -35,7 +35,7 @@ export default function SurveyParticipantsPage() {
                 const result = await surveyView(Array.isArray(id) ? id[0] : id);
                 const rawParticipants = result.data
                     .participants as Participant[];
-                console.log('참여자 데이터', rawParticipants);
+                // console.log('참여자 데이터', rawParticipants);
 
                 const enriched = rawParticipants.map((p) => ({
                     ...p,
