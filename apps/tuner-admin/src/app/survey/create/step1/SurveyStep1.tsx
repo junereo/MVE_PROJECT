@@ -48,7 +48,6 @@ const SurveyStep1 = () => {
                 // 설문 수정
                 try {
                     const { data } = await surveyView(id);
-                    // console.log(data);
 
                     setStep1({
                         youtubeVideoId: data.music_id,
@@ -69,9 +68,10 @@ const SurveyStep1 = () => {
                         reward: data.reward,
                         expertReward: data.expert_reward,
                         surveyId: data.id.toString(),
-                        thumbnail_uri: data.thumbnail_uri ?? '', // 사용자가 업로드한 썸네일 수정시 받아오기
-                        surveyQuestionsRaw: data.survey_question, // 사용자가 업로드한 설문정보 step2 에서 이걸로 설문을 데이터를 수정
+                        thumbnail_uri: data.thumbnail_uri ?? '',
+                        surveyQuestionsRaw: data.survey_question,
                     });
+
                     setRewardInput({
                         reward_amount: data.reward_amount
                             ? (data.reward_amount / 1000).toString()
@@ -87,15 +87,31 @@ const SurveyStep1 = () => {
                     console.error('❌ 수정 설문 불러오기 실패:', err);
                 }
             } else if (videoId && title && thumbnail && isFromSearch) {
-                setStep1({
-                    youtubeVideoId: videoId,
-                    youtubeTitle: title,
-                    youtubeThumbnail: thumbnail,
-                    channelTitle: channelTitle ?? '',
-                    url: `https://www.youtube.com/watch?v=${videoId}`,
-                    title,
-                    artist: channelTitle || '',
-                });
+                // 기본 썸네일을 base64로 불러오기
+                try {
+                    const res = await fetch('/logo.png');
+                    const blob = await res.blob();
+                    const reader = new FileReader();
+
+                    reader.onloadend = () => {
+                        const base64 = reader.result as string;
+
+                        setStep1({
+                            youtubeVideoId: videoId,
+                            youtubeTitle: title,
+                            youtubeThumbnail: thumbnail,
+                            channelTitle: channelTitle ?? '',
+                            url: `https://www.youtube.com/watch?v=${videoId}`,
+                            title,
+                            artist: channelTitle || '',
+                            thumbnail_uri: base64, // 기본 썸네일 적용
+                        });
+                    };
+
+                    reader.readAsDataURL(blob);
+                } catch (err) {
+                    console.error('기본 썸네일 불러오기 실패:', err);
+                }
             }
         };
 
@@ -246,10 +262,13 @@ const SurveyStep1 = () => {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="w-[280px] h-[180px] border-2 border-dashed border-gray-400 rounded flex items-center justify-center mb-2">
-                                                <span className="text-gray-500">
-                                                    썸네일 미리보기 없음
-                                                </span>
+                                            <div className="w-[280px] h-[180px] relative border mb-2 rounded overflow-hidden bg-white">
+                                                <Image
+                                                    alt="기본 썸네일"
+                                                    src="/logo.png" // public/logo.png 기준
+                                                    fill
+                                                    className="object-contain"
+                                                />
                                             </div>
                                         )}
 
