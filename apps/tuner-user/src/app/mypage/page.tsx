@@ -1,15 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuthGuard } from "@/features/auth/hooks/useAuthGuard";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useUserStore } from "@/features/users/store/useUserStore";
 import { useSurveyAnswerStore } from "@/features/users/store/useSurveyAnswerStore";
+import { useWithdrawalStore } from "@/features/withdrawal/store/useWithdrawalStore";
 
 import { getUserInfo } from "@/features/users/services/user";
 import { getMySurveyAnswer } from "@/features/users/services/survey";
 import { getUserWithdrawals } from "@/features/withdrawal/services/withdrawal";
+import { getAddressToken } from "@/features/withdrawal/services/contract";
 
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import UserProfile from "./components/UserProfile";
@@ -25,25 +27,27 @@ export default function MyPage() {
   const { user } = useAuthStore();
   const { userInfo, setUserInfo } = useUserStore();
   const { answers, setAnswers } = useSurveyAnswerStore();
+  const { setWithdrawals } = useWithdrawalStore();
+  const [tuner, setTuner] = useState<number>(0);
 
   useEffect(() => {
     const fetchUser = async () => {
       if (user?.id) {
         const res = await getUserInfo(Number(user.id));
         const data = await getMySurveyAnswer();
-        console.log("참여 설문 응답 결과", data.data);
         const result = await getUserWithdrawals(Number(user.id));
-        console.log("출금 내역", result);
+        const tunerRes = await getAddressToken(Number(user.id));
+
         setUserInfo(res.data);
         setAnswers(data.data);
+        setWithdrawals(result.data);
+        const parsed = Number(tunerRes.token);
+        setTuner(isNaN(parsed) ? 0 : parsed);
       }
     };
-    setTimeout(() => {
-      console.log("참여 설문 상태", useSurveyAnswerStore.getState().answers);
-    }, 100);
 
     fetchUser();
-  }, [user, setUserInfo, setAnswers]);
+  }, [user, setUserInfo, setAnswers, setWithdrawals]);
 
   if (!isInitialized || !userInfo) return null;
 
@@ -51,7 +55,7 @@ export default function MyPage() {
     <div className="bg-gray-100 space-y-2">
       <Breadcrumb crumbs={[{ label: "마이페이지" }]} />
       <UserProfile nickname={userInfo.nickname} role={userInfo.role} />
-      <WalletInfo balance={userInfo.balance} />
+      <WalletInfo balance={userInfo.balance} tuner={tuner} />
 
       <SurveyStats
         title="설문 생성 내역"

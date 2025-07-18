@@ -3,11 +3,8 @@ import { LoginFormData, LoginFormErrors } from "../types";
 // 로그인 입력값 유효성 검사
 export const validateLoginField = (
   field: keyof LoginFormData,
-  value: string,
-  formData: LoginFormData
+  value: string
 ): string => {
-  console.log(formData);
-
   switch (field) {
     case "email":
       return /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i.test(
@@ -28,7 +25,7 @@ export const allLoginFields = (formData: LoginFormData): LoginFormErrors => {
 
   // 각 필드에 대해 유효성 검사 수행
   (Object.keys(formData) as (keyof LoginFormData)[]).forEach((field) => {
-    const error = validateLoginField(field, formData[field], formData); // 각 필드에 대해 유효성 검사 수행
+    const error = validateLoginField(field, formData[field]); // 각 필드에 대해 유효성 검사 수행
     if (error) errors[field] = error; // 에러 있는 경우 errors 객체에 추가
   });
   return errors;

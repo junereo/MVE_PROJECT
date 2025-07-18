@@ -160,7 +160,6 @@ export default function FixedQuestionTemplatePage() {
                 question_type: Question_type.fixed,
                 question_order: 1,
             };
-            console.log('페이로드', payload);
 
             await createTemplate(payload);
             alert('저장 완료!');
@@ -182,7 +181,7 @@ export default function FixedQuestionTemplatePage() {
     return (
         <div className="">
             <div className="w-full  text-black text-2xl py-3  font-bold">
-                fixedQuestion
+                고정 질문
             </div>
             <div className="p-6">
                 <div className="flex justify-center">

@@ -24,10 +24,8 @@ interface Participant {
         nickname: string;
         role: string;
     };
-    reward: number;
-    answers: {
-        answers: AnswerItem[];
-    };
+    rewarded: number;
+    answers: AnswerItem[];
 }
 
 export default function ParticipantDetailPage() {
@@ -51,15 +49,11 @@ export default function ParticipantDetailPage() {
                     answers: { answers: Omit<AnswerItem, 'question_type'>[] };
                 }) => String(item.user_id) === String(userId),
             );
+
             if (!p) return;
 
-            const reward =
-                p.user.badge_issued_at !== null
-                    ? result.data.expert_reward
-                    : result.data.reward;
-
             const enrichedAnswers: AnswerItem[] = (
-                p.answers.answers as Omit<AnswerItem, 'question_type'>[]
+                p.answers as Omit<AnswerItem, 'question_type'>[]
             ).map((a) => {
                 const match = surveyQs.find(
                     (q) => q.question_text === a.question_text,
@@ -77,8 +71,8 @@ export default function ParticipantDetailPage() {
             });
             setParticipant({
                 user: p.user,
-                reward,
-                answers: { answers: enrichedAnswers },
+                rewarded: p.rewarded,
+                answers: enrichedAnswers,
             });
         };
 
@@ -87,11 +81,11 @@ export default function ParticipantDetailPage() {
 
     if (!participant) return <div className="p-6">로딩 중...</div>;
 
-    const fixedAnswers = participant.answers.answers.filter(
+    const fixedAnswers = participant.answers.filter(
         (q) => q.question_type === Question_type.fixed,
     );
 
-    const customAnswers = participant.answers.answers.filter(
+    const customAnswers = participant.answers.filter(
         (q) => q.question_type === Question_type.custom,
     );
 
@@ -124,7 +118,7 @@ export default function ParticipantDetailPage() {
 
     return (
         <>
-            <div className="text-2xl font-bold py-3">User Survey View</div>
+            <div className="text-2xl font-bold py-3">유저 설문 정보</div>
             <div className="p-6 space-y-6">
                 <div className="mb-6 border p-4 rounded bg-gray-50">
                     <p>
@@ -134,7 +128,8 @@ export default function ParticipantDetailPage() {
                         등급: <strong>{participant.user.role}</strong>
                     </p>
                     <p>
-                        지급 리워드: <strong>{participant.reward} STK</strong>
+                        지급 리워드:{' '}
+                        <strong>{participant.rewarded} 포인트</strong>
                     </p>
                 </div>
 

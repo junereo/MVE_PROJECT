@@ -23,12 +23,6 @@ export default function EditResponseClient({
   const { isInitialized } = useAuthGuard();
   const { Funnel, setStep } = useFunnel<Step>("step1");
 
-  console.log("🔍 [EditResponseClient] props", {
-    surveyId,
-    surveyTitle,
-    submitAnswers,
-  });
-
   if (!isInitialized) return null;
 
   return (

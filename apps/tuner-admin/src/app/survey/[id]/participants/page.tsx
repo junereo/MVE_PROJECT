@@ -9,10 +9,12 @@ interface Participant {
     user: {
         id: number;
         nickname: string;
-        role: 'ordinary' | 'Expert' | 'admin' | 'superadmin';
+        role: 'ordinary' | 'expert' | 'admin' | 'superadmin';
         badge_issued_at: string | null;
     };
-    reward: number;
+    rewarded: number;
+    status: string;
+    created_at: string;
 }
 
 export default function SurveyParticipantsPage() {
@@ -67,9 +69,8 @@ export default function SurveyParticipantsPage() {
     return (
         <div>
             <div className="w-full  text-black text-2xl py-3  font-bold">
-                Survey User List
+                설문 참여 리스트
             </div>
-
             <div className="flex justify-between items-center mb-4">
                 <select
                     value={filter}
@@ -81,42 +82,69 @@ export default function SurveyParticipantsPage() {
                 >
                     <option value="전체">전체</option>
                     <option value="ordinary">일반</option>
-                    <option value="Expert">Expert</option>
+                    <option value="expert">expert</option>
                 </select>
+
+                <span className="text-sm text-gray-600">
+                    ※ 설문이 완료되어야 실제 지급된 리워드가 표시됩니다.
+                </span>
             </div>
-
-            <table className="w-full border text-sm text-center">
-                <thead className="bg-gray-100">
-                    <tr>
-                        <th className="border px-2 py-1">ID</th>
-                        <th className="border px-2 py-1">닉네임</th>
-                        <th className="border px-2 py-1">등급</th>
-                        <th className="border px-2 py-1">리워드</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {pageData.map((p) => (
-                        <tr
-                            key={p.user.id}
-                            className="hover:bg-gray-100 cursor-pointer"
-                            onClick={() =>
-                                router.push(
-                                    `/survey/${id}/participants/${p.user.id}`,
-                                )
-                            }
-                        >
-                            <td className="border px-2 py-1">{p.user.id}</td>
-                            <td className="border px-2 py-1">
-                                {p.user.nickname}
-                            </td>
-                            <td className="border px-2 py-1">{p.user.role}</td>
-                            <td className="border px-2 py-1">{p.reward} STK</td>
+            <div className="bg-white rounded-xl shadow p-4 w-full">
+                <table className="w-full border text-sm text-center">
+                    <thead className="bg-gray-100">
+                        <tr>
+                            <th className="border px-2 py-1 w-[40px]">ID</th>
+                            <th className="border px-2 py-1  w-[150px]">
+                                닉네임
+                            </th>
+                            <th className="border px-2 py-1  w-[150px]">
+                                등급
+                            </th>
+                            <th className="border px-2 py-1  w-[250px]">
+                                참여시각
+                            </th>
+                            <th className="border px-2 py-1  w-[40px]">
+                                지급여부
+                            </th>
+                            <th className="border px-2 py-1  w-[40px]">
+                                리워드
+                            </th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
 
+                    <tbody>
+                        {pageData.map((p) => (
+                            <tr
+                                key={p.user.id}
+                                className="hover:bg-gray-100 cursor-pointer"
+                                onClick={() =>
+                                    router.push(
+                                        `/survey/${id}/participants/${p.user.id}`,
+                                    )
+                                }
+                            >
+                                <td className="border px-2 py-1">
+                                    {p.user.id}
+                                </td>
+                                <td className="border px-2 py-1">
+                                    {p.user.nickname}
+                                </td>
+                                <td className="border px-2 py-1">
+                                    {p.user.role}
+                                </td>
+                                <td className="border px-2 py-1 w-[160px]">
+                                    {p.created_at.split('T')[0]}{' '}
+                                    {p.created_at.split('T')[1]?.slice(0, 8)}
+                                </td>
+                                <td className="border px-2 py-1">{p.status}</td>
+                                <td className="border px-2 py-1 w-[100px]">
+                                    {p.rewarded} 포인트
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
             {totalPages > 1 && (
                 <div className="mt-4 flex justify-center gap-2">
                     {Array.from({ length: totalPages }).map((_, i) => (

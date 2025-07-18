@@ -129,17 +129,17 @@ export default function SurveyComplete() {
     const router = useRouter();
     const handleSubmit = async () => {
         try {
-            console.log(' 전송 데이터:', serverPayload);
+            // console.log(' 전송 데이터:', serverPayload);
 
             if (step1.surveyId) {
                 // 수정 (PUT)
                 const id = Number(step1.surveyId);
                 await surveyPut(serverPayload, id);
-                console.log('수정 완료');
+                // console.log('수정 완료');
             } else {
                 // 새로 생성 (POST)
                 await surveyCreate(serverPayload);
-                console.log('생성 완료');
+                // console.log('생성 완료');
             }
 
             alert('서버로 보낼 JSON을 콘솔과 화면에 출력했습니다.');
@@ -153,7 +153,7 @@ export default function SurveyComplete() {
     return (
         <div>
             <div className="w-full font-bold text-black text-2xl py-3">
-                Survey create Complete
+                설문 만들기 제출
             </div>
             <div className="p-6">
                 <div className="flex justify-center">

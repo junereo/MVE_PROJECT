@@ -130,16 +130,16 @@ export default function SurveyStep2() {
                         template_id: step2.template_id ?? 1,
                     });
 
-                    console.log('✅ 설문 수정 로드 완료');
+                    // console.log('설문 수정 로드 완료');
                 } catch (err) {
-                    console.error('❌ 수정 설문 불러오기 실패:', err);
+                    console.error('수정 설문 불러오기 실패:', err);
                 }
             } else {
                 // 새 설문인 경우 템플릿 불러오기
                 try {
                     const templateId = 1;
                     const { data } = await fetchTemplates(templateId);
-                    console.log('템플릿', data);
+                    // console.log('템플릿', data);
 
                     const template = data[0]?.question;
                     const parsed: Record<string, Question[]> = {};
@@ -417,8 +417,8 @@ export default function SurveyStep2() {
         };
 
         try {
-            const res = await surveyCreate(draftPayload);
-            console.log(res);
+            await surveyCreate(draftPayload);
+            // console.log(res);
 
             alert('임시 저장 완료!');
             router.push('/survey');
@@ -490,7 +490,7 @@ export default function SurveyStep2() {
     return (
         <div>
             <div className="w-full text-black font-bold text-2xl py-3">
-                Survey create Step2
+                설문 만들기 Step2
             </div>
             <div className="p-6">
                 <div className="flex justify-center">

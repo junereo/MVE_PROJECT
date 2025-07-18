@@ -84,7 +84,7 @@ export default function Step2Question({
     if (step4.questions.length === 0 && step4.customQuestions.length === 0) {
       getSurveyById(surveyId).then((res) => {
         const rawQuestions = res.survey_question;
-        console.log("rawQuestions", rawQuestions);
+
         if (!Array.isArray(rawQuestions) || rawQuestions.length === 0) {
           console.error("질문이 없습니다.");
           return;
@@ -134,15 +134,7 @@ export default function Step2Question({
         setAnswer(category, question.id, validAnswer);
       });
     }
-  }, [submitAnswers, questions]);
-
-  useEffect(() => {
-    console.log("설문 답변", answers);
-  }, [answers]);
-
-  useEffect(() => {
-    console.log("user.id 확인:", user?.id);
-  }, [user]);
+  }, [submitAnswers, questions, setAnswer]);
 
   const handlePrev = () => {
     if (tabIndex > 0) {
@@ -190,14 +182,12 @@ export default function Step2Question({
       status: SurveyStatusEnum.COMPLETE,
       user_info: userPayload,
     };
-    console.log("userPayload", userPayload);
-    console.log("payload", surveyPayload);
 
     try {
-      const response = await updateUserInfo(Number(user.id), userPayload);
-      console.log("기본 정보", response);
-      const res = await postSurveyAnswer(surveyPayload);
-      console.log("설문 참여", res);
+      await updateUserInfo(Number(user.id), userPayload);
+
+      await postSurveyAnswer(surveyPayload);
+
       sessionStorage.removeItem("editResponseData");
       setSubmitStatus("success");
       resetAnswers();
@@ -233,7 +223,6 @@ export default function Step2Question({
       answers: formattedAnswers,
       status: SurveyStatusEnum.DRAFT,
     };
-    console.log("payload", payload);
 
     try {
       await postSurveyAnswer(payload);

@@ -30,7 +30,6 @@ export default function MainSurveyList({
     const fetchSurveys = async () => {
       try {
         const res = await getSurveyList();
-        console.log("설문정보", res.data);
         const sorted = res.data.sort((a: SurveyResponse, b: SurveyResponse) => {
           return (
             new Date(b.start_at).getTime() - new Date(a.start_at).getTime()
@@ -52,7 +51,7 @@ export default function MainSurveyList({
     };
 
     fetchSurveys();
-  }, [status]);
+  }, [status, submitStatus]);
 
   return surveys.length === 0 ? (
     <div className="flex flex-col items-center justify-center pt-10 text-gray-400 w-full col-span-2">

@@ -84,7 +84,7 @@ export default function List({
 
         {reward !== undefined && surveyType === SurveyTypeEnum.OFFICIAL && (
           <p className="text-xs sm:text-sm text-orange-500 font-medium">
-            🎁 {reward / 1000} STK
+            🎁 {reward / 1000} MVE
           </p>
         )}
       </div>

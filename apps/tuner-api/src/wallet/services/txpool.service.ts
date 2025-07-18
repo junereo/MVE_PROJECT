@@ -33,7 +33,7 @@ export class TxPoolService {
     }
 
     async init(): Promise<void> {
-        this.provider = new JsonRpcProvider(process.env.SEPLOIA_RPC_URL!);
+        this.provider = new JsonRpcProvider(process.env.KAIROS_RPC_URL!);
         this.wallet = new Wallet(process.env.WALLET_PRIVATE_KEY!, this.provider);
         // DB에서 ABI 동적 로드
         const latest = await this.tunerContractService.getLatestContract();
@@ -67,17 +67,35 @@ export class TxPoolService {
     const messageString = JSON.stringify(txMessage);
     const signature = await this.metaService.createSign(singer_wallet, messageString);
 
-    // WithdrawalRequest 생성
-    const withdrawal = await prisma.withdrawalRequest.create({
-      data: {
-        user_id: Number(uid),
-        amount: Number(message),
-        status: 'pending',
-        txhash: '',
-        message: messageString,
-        signature: signature,
-      },
-    });
+    // 차감할 금액
+    const amount = Number(message);
+
+    const user = await prisma.user.findUnique({ where: { id: Number(uid) } });
+    if (!user || user.balance < amount) {
+      throw new Error('잔액이 부족합니다.');
+    }
+
+    // 트랜잭션으로 withdrawalRequest 생성 + balance 차감
+    const [withdrawal] = await prisma.$transaction([
+      prisma.withdrawalRequest.create({
+        data: {
+          user_id: Number(uid),
+          amount: amount,
+          status: 'pending',
+          txhash: '',
+          message: messageString,
+          signature: signature,
+        },
+      }),
+      prisma.user.update({
+        where: { id: Number(uid) },
+        data: {
+          balance: {
+            decrement: amount * 1000, // balance에서 amount만큼 차감
+          },
+        },
+      }),
+    ]);
 
     // 필요하다면 withdrawal 정보 반환
     return withdrawal;

@@ -47,11 +47,15 @@ export default function LoginForm() {
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
     setFormData(updated);
-    const error = validateLoginField(
-      name as keyof LoginFormData,
-      value,
-      updated
-    );
+    const error = (() => {
+      const baseError = validateLoginField(name as keyof LoginFormData, value);
+      if (name === "confirmPassword" && updated.password !== value) {
+        return "비밀번호가 일치하지 않습니다.";
+      }
+
+      return baseError;
+    })();
+
     setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
@@ -133,12 +137,17 @@ export default function LoginForm() {
           <Button type="submit" color="blue">
             로그인
           </Button>
-          <Link
-            href="/auth/signup"
-            className="text-center text-blue-400 hover:underline mt-2 mb-2"
-          >
-            아직 계정이 없으신가요? 회원가입
-          </Link>
+          <div className="flex justify-center gap-6 text-sm text-blue-500 mt-2">
+            <Link href="/auth/find-password" className="hover:underline">
+              비밀번호 찾기
+            </Link>
+            <Link href="/auth/find-id" className="hover:underline">
+              이메일 찾기
+            </Link>
+            <Link href="/auth/signup" className="hover:underline">
+              회원가입
+            </Link>
+          </div>
         </form>
       </div>
     </>

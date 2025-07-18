@@ -11,7 +11,6 @@ import { useSurveyInfo } from "@/features/users/store/useSurveyInfo";
 import { InputTypeEnum } from "@/features/survey/types/enums";
 import QuestionText from "@/app/survey/components/QuestionText";
 import QuestionOptions from "@/app/survey/components/QuestionOptions";
-import { useUserStore } from "@/features/users/store/useUserStore";
 import {
   AgeKey,
   ageMap,
@@ -56,7 +55,6 @@ export default function Step1Info({
       try {
         if (!user?.id) return;
         const data = await getUserInfo(Number(user.id));
-        console.log("설문 참여 시 기본 정보", data.data);
         const uiInfo = mapUserInfo(data.data);
         setUserInfo(uiInfo); // ← 여기서 최신 정보 세팅
       } catch (err) {
@@ -65,21 +63,12 @@ export default function Step1Info({
     };
 
     fetchUserInfo();
-  }, [setUserInfo]);
+  }, [setUserInfo, user?.id]);
 
   const handleNext = () => {
     setUserInfo({ gender, age, genre, jobDomain });
     onNext();
   };
-
-  useEffect(() => {
-    console.log("설문 기본 정보 상태 변경됨", {
-      gender,
-      age,
-      genre,
-      jobDomain,
-    });
-  }, [gender, age, genre, jobDomain]);
 
   const isValid = gender && age && genre && typeof jobDomain === "boolean";
 

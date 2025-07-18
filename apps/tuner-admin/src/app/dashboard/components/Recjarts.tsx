@@ -1,5 +1,4 @@
-'use client'; // Next.js App Router라면 필요
-
+'use client';
 import {
     LineChart,
     Line,
@@ -10,17 +9,12 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 
-// 샘플 데이터
-const data = [
-    { month: 'Jan', reward: 700 },
-    { month: 'Feb', reward: 650 },
-    { month: 'Mar', reward: 800 },
-    { month: 'Apr', reward: 1000 },
-    { month: 'May', reward: 1200 },
-    { month: 'Jun', reward: 1350 },
-];
+interface RewardLineChartProps {
+    data: { date?: string; month?: string; participants: number }[];
+    viewMode: '주간' | '월간';
+}
 
-const RewardLineChart = () => {
+const RewardLineChart = ({ data, viewMode }: RewardLineChartProps) => {
     return (
         <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -29,13 +23,35 @@ const RewardLineChart = () => {
                     margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
                 >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
+                    <XAxis
+                        dataKey="date"
+                        interval={0}
+                        scale="point"
+                        tickFormatter={(val: string) => {
+                            if (viewMode === '주간') {
+                                const weekday = new Date(val).getDay(); // 0 ~ 6
+                                const weekdays = [
+                                    '일',
+                                    '월',
+                                    '화',
+                                    '수',
+                                    '목',
+                                    '금',
+                                    '토',
+                                ];
+                                return weekdays[weekday];
+                            }
+                            // 월간일 경우
+                            const m = val.split('-')[1];
+                            return `${parseInt(m)}월`;
+                        }}
+                    />
+                    <YAxis tickFormatter={(v) => `${v}명`} />
+                    <Tooltip formatter={(val: number) => `${val}명`} />
                     <Line
                         type="monotone"
-                        dataKey="reward"
-                        stroke="#8884d8"
+                        dataKey="participants"
+                        stroke="#00C49F"
                         strokeWidth={2}
                     />
                 </LineChart>
@@ -43,8 +59,5 @@ const RewardLineChart = () => {
         </div>
     );
 };
-// 요소	커스터마이징 방법
-// 선 색상	stroke="#00C49F" 바꾸기
-// 툴팁 형식	<Tooltip formatter={(val) => $${val}} />
-// Y축 단위	<YAxis tickFormatter={(v) => $${v}} />
+
 export default RewardLineChart;

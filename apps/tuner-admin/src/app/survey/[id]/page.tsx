@@ -1,11 +1,12 @@
 'use client';
 
-import { surveyView } from '@/lib/network/api';
+import { surveyClose, surveyView, userSurveyData } from '@/lib/network/api';
 import { SurveyData } from '@/types';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import DonutChartWithLegend from './components/DonutChartWithLegend';
+// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 // 사용 예정: 참여자 타입 (현재 UI에선 사용 안하지만 삭제하지 않음)
 // interface SurveyParticipant {
@@ -14,6 +15,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 //   role: "ordinary" | "Expert" | "admin" | "superadmin";
 //   reward: number;
 // }
+interface SurveyAnswerStat {
+    average: number[];
+}
 
 interface QuestionItem {
     question_text: string;
@@ -22,15 +26,6 @@ interface QuestionItem {
     options: string[];
     category: string;
     max_num?: number;
-}
-
-interface SurveyResponse {
-    user_id: number;
-    gender?: string;
-    age?: number;
-    scores?: Record<string, number>;
-    templateAnswers?: Record<string, string | string[]>;
-    customAnswers?: Record<string, string | string[]>;
 }
 
 const extractYoutubeId = (url: string): string => {
@@ -70,8 +65,24 @@ export default function SurveyDetailPage() {
     const [surveyData, setSurveyData] = useState<SurveyData | null>(null);
     const [fixedQuestions, setFixedQuestions] = useState<QuestionItem[]>([]);
     const [customQuestions, setCustomQuestions] = useState<QuestionItem[]>([]);
-    const [genderFilter, setGenderFilter] = useState('전체');
-    const [ageFilter, setAgeFilter] = useState('전체');
+
+    const [surveyStats, setSurveyStats] = useState<Record<
+        number,
+        SurveyAnswerStat
+    > | null>(null);
+
+    const [genderStats, setGenderStats] = useState<{
+        male: number;
+        female: number;
+    }>({ male: 0, female: 0 });
+    const [ageStats, setAgeStats] = useState({
+        teen: 0,
+        twenties: 0,
+        thirties: 0,
+        forties: 0,
+        fifties: 0,
+        sixties: 0,
+    });
 
     useEffect(() => {
         if (!id) return;
@@ -79,6 +90,34 @@ export default function SurveyDetailPage() {
         const fetchSurvey = async () => {
             try {
                 const result = await surveyView(Array.isArray(id) ? id[0] : id);
+                const result2 = await userSurveyData(
+                    Array.isArray(id) ? id[0] : id,
+                );
+
+                const demographics = result2?.data?.demographics;
+
+                if (demographics?.gender) {
+                    setGenderStats(demographics.gender);
+                } else {
+                    console.warn('demographics.gender 없음:', result2);
+                }
+                if (demographics?.gender) {
+                    setGenderStats(demographics.gender);
+                }
+                if (demographics?.age) {
+                    setAgeStats(demographics.age);
+                }
+                const rawStats = result2.data;
+                if (rawStats) {
+                    const filteredStats: Record<number, SurveyAnswerStat> = {};
+                    Object.entries(rawStats).forEach(([key, value]) => {
+                        if (!isNaN(Number(key))) {
+                            filteredStats[Number(key)] =
+                                value as SurveyAnswerStat;
+                        }
+                    });
+                    setSurveyStats(filteredStats);
+                }
                 const survey = result.data;
 
                 const normalizedSurvey = {
@@ -110,29 +149,21 @@ export default function SurveyDetailPage() {
 
         fetchSurvey();
     }, [id]);
-
+    const genderChartData = [
+        { name: '남성', value: genderStats.male },
+        { name: '여성', value: genderStats.female },
+    ];
+    const ageDonutData = [
+        { name: '10대', value: ageStats.teen },
+        { name: '20대', value: ageStats.twenties },
+        { name: '30대', value: ageStats.thirties },
+        { name: '40대', value: ageStats.forties },
+        { name: '50대', value: ageStats.fifties },
+        { name: '60대+', value: ageStats.sixties },
+    ];
     if (!surveyData) return <div className="p-6 text-gray-600">로딩 중...</div>;
 
     const youtubeId = extractYoutubeId(surveyData.music_uri || '');
-
-    const filteredResponses: SurveyResponse[] = (
-        surveyData.surveyResponses || []
-    ).filter((res) => {
-        const genderOk = genderFilter === '전체' || res.gender === genderFilter;
-        const ageOk =
-            ageFilter === '전체' ||
-            (res.age !== undefined &&
-                (ageFilter === '10대'
-                    ? res.age < 20
-                    : ageFilter === '20대'
-                    ? res.age < 30 && res.age >= 20
-                    : ageFilter === '30대'
-                    ? res.age < 40 && res.age >= 30
-                    : ageFilter === '40대'
-                    ? res.age < 50 && res.age >= 40
-                    : res.age >= 50));
-        return genderOk && ageOk;
-    });
 
     const renderQuestionAccordion = (
         questions: QuestionItem[],
@@ -141,18 +172,12 @@ export default function SurveyDetailPage() {
         <div className="mt-4">
             <h2 className="text-lg font-bold mb-2">{typeLabel}</h2>
             {questions.map((q, i) => {
-                const answerCount = q.options.map((opt) => {
-                    const count = filteredResponses.filter((res) => {
-                        const ans =
-                            q.question_type === 'fixed'
-                                ? res.templateAnswers?.[q.question_text]
-                                : res.customAnswers?.[q.question_text];
-                        return Array.isArray(ans)
-                            ? ans.includes(opt)
-                            : ans === opt;
-                    }).length;
+                const averageData = surveyStats?.[i]?.average || [];
+                const answerCount = q.options.map((opt, idx) => {
+                    const count = averageData[idx] ?? 0;
                     return { option: opt, count };
                 });
+
                 const total = answerCount.reduce(
                     (acc, cur) => acc + cur.count,
                     0,
@@ -183,9 +208,16 @@ export default function SurveyDetailPage() {
                                             key={idx}
                                             className="flex items-center gap-2"
                                         >
+                                            {/* 왼쪽 퍼센트 텍스트 */}
+
+                                            {/* 항목명 */}
                                             <span className="w-1/4">
                                                 {option}
                                             </span>
+                                            <span className="text-sm w-10 text-right">
+                                                {percent}%
+                                            </span>
+                                            {/* 막대 그래프 */}
                                             <div className="w-3/4 bg-gray-200 rounded h-4">
                                                 <div
                                                     className="h-4 bg-blue-500 rounded"
@@ -194,9 +226,6 @@ export default function SurveyDetailPage() {
                                                     }}
                                                 />
                                             </div>
-                                            <span className="text-sm w-10 text-right">
-                                                {percent}%
-                                            </span>
                                         </li>
                                     );
                                 })}
@@ -211,7 +240,7 @@ export default function SurveyDetailPage() {
     return (
         <div>
             <div className="w-full text-black text-2xl py-3 font-bold">
-                Survey Detail - {surveyData.survey_title}
+                설문 상세정보 - {surveyData.survey_title}
             </div>
             <div className="p-6">
                 <div className="flex flex-col md:flex-row gap-6">
@@ -230,6 +259,11 @@ export default function SurveyDetailPage() {
                                     (ID: {surveyData.creator.id})
                                 </p>
                                 <p>
+                                    📅 설문 기간:{' '}
+                                    {surveyData.start_at.split('T')[0]} ~{' '}
+                                    {surveyData.end_at.split('T')[0]}
+                                </p>
+                                <p>
                                     📘 설문 유형:{' '}
                                     {surveyData.type === 'official' ? (
                                         <span className="text-green-600 font-bold">
@@ -239,16 +273,33 @@ export default function SurveyDetailPage() {
                                         '일반 설문'
                                     )}
                                 </p>
-                                <p>
-                                    💰 총 리워드: {surveyData.reward_amount} STK
-                                </p>
-                                <p>
-                                    지급 완료: 0 STK / 잔여:{' '}
-                                    {surveyData.reward_amount} STK
-                                    <br />
-                                    일반 유저: {surveyData.reward} STK / Expert:{' '}
-                                    {surveyData.expert_reward} STK
-                                </p>
+                                {surveyData.type === 'official' && (
+                                    <>
+                                        <p>
+                                            💰 총 리워드:{' '}
+                                            {surveyData.reward_amount.toLocaleString()}{' '}
+                                            포인트
+                                        </p>
+                                        <p>
+                                            지급 완료:{' '}
+                                            {(
+                                                surveyData.reward_amount -
+                                                surveyData.rest_amount / 1000
+                                            ).toLocaleString()}{' '}
+                                            포인트 / 잔여:{' '}
+                                            {(
+                                                surveyData.rest_amount / 1000
+                                            ).toLocaleString()}{' '}
+                                            포인트
+                                            <br />
+                                            일반 유저:{' '}
+                                            {surveyData.reward.toLocaleString()}{' '}
+                                            포인트 / Expert:{' '}
+                                            {surveyData.expert_reward.toLocaleString()}{' '}
+                                            포인트
+                                        </p>
+                                    </>
+                                )}
                                 <div>{surveyData.music_title}</div>
                                 <div className="flex items-center gap-2">
                                     <span
@@ -261,12 +312,42 @@ export default function SurveyDetailPage() {
                                     {surveyData.is_active === 'upcoming' && (
                                         <Link
                                             href={`/survey/create/step1?id=${surveyData.id}`}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white px-[81px] py-2 text-sm rounded-md font-medium"
+                                            className="bg-blue-500 hover:bg-blue-600 text-white px-[85px] py-2 text-sm rounded-md font-medium"
                                         >
                                             설문 수정하러 가기
                                         </Link>
                                     )}
+                                    {surveyData.is_active === 'ongoing' && (
+                                        <button
+                                            className="bg-blue-500 hover:bg-blue-600 text-white px-[85px] py-2 text-sm rounded-md font-medium"
+                                            onClick={async () => {
+                                                try {
+                                                    // 조기 종료용 payload 구성
+
+                                                    await surveyClose(
+                                                        surveyData.id,
+                                                    );
+
+                                                    alert(
+                                                        '설문이 조기 종료되었습니다.',
+                                                    );
+                                                    location.reload(); // 또는 router.refresh()
+                                                } catch (error) {
+                                                    console.error(
+                                                        '조기 종료 실패:',
+                                                        error,
+                                                    );
+                                                    alert(
+                                                        '조기 종료에 실패했습니다.',
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            설문 조기 종료
+                                        </button>
+                                    )}
                                 </div>
+
                                 <div className="flex gap-2 pt-1 flex-col">
                                     <a
                                         href={`https://www.youtube.com/watch?v=${youtubeId}`}
@@ -284,52 +365,16 @@ export default function SurveyDetailPage() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="flex gap-4 mt-4">
-                            <select
-                                value={genderFilter}
-                                onChange={(e) =>
-                                    setGenderFilter(e.target.value)
-                                }
-                                className="border px-2 py-1 text-sm"
-                            >
-                                <option value="전체">전체 성별</option>
-                                <option value="male">남성</option>
-                                <option value="female">여성</option>
-                            </select>
-                            <select
-                                value={ageFilter}
-                                onChange={(e) => setAgeFilter(e.target.value)}
-                                className="border px-2 py-1 text-sm"
-                            >
-                                <option value="전체">전체 연령</option>
-                                <option value="10대">10대</option>
-                                <option value="20대">20대</option>
-                                <option value="30대">30대</option>
-                                <option value="40대">40대</option>
-                                <option value="50대+">50대+</option>
-                            </select>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                            <DonutChartWithLegend
+                                title="연령별 참여 비율"
+                                data={ageDonutData}
+                            />
+                            <DonutChartWithLegend
+                                title="성별 참여 비율"
+                                data={genderChartData}
+                            />
                         </div>
-
-                        <div className="w-full">
-                            <BarChart
-                                width={400}
-                                height={250}
-                                data={[
-                                    { age: '10대', count: 2 },
-                                    { age: '20대', count: 5 },
-                                ]}
-                            >
-                                {' '}
-                                {/* 더미 데이터 */}
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="age" />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey="count" fill="#10b981" />
-                            </BarChart>
-                        </div>
-
                         {renderQuestionAccordion(fixedQuestions, '고정 질문')}
                         {renderQuestionAccordion(
                             customQuestions,

@@ -47,8 +47,7 @@ const SignUpForm = () => {
         }
 
         try {
-            const result = await pushOauth(formData);
-            console.log(result);
+            await pushOauth(formData);
             alert('회원가입이 완료되었습니다.');
             router.push('/dashboard');
         } catch (error) {
@@ -72,7 +71,7 @@ const SignUpForm = () => {
     return (
         <div>
             <div className="w-full  text-black text-2xl py-3  font-bold">
-                Tunemate Sing Up
+                관리자 회원 가입
             </div>
             <div className="flex justify-center py-2 px-4">
                 <div className="w-full max-w-md bg-black text-white p-8 rounded-2xl shadow-xl">

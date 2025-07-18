@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layouts/Header";
 import BottomNavbar from "@/components/layouts/BottomNavbar";
@@ -13,8 +12,6 @@ import { useEffect, useState } from "react";
 import { SurveyResponse } from "@/features/survey/types/surveyResponse";
 import SurveyResult from "./components/SurveyResult";
 import { SurveyTypeEnum } from "@/features/survey/types/enums";
-import { UserUpdatePayload } from "@/features/users/types/userInfo";
-import Link from "next/link";
 import YoutubeThumbnailPlayer from "./components/YoutubeThumbnailPlayer";
 
 type SurveyStatus = "upcoming" | "ongoing" | "closed";
@@ -36,7 +33,6 @@ export default function SurveyDetail() {
     const fetch = async () => {
       try {
         const response = await getSurveyById(Number(params.surveyId));
-        console.log("설문 상세", response);
         setSurvey(response);
       } catch (err) {
         console.error("설문 상세 불러오기 실패", err);
@@ -123,7 +119,7 @@ export default function SurveyDetail() {
           {type === SurveyTypeEnum.OFFICIAL && (
             <InfoRow
               label="리워드"
-              value={`🎁 ${reward_amount / 1000} STK`}
+              value={`🎁 ${reward_amount / 1000} MVE`}
               valueClass="text-orange-500"
             />
           )}

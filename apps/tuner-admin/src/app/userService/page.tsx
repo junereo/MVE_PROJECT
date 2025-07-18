@@ -1,30 +1,38 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { userList } from '@/lib/network/api';
+import {
+    settings,
+    userList,
+    userReward,
+    userExpert,
+    userSBTtoken,
+} from '@/lib/network/api';
 import Dropdown from '@/app/components/ui/DropDown';
 import RankChangeModal from './components/RankChaingeModal';
 import RewardModal from './components/RewardModal';
 import { useSessionStore } from '@/store/useAuthmeStore';
 import { useRouter } from 'next/navigation';
+import axiosClient from '@/lib/network/axios';
 
-interface User {
+export interface User {
     id: number;
     nickname: string;
     email: string;
     role: 'superadmin' | 'admin' | 'ordinary' | 'expert';
     rewardLeft: number;
+    balance: number;
 }
-interface ServerUser {
+export interface ServerUser {
     id: number;
     email: string;
     nickname: string;
-    role: 'superadmin' | 'admin' | 'ordinary';
+    role: 'superadmin' | 'admin' | 'ordinary' | 'expert';
     balance: number;
     badge_issued_at: string | null;
+    rewardLeft?: number;
 }
 export default function AdminUserPage() {
-    const { user } = useSessionStore();
     const router = useRouter();
     const [users, setUsers] = useState<User[]>([]);
     const [threshold, setThreshold] = useState(5);
@@ -39,33 +47,99 @@ export default function AdminUserPage() {
         nickname: string;
     } | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [ownerRewardLeft, setOwnerRewardLeft] = useState<number>(0);
     const usersPerPage = 15;
+    useSessionStore();
 
+    // useEffect(() => {
+    //     const fetchUsers = async () => {
+    //         try {
+    //             const { data } = await userList();
+    //             console.log(data);
+
+    //             const mappedUsers: User[] = data.map((user: ServerUser) => ({
+    //                 id: user.id,
+    //                 nickname: user.nickname,
+    //                 email: user.email,
+    //                 role: user.badge_issued_at
+    //                     ? 'expert'
+    //                     : user.role === 'ordinary'
+    //                     ? 'ordinary'
+    //                     : user.role,
+    //                 rewardLeft: user.balance ?? 0,
+    //             }));
+
+    //             setUsers(mappedUsers);
+    //         } catch (err) {
+    //             console.error('유저 목록 불러오기 실패:', err);
+    //         }
+    //     };
+
+    //     fetchUsers();
+    // }, []);
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchData = async () => {
             try {
-                const { data } = await userList();
-                console.log(data);
+                // 1. 유저 리스트
+                const { data: userListData } = await userList();
 
-                const mappedUsers: User[] = data.map((user: ServerUser) => ({
-                    id: user.id,
-                    nickname: user.nickname,
-                    email: user.email,
-                    role: user.badge_issued_at
-                        ? 'expert'
-                        : user.role === 'ordinary'
-                        ? 'ordinary'
-                        : user.role,
-                    rewardLeft: user.balance ?? 0,
-                }));
+                // 2. 각 유저별 보유 리워드 조회
+                const usersWithReward = await Promise.all(
+                    userListData.map(async (u: ServerUser): Promise<User> => {
+                        try {
+                            const res = await userReward(u.id);
+                            return {
+                                id: u.id,
+                                nickname: u.nickname,
+                                email: u.email,
+                                role: u.badge_issued_at ? 'expert' : u.role,
+                                rewardLeft: res.data.token ?? 0,
+                                balance: u.balance,
+                            };
+                        } catch (e) {
+                            console.error(
+                                `❌ 유저 ${u.id} 보유 리워드 조회 실패`,
+                                e,
+                            );
+                            return {
+                                id: u.id,
+                                nickname: u.nickname,
+                                email: u.email,
+                                role: u.badge_issued_at ? 'expert' : u.role,
+                                rewardLeft: 0,
+                                balance: u.balance,
+                            };
+                        }
+                    }),
+                );
 
-                setUsers(mappedUsers);
+                setUsers(usersWithReward);
+
+                // 3. 오너 출금 가능 리워드 (allowance)
+                const caRes = await axiosClient.get('/contract/ca');
+                const spender = caRes.data.ca_transac;
+                const tokenAddress = caRes.data.ca_token;
+
+                try {
+                    const rewardRes = await axiosClient.post(
+                        '/contract/wallet/allowance',
+                        {
+                            owner: 'owner',
+                            spender,
+                            tokenAddress,
+                        },
+                    );
+                    setOwnerRewardLeft(rewardRes.data.allowance ?? 0);
+                } catch (e) {
+                    console.error('❌ 오너 allowance 조회 실패:', e);
+                    setOwnerRewardLeft(0);
+                }
             } catch (err) {
-                console.error('유저 목록 불러오기 실패:', err);
+                console.error('❌ 전체 유저 및 오너 리워드 조회 실패:', err);
             }
         };
 
-        fetchUsers();
+        fetchData();
     }, []);
 
     const filteredUsers = users
@@ -87,10 +161,10 @@ export default function AdminUserPage() {
     );
     const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-    const handleRewardClick = (id: number, nickname: string) => {
-        setSelectedUser({ id, nickname });
-        setRewardModalOpen(true);
-    };
+    // const handleRewardClick = (id: number, nickname: string) => {
+    //     setSelectedUser({ id, nickname });
+    //     setRewardModalOpen(true);
+    // };
     const handleConfirmReward = (amount: number) => {
         if (selectedUser) {
             console.log(
@@ -106,41 +180,103 @@ export default function AdminUserPage() {
         setRankModalOpen(true);
     };
 
-    const handleConfirmRankChange = () => {
+    const handleConfirmRankChange = async () => {
         if (selectedUser) {
-            console.log(
-                `${selectedUser.nickname} (ID: ${selectedUser.id}) 등급을 Expert로 변경`,
-            );
-            setRankModalOpen(false);
-            setSelectedUser(null);
+            try {
+                const userToUpdate = users.find(
+                    (u) => u.id === selectedUser.id,
+                );
+                if (!userToUpdate) return;
+
+                if (
+                    userToUpdate.role === 'admin' ||
+                    userToUpdate.role === 'superadmin'
+                ) {
+                    alert('admin 및 superadmin의 등급은 변경할 수 없습니다.');
+                    return;
+                }
+
+                // 1. SBT 뱃지 발급
+                try {
+                    await userSBTtoken(userToUpdate.id);
+                    // console.log('SBT 뱃지 발급 성공:', res.data);
+                } catch (error) {
+                    console.error('SBT 뱃지 발급 실패:', error);
+                    alert('SBT 뱃지 발급에 실패했습니다.');
+                    return;
+                }
+
+                // 2. Expert 등급 변경
+                await userExpert(userToUpdate.id, {
+                    ...userToUpdate,
+                    role: 'expert',
+                });
+                alert(
+                    `${userToUpdate.nickname}의 등급이 Expert로 변경되었습니다.`,
+                );
+
+                // 3. 유저 목록 갱신
+                const { data } = await userList();
+                const mappedUsers = data.map((user: ServerUser) => ({
+                    id: user.id,
+                    nickname: user.nickname,
+                    email: user.email,
+                    role: user.badge_issued_at
+                        ? 'expert'
+                        : user.role === 'ordinary'
+                        ? 'ordinary'
+                        : user.role,
+                    rewardLeft: user.balance ?? 0,
+                }));
+                setUsers(mappedUsers);
+
+                // 모달 종료
+                setRankModalOpen(false);
+                setSelectedUser(null);
+            } catch (error) {
+                console.error('❌ 등급 변경 실패:', error);
+                alert('등급 변경 중 오류가 발생했습니다.');
+            }
         }
     };
 
-    const handleUpdateThreshold = () => {
-        console.log('저장된 기준:', threshold);
+    const handleUpdateThreshold = async () => {
+        try {
+            const formData = {
+                key: 'Expert_thresh',
+                value: String(threshold),
+            };
+            const res = await settings(formData);
+            console.log(' 저장 성공:', res.data);
+            alert('Expert 기준이 저장되었습니다.');
+        } catch (error) {
+            console.error('❌ Expert 기준 저장 실패:', error);
+        }
     };
 
     return (
         <div>
             <div className="w-full text-black text-2xl py-3 font-bold">
-                UserListTable
+                유저 관리
             </div>
             <div className="p-6">
                 <div className="bg-white p-4 rounded-xl shadow mb-6 text-sm flex flex-wrap gap-4">
                     <div>
                         출금 가능 리워드:{' '}
                         <span className="font-semibold">
-                            {user?.balance ?? 0} STK
+                            {ownerRewardLeft.toLocaleString()} Tuner
                         </span>
                     </div>
                     <div>
-                        전체 리워드 총합:{' '}
+                        배포된 전체 리워드 총합:{' '}
                         <span className="font-semibold">
-                            {users.reduce(
-                                (acc, user) => acc + user.rewardLeft,
-                                0,
-                            )}{' '}
-                            STK
+                            {users.reduce((acc, user) => {
+                                const reward = Number(user.rewardLeft);
+                                return isNaN(reward) || reward === 0
+                                    ? acc
+                                    : acc + reward;
+                            }, 0)}{' '}
+                            Tuner
                         </span>
                     </div>
                 </div>
@@ -242,7 +378,10 @@ export default function AdminUserPage() {
                                     등급
                                 </th>
                                 <th className="border px-2 py-1 w-[120px]">
-                                    리워드 잔량
+                                    포인트
+                                </th>
+                                <th className="border px-2 py-1 w-[120px]">
+                                    Tuner토큰
                                 </th>
                                 <th className="border px-2 py-1 w-[160px]">
                                     관리
@@ -256,7 +395,7 @@ export default function AdminUserPage() {
                                     className="hover:bg-blue-50 cursor-pointer"
                                     onClick={() =>
                                         router.push(`/userService/${user.id}`)
-                                    } // 🔥 여기가 핵심!
+                                    }
                                 >
                                     <td className="border px-2 py-1">
                                         {user.id}
@@ -276,8 +415,11 @@ export default function AdminUserPage() {
                                     <td className="border px-2 py-1 capitalize">
                                         {user.role}
                                     </td>
+                                    <td className="border px-2 py-1 capitalize">
+                                        {user.balance / 1000}
+                                    </td>
                                     <td className="border px-2 py-1">
-                                        {user.rewardLeft} STK
+                                        {user.rewardLeft} Tuner
                                     </td>
                                     <td
                                         className="border px-2 py-1 space-x-2"
@@ -285,16 +427,29 @@ export default function AdminUserPage() {
                                     >
                                         <button
                                             className="bg-yellow-400 px-2 py-1 rounded text-white text-xs"
-                                            onClick={() =>
+                                            disabled={
+                                                user.role === 'admin' ||
+                                                user.role === 'superadmin'
+                                            }
+                                            onClick={() => {
+                                                if (
+                                                    user.role === 'admin' ||
+                                                    user.role === 'superadmin'
+                                                ) {
+                                                    alert(
+                                                        'admin 및 superadmin의 등급은 변경할 수 없습니다.',
+                                                    );
+                                                    return;
+                                                }
                                                 handleRankClick(
                                                     user.id,
                                                     user.nickname,
-                                                )
-                                            }
+                                                );
+                                            }}
                                         >
                                             등급 변경
                                         </button>
-                                        <button
+                                        {/* <button
                                             className="bg-blue-500 px-2 py-1 rounded text-white text-xs"
                                             onClick={() =>
                                                 handleRewardClick(
@@ -303,8 +458,8 @@ export default function AdminUserPage() {
                                                 )
                                             }
                                         >
-                                            리워드 지급
-                                        </button>
+                                            포인트 지급
+                                        </button> */}
                                     </td>
                                 </tr>
                             ))}
