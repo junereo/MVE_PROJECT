@@ -270,68 +270,47 @@ export const findUserId = async (req: Request, res: Response): Promise<void> => 
 export const resetPasswordRequest = async (req: Request, res: Response) => {
   const { email } = req.body;
 
-  if (!email) {
-    res.status(400).json({ message: "이메일을 입력해주세요." });
-    return
-  }
+  if (!email) return res.status(400).json({ message: "이메일을 입력해주세요." });
 
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-     res.status(404).json({ message: "존재하지 않는 이메일입니다." });
-     return
-  }
+  if (!user) return res.status(404).json({ message: "존재하지 않는 이메일입니다." });
 
-  // JWT 발급
-  const token = jwt.sign(
-    { userId: user.id },
-    process.env.JWT_SECRET!,
-    { expiresIn: "15m" }
-  );
+  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: "20m" });
+  await redisClient.setex(`reset:${token}`, 1200, user.id.toString());
 
-  // Redis 저장
-  await redisClient.setex(`reset:${token}`, 900, user.id.toString());
 
-  const resetLink = `${process.env.CLIENT_USER_IP}/reset-password?token=${token}`;
-
-  console.log("발송 링크:", resetLink);
+  const resetLink = `${process.env.CLIENT_USER_IP}/auth/reset-password?token=${token}`;
+  console.log(" 발송 링크:", resetLink);
 
   await sendResetPasswordEmail(user.email, resetLink);
 
   res.json({ success: true, message: "재설정 링크가 전송되었습니다." });
-  return;
 };
 
 
-// 비밀번호 재설정 실행
+// 비밀번호 재설정 실행: token + 새 비밀번호 받아서 업데이트
 export const resetPassword = async (req: Request, res: Response) => {
   const { token, newPassword } = req.body;
 
   try {
-    // JWT 검증
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
-
-    // Redis에서 토큰이 유효한지 확인
     const userId = await redisClient.get(`reset:${token}`);
     if (!userId) {
-      res.status(400).json({ message: "유효하지 않거나 만료된 링크입니다." });
-      return;
+      console.log("Redis에서 유효하지 않은 토큰");
+      return res.status(400).json({ message: "유효하지 않거나 만료된 링크입니다." });
     }
 
-    // 비밀번호 해시 후 DB 업데이트
-    const hashed = await bcrypt.hash(newPassword, 10);
+    jwt.verify(token, process.env.JWT_SECRET!);
 
+    const hashed = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({
       where: { id: Number(userId) },
       data: { password: hashed },
     });
 
-    // Redis에서 토큰 삭제
     await redisClient.del(`reset:${token}`);
-
     res.json({ success: true, message: "비밀번호가 재설정되었습니다." });
-    return;
   } catch (error) {
+    console.error("비밀번호 재설정 에러:", error);
     res.status(400).json({ message: "유효하지 않거나 만료된 링크입니다." });
-    return;
   }
 };
