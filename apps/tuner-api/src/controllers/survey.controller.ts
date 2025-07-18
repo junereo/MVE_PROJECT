@@ -59,7 +59,7 @@ export const createSurveyHandler = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const excute : boolean = false;
+    const excute : boolean = process.env.SURVEY_CONNECT_BLOCKCHAIN === "true" ? true : false;
     if(excute){
       // 1. 사용자 지갑 생성
       const wallet = await metaTransctionService.createWallet(userId);
