@@ -10,7 +10,7 @@ export default function QuestionBasedResponses({
     <div className="space-y-10">
       {questions.map((q, i) => (
         <div key={i} className="space-y-4">
-          <h2 className="font-bold text-base sm:text-lg text-gray-800 border-l-4 border-blue-500 pl-3">
+          <h2 className="font-bold text-base sm:text-lg text-gray-800 border-l-4 border-[#57CC7E] pl-3">
             {q.question}
           </h2>
           <div className="space-y-2">

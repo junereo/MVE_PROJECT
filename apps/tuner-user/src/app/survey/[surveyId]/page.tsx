@@ -80,6 +80,7 @@ export default function SurveyDetail() {
           youtubeUrl={music_uri}
           title={music_title}
           badgeText={type === "official" ? "공식 설문" : "일반 설문"}
+          type={type}
         />
 
         <div className="flex justify-between items-center mb-4 px-1">
