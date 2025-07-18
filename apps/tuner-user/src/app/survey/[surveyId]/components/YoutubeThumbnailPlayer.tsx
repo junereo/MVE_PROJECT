@@ -48,7 +48,7 @@ export default function YoutubeThumbnailPlayer({
             <Image src="/icons/play.svg" alt="재생" width={60} height={60} />
           </div>
           {badgeText && (
-            <div className="absolute top-3 left-3 px-3 py-1 bg-white/80 text-xs font-medium rounded-full backdrop-blur-sm text-blue-600">
+            <div className="absolute top-3 left-3 px-3 py-1 bg-white/80 text-xs font-medium rounded-full backdrop-blur-sm text-[#57CC7E]">
               {badgeText}
             </div>
           )}

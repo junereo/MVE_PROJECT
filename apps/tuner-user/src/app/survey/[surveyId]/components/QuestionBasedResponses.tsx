@@ -22,7 +22,7 @@ export default function QuestionBasedResponses({
                 </div>
                 <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-blue-500 rounded-full"
+                    className="h-full bg-[#57CC7E] rounded-full"
                     style={{ width: `${opt.percentage}%` }}
                   />
                 </div>

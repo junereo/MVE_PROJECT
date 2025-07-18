@@ -23,7 +23,7 @@ export default function BottomNavbar() {
             key={item.href}
             href={item.href}
             className={`flex flex-col items-center text-sm font-medium transition ${
-              isActive ? "text-blue-600" : "text-gray-500 hover:text-blue"
+              isActive ? "text-[#57CC7E]" : "text-gray-500 hover:text-[#57CC7E]"
             }`}
           >
             {item.icon}

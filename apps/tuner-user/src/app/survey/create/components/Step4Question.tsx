@@ -204,6 +204,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
   const handleSave = async () => {
     try {
       const payload = formatSurveyPayload(SurveyStatusEnum.DRAFT);
+      console.log("payload", payload);
       await createSurvey(payload);
       setSurveySubmitStatus("saved"); // 임시저장 성공 상태로 업데이트
       onNext();
@@ -297,7 +298,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
             </Button>
           </div>
           <div className="w-[180px] sm:w-[400px]">
-            <Button onClick={handleNext} color="blue">
+            <Button onClick={handleNext} color="black">
               다음
             </Button>
           </div>
@@ -316,7 +317,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
               </Button>
             </div>
             <div className="w-[110px] sm:w-[300px]">
-              <Button onClick={handleSubmit} color="blue">
+              <Button onClick={handleSubmit} color="black">
                 설문 생성
               </Button>
             </div>
