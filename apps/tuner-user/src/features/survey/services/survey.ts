@@ -33,12 +33,6 @@ export const getSurveyById = async (
 ): Promise<SurveyResponse> => {
   const response = await axios.get(`/survey/s/${surveyId}`);
   return response.data.data;
-
-  // return {
-  //   ...data,
-  //   participantCount: data.participants?.length ?? 0,
-  //   release_date: data.release_date ?? "미정",
-  // };
 };
 
 // 설문 질문 불러오기 / id=1 고정질문

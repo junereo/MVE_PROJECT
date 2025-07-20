@@ -20,7 +20,7 @@ export function formatSurveyPayload(status: SurveyStatusEnum): SurveyPayload {
 
     survey_title: step2.survey_title,
     is_released: step2.is_released,
-    release_date: step2.release_date,
+    released_date: step2.released_date,
     genre: step2.genre.toLowerCase(),
 
     type: step3.surveyType,

@@ -65,10 +65,6 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
         surveyType,
         reward: 1000, // 1 * 1000
       });
-      const payload = {
-        surveyType,
-        reward: 1000, // 1 * 1000
-      };
     } else {
       setStep3({
         surveyType,
@@ -76,12 +72,6 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
         reward: Math.round(Number(reward) * 1000),
         expert_reward: Math.round(Number(expertReward) * 1000),
       });
-      const payload = {
-        surveyType,
-        reward_amount: Math.round(Number(rewardAmount) * 1000),
-        reward: Math.round(Number(reward) * 1000),
-        expert_reward: Math.round(Number(expertReward) * 1000),
-      };
     }
 
     onNext();
