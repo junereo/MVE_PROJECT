@@ -208,7 +208,6 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
     setIsSubmitting(true);
     try {
       const payload = formatSurveyPayload(SurveyStatusEnum.DRAFT);
-      console.log("payload", payload);
       await createSurvey(payload);
       setSurveySubmitStatus("saved"); // 임시저장 성공 상태로 업데이트
       onNext();

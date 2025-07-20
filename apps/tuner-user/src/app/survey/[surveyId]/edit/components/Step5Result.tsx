@@ -3,7 +3,7 @@
 import { useSurveyStore } from "@/features/survey/store/useSurveyStore";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Step6Props {
   onPrev: () => void;
@@ -48,6 +48,7 @@ const statusMap: Record<StatusKey, StatusUI> = {
 };
 
 export default function Step5Result({ onPrev }: Step6Props) {
+  const router = useRouter();
   const { surveySubmitStatus, createdSurveyId } = useSurveyStore();
 
   const status: StatusKey = surveySubmitStatus || "error";
@@ -57,6 +58,13 @@ export default function Step5Result({ onPrev }: Step6Props) {
     status === "success" && createdSurveyId
       ? `/survey/${createdSurveyId}`
       : ui.link;
+
+  const handleClick = () => {
+    if (dynamicLink) {
+      router.replace(dynamicLink);
+      router.refresh(); // ✅ 여기에서 실행됨
+    }
+  };
 
   return (
     <div className="flex justify-center px-4">
@@ -74,9 +82,9 @@ export default function Step5Result({ onPrev }: Step6Props) {
         </div>
 
         {dynamicLink ? (
-          <Link href={dynamicLink} className="w-full">
-            <Button color="blue">{ui.buttonText}</Button>
-          </Link>
+          <Button color="blue" onClick={handleClick}>
+            {ui.buttonText}
+          </Button>
         ) : (
           <Button color="red" onClick={onPrev}>
             {ui.buttonText}

@@ -50,6 +50,7 @@ export default function Step1YouTube({ onNext }: Step1Props) {
     }
 
     setError(null);
+
     setStep1({
       video: selectedVideo,
       start_at,
