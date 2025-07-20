@@ -135,6 +135,9 @@ export default function SurveyDetail() {
                 : "text-gray-400"
             }
           />
+          <p className="text-xs text-gray-400 mt-1 ml-auto text-right">
+            * 리워드는 설문 종료 후 지급됩니다.
+          </p>
         </section>
         {is_active === "closed" && (
           <section className="space-y-6 pt-6 border-t border-gray-100">
