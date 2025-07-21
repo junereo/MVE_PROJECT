@@ -10,6 +10,7 @@ import {
 } from '@/lib/authError/singupHandler';
 import { SignupFormData, SignupFormErrors } from '@/types';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const SignUpForm = () => {
     const router = useRouter();
@@ -74,11 +75,17 @@ const SignUpForm = () => {
                 관리자 회원 가입
             </div>
             <div className="flex justify-center py-2 px-4">
-                <div className="w-full max-w-md bg-black text-white p-8 rounded-2xl shadow-xl">
+                <div className="w-full max-w-md bg-white text-white p-8 rounded-2xl shadow-xl">
                     <div className="flex flex-col items-center mb-6">
-                        <h1 className="text-3xl font-extrabold text-white mb-2 tracking-wide">
-                            Tunemate Sign Up
-                        </h1>
+                        <div className="flex items-center gap-2 text-[#888888] font-bold text-lg p-4">
+                            <Image
+                                src="/logo.png"
+                                alt="로고"
+                                width={280}
+                                height={200}
+                            />
+                        </div>
+
                         <p className="text-sm text-neutral-500">
                             관리자 전용 회원가입 페이지
                         </p>
@@ -87,7 +94,7 @@ const SignUpForm = () => {
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* 이름 */}
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-gray-300">
+                            <label className="block mb-1 text-sm font-medium text-black">
                                 닉네임
                             </label>
                             <input
@@ -103,7 +110,7 @@ const SignUpForm = () => {
 
                         {/* 이메일 */}
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-gray-300">
+                            <label className="block mb-1 text-sm font-medium text-black">
                                 이메일
                             </label>
                             <input
@@ -124,7 +131,7 @@ const SignUpForm = () => {
 
                         {/* 비밀번호 */}
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-gray-300">
+                            <label className="block mb-1 text-sm font-medium text-black">
                                 비밀번호
                             </label>
                             <input
@@ -145,7 +152,7 @@ const SignUpForm = () => {
 
                         {/* 비밀번호 확인 */}
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-gray-300">
+                            <label className="block mb-1 text-sm font-medium text-black">
                                 비밀번호 확인
                             </label>
                             <input
@@ -169,7 +176,7 @@ const SignUpForm = () => {
 
                         {/* 휴대전화 */}
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-gray-300">
+                            <label className="block mb-1 text-sm font-medium text-black">
                                 휴대전화 번호
                             </label>
                             <input
@@ -190,15 +197,15 @@ const SignUpForm = () => {
 
                         {/* 관리자 권한 */}
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-gray-300">
+                            <label className="block mb-1 text-sm font-medium text-black">
                                 🛡 관리자 권한 설정
                             </label>
                             <div className="flex gap-3">
                                 <label
                                     className={`cursor-pointer px-4 py-2 rounded-md border text-sm font-semibold transition ${
                                         formData.role === AdminRole.admin
-                                            ? 'bg-white text-black border-white'
-                                            : 'border-gray-400 text-white'
+                                            ? 'bg-blue-600 text-white border-white'
+                                            : 'border-gray-400 text-black'
                                     }`}
                                 >
                                     <input
@@ -220,8 +227,8 @@ const SignUpForm = () => {
                                 <label
                                     className={`cursor-pointer px-4 py-2 rounded-md border text-sm font-semibold transition ${
                                         formData.role === AdminRole.superadmin
-                                            ? 'bg-white text-black border-white'
-                                            : 'border-gray-400 text-white'
+                                            ? 'bg-blue-600 text-white border-white'
+                                            : 'border-gray-400 text-black'
                                     }`}
                                 >
                                     <input
