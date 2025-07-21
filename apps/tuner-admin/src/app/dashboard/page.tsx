@@ -112,7 +112,9 @@ const Dashboard = () => {
     }, [viewMode, surveys]);
 
     const totalSurveys = surveys.length;
-    const totalParticipants = participants.length;
+    // const totalParticipants = participants.length;
+    const totalUniqueParticipants = new Set(participants.map((p) => p.user_id))
+        .size;
     const router = useRouter();
     const statusCount = {
         예정: 0,
@@ -159,7 +161,7 @@ const Dashboard = () => {
                     />
                     <SummaryCard
                         title="참여자 수"
-                        value={String(totalParticipants)}
+                        value={String(totalUniqueParticipants)}
                         trend="Total Participants"
                         percentage="+8.2%"
                     />
