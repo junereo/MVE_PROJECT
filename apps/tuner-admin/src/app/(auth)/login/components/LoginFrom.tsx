@@ -9,6 +9,7 @@ import {
     allLoginFields,
 } from '@/lib/authError/loginHandler';
 import { LoginFormData, LoginFormErrors } from '@/types';
+import Image from 'next/image';
 
 const LoginForm = () => {
     const router = useRouter();
@@ -55,11 +56,16 @@ const LoginForm = () => {
 
     return (
         <div className="min-h-screen bg-[#DEDEDE] flex justify-center py-28 px-4">
-            <div className="w-full max-w-xl bg-black text-white p-12 rounded-2xl shadow-xl">
+            <div className="w-full max-w-xl bg-white text-white p-12 rounded-2xl shadow-xl">
                 <div className="flex flex-col items-center mb-10">
-                    <h1 className="text-4xl font-extrabold text-white mb-2 tracking-wide">
-                        Tunemate Admin
-                    </h1>
+                    <div className="flex items-center gap-2 text-[#888888] font-bold text-lg p-4">
+                        <Image
+                            src="/logo.png"
+                            alt="로고"
+                            width={280}
+                            height={200}
+                        />
+                    </div>
                     <p className="text-base text-neutral-500">
                         관리자 전용 로그인 페이지
                     </p>
