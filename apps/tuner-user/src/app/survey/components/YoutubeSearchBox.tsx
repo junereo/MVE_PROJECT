@@ -73,7 +73,7 @@ export default function YoutubeSearchBox({
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
           <button
-            className="bg-[#57CC7E] px-3 py-1 rounded"
+            className="bg-black text-white px-3 py-1 rounded"
             onClick={handleSearch}
           >
             검색

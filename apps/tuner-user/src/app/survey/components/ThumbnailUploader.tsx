@@ -5,6 +5,8 @@ import Button from "@/components/ui/Button";
 export default function ThumbnailUploader() {
   const { step1, setStep1 } = useSurveyStore();
 
+  const imageSrc = step1.thumbnail_uri || step1.video?.thumbnail_uri || "";
+
   const handleUpload = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -41,11 +43,11 @@ export default function ThumbnailUploader() {
       </div>
 
       <div className="flex flex-col items-center">
-        {step1.thumbnail_uri ? (
+        {imageSrc ? (
           <div className="w-full h-[180px] relative border mb-2 rounded overflow-hidden bg-white">
             <Image
               alt="설문 업로드 사진"
-              src={step1.thumbnail_uri}
+              src={imageSrc}
               fill
               className="object-contain"
             />
@@ -57,9 +59,11 @@ export default function ThumbnailUploader() {
             </span>
           </div>
         )}
+
         <Button onClick={handleUpload} color="black">
           이미지 업로드
         </Button>
+
         {step1.thumbnail_uri && (
           <Button onClick={handleDelete} color="white">
             삭제

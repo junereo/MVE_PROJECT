@@ -44,6 +44,7 @@ const typeOptions = [
 export default function Step4Question({ onPrev, onNext }: Step4Props) {
   const [tabIndex, setTabIndex] = useState(0);
   const currentKey = baseCategories[tabIndex]?.key ?? "";
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     step4: { questions, customQuestions },
@@ -184,6 +185,7 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
 
   // 설문 생성
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
       const payload = formatSurveyPayload(SurveyStatusEnum.COMPLETE);
       const res = await createSurvey(payload);
@@ -196,21 +198,23 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
     } catch (err) {
       console.error("설문 생성 에러", err);
       setSurveySubmitStatus("error");
+      setIsSubmitting(false);
       onNext();
     }
   };
 
   // 임시저장
   const handleSave = async () => {
+    setIsSubmitting(true);
     try {
       const payload = formatSurveyPayload(SurveyStatusEnum.DRAFT);
-      console.log("payload", payload);
       await createSurvey(payload);
       setSurveySubmitStatus("saved"); // 임시저장 성공 상태로 업데이트
       onNext();
     } catch (err) {
       console.error("임시저장 에러", err);
       setSurveySubmitStatus("save-error"); // 실패 상태로 업데이트
+      setIsSubmitting(false);
       onNext();
     }
   };
@@ -312,13 +316,21 @@ export default function Step4Question({ onPrev, onNext }: Step4Props) {
           </div>
           <div className="flex items-center">
             <div className="w-[70px] sm:w-[100px]">
-              <Button onClick={handleSave} color="white">
-                임시저장
+              <Button
+                onClick={handleSave}
+                color="white"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "저장 중..." : "임시저장"}
               </Button>
             </div>
             <div className="w-[110px] sm:w-[300px]">
-              <Button onClick={handleSubmit} color="black">
-                설문 생성
+              <Button
+                onClick={handleSubmit}
+                color="black"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "생성 중..." : "설문 생성"}
               </Button>
             </div>
           </div>
