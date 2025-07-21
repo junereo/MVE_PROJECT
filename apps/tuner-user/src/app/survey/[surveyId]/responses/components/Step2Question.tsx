@@ -51,7 +51,6 @@ export default function Step2Question({
   const { answers, setAnswer, resetAnswers, setSubmitStatus } =
     useAnswerStore();
   const { gender, age, genre, jobDomain, resetUserInfo } = useSurveyInfo();
-  console.log("submit 전", gender);
 
   const { user } = useAuthStore();
 
@@ -169,7 +168,6 @@ export default function Step2Question({
       status: SurveyStatusEnum.COMPLETE,
       user_info: userPayload,
     };
-    console.log("user payload", userPayload);
 
     try {
       await updateUserInfo(Number(user.id), userPayload);
