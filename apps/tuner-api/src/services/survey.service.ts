@@ -206,6 +206,12 @@ export const createSurvey = async ({
     console.log("endDate:", endDate.toISOString());
 
     return await prisma.$transaction(async (tx) => {
+      const parseDateOrToday = (value: any): Date => {
+        if (!value || value === "" || isNaN(new Date(value).getTime())) {
+          return new Date(); // 현재 시간으로 대체
+        }
+        return new Date(value);
+      };
       const survey = await tx.survey.create({
         data: {
           user_id: userId,
@@ -219,7 +225,7 @@ export const createSurvey = async ({
           genre: (body.genre as Genre) ?? null,
           type: body.type,
           is_released: !!body.is_released,
-          released_date: body.released_date,
+          released_date: parseDateOrToday(body.released_date),
           is_active: checkSurveyActive(startDate, endDate),
           status: body.status ?? "draft",
           reward: body.reward ?? 0,
