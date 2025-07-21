@@ -1,27 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Button from "@/components/ui/Button";
-import SurveyTabs from "../../../components/SurveyTabs";
-import QuestionText from "../../../components/QuestionText";
-import QuestionOptions from "../../../components/QuestionOptions";
-import QuestionSubjective from "../../../components/QuestionSubjective";
+import { useEffect, useRef, useState } from "react";
 import {
   fetchSurveyQuestions,
   updateSurvey,
 } from "@/features/survey/services/survey";
 import {
+  useSurveyStore,
+  Questions,
+} from "@/features/survey/store/useSurveyStore";
+import {
   InputTypeEnum,
   QuestionTypeEnum,
   SurveyStatusEnum,
 } from "@/features/survey/types/enums";
-import { formatSurveyPayload } from "@/features/survey/utils/formatSurveyPayload";
-import CustomForm from "../../../components/CustomForm";
-import {
-  useSurveyStore,
-  Questions,
-} from "@/features/survey/store/useSurveyStore";
 import type { SurveyResponse } from "@/features/survey/types/surveyResponse";
+import { formatSurveyPayload } from "@/features/survey/utils/formatSurveyPayload";
+import Button from "@/components/ui/Button";
+import SurveyTabs from "../../../components/SurveyTabs";
+import QuestionText from "../../../components/QuestionText";
+import QuestionOptions from "../../../components/QuestionOptions";
+import QuestionSubjective from "../../../components/QuestionSubjective";
+import CustomForm from "../../../components/CustomForm";
 
 interface Step4Props {
   onPrev: () => void;
@@ -49,6 +49,7 @@ export default function Step4Question({
   initialSurvey,
 }: Step4Props) {
   const [tabIndex, setTabIndex] = useState(0);
+  const tabIndexRef = useRef(0);
   const currentKey = baseCategories[tabIndex]?.key ?? "";
 
   const {
@@ -69,13 +70,11 @@ export default function Step4Question({
     (q) => q.category === currentKey
   );
 
-  // 기본 설문 불러옴 (최초 1회만)
   useEffect(() => {
     if (initialized || (questions && questions.length > 0)) return;
     const getData = async () => {
       try {
         const response = await fetchSurveyQuestions(questionsId);
-        console.log("기본 설문", response);
         if (!response.success || !Array.isArray(response.data)) {
           throw new Error("응답 형식이 올바르지 않습니다.");
         }
@@ -101,7 +100,7 @@ export default function Step4Question({
 
         setStep4({
           questions: defaultQuestions,
-          customQuestions: [], // 초기화하거나 유지할 값
+          customQuestions: [],
         });
         setInitialized(true);
       } catch (error) {
@@ -111,13 +110,17 @@ export default function Step4Question({
     getData();
   }, [setStep4, initialized, questions]);
 
-  // 커스텀 질문 추가
+  useEffect(() => {
+    tabIndexRef.current = tabIndex;
+  }, [tabIndex]);
+
   const handleAddCustom = () => {
     const newId = Date.now() + Math.random();
+    const category = baseCategories[tabIndexRef.current]?.key ?? "step1";
 
     addCustomQuestion({
       id: newId,
-      category: currentKey,
+      category,
       question_type: QuestionTypeEnum.CUSTOM,
       question_text: "",
       type: InputTypeEnum.MULTIPLE,
@@ -130,11 +133,9 @@ export default function Step4Question({
       (q) => q.id === id && q.category === currentKey
     );
     if (!question) return;
-
     updateCustomQuestion(id, { ...question, question_text: text });
   };
 
-  // 질문 형식 변경
   const handleTypeChange = (id: number, newType: string) => {
     const question = customQuestions.find(
       (q) => q.id === id && q.category === currentKey
@@ -152,7 +153,6 @@ export default function Step4Question({
     updateCustomQuestion(id, newQuestion);
   };
 
-  // 옵션 추가
   const handleAddOption = (qId: number) => {
     const question = customQuestions.find(
       (q) => q.id === qId && q.category === currentKey
@@ -171,14 +171,8 @@ export default function Step4Question({
     if (!question) return;
 
     const updatedOptions = [...(question.options ?? [])];
-
-    // 인덱스 맞춰서 길이 채우기
-    while (updatedOptions.length <= optIndex) {
-      updatedOptions.push("");
-    }
-
+    while (updatedOptions.length <= optIndex) updatedOptions.push("");
     updatedOptions[optIndex] = value;
-
     updateCustomQuestion(qId, { ...question, options: updatedOptions });
   };
 
@@ -192,13 +186,12 @@ export default function Step4Question({
     else onNext();
   };
 
-  // 설문 수정
   const handleSubmit = async () => {
     try {
       const surveyId = initialSurvey.id;
       const payload = {
         ...formatSurveyPayload(SurveyStatusEnum.COMPLETE),
-        surveyId, // props로 받은 surveyId 추가
+        surveyId,
       };
       await updateSurvey(payload, surveyId);
       setCreatedSurveyId(Number(surveyId));
@@ -212,7 +205,6 @@ export default function Step4Question({
     }
   };
 
-  // 임시저장
   const handleSave = async () => {
     try {
       const surveyId = initialSurvey.id;
@@ -220,12 +212,13 @@ export default function Step4Question({
         ...formatSurveyPayload(SurveyStatusEnum.DRAFT),
         surveyId,
       };
+
       await updateSurvey(payload, surveyId);
-      setSurveySubmitStatus("saved"); // 임시저장 성공 상태로 업데이트
+      setSurveySubmitStatus("saved");
       onNext();
     } catch (err) {
       console.error("임시저장 에러", err);
-      setSurveySubmitStatus("save-error"); // 실패 상태로 업데이트
+      setSurveySubmitStatus("save-error");
       onNext();
     }
   };
@@ -249,7 +242,10 @@ export default function Step4Question({
         <SurveyTabs
           tabs={baseCategories}
           current={tabIndex}
-          setTab={setTabIndex}
+          setTab={(i) => {
+            tabIndexRef.current = i;
+            setTabIndex(i);
+          }}
         />
 
         {currentQuestions.map((q, idx) => (
@@ -294,7 +290,6 @@ export default function Step4Question({
             const updated = {
               ...q,
               options: (q.options ?? []).filter((_, i) => i !== optIndex),
-              // max_num도 같이 조정해야 안전
               max_num:
                 q.max_num && q.max_num > (q.options?.length ?? 1) - 1
                   ? (q.options?.length ?? 1) - 1
