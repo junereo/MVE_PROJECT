@@ -64,7 +64,7 @@ export default function Reward() {
 
     if (isNaN(numericAmount) || numericAmount <= 0 || numericAmount > balance) {
       setModalContent({
-        image: "X.png",
+        image: "x.png",
         description: "유효한 출금 금액을 입력해주세요.",
         buttonLabel: "확인",
         color: "red",
@@ -97,7 +97,7 @@ export default function Reward() {
       console.error("출금 요청 실패:", err);
 
       setModalContent({
-        image: "X.png",
+        image: "x.png",
         description: "출금 요청에 실패했습니다.",
         buttonLabel: "확인",
         color: "red",

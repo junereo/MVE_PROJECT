@@ -13,7 +13,6 @@ const SearchInput = () => {
     if (!value.trim()) return;
     const trimmedValue = value.trim();
     if (!trimmedValue) return;
-    console.log("검색 이동:", `/search?keyword=${trimmedValue}`);
     router.push(`/search?keyword=${encodeURIComponent(value.trim())}`);
   };
 

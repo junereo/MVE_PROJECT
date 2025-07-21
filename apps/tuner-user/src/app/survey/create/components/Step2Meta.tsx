@@ -32,7 +32,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
     "released" | "unreleased" | null
   >(step2.is_released ? "released" : "unreleased");
   const [releaseDate, setReleaseDate] = useState<Date | null>(
-    step2.release_date ? new Date(step2.release_date) : null
+    step2.released_date ? new Date(step2.released_date) : null
   );
   const [genre, setGenre] = useState<string | undefined>(step2.genre);
 
@@ -47,7 +47,7 @@ export default function Step2Meta({ onPrev, onNext }: Step2Props) {
     setStep2({
       survey_title: surveyTitle,
       is_released: releaseType === "released",
-      release_date: releaseDate?.toISOString() || "",
+      released_date: releaseDate?.toISOString() || "",
       genre,
     });
 

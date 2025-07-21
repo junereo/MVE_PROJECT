@@ -46,7 +46,7 @@ export default function SurveyEditClient({
     setStep2({
       survey_title: initialSurvey.survey_title,
       is_released: initialSurvey.released_date ? true : false,
-      release_date: initialSurvey.released_date,
+      released_date: initialSurvey.released_date,
       genre: initialSurvey.genre,
     });
     setStep3({

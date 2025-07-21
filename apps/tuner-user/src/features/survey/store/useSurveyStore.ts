@@ -27,7 +27,7 @@ export interface SurveyStep1 {
 export type SurveyStep2 = {
   survey_title: string;
   is_released: boolean;
-  release_date: string;
+  released_date: string;
   genre: string;
 };
 
@@ -105,7 +105,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
   step2: {
     survey_title: "",
     is_released: true,
-    release_date: "",
+    released_date: "",
     genre: "",
   },
   setStep2: (data) =>
@@ -181,7 +181,7 @@ export const useSurveyStore = create<SurveyState>((set) => ({
       step2: {
         survey_title: "",
         is_released: true,
-        release_date: "",
+        released_date: "",
         genre: "",
       },
       step3: {

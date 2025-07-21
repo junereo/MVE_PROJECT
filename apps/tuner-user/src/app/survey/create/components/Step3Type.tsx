@@ -134,6 +134,23 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
               <br />
               참여자 수, 점수, 결과 등이 외부로 공개됩니다.
             </p>
+            {surveyType === SurveyTypeEnum.OFFICIAL && (
+              <div className="text-right text-sm text-gray-600 pt-1">
+                보유 TUNER:{" "}
+                <span className="font-semibold text-black">
+                  {tunerBalance.toFixed(1)} TUNER
+                </span>
+                <br />
+                차감 후 잔액:{" "}
+                <span
+                  className={`font-semibold ${
+                    remainingBalance < 0 ? "text-red-500" : "text-black"
+                  }`}
+                >
+                  {remainingBalance.toFixed(1)} TUNER
+                </span>
+              </div>
+            )}
             <Input
               label="리워드 총량"
               type="number"
@@ -174,23 +191,6 @@ export default function Step3Type({ onPrev, onNext }: Step3Props) {
               }}
               placeholder="각 Expert 회원에게 지급할 리워드를 입력해주세요."
             />
-            {surveyType === SurveyTypeEnum.OFFICIAL && (
-              <div className="text-right text-sm text-gray-600 pt-1">
-                보유 TUNER:{" "}
-                <span className="font-semibold text-black">
-                  {tunerBalance.toFixed(1)} TUNER
-                </span>
-                <br />
-                차감 후 잔액:{" "}
-                <span
-                  className={`font-semibold ${
-                    remainingBalance < 0 ? "text-red-500" : "text-black"
-                  }`}
-                >
-                  {remainingBalance.toFixed(1)} TUNER
-                </span>
-              </div>
-            )}
           </>
         )}
         {surveyType === SurveyTypeEnum.GENERAL && (

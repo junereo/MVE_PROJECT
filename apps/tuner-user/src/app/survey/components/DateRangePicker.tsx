@@ -48,14 +48,14 @@ export default function DateRangePicker({
       )}
 
       <div className="flex flex-wrap gap-2">
-        {[0, 7, 15, 30].map((d) => (
+        {[7, 15, 30].map((d) => (
           <button
             key={d}
             type="button"
             onClick={() => handleQuickRange(d)}
             className="px-3 py-1.5 rounded-full border border-[#57CC7E] text-[#57CC7E] text-sm  hover:text-white hover:bg-[#57CC7E] font-semibold transition"
           >
-            {d === 0 ? "오늘" : `${d}일`}
+            {`${d}일`}
           </button>
         ))}
       </div>
