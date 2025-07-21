@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation'; // ✅ 추가
-
+import Image from 'next/image';
 export default function Navigate() {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname(); // ✅ 현재 경로 가져오기
@@ -54,8 +54,8 @@ export default function Navigate() {
         lg:translate-x-0 lg:w-[8%] 
       `}
             >
-                <div className="text-[#888888] font-bold text-lg p-4">
-                    네비게이션
+                <div className="flex items-center gap-2 text-[#888888] font-bold text-lg p-4">
+                    <Image src="/logo.png" alt="로고" width={70} height={42} />
                 </div>
                 <ul className="space-y-2 px-4">
                     {navItems.map((item) => {
