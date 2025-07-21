@@ -7,19 +7,19 @@ import {
   Survey,
   Genre,
   Survey_Question,
-  UserRole
+  UserRole,
 } from "@prisma/client";
 import { AnswerItem } from "../types/survey.types";
 import { calculateSurveyResult } from "./survey.result.service";
 import { DateTime } from "luxon";
-import { SurveyService } from '../wallet/services/survey.service'
-import { MetaTransctionService } from '../wallet/services/meta_transction.service'
+import { SurveyService } from "../wallet/services/survey.service";
+import { MetaTransctionService } from "../wallet/services/meta_transction.service";
 
 // import { FIXED_SURVEY_QUESTIONS } from '../constants/fixedSurveyQuestions';
 
 const prisma = new PrismaClient();
-const metaService = new MetaTransctionService()
-const surveyService = new SurveyService(metaService)
+const metaService = new MetaTransctionService();
+const surveyService = new SurveyService(metaService);
 
 // 상태 계산 (한국시간 기준)
 export const checkSurveyActive = (
@@ -78,7 +78,12 @@ export const createSurveyParticipant = async ({
 }) => {
   const survey = await prisma.survey.findUnique({
     where: { id: survey_id },
-    select: { status: true, is_active: true, reward: true, expert_reward: true },
+    select: {
+      status: true,
+      is_active: true,
+      reward: true,
+      expert_reward: true,
+    },
   });
   if (!survey) throw new Error("해당 설문이 존재하지 않습니다.");
 
@@ -98,7 +103,8 @@ export const createSurveyParticipant = async ({
   const needsUpdate =
     user.gender === null ||
     user.age === null ||
-    !user.genre || user.genre.length === 0 ||
+    !user.genre ||
+    user.genre.length === 0 ||
     user.job_domain === null;
 
   if (needsUpdate) {
@@ -109,9 +115,10 @@ export const createSurveyParticipant = async ({
       data: {
         gender: user_info.gender,
         age: user_info.age as any,
-        genre: Array.isArray(user_info.genre) && user_info.genre.length > 0
-          ? user_info.genre[0] as Genre
-          : null,
+        genre:
+          Array.isArray(user_info.genre) && user_info.genre.length > 0
+            ? (user_info.genre[0] as Genre)
+            : null,
         job_domain: user_info.job_domain,
       },
     });
@@ -123,9 +130,9 @@ export const createSurveyParticipant = async ({
 
   // 지급 리워드 결정
   let rewardAmount = 0;
-  if (user.role === 'expert') {
+  if (user.role === "expert") {
     rewardAmount = survey.expert_reward ?? 0;
-  } else if (user.role === 'ordinary') {
+  } else if (user.role === "ordinary") {
     rewardAmount = survey.reward ?? 0;
   }
 
@@ -176,7 +183,9 @@ export const createSurvey = async ({
     }
 
     const kstNow = DateTime.now().setZone("Asia/Seoul");
-    const startDate = body.start_at ? new Date(body.start_at) : kstNow.toJSDate();
+    const startDate = body.start_at
+      ? new Date(body.start_at)
+      : kstNow.toJSDate();
 
     let endDate: Date;
 
@@ -207,10 +216,10 @@ export const createSurvey = async ({
           artist: body.artist ?? "",
           music_uri: body.music_uri ?? "",
           thumbnail_uri: body.thumbnail_uri ?? "",
-          genre: body.genre as Genre ?? null,
+          genre: (body.genre as Genre) ?? null,
           type: body.type,
           is_released: !!body.is_released,
-          released_date: new Date(),
+          released_date: body.released_date,
           is_active: checkSurveyActive(startDate, endDate),
           status: body.status ?? "draft",
           reward: body.reward ?? 0,
@@ -273,11 +282,11 @@ export const getSurveyListService = async () => {
     orderBy: [
       {
         creator: {
-          role: 'asc',
+          role: "asc",
         },
       },
       {
-        start_at: 'desc',
+        start_at: "desc",
       },
     ],
   });
@@ -285,8 +294,12 @@ export const getSurveyListService = async () => {
   const kstNow = DateTime.now().setZone("Asia/Seoul");
 
   for (const survey of surveys) {
-    const start = DateTime.fromJSDate(new Date(survey.start_at)).setZone("Asia/Seoul");
-    const end = DateTime.fromJSDate(new Date(survey.end_at)).setZone("Asia/Seoul");
+    const start = DateTime.fromJSDate(new Date(survey.start_at)).setZone(
+      "Asia/Seoul"
+    );
+    const end = DateTime.fromJSDate(new Date(survey.end_at)).setZone(
+      "Asia/Seoul"
+    );
 
     const newState = checkSurveyActive(start.toJSDate(), end.toJSDate());
 
@@ -388,17 +401,21 @@ export const updateSurveyService = async (surveyId: number, body: any) => {
       end_at,
       status: body.status ?? survey.status,
       is_active: checkSurveyActive(start_at, end_at),
+      is_released: !!body.is_released,
+      released_date: body.released_date ?? null,
       survey_question: body.survey_question ?? [],
     },
   });
 
-  if (updatedSurvey.status === "complete" || updatedSurvey.is_active === "closed") {
+  if (
+    updatedSurvey.status === "complete" ||
+    updatedSurvey.is_active === "closed"
+  ) {
     await calculateSurveyResult(surveyId);
   }
 
   return updatedSurvey;
 };
-
 
 export const createSurveyResult = async ({
   survey_id,
@@ -452,6 +469,8 @@ export const getSurveyQuestion = async ({
       survey_title: true,
       survey_question: true,
       is_active: true,
+      is_released: true,
+      released_date: true,
       status: true,
     },
   });
@@ -510,14 +529,11 @@ export const updateSurveyResponse = async ({
   return updated;
 };
 
-
-export const terminateSurvey = async (
-    surveyId: number
-  ) => {
+export const terminateSurvey = async (surveyId: number) => {
   const survey = await prisma.survey.update({
-              where: { id: surveyId },
-              data: { is_active: "closed" },
-            })
+    where: { id: surveyId },
+    data: { is_active: "closed" },
+  });
 
   const participants = await prisma.survey_Participants.findMany({
     where: { survey_id: surveyId },
@@ -532,59 +548,59 @@ export const terminateSurvey = async (
         },
       },
     },
-  })
+  });
 
   // 참여자 병렬 처리
   await Promise.all(
     participants.map(async (participant) => {
-      if (!participant.user_id || !participant.user) return
+      if (!participant.user_id || !participant.user) return;
 
-      const rewardAmount = participant.rewarded ?? 0
-      if (rewardAmount <= 0) return
+      const rewardAmount = participant.rewarded ?? 0;
+      if (rewardAmount <= 0) return;
 
       await prisma.transaction.create({
         data: {
           user_id: participant.user_id,
-          type: 'DEPOSIT',
+          type: "DEPOSIT",
           amount: rewardAmount,
           memo: `설문 참여 리워드 (설문 ID: ${surveyId})`,
         },
-      })
+      });
 
       await prisma.user.update({
         where: { id: participant.user_id },
         data: {
           balance: { increment: rewardAmount },
         },
-      })
+      });
 
       await prisma.survey_Participants.update({
         where: { id: participant.id },
         data: { rewarded: 0 },
-      })
+      });
 
-      let metadata_ipfs = 'failed'
+      let metadata_ipfs = "failed";
       try {
         const ipfsResult = await surveyService.submitSurveyAndMint(
           String(participant.user_id),
           String(surveyId),
           JSON.stringify(survey)
-        )
+        );
         if (ipfsResult?.metadataUri) {
-          metadata_ipfs = ipfsResult.metadataUri
+          metadata_ipfs = ipfsResult.metadataUri;
         }
       } catch (e) {
-        console.error('[CRON] IPFS 업로드 실패:', e)
+        console.error("[CRON] IPFS 업로드 실패:", e);
       }
 
       await prisma.survey_Result.updateMany({
         where: { survey_id: surveyId },
         data: { metadata_ipfs },
-      })
+      });
 
       console.log(
         `[CRON] 지급 완료: user_id=${participant.user_id}, amount=${rewardAmount}, metadata_ipfs=${metadata_ipfs}`
-      )
+      );
     })
-  )   
+  );
 };

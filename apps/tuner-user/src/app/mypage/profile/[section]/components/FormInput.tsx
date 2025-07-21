@@ -28,7 +28,7 @@ export default function FormInput({
       <input
         type={type}
         maxLength={maxLength}
-        className={`block w-full mt-1 px-3 py-2 border rounded ${
+        className={`block w-full mt-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#A2EDB4] ${
           isReadOnly ? "bg-gray-100 text-gray-500" : ""
         } ${
           error ? "border-red-500 focus:outline-red-500" : "border-gray-300"

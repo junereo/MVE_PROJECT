@@ -1,17 +1,25 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+// app/mypage/participantsSurvey/page.tsx
+"use client";
+
+import { useEffect, useState } from "react";
 import ParticipantsSurvey from "./ParticipantsSurvey";
-import { getMySurveyAnswerForSSR } from "@/features/users/services/getMySurveyAnswerForSSR";
+import { getMySurveyAnswer } from "@/features/users/services/survey";
 
-export default async function ParticipantsSurveyPage() {
-  const accessToken = cookies().get("token")?.value;
+export default function ParticipantsSurveyPage() {
+  const [answers, setAnswers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!accessToken) {
-    redirect("/auth"); // 로그인 안 됐으면 바로 로그인 페이지로
-  }
+  useEffect(() => {
+    getMySurveyAnswer()
+      .then((res) => {
+        setAnswers(res.data);
+      })
+      .catch((err) => {
+        console.error("에러:", err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  const res = await getMySurveyAnswerForSSR();
-  const answers = res.data;
-
+  if (loading) return <div>로딩 중...</div>;
   return <ParticipantsSurvey answers={answers} />;
 }

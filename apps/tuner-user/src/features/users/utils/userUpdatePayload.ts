@@ -14,9 +14,11 @@ const ageGroupMap: Record<UserSurveyInfo["age"], UserUpdatePayload["age"]> = {
   "": "twenties",
 };
 
-export const userUpdatePayload = (info: UserSurveyInfo): UserUpdatePayload => ({
-  gender: info.gender === "여성",
-  age: ageGroupMap[info.age],
-  genre: info.genre as GenreKey,
-  job_domain: info.jobDomain!,
-});
+export const userUpdatePayload = (info: UserSurveyInfo): UserUpdatePayload => {
+  return {
+    gender: info.gender === "남성" ? true : false,
+    age: ageGroupMap[info.age],
+    genre: info.genre as GenreKey,
+    job_domain: info.jobDomain!,
+  };
+};

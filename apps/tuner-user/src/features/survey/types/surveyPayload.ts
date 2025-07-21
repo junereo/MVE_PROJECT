@@ -22,7 +22,7 @@ export type SurveyPayload = {
   // step2 설문 정보
   survey_title: string;
   is_released: boolean;
-  release_date: string; // ISO 8601 string
+  released_date: string; // ISO 8601 string
   genre: string;
 
   // step3 타입

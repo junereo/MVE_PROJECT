@@ -135,19 +135,49 @@ export default function SurveyDetail() {
                 : "text-gray-400"
             }
           />
+          <p className="text-xs text-gray-400 mt-1 ml-auto text-right">
+            * 리워드는 설문 종료 후 지급됩니다.
+          </p>
         </section>
         {is_active === "closed" && (
           <section className="space-y-6 pt-6 border-t border-gray-100">
             <h1 className="text-xl font-bold text-gray-800 ">설문 결과</h1>
-            <p className="text-sm text-gray-500">
-              총{" "}
-              <span className="text-gray-800 font-semibold">
-                {`${participants?.length?.toLocaleString() ?? 0}명`}
-              </span>
-              이 참여했어요.
-            </p>
+            {participants?.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500 space-y-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-12 w-12 text-gray-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 12a4 4 0 00-8 0m8 0v1a4 4 0 01-4 4H8m8-5a4 4 0 11-8 0m8 0v1a4 4 0 01-4 4H8"
+                  />
+                </svg>
+                <p className="text-base font-medium text-gray-600">
+                  설문 참여자가 없어요
+                </p>
+                <p className="text-sm text-gray-400">
+                  설문 참여가 완료되면 이곳에 결과가 표시돼요.
+                </p>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-gray-500">
+                  총{" "}
+                  <span className="text-gray-800 font-semibold">
+                    {`${participants?.length?.toLocaleString() ?? 0}명`}
+                  </span>
+                  이 참여했어요.
+                </p>
 
-            <SurveyResult surveyId={id} />
+                <SurveyResult surveyId={id} />
+              </>
+            )}
           </section>
         )}
 

@@ -123,7 +123,10 @@ export default function MemberEditForm() {
           error={emailError}
           type="email"
         />
-        <button type="submit" className="w-full bg-[#57CC7E] py-2 rounded">
+        <button
+          type="submit"
+          className="w-full bg-black text-white py-2 rounded"
+        >
           수정
         </button>
       </form>

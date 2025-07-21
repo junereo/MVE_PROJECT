@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import Input from "@/components/ui/Input";
+import { useEffect, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
 import Dropdown from "@/components/ui/DropDown";
 import { InputTypeEnum } from "@/features/survey/types/enums";
@@ -18,6 +17,61 @@ interface CustomFormProps {
   onAddOption: (qId: number) => void;
   onChangeMaxNum: (id: number, max: number) => void;
   onRemoveOption: (qId: number, oIndex: number) => void;
+}
+
+// 질문 입력을 위한 로컬 상태 input
+function LocalTextInput({
+  questionId,
+  initialText,
+  onBlurSave,
+}: {
+  questionId: number;
+  initialText: string;
+  onBlurSave: (id: number, value: string) => void;
+}) {
+  const [text, setText] = useState(initialText);
+
+  useEffect(() => {
+    setText(initialText);
+  }, [initialText, questionId]);
+
+  return (
+    <input
+      className="w-full border rounded px-3 py-2 text-sm"
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      onBlur={() => onBlurSave(questionId, text)}
+      placeholder="질문 내용을 입력해주세요"
+    />
+  );
+}
+
+function LocalOptionInput({
+  questionId,
+  optIndex,
+  initialValue,
+  onBlurSave,
+}: {
+  questionId: number;
+  optIndex: number;
+  initialValue: string;
+  onBlurSave: (qId: number, index: number, value: string) => void;
+}) {
+  const [text, setText] = useState(initialValue);
+
+  useEffect(() => {
+    setText(initialValue);
+  }, [initialValue, questionId, optIndex]);
+
+  return (
+    <input
+      className="w-full border rounded px-3 py-2 text-sm"
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      onBlur={() => onBlurSave(questionId, optIndex, text)}
+      placeholder={`선택지 ${optIndex + 1}`}
+    />
+  );
 }
 
 export default function CustomForm({
@@ -75,25 +129,22 @@ export default function CustomForm({
           />
 
           {/* 질문 입력 */}
-          <Input
-            label="질문 내용"
-            value={q.question_text}
-            onChange={(e) => onChangeText(q.id, e.target.value)}
+          <LocalTextInput
+            questionId={q.id}
+            initialText={q.question_text}
+            onBlurSave={onChangeText}
           />
 
           {/* 객관식 */}
           {q.type === InputTypeEnum.MULTIPLE && (
             <div className="space-y-2">
-              {[...Array(5)].map((_, optIndex) => (
-                <input
+              {(q.options ?? []).map((opt, optIndex) => (
+                <LocalOptionInput
                   key={`${q.id}-m-${optIndex}`}
-                  type="text"
-                  value={q.options?.[optIndex] ?? ""}
-                  onChange={(e) =>
-                    onChangeOption(q.id, optIndex, e.target.value)
-                  }
-                  placeholder={`선택지 ${optIndex + 1}`}
-                  className="w-full border rounded px-3 py-2 text-sm"
+                  questionId={q.id}
+                  optIndex={optIndex}
+                  initialValue={opt}
+                  onBlurSave={onChangeOption}
                 />
               ))}
             </div>
@@ -102,46 +153,41 @@ export default function CustomForm({
           {/* 체크박스 */}
           {q.type === InputTypeEnum.CHECKBOX && (
             <div className="space-y-2">
-              {/* 최대 선택 개수 */}
-              {q.type === InputTypeEnum.CHECKBOX && (
-                <div className="flex justify-end items-center gap-2">
-                  <label className="block text-sm font-medium text-gray-700 pt-2">
-                    최대 선택 개수
-                  </label>
+              <div className="flex justify-end items-center gap-2">
+                <label className="block text-sm font-medium text-gray-700 pt-2">
+                  최대 선택 개수
+                </label>
 
-                  <div className="w-32">
-                    <Dropdown
-                      options={
-                        q.options && q.options.length > 0
-                          ? Array.from({ length: q.options.length }, (_, i) =>
-                              String(i + 1)
-                            )
-                          : ["1"]
-                      }
-                      selected={String(q.max_num ?? "")}
-                      onSelect={(val) => onChangeMaxNum(q.id, Number(val))}
-                    />
-                  </div>
-                  {q.max_num && q.options && q.max_num > q.options.length && (
-                    <p className="text-sm text-red-500">
-                      ⚠ 최대 선택 수는 선택지 수보다 클 수 없습니다.
-                    </p>
-                  )}
+                <div className="w-32">
+                  <Dropdown
+                    options={
+                      q.options && q.options.length > 0
+                        ? Array.from({ length: q.options.length }, (_, i) =>
+                            String(i + 1)
+                          )
+                        : ["1"]
+                    }
+                    selected={String(q.max_num ?? "")}
+                    onSelect={(val) => onChangeMaxNum(q.id, Number(val))}
+                  />
                 </div>
-              )}
+                {q.max_num && q.options && q.max_num > q.options.length && (
+                  <p className="text-sm text-red-500">
+                    ⚠ 최대 선택 수는 선택지 수보다 클 수 없습니다.
+                  </p>
+                )}
+              </div>
+
               {(q.options ?? []).map((opt, optIndex) => (
                 <div
                   key={`${q.id}-c-${optIndex}`}
                   className="flex items-center gap-2"
                 >
-                  <input
-                    type="text"
-                    value={opt}
-                    onChange={(e) =>
-                      onChangeOption(q.id, optIndex, e.target.value)
-                    }
-                    placeholder={`선택지 ${optIndex + 1}`}
-                    className="w-full border rounded px-3 py-2 text-sm"
+                  <LocalOptionInput
+                    questionId={q.id}
+                    optIndex={optIndex}
+                    initialValue={opt}
+                    onBlurSave={onChangeOption}
                   />
                   <button
                     type="button"
